@@ -4,7 +4,8 @@
             {
                 "name": "ecran1",
                 "style": {
-                    "color": "#6897bb"
+                    "color": "#6897bb",
+                    "align": "center"
                 },
                 "content": [
                     {
@@ -13,6 +14,56 @@
                                 "align": "center"
                             },
                             "content": [
+                                {
+                                    "text": {
+                                        "value": "hello world",
+                                        "style": {
+                                            "color": "red",
+                                            "decoration": "underline"
+                                        }
+                                    }
+                                },
+                                {
+                                    "block": {
+                                        "style": {
+                                            "color": "blue"
+                                        },
+                                        "content": [
+                                            {
+                                                "text": {
+                                                    "value": "some nested text"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "text": {
+                                        "value": "other text",
+                                        "style": {
+                                            "color": "red",
+                                            "decoration": "underline"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "block": {
+                            "style": {
+                                "align": "center"
+                            },
+                            "content": [
+                                {
+                                    "text": {
+                                        "value": "hello world",
+                                        "style": {
+                                            "color": "red",
+                                            "decoration": "underline"
+                                        }
+                                    }
+                                },
                                 {
                                     "text": {
                                         "value": "hello world",

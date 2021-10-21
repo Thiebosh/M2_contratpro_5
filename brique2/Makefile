@@ -1,4 +1,4 @@
-compile:
+build:
 	rm -rf prototypeur.exe
 	mkdir -p compilation
 	bison -d bison.cpp -o compilation/compiled.bison.cpp
@@ -9,5 +9,5 @@ run:
 	./prototypeur.exe
 
 all:
-	make compile
+	make build
 	make run

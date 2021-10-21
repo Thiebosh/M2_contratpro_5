@@ -5,6 +5,7 @@
     #include <iostream>
     #include <string>
     #include <map>
+    #include <stack>
 
     using namespace std;
 
@@ -19,11 +20,24 @@
     string currentHtml = "";
     map<string, string> htmlContent;
     int indent = 0; //tmp
+    stack<int> styleIndex;
 
     map<container, string> colorContainer = {
-		{container::block, "background-color"},
-		{container::text, "color"}
+		{container::screen, "background-color: "},
+		{container::block, "background-color: "},
+		{container::text, "color: "}
 	};
+    map<string, map<container, string>> alignContainer = {
+        {"center", 
+            {
+                {container::screen, "margin: auto;\n"},
+                {container::block, "margin: auto;\n"},
+                {container::text, "text-align: center;\n"}
+            }
+        }
+    };
+
+    void insertStyle(string line);
 
     extern FILE *yyin;
     extern int yylex ();
@@ -59,7 +73,7 @@
 
 %%
 
-proto: OPEN_DOC ROOT { cout << " <start>"; } OPEN_DOC proto_files CLOSE_DOC { cout << " <finish>"; } CLOSE_DOC;
+proto: OPEN_DOC ROOT OPEN_DOC proto_files CLOSE_DOC CLOSE_DOC;
 
 proto_files
     :   proto_files NEXT proto_files
@@ -120,25 +134,57 @@ field
         }
     |   STYLE
         {
-            htmlContent[currentHtml] += "-2style=\"";
+            if (currentContainer != container::text) {
+                htmlContent[currentHtml].pop_back();
+                htmlContent[currentHtml].pop_back();
+                htmlContent[currentHtml] += " style=\"\n";
+                styleIndex.push(htmlContent[currentHtml].size());
+                cout << "add " << styleIndex.size() << endl;
+
+                if (currentContainer != container::block) ++indent;
+            }
         }
         doc
         {
-            htmlContent[currentHtml] += "\">";
+            if (currentContainer != container::text) {
+                if (currentContainer != container::block) --indent;
+                
+                //styleIndex.pop();
+                cout << "remove " << styleIndex.size() << endl;
+                htmlContent[currentHtml].pop_back();
+                htmlContent[currentHtml] += "\">\n";
+            }
         }
     |   COLOR COLOR_VALUE
         {
-            htmlContent[currentHtml] += colorContainer[currentContainer] + ": " + $2 + ";\n";
+            insertStyle(colorContainer[currentContainer] + $2 + ";\n");
         }
     |   COLOR STR_VALUE
         {
-            htmlContent[currentHtml] += colorContainer[currentContainer] + ": " + $2 + ";\n";
+            insertStyle(colorContainer[currentContainer] + $2 + ";\n");
         }
-    |   ALIGN STR_VALUE { cout << " <ALIGN '" << $2 << "'>"; }
-    |   DECO STR_VALUE { cout << " <DECO '" << $2 << "'>"; }
+    |   DECO STR_VALUE
+        {
+            insertStyle("text-decoration: " + (string)$2 + ";\n");
+        }
+    |   ALIGN STR_VALUE
+        {
+            insertStyle(alignContainer[$2][currentContainer]);
+        }
     ;
 
 %%
+
+void insertStyle(string line) {
+    line = string(indent, '\t') + line;
+    if (currentContainer != container::text) {
+        htmlContent[currentHtml] += line;
+    }
+    else {
+        cout << "use " << styleIndex.size() << endl;
+        htmlContent[currentHtml].insert(styleIndex.top(), line);
+    }
+}
 
 int main(int argc, char **argv) {
     if (yyin = fopen("needs.json","r")) {//fournit à flex le fichier à parser
