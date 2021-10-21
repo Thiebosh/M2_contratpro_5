@@ -1,0 +1,32 @@
+{
+    "root": {
+        "screen": [
+            {
+                "name": "ecran1",
+                "style": {
+                    "color": "#6897bb"
+                },
+                "content": [
+                    {
+                        "block": {
+                            "style": {
+                                "align": "center"
+                            },
+                            "content": [
+                                {
+                                    "text": {
+                                        "value": "hello world",
+                                        "style": {
+                                            "color": "red",
+                                            "decoration": "underline"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}
