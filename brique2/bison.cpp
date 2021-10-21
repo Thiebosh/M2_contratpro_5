@@ -83,6 +83,7 @@ proto_files
         }
         array
         {
+            if (!styleIndex.empty()) styleIndex.pop();
             htmlContent[currentHtml] += "</article>";
         }
     ;
@@ -121,6 +122,7 @@ field
         }
         doc
         {
+            if (!styleIndex.empty()) styleIndex.pop();
             htmlContent[currentHtml] += string((--indent)--, '\t') + "</div>\n";
         }
     |   TEXT
@@ -139,7 +141,6 @@ field
                 htmlContent[currentHtml].pop_back();
                 htmlContent[currentHtml] += " style=\"\n";
                 styleIndex.push(htmlContent[currentHtml].size());
-                cout << "add " << styleIndex.size() << endl;
 
                 if (currentContainer != container::block) ++indent;
             }
@@ -148,9 +149,7 @@ field
         {
             if (currentContainer != container::text) {
                 if (currentContainer != container::block) --indent;
-                
-                //styleIndex.pop();
-                cout << "remove " << styleIndex.size() << endl;
+
                 htmlContent[currentHtml].pop_back();
                 htmlContent[currentHtml] += "\">\n";
             }
@@ -181,7 +180,6 @@ void insertStyle(string line) {
         htmlContent[currentHtml] += line;
     }
     else {
-        cout << "use " << styleIndex.size() << endl;
         htmlContent[currentHtml].insert(styleIndex.top(), line);
     }
 }
