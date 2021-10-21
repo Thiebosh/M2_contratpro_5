@@ -28,9 +28,9 @@
     map<string, map<container, string>> alignContainer = {
         {"center", 
             {
-                {container::screen, "margin: auto;\n"},
-                {container::block, "margin: auto;\n"},
-                {container::text, "text-align: center;\n"}
+                {container::screen, "margin: auto; "},
+                {container::block, "margin: auto; "},
+                {container::text, "text-align: center; "}
             }
         }
     };
@@ -79,6 +79,7 @@ proto_files
         }
         array
         {
+            --indent;
             htmlContent[currentHtml] += "</article>";
         }
     ;
@@ -106,6 +107,7 @@ field
                 case container::screen:
                     currentHtml = $2;
                     htmlContent.insert({currentHtml, "<article>\n"});
+                    indent++;
                     break;
             }
         }
@@ -113,20 +115,20 @@ field
     |   BLOCK
         {
             currentContainer = container::block;
-            htmlContent[currentHtml] += string((++indent)++, '\t') + "<div>\n";
+            htmlContent[currentHtml] += string(indent++, '\t') + "<div>\n";
         }
         doc
         {
-            htmlContent[currentHtml] += string((--indent)--, '\t') + "</div>\n";
+            htmlContent[currentHtml] += string(--indent, '\t') + "</div>\n";
         }
     |   TEXT
         {
             currentContainer = container::text;
-            htmlContent[currentHtml] += string((++indent)++, '\t') + "<p>\n";
+            htmlContent[currentHtml] += string(indent++, '\t') + "<p>\n";
         }
         doc
         {
-            htmlContent[currentHtml] += string((--indent)--, '\t') + "</p>\n";
+            htmlContent[currentHtml] += string(--indent, '\t') + "</p>\n";
         }
     |   VALUE STR_VALUE
         {
@@ -136,32 +138,28 @@ field
         {
             htmlContent[currentHtml].pop_back();
             htmlContent[currentHtml].pop_back();
-            htmlContent[currentHtml] += " style=\"\n";
-
-            if (currentContainer != container::block) ++indent;
+            htmlContent[currentHtml] += " style=\"";
         }
         doc
         {
-            if (currentContainer != container::block) --indent;
-
             htmlContent[currentHtml].pop_back();
             htmlContent[currentHtml] += "\">\n";
         }
     |   COLOR COLOR_VALUE
         {
-            htmlContent[currentHtml] += string(indent, '\t') + colorContainer[currentContainer] + $2 + ";\n";
+            htmlContent[currentHtml] += colorContainer[currentContainer] + $2 + "; ";
         }
     |   COLOR STR_VALUE
         {
-            htmlContent[currentHtml] += string(indent, '\t') + colorContainer[currentContainer] + $2 + ";\n";
+            htmlContent[currentHtml] += colorContainer[currentContainer] + $2 + "; ";
         }
     |   DECO STR_VALUE
         {
-            htmlContent[currentHtml] += string(indent, '\t') + "text-decoration: " + (string)$2 + ";\n";
+            htmlContent[currentHtml] += "text-decoration: " + (string)$2 + "; ";
         }
     |   ALIGN STR_VALUE
         {
-            htmlContent[currentHtml] += string(indent, '\t') + alignContainer[$2][currentContainer];
+            htmlContent[currentHtml] += alignContainer[$2][currentContainer] + " ";
         }
     ;
 
