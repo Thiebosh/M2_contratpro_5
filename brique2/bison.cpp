@@ -1,10 +1,29 @@
 %define parse.error verbose
 %{
-    #include <iostream>
-
     #define YYDEBUG 1
 
+    #include <iostream>
+    #include <string>
+    #include <map>
+
     using namespace std;
+
+    enum class container {
+        root,
+        screen,
+        block,
+        text
+    };
+
+    container currentContainer = container::root;
+    string currentHtml = "";
+    map<string, string> htmlContent;
+    int indent = 0; //tmp
+
+    map<container, string> colorContainer = {
+		{container::block, "background-color"},
+		{container::text, "color"}
+	};
 
     extern FILE *yyin;
     extern int yylex ();
@@ -43,50 +62,83 @@
 proto: OPEN_DOC ROOT { cout << " <start>"; } OPEN_DOC proto_files CLOSE_DOC { cout << " <finish>"; } CLOSE_DOC;
 
 proto_files
-    : proto_files NEXT proto_files
-    | SCREEN array { cout << " <generate html content file>"; }
+    :   proto_files NEXT proto_files
+    |   SCREEN
+        {
+            currentContainer = container::screen;
+        }
+        array
+        {
+            htmlContent[currentHtml] += "</article>";
+        }
     ;
 
-array: OPEN_ARRAY { cout << " <unwrap array>"; } array_content CLOSE_ARRAY;
+array: OPEN_ARRAY array_content CLOSE_ARRAY;
 
 array_content
-    : doc NEXT array_content
-    | doc
-    | STR_VALUE NEXT array_content
-    | STR_VALUE
+    :   doc NEXT array_content
+    |   doc
+    |   STR_VALUE NEXT array_content
+    |   STR_VALUE
     ;
 
-doc: OPEN_DOC { cout << " <unwrap object>"; } fields CLOSE_DOC;
+doc: OPEN_DOC fields CLOSE_DOC;
 
 fields
-    : field NEXT fields
-    | field
+    :   field NEXT fields
+    |   field
     ;
 
 field
-    : NAME STR_VALUE { cout << " <NAME '" << $2 << "'>"; }
-    | STYLE { cout << " <STYLE>"; } doc
-    | COLOR COLOR_VALUE { cout << " <COLOR '" << $2 << "'>"; }
-    | COLOR STR_VALUE { cout << " <COLOR '" << $2 << "'>"; }
-    | ALIGN STR_VALUE { cout << " <ALIGN '" << $2 << "'>"; }
-    | DECO STR_VALUE { cout << " <DECO '" << $2 << "'>"; }
-    | CONTENT { cout << " <CONTENT>"; } array
-    | BLOCK { cout << " <BLOCK>"; } doc
-    | TEXT { cout << " <TEXT>"; } doc
-    | VALUE STR_VALUE { cout << " <VALUE '" << $2 << "'>"; }
+    :   NAME STR_VALUE
+        { 
+            switch(currentContainer) {
+                case container::screen:
+                    currentHtml = $2;
+                    htmlContent.insert({currentHtml, "<article>\n"});
+                    break;
+            }
+        }
+    |   CONTENT array
+    |   BLOCK
+        {
+            currentContainer = container::block;
+            htmlContent[currentHtml] += string((++indent)++, '\t') + "<div>\n";
+        }
+        doc
+        {
+            htmlContent[currentHtml] += string((--indent)--, '\t') + "</div>\n";
+        }
+    |   TEXT
+        {
+            currentContainer = container::text;
+        }
+        doc
+    |   VALUE STR_VALUE
+        {
+            htmlContent[currentHtml] += string(indent, '\t') + $2 + '\n';
+        }
+    |   STYLE
+        {
+            htmlContent[currentHtml] += "-2style=\"";
+        }
+        doc
+        {
+            htmlContent[currentHtml] += "\">";
+        }
+    |   COLOR COLOR_VALUE
+        {
+            htmlContent[currentHtml] += colorContainer[currentContainer] + ": " + $2 + ";\n";
+        }
+    |   COLOR STR_VALUE
+        {
+            htmlContent[currentHtml] += colorContainer[currentContainer] + ": " + $2 + ";\n";
+        }
+    |   ALIGN STR_VALUE { cout << " <ALIGN '" << $2 << "'>"; }
+    |   DECO STR_VALUE { cout << " <DECO '" << $2 << "'>"; }
     ;
 
 %%
-
-
-// int main(void)
-// {
-//     int token;
-//     while ((token = yylex()) != 0)
-//         printf("Token: %d (%s)\n", token, yytext);
-//     return 0;
-// }
-
 
 int main(int argc, char **argv) {
     if (yyin = fopen("needs.json","r")) {//fournit à flex le fichier à parser
@@ -94,7 +146,12 @@ int main(int argc, char **argv) {
         yyparse();//parse le fichier
     }
 
-    cout << endl << endl << "fin de parcours." << endl;
+    cout << endl << endl << "fin de parcours." << endl << endl;
+
+    cout << "affiche contenu écrans :" << endl;
+	for (auto file : htmlContent) cout << file.first << ".html" << endl << file.second << endl << endl;
+
+    cout << "fin d'exécution." << endl;
 
     return 0;
 }
