@@ -5,7 +5,6 @@
     #include <iostream>
     #include <string>
     #include <map>
-    #include <stack>
 
     using namespace std;
 
@@ -20,7 +19,6 @@
     string currentHtml = "";
     map<string, string> htmlContent;
     int indent = 0; //tmp
-    stack<int> styleIndex;
 
     map<container, string> colorContainer = {
 		{container::screen, "background-color: "},
@@ -36,8 +34,6 @@
             }
         }
     };
-
-    void insertStyle(string line);
 
     extern FILE *yyin;
     extern int yylex ();
@@ -83,7 +79,6 @@ proto_files
         }
         array
         {
-            if (!styleIndex.empty()) styleIndex.pop();
             htmlContent[currentHtml] += "</article>";
         }
     ;
@@ -122,67 +117,55 @@ field
         }
         doc
         {
-            if (!styleIndex.empty()) styleIndex.pop();
             htmlContent[currentHtml] += string((--indent)--, '\t') + "</div>\n";
         }
     |   TEXT
         {
             currentContainer = container::text;
+            htmlContent[currentHtml] += string((++indent)++, '\t') + "<p>\n";
         }
         doc
+        {
+            htmlContent[currentHtml] += string((--indent)--, '\t') + "</p>\n";
+        }
     |   VALUE STR_VALUE
         {
             htmlContent[currentHtml] += string(indent, '\t') + $2 + '\n';
         }
     |   STYLE
         {
-            if (currentContainer != container::text) {
-                htmlContent[currentHtml].pop_back();
-                htmlContent[currentHtml].pop_back();
-                htmlContent[currentHtml] += " style=\"\n";
-                styleIndex.push(htmlContent[currentHtml].size());
+            htmlContent[currentHtml].pop_back();
+            htmlContent[currentHtml].pop_back();
+            htmlContent[currentHtml] += " style=\"\n";
 
-                if (currentContainer != container::block) ++indent;
-            }
+            if (currentContainer != container::block) ++indent;
         }
         doc
         {
-            if (currentContainer != container::text) {
-                if (currentContainer != container::block) --indent;
+            if (currentContainer != container::block) --indent;
 
-                htmlContent[currentHtml].pop_back();
-                htmlContent[currentHtml] += "\">\n";
-            }
+            htmlContent[currentHtml].pop_back();
+            htmlContent[currentHtml] += "\">\n";
         }
     |   COLOR COLOR_VALUE
         {
-            insertStyle(colorContainer[currentContainer] + $2 + ";\n");
+            htmlContent[currentHtml] += string(indent, '\t') + colorContainer[currentContainer] + $2 + ";\n";
         }
     |   COLOR STR_VALUE
         {
-            insertStyle(colorContainer[currentContainer] + $2 + ";\n");
+            htmlContent[currentHtml] += string(indent, '\t') + colorContainer[currentContainer] + $2 + ";\n";
         }
     |   DECO STR_VALUE
         {
-            insertStyle("text-decoration: " + (string)$2 + ";\n");
+            htmlContent[currentHtml] += string(indent, '\t') + "text-decoration: " + (string)$2 + ";\n";
         }
     |   ALIGN STR_VALUE
         {
-            insertStyle(alignContainer[$2][currentContainer]);
+            htmlContent[currentHtml] += string(indent, '\t') + alignContainer[$2][currentContainer];
         }
     ;
 
 %%
-
-void insertStyle(string line) {
-    line = string(indent, '\t') + line;
-    if (currentContainer != container::text) {
-        htmlContent[currentHtml] += line;
-    }
-    else {
-        htmlContent[currentHtml].insert(styleIndex.top(), line);
-    }
-}
 
 int main(int argc, char **argv) {
     if (yyin = fopen("needs.json","r")) {//fournit à flex le fichier à parser

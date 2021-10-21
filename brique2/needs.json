@@ -16,11 +16,11 @@
                             "content": [
                                 {
                                     "text": {
-                                        "value": "hello world",
                                         "style": {
                                             "color": "red",
                                             "decoration": "underline"
-                                        }
+                                        },
+                                        "value": "hello world"
                                     }
                                 },
                                 {
@@ -39,11 +39,10 @@
                                 },
                                 {
                                     "text": {
-                                        "value": "other text",
                                         "style": {
-                                            "color": "red",
-                                            "decoration": "underline"
-                                        }
+                                            "color": "red"
+                                        },
+                                        "value": "other text"
                                     }
                                 }
                             ]
@@ -57,20 +56,19 @@
                             "content": [
                                 {
                                     "text": {
-                                        "value": "hello world1",
                                         "style": {
-                                            "color": "red",
-                                            "decoration": "underline"
-                                        }
+                                            "color": "green",
+                                            "decoration": "italic"
+                                        },
+                                        "value": "hello world1"
                                     }
                                 },
                                 {
                                     "text": {
-                                        "value": "hello world2",
                                         "style": {
-                                            "color": "red",
-                                            "decoration": "underline"
-                                        }
+                                            "color": "lightblue"
+                                        },
+                                        "value": "hello world2"
                                     }
                                 }
                             ]
