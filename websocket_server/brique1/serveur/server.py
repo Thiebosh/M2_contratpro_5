@@ -1,168 +1,93 @@
 import select
 import socket
-import queue
-import threading
+from room_manager import RoomManager
 
+class Server():
+    def __init__(self) -> None:
+        self.init_server()
+        self.inputs = []
+        self.polling_freq = 0.5
+        self.room_m = RoomManager()
 
-def init_server(ip = "localhost", port=20002, backlog=5):
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.setblocking(False)
+    def init_server(self, ip = "localhost", port=20002, backlog=5):
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.setblocking(False)
 
-    server.bind((ip, port))
-    server.listen(backlog)
+        self.socket.bind((ip, port))
+        self.socket.listen(backlog)
 
-    return server
-
-
-def run_server(server: socket.socket, polling_freq=0.5, buff_size=1024, encoding="utf-8"):    
-    inputs = [server]
-    rooms = {}
-
-    while inputs:
-        try:
-            readable, _, exception = select.select(inputs, [], inputs, polling_freq)
-
-        except KeyboardInterrupt:
-            print("get close signal")
-            for socket in inputs:
-                socket.close()
-            for room in rooms.values():
-                room["close_evt"].set()
-            break
-
-        # handle inputs
-        for socket in readable:
-            if socket is server:
-                new_socket, client_address = socket.accept()
-                print(f"SERVER - new connexion {client_address}")
-                new_socket.setblocking(False)  # as for server
-                inputs.append(new_socket)  # new input socket
-
-                # new_socket.send("which project ?".encode(encoding)) # tmp, dégagera quand protocole uniformisé
-
-                continue
-
-            b_msg = socket.recv(buff_size)
-
-            if not b_msg:
-                print(f"close client")
-                inputs.remove(socket)
-                socket.close()
-
-                continue
-
-            target = b_msg.decode(encoding)
-
-            if not target in rooms:
-                rooms[target] = {
-                    "close_evt": threading.Event(), # bidirectionnal flag
-                    "add_queue": queue.Queue(),
-                    "add_lock": threading.Lock()
-                }
-
-                args = (target, socket, *rooms[target].values())
-                worker = threading.Thread(target=room_server, args=args)
-                worker.setDaemon(True)
-                worker.start()
-
-            else:
-                with rooms[target]["add_lock"]:
-                    rooms[target]["add_queue"].put(socket)
-
-            inputs.remove(socket)
-
-        # handle except
-        for socket in exception:
-            inputs.remove(socket)
+    def read(self):
+        readable, _, exception = select.select(self.inputs, [], self.inputs, self.polling_freq)
+        return readable, exception
+            
+    def close(self):
+        print("Get close signal")
+        for socket in self.inputs:
             socket.close()
+        for room in self.room_m.rooms.values():
+            room.close_evt.set()
 
-        rooms = {key: values for key, values in rooms.items() if not values["close_evt"].is_set()}
+    def add_connection(self, socket):
+        new_socket, client_address = socket.accept()
+        print(f"SERVER - New connexion {client_address}")
+        new_socket.setblocking(False)  # as for server
+        self.inputs.append(new_socket)  # new input socket
+    
+    def close_client_connection(self, socket):
+        print(f"Close client")
+        self.inputs.remove(socket)
+        socket.close()
 
+    def run(self, buff_size=1024, encoding="utf-8"):    
+        self.inputs.append(self.socket) # Contient tous les sockets (serveur + toutes les rooms)
 
-def room_server(name: str, socket_init: socket.socket, close_evt: threading.Event,
-                    add_queue: queue.Queue, add_lock: threading.Lock,
-                    polling_freq=0.1, buff_size=1024, encoding="utf-8"):
-    print(f"{name} - create room")
-    inputs = [socket_init]
-    outputs = []
-    client_msg_queue = {socket_init: queue.Queue()}
-
-    history = [] # tmp pour test envoi global
-
-    while not close_evt.is_set() and inputs:
-        # add sockets
-        with add_lock:
-            while not add_queue.empty():
-                socket = add_queue.get()
-                inputs.append(socket)
-                client_msg_queue[socket] = queue.Queue()
-                print(f"{name} - get client {socket.getpeername()}")
-
-                # programme un envoi global
-                client_msg_queue[socket].put("\n".join(history).encode(encoding))
-                outputs.append(socket)
-
-        # update sockets
-        try:
-            readable, writable, exception = select.select(inputs, outputs, inputs, polling_freq)
-
-        except KeyboardInterrupt:
-            print(f"{name} - get close signal")
-            for socket in inputs:
-                socket.close()
-            break
-
-        # handle inputs
-        for socket in readable:
-            b_msg = socket.recv(buff_size)
-
-            if not b_msg:
-                print(f"{name} - close client")
-                if socket in outputs:
-                    outputs.remove(socket)
-                inputs.remove(socket)
-                socket.close()
-                del client_msg_queue[socket]
-
-                continue
-
-            # tmp : send to every other clients
-            history.append(b_msg.decode(encoding))
-            for client in client_msg_queue:
-                if client != socket:
-                    client_msg_queue[client].put(b_msg)  # enqueue msg
-                    if client not in outputs:
-                        outputs.append(client)  # let select send it
-
-            # todo : recieve json with command and args to execute
-
-        # handle output
-        for socket in writable:
+        while self.inputs:
             try:
-                next_msg = client_msg_queue[socket].get_nowait()  # unqueue msg
-            except queue.Empty:
-                outputs.remove(socket)
-            else:
-                socket.send(next_msg)
+                readable, exception = self.read()
+            except KeyboardInterrupt:
+                self.close()
+                break
+            
+            # handle inputs
+            for socket in readable:
+                if socket is self.socket: # S'il y a une connexion, c'est le serveur qui va envoyer un message d'où le check
+                   self.add_connection(socket)
+                    # new_socket.send("which project ?".encode(encoding)) # tmp, dégagera quand protocole uniformisé
+                   continue
 
-        # handle except
-        for socket in exception:
-            if socket in outputs:
-                outputs.remove(socket)
-            inputs.remove(socket)
-            socket.close()
-            del client_msg_queue[socket]
+                b_msg = socket.recv(buff_size)
 
-    print(f"{name} - close room")
+                if not b_msg:
+                    self.close_client_connection(socket)
+                    continue
+
+                target = b_msg.decode(encoding)
+
+                if not target in self.room_m.rooms:
+                    self.room_m.create_room(target, socket)
+
+                else:
+                    self.room_m.add_message(target, socket)
+
+                self.inputs.remove(socket)
+
+            # handle except
+            for socket in exception:
+                self.inputs.remove(socket)
+                socket.close()
+
+            self.room_m.rooms = {key: values for key, values in self.room_m.rooms.items() if not values.get_param()["close_evt"].is_set()}
+
+    
 
 
 if __name__ == "__main__":
-    print("start server")
+    print("Starting server...")
     
-    server = init_server()
+    server = Server()
 
-    print("server ready")
+    print("Server ready")
 
-    run_server(server)
+    server.run()
 
-    print("close server")
+    print("Closing server...")
