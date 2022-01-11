@@ -20,24 +20,29 @@ class MasterJson():
 			f = open(file_path)
 			self.data = json.load(f)
 		
-	def consumer(self, path: str, action: str ):
-		"""Consumer
+	def consumer(self, path: str, action: str, value: str, value_type: str ):
+		"""[Consumer]
 
 		Args:
 			path (str): [A JSON path]
 			action (str): [action to make on the json]
+			value (str): [Value to add when editing or creating]
+			value_type (str): [value time, can be list, int, string, dict]
 		"""
+		
 		list_path = path.split("\\")
 		if action == "Create":
 			MasterJson.create_from_path(path, self.data)
 			f = open(self.file_path, 'w')
 			json.dump(self.data, f)
 
-		for i in range(len(list_path)):
-			key = list_path[i]
-			if key.isnumeric():
-				key = int(key)
-			hodler = self.data[key]
+		## Editing ##
+		if action == "Edit":
+			for i in range(len(list_path)):
+				key = list_path[i]
+				if key.isnumeric():
+					key = int(key)
+				hodler = self.data[key]
 		
 		pass
 
