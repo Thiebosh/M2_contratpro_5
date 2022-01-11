@@ -7,33 +7,43 @@ COLLECTION = "accounts"
 
 @bp_account.route("/create", methods=['GET', 'POST'])
 async def create():
-    return "create account", 200
-
-    post = (await request.form)
+    post = request.args # (await request.form)
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
     username = post.get("username", type=str, default=None)
     password = post.get("password", type=str, default=None) # should have been hashed
 
+    if not (username and password):
+        return "pas mes args", status.HTTP_400_BAD_REQUEST
+
     # verify if username does not exist
-    query = ""
+    filter = {
+        "username": {
+            "$regex": username,
+            "$options": "i"
+        }
+    }
 
-    result = current_app.config["partners"]["db"].find(COLLECTION, query)
-
-    if result:
+    if await current_app.config["partners"]["db"].find(COLLECTION, filter):
         return {
             "result": "already exist"
         }, status.HTTP_200_OK
 
-    # add to database
-    query = ""
-
-    result = current_app.config["partners"]["db"].insert(COLLECTION, query)
+    # create user
+    doc = {
+        "username": username,
+        "password": password
+    }
 
     return {
-        "result": "success/failure"
+        "success": await current_app.config["partners"]["db"].insert(COLLECTION, doc)
     }, status.HTTP_200_OK
+
+
+@bp_account.route("/search", methods=['GET', 'POST'])
+async def search():
+    pass
 
 
 @bp_account.route("/connect", methods=['GET', 'POST'])

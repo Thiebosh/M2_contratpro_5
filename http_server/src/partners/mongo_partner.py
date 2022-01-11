@@ -21,9 +21,11 @@ class MongoPartner:
         if collection not in self.collections:
             return False
 
+        success = False
         try:
-            result = self.collections[collection].insert_many(data)
-            print(f"{LOGGER_ID} inserted {len(result.inserted_ids)}/{len(data)} lines")
+            result = self.collections[collection].insert_one(data)
+            success = True
+            print(f"{LOGGER_ID} inserted {result.inserted_id}")
 
         except WriteError as error:
             print(LOGGER_ID, error.details)
@@ -33,13 +35,15 @@ class MongoPartner:
             print(type(exception))
             print(exception)
 
+        return success
+
 
     async def update(self, collection, data):
         if collection not in self.collections:
             return False
 
         try:
-            result = self.collections[collection].update_many(data)
+            result = self.collections[collection].update_one(data)
 
             print(f"{LOGGER_ID} updated {len(result.inserted_ids)}/{len(data)} lines")
 
@@ -56,7 +60,7 @@ class MongoPartner:
         if collection not in self.collections:
             return False
 
-        return self.collections[collection].find(filter)
+        return list(self.collections[collection].find(filter))
 
 
     async def aggregate(self, collection, aggregation):
@@ -67,4 +71,19 @@ class MongoPartner:
 
 
     async def delete(self, collection, filter):
-        pass # todo
+        if collection not in self.collections:
+            return False
+
+        try:
+            result = self.collections[collection].delete_one(filter)
+
+            print(LOGGER_ID, result)
+            # print(f"{LOGGER_ID} updated {len(result.inserted_ids)}/{len(data)} lines")
+
+        except WriteError as error:
+            print(LOGGER_ID, error.details)
+
+        except Exception as e:
+            print("something went wrong...")
+            print(type(e))
+            print(e)
