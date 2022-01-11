@@ -3,66 +3,107 @@ from flask_api import status
 
 bp_account = Blueprint("account", __name__)
 
+COLLECTION = "accounts"
 
 @bp_account.route("/create", methods=['GET', 'POST'])
 async def create():
     return "create account", 200
+
     post = (await request.form)
-    if len(post) != 1:
+    if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
-    search_index = post.get("search_index", type=str, default=None)
+    username = post.get("username", type=str, default=None)
+    password = post.get("password", type=str, default=None) # should have been hashed
+
+    # verify if username does not exist
+    query = ""
+
+    result = current_app.config["partners"]["db"].find(COLLECTION, query)
+
+    if result:
+        return {
+            "result": "already exist"
+        }, status.HTTP_200_OK
+
+    # add to database
+    query = ""
+
+    result = current_app.config["partners"]["db"].insert(COLLECTION, query)
 
     return {
-        "total": await current_app.config["partners"]["els"].count(index=search_index),
-        "columns": await current_app.config["partners"]["els"].get_headers(index=search_index),
-        "tags": await current_app.config["partners"]["els"].get_tags(index=""),
+        "result": "success/failure"
     }, status.HTTP_200_OK
 
 
-@bp_account.route("/loggin", methods=['GET', 'POST'])
-async def loggin():
+@bp_account.route("/connect", methods=['GET', 'POST'])
+async def connect():
     return "log to account", 200
+
     post = (await request.form)
-    if len(post) != 1:
+    if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
-    search_index = post.get("search_index", type=str, default=None)
+    username = post.get("username", type=str, default=None)
+    password = post.get("password", type=str, default=None) # should have been hashed
+
+    # verify if match username and password
+    query = ""
+
+    result = current_app.config["partners"]["db"].find(COLLECTION, query)
 
     return {
-        "total": await current_app.config["partners"]["els"].count(index=search_index),
-        "columns": await current_app.config["partners"]["els"].get_headers(index=search_index),
-        "tags": await current_app.config["partners"]["els"].get_tags(index=""),
+        "result": "success/failure",
+        "id": 123
     }, status.HTTP_200_OK
 
 
 @bp_account.route("/update", methods=['GET', 'POST'])
 async def update():
     return "update account", 200
+
     post = (await request.form)
-    if len(post) != 1:
+    if len(post) != 3:
         return "", status.HTTP_400_BAD_REQUEST
 
-    search_index = post.get("search_index", type=str, default=None)
+    user_id = post.get("id", type=int, default=None)
+    username = post.get("username", type=str, default=None)
+    password = post.get("password", type=str, default=None) # should have been hashed
+
+    # verify if name does not exist for other than id
+    query = ""
+
+    result = current_app.config["partners"]["db"].find(COLLECTION, query)
+
+    if result:
+        return {
+            "result": "name already exist"
+        }, status.HTTP_200_OK
+    
+    # update fields
+    query = ""
+
+    result = current_app.config["partners"]["db"].update(COLLECTION, query)
 
     return {
-        "total": await current_app.config["partners"]["els"].count(index=search_index),
-        "columns": await current_app.config["partners"]["els"].get_headers(index=search_index),
-        "tags": await current_app.config["partners"]["els"].get_tags(index=""),
+        "result": "success/failure"
     }, status.HTTP_200_OK
 
 
 @bp_account.route("/delete", methods=['GET', 'POST'])
 async def delete():
     return "delete account", 200
+
     post = (await request.form)
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
-    search_index = post.get("search_index", type=str, default=None)
+    user_id = post.get("id", type=int, default=None)
+
+    query = ""
+
+    result = current_app.config["partners"]["db"].delete(COLLECTION, query)
 
     return {
-        "total": await current_app.config["partners"]["els"].count(index=search_index),
-        "columns": await current_app.config["partners"]["els"].get_headers(index=search_index),
-        "tags": await current_app.config["partners"]["els"].get_tags(index=""),
+        "result": "success/failure"
     }, status.HTTP_200_OK

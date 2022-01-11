@@ -7,18 +7,22 @@ class MongoPartner:
     def __init__(self, mongo_url):
         print(mongo_url)
         self.conn = MongoClient(mongo_url, tlsAllowInvalidCertificates=True)
-        self.db = self.conn.spectry
-        self.accounts = self.db.accounts
-        self.projects = self.db.projects
+        self.collections = {
+            "accounts": self.conn.spectry.accounts,
+            "projects": self.conn.spectry.projects
+        }
 
 
     def close(self):
         self.conn.close()
 
 
-    async def make_insert(self, collection, data):
+    async def insert(self, collection, data):
+        if collection not in self.collections:
+            return False
+
         try:
-            result = collection.insert_many(data)
+            result = self.collections[collection].insert_many(data)
             print(f"{LOGGER_ID} inserted {len(result.inserted_ids)}/{len(data)} lines")
 
         except WriteError as error:
@@ -30,9 +34,12 @@ class MongoPartner:
             print(exception)
 
 
-    async def make_update(self, collection, data):
+    async def update(self, collection, data):
+        if collection not in self.collections:
+            return False
+
         try:
-            result = collection.update_many(data)
+            result = self.collections[collection].update_many(data)
 
             print(f"{LOGGER_ID} updated {len(result.inserted_ids)}/{len(data)} lines")
 
@@ -45,73 +52,19 @@ class MongoPartner:
             print(e)
 
 
-    async def make_find(self, collection, filter):
-        return collection.find(filter)
+    async def find(self, collection, filter):
+        if collection not in self.collections:
+            return False
+
+        return self.collections[collection].find(filter)
 
 
-    async def make_aggregate(self, collection, aggregation):
-        return list(collection.aggregate(aggregation))[0]
+    async def aggregate(self, collection, aggregation):
+        if collection not in self.collections:
+            return False
+
+        return list(self.collections[collection].aggregate(aggregation))[0]
 
 
-    async def create_user():
-        query = ""
-
-        # db call
-
-        return False
-
-
-    async def read_user():
-        query = ""
-
-        # db call
-
-        return False
-
-
-    async def update_user():
-        query = ""
-
-        # db call
-
-        return False
-
-
-    async def delete_user():
-        query = ""
-
-        # db call
-
-        return False
-
-
-    async def create_project():
-        query = ""
-
-        # db call
-
-        return False
-
-
-    async def read_project():
-        query = ""
-
-        # db call
-
-        return False
-
-
-    async def update_project():
-        query = ""
-
-        # db call
-
-        return False
-
-
-    async def delete_project():
-        query = ""
-
-        # db call
-
-        return False
+    async def delete(self, collection, filter):
+        pass # todo
