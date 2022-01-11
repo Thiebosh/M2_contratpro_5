@@ -2,7 +2,7 @@ import os
 from quart import Quart, current_app
 from flask_api import status
 
-# from partners.db_partner import dbPartner
+from partners.mongo_partner import MongoPartner
 
 from blueprints.account import bp_account
 from blueprints.project import bp_project
@@ -15,13 +15,13 @@ def create_app(config, db=None) -> Quart:
     app.url_map.strict_slashes = False
 
     # partners setup
-    # app.config["partners"] = dict(
-    #     els = els or ElsPartner(els_url=f"https://{os.environ.get('ELS_USERNAME')}:{os.environ.get('ELS_PASSWORD')}@{os.environ.get('ELS_URL')}")
-    # )
+    app.config["partners"] = dict(
+        db = db or MongoPartner(mongo_url=f"mongodb+srv://{os.environ.get('MONGO_USERNAME')}:{os.environ.get('MONGO_PASSWORD')}@{os.environ.get('MONGO_URL')}")
+    )
 
     # routes setup
     @app.route("/<path:_>")
-    def error(_):
+    def not_found(_):
         return "", status.HTTP_400_BAD_REQUEST
 
     # register blueprints
