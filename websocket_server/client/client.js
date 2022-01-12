@@ -47,8 +47,11 @@ $(function () {
   });
 
   $("#connectionButton").on("click", function(){
-    socket.send("projet_test");
+    let roomName = $("#roomNameInput").val(); 
+    msg = JSON.stringify({"roomName" : roomName})
+    socket.send(msg);
     inRoom = true;
+
     $("#connectionButton").css("display","None");
     $("#createButton").css("display","");
     $("#exitRoomButton").css("display","");
@@ -57,8 +60,9 @@ $(function () {
   });
 
   $("#exitRoomButton").on("click", function(){
-    inRoom = false;
     socket.send("exit")
+    inRoom = false;
+
     $("#message_output").empty();
     $("#connectionButton").css("display","");
     $("#createButton").css("display","None");
