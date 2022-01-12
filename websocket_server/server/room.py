@@ -3,6 +3,7 @@ import threading
 import select
 from .websocket import WebSocket
 import json
+from .use_cases.client_request import MasterJson
 
 class Room():
     def __init__(self, room_name, room_socket, callback_update_server_sockets, callback_remove_room) -> None:
@@ -17,8 +18,7 @@ class Room():
         self.history = []
         self.callback_update_server_sockets = callback_update_server_sockets
         self.callback_remove_room = callback_remove_room
-        self.init_action_functions_dict()
-    
+        self.master_json = MasterJson()
 
     def get_param(self):
         return {
@@ -64,21 +64,22 @@ class Room():
             if client_socket not in self.outputs:
                 self.outputs.append(client_socket)
 
-    def init_action_functions_dict(self):
-        self.action_functions_dict = {
-            # "update": ,
-            # "delete": ,
-            # "generate": function, #generates files
-            # "execute": function, #get specific page
-            "exitRoom": self.close_client_connection_to_room
-        }
 
     def check_and_execute_action_function(self, msg):
         msg = json.loads(msg)
         if "action" in msg:
             action = msg["action"]
-            self.action_functions_dict()[action]
-            if action == "exitRoom":
+            
+            if action == "update":
+                dict = self.master_json.create_from_path(msg["path"], value=msg["content"])
+            elif action == "delete":
+                pass
+            elif action == "generate":
+                pass
+            elif action == "execute":
+                pass
+            elif action == "exitRoom":
+                self.close_client_connection_to_room()
                 return False
         return True
 
