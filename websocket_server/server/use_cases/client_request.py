@@ -47,7 +47,7 @@ class MasterJson():
 		pass
 
 	@staticmethod
-	def create_from_path(string_path: str, dictionary: dict, value: str = None):
+	def create_from_path(string_path: str, dictionary: dict = {}, value: str = None):
 		"""Create New Dictionnary based on hierarchie path
 
 		Args:
