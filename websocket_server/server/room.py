@@ -1,6 +1,8 @@
 import queue
 import threading
 import select
+
+from .message_manager import MessageManager
 from .websocket import WebSocket
 import json
 from .use_cases.client_request import MasterJson
@@ -19,6 +21,8 @@ class Room():
         self.callback_update_server_sockets = callback_update_server_sockets
         self.callback_remove_room = callback_remove_room
         self.master_json = MasterJson()
+        self.current_dict = {}
+        self.message_manager = MessageManager()
 
     def get_param(self):
         return {
@@ -71,7 +75,8 @@ class Room():
             action = msg["action"]
             
             if action == "update":
-                dict = self.master_json.create_from_path(msg["path"], value=msg["content"])
+                self.current_dict = self.master_json.create_from_path(msg["path"], self.current_dict, msg["content"])
+                self.message_manager.json_to_str(self.current_dict)
             elif action == "delete":
                 pass
             elif action == "generate":
@@ -105,10 +110,10 @@ class Room():
 
                 if not self.check_and_execute_action_function(msg):
                     continue
-                
-                self.history.append(msg)
+
+                self.history.append(self.message_manager.str_message)
                 for client_socket in self.client_connection_queue:
-                    self.add_message_in_queue(socket, client_socket, msg)
+                    self.add_message_in_queue(socket, client_socket, self.message_manager.str_message)
 
             for socket in writable:
                 try:
