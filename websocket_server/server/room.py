@@ -17,6 +17,7 @@ class Room():
         self.history = []
         self.callback_update_server_sockets = callback_update_server_sockets
         self.callback_remove_room = callback_remove_room
+        self.init_action_functions_dict()
     
 
     def get_param(self):
@@ -63,6 +64,24 @@ class Room():
             if client_socket not in self.outputs:
                 self.outputs.append(client_socket)
 
+    def init_action_functions_dict(self):
+        self.action_functions_dict = {
+            # "update": ,
+            # "delete": ,
+            # "generate": function, #generates files
+            # "execute": function, #get specific page
+            "exitRoom": self.close_client_connection_to_room
+        }
+
+    def check_and_execute_action_function(self, msg):
+        msg = json.loads(msg)
+        if "action" in msg:
+            action = msg["action"]
+            self.action_functions_dict()[action]
+            if action == "exitRoom":
+                return False
+        return True
+
 
     def run(self, polling_freq=0.1, encoding="utf-8"):
         print(f"{self.room_name} - Create room")
@@ -79,8 +98,11 @@ class Room():
             
             for socket in readable:
                 msg = WebSocket.recv(socket, encoding)
-                if not msg or msg == "exit":
+                if not msg:
                     self.close_client_connection_to_room(socket)
+                    continue
+
+                if not self.check_and_execute_action_function(msg):
                     continue
                 
                 self.history.append(msg)

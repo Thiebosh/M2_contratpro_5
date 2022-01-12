@@ -71,12 +71,12 @@ class Server():
 
                 target = json.loads(target)
                 
-                if "connectRoom" in target:
-                    if not target["connectRoom"] in self.room_m.rooms:
-                        self.room_m.create_room(target["connectRoom"], socket, self.callback_update_server_sockets)
+                if "action" in target and target["action"] == "connectRoom" :
+                    if not target["roomName"] in self.room_m.rooms:
+                        self.room_m.create_room(target["roomName"], socket, self.callback_update_server_sockets)
 
                     else:
-                        self.room_m.add_message(target["connectRoom"], socket)
+                        self.room_m.add_client_to_room(target["roomName"], socket)
 
                 self.inputs.remove(socket)
 

@@ -39,7 +39,7 @@ $(function () {
 
   $("#createButton").on("click", function(){
     json = {
-      "operation":"create",
+      "action":"update",
       "path":"root/screen",
       "content":{'name':'Home'}
   }
@@ -48,7 +48,7 @@ $(function () {
 
   $("#connectionButton").on("click", function(){
     let roomName = $("#roomNameInput").val(); 
-    msg = JSON.stringify({"connectRoom" : roomName})
+    msg = JSON.stringify({"action":"connectRoom", "roomName" : roomName})
     socket.send(msg);
     inRoom = true;
 
@@ -60,7 +60,8 @@ $(function () {
   });
 
   $("#exitRoomButton").on("click", function(){
-    socket.send("exit")
+    msg = JSON.stringify({"action":"exitRoom"})
+    socket.send(msg)
     inRoom = false;
 
     $("#message_output").empty();
