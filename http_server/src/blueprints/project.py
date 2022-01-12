@@ -7,30 +7,42 @@ COLLECTION = "projects"
 
 @bp_project.route("/create", methods=['GET', 'POST'])
 async def create():
-    return "create project", 200
-
-    post = (await request.form)
+    post = request.args # (await request.form)
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
     project_name = post.get("project", type=str, default=None)
-    users_id = post.get("users_id", type=str, default=None) # convert to json
+    users_id = post.get("users_id", type=str, default=None)
+
+    if not (project_name and users_id):
+        return "pas mes args", status.HTTP_400_BAD_REQUEST
 
     # verify if name does not exist
-    query = ""
+    filter = {
+        "name": {
+            "$regex": project_name,
+            "$options": "i"
+        }
+    }
 
-    result = current_app.config["partners"]["db"].find(COLLECTION, query)
-
-    if result:
+    if current_app.config["partners"]["db"].find(COLLECTION, filter):
         return {
             "result": "already exist"
         }, status.HTTP_200_OK
 
     # create project
-    current_date = ""
+    now = ""
     needs = { "root": {} } # convert to string
 
-    query = ""
+    query = {
+        "name": project_name,
+        "users": users_id, # convert to json
+        "first_needs": now,
+        "last_needs": now,
+        "last_proto": now,
+        "needs": needs,
+        "session": ""
+    }
 
     result = current_app.config["partners"]["db"].insert(COLLECTION, query)
 
@@ -38,6 +50,11 @@ async def create():
         "result": "success/failure",
         "id": 456
     }, status.HTTP_200_OK
+
+
+@bp_project.route("/search", methods=['GET', 'POST'])
+async def search():
+    pass
 
 
 @bp_project.route("/connect", methods=['GET', 'POST'])
