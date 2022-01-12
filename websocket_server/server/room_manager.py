@@ -13,7 +13,7 @@ class RoomManager():
         worker.setDaemon(True)
         worker.start()
     
-    def add_message(self, room_name, socket):
+    def add_client_to_room(self, room_name, socket):
         with self.rooms[room_name].lock:
             self.rooms[room_name].queue.put(socket)
 
