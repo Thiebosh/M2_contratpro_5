@@ -1,7 +1,7 @@
 import select
 import socket
-from room_manager import RoomManager
-from websocket import WebSocket
+from .room_manager import RoomManager
+from .websocket import WebSocket
 from socket import timeout
 
 class Server():
@@ -63,6 +63,7 @@ class Server():
                    continue
 
                 target = WebSocket.recv(socket, encoding)
+                print(target)
                 if not target:
                     self.close_client_connection(socket)
                     continue
@@ -85,14 +86,3 @@ class Server():
     
     def callback_update_server_sockets(self,socket):
         self.inputs.append(socket)
-
-if __name__ == "__main__":
-    print("Starting server...")
-    
-    server = Server()
-
-    print("Server ready")
-
-    server.run()
-
-    print("Closing server...")

@@ -1,7 +1,7 @@
 import queue
 import threading
 import select
-from websocket import WebSocket
+from .websocket import WebSocket
 import json
 
 class Room():
