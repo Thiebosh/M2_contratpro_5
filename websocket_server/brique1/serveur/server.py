@@ -46,7 +46,7 @@ class Server():
         self.inputs.remove(socket)
         socket.close()
 
-    def run(self, buff_size=1024, encoding="utf-8"):    
+    def run(self, encoding="utf-8"):    
         self.inputs.append(self.socket) # Contient tous les sockets (serveur + toutes les rooms)
 
         while self.inputs:
@@ -55,7 +55,6 @@ class Server():
             except KeyboardInterrupt:
                 self.close()
                 break
-            
             # handle inputs
             for socket in readable:
                 if socket is self.socket: # S'il y a une connexion, c'est le serveur qui va envoyer un message d'où le check
@@ -64,13 +63,12 @@ class Server():
                    continue
 
                 target = WebSocket.recv(socket, encoding)
-
                 if not target:
                     self.close_client_connection(socket)
                     continue
 
                 if not target in self.room_m.rooms:
-                    self.room_m.create_room(target, socket)
+                    self.room_m.create_room(target, socket, self.callback_update_server_sockets)
 
                 else:
                     self.room_m.add_message(target, socket)
@@ -85,7 +83,8 @@ class Server():
             self.room_m.rooms = {key: values for key, values in self.room_m.rooms.items() if not values.get_param()["close_evt"].is_set()}
 
     
-
+    def callback_update_server_sockets(self,socket):
+        self.inputs.append(socket)
 
 if __name__ == "__main__":
     print("Starting server...")

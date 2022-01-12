@@ -4,13 +4,11 @@ $(function () {
   const input_msg = $("#message_input");
   const output_msg = $("#message_output");
 
-  let ready = false;
+  let inRoom = false;
 
   socket.onopen = function(e) {
     console.log("[open] Connection established");
     console.log("Sending to server");
-    socket.send("projet_test");
-    ready = true;
   };
 
   socket.onmessage = function(event) {
@@ -19,7 +17,7 @@ $(function () {
   };
 
   socket.onclose = function(event) {
-    ready = false;
+    inRoom = false;
     if (event.wasClean) {
       console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
     } else {
@@ -34,7 +32,7 @@ $(function () {
   };
 
   input_msg.change(() => {
-    if (!ready) return;
+    if (!inRoom) return;
     socket.send(input_msg.val());
     $(`<p>- client : ${input_msg.val()}</p>`).appendTo(output_msg);
   });
@@ -46,5 +44,26 @@ $(function () {
       "content":"{'name':'Home'}"
   }
   socket.send(JSON.stringify(json))
-  })
+  });
+
+  $("#connectionButton").on("click", function(){
+    socket.send("projet_test");
+    inRoom = true;
+    $("#connectionButton").css("display","None");
+    $("#createButton").css("display","");
+    $("#exitRoomButton").css("display","");
+    $("#message_input").css("display","");
+    $("#roomNameInput").css("display","None");
+  });
+
+  $("#exitRoomButton").on("click", function(){
+    inRoom = false;
+    socket.send("exit")
+    $("#message_output").empty();
+    $("#connectionButton").css("display","");
+    $("#createButton").css("display","None");
+    $("#exitRoomButton").css("display","None");
+    $("#message_input").css("display","None");
+    $("#roomNameInput").css("display","");
+  });
 });
