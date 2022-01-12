@@ -47,7 +47,7 @@ class MasterJson():
 		pass
 
 	@staticmethod
-	def create_from_path(string_path: str, dictionary: dict):
+	def create_from_path(string_path: str, dictionary: dict, value: str = None):
 		"""Create New Dictionnary based on hierarchie path
 
 		Args:
@@ -62,12 +62,17 @@ class MasterJson():
 		parts = string_path.split('/', 1)
 		if len(parts) > 1:
 			branch = dictionary.setdefault(parts[0], {})
-			MasterJson.create_from_path(parts[1], branch)
+			MasterJson.create_from_path(parts[1], branch, value)
 		else:
 			if dictionary.__contains__(parts[0]):
 					# If there's an addition error here, it's because invalid data was added
-					dictionary[parts[0]] += 1
+					logging.debug("Modify in path {} from {} to {}".format(string_path, dictionary[parts[0]], value))
+					dictionary[parts[0]] = value
 			else:
-					dictionary[parts[0]] = 1
+					logging.debug("Creating new path  with value {}".format(string_path))
+					dictionary[parts[0]] = value
 		return dictionary
 
+	@staticmethod
+	def edit_from_path(string_path: str, dictionnary: dict):
+		pass
