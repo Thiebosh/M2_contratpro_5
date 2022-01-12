@@ -83,8 +83,6 @@ class Room():
                     self.close_client_connection_to_room(socket)
                     continue
                 
-                json.loads(msg)
-
                 self.history.append(msg)
                 for client_socket in self.client_connection_queue:
                     self.add_message_in_queue(socket, client_socket, msg)

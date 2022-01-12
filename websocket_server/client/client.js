@@ -40,15 +40,15 @@ $(function () {
   $("#createButton").on("click", function(){
     json = {
       "operation":"create",
-      "target":"root/screen",
-      "content":"{'name':'Home'}"
+      "path":"root/screen",
+      "content":{'name':'Home'}
   }
   socket.send(JSON.stringify(json))
   });
 
   $("#connectionButton").on("click", function(){
     let roomName = $("#roomNameInput").val(); 
-    msg = JSON.stringify({"roomName" : roomName})
+    msg = JSON.stringify({"connectRoom" : roomName})
     socket.send(msg);
     inRoom = true;
 

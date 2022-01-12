@@ -3,6 +3,7 @@ import socket
 from .room_manager import RoomManager
 from .websocket import WebSocket
 from socket import timeout
+import json
 
 class Server():
     def __init__(self) -> None:
@@ -63,16 +64,19 @@ class Server():
                    continue
 
                 target = WebSocket.recv(socket, encoding)
-                print(target)
+
                 if not target:
                     self.close_client_connection(socket)
                     continue
 
-                if not target in self.room_m.rooms:
-                    self.room_m.create_room(target, socket, self.callback_update_server_sockets)
+                target = json.loads(target)
+                
+                if "connectRoom" in target:
+                    if not target["connectRoom"] in self.room_m.rooms:
+                        self.room_m.create_room(target["connectRoom"], socket, self.callback_update_server_sockets)
 
-                else:
-                    self.room_m.add_message(target, socket)
+                    else:
+                        self.room_m.add_message(target["connectRoom"], socket)
 
                 self.inputs.remove(socket)
 
