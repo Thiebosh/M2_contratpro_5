@@ -38,4 +38,13 @@ $(function () {
     socket.send(input_msg.val());
     $(`<p>- client : ${input_msg.val()}</p>`).appendTo(output_msg);
   });
+
+  $("#createButton").on("click", function(){
+    json = {
+      "operation":"create",
+      "target":"root/screen",
+      "content":"{'name':'Home'}"
+  }
+  socket.send(JSON.stringify(json))
+  })
 });

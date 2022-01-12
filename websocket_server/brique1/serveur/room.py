@@ -1,8 +1,8 @@
 import queue
 import threading
 import select
-from message_manager import MessageManager
 from websocket import WebSocket
+import json
 
 class Room():
     def __init__(self, room_name, room_socket) -> None:
@@ -80,6 +80,8 @@ class Room():
                 if not msg:
                     self.close_client_connection_to_room(socket)
                     continue
+                
+                json.loads(msg)
 
                 self.history.append(msg)
                 for client_socket in self.client_connection_queue:
