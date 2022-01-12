@@ -1,6 +1,8 @@
 import queue
 import threading
 import select
+from message_manager import MessageManager
+from websocket import WebSocket
 
 class Room():
     def __init__(self, room_name, room_socket) -> None:
@@ -40,7 +42,7 @@ class Room():
         self.client_connection_queue[socket] = queue.Queue()
         print(f"{self.room_name} - Get client {socket.getpeername()}")
 
-        self.client_connection_queue[socket].put("\n".join(self.history).encode(encoding))
+        self.client_connection_queue[socket].put("\n".join(self.history))
         self.outputs.append(socket)
 
 
@@ -74,15 +76,14 @@ class Room():
                 break
             
             for socket in readable:
-                b_msg = socket.recv(buff_size)
-
-                if not b_msg:
+                msg = WebSocket.recv(socket, encoding)
+                if not msg:
                     self.close_client_connection_to_room(socket)
                     continue
 
-                self.history.append(b_msg.decode(encoding))
+                self.history.append(msg)
                 for client_socket in self.client_connection_queue:
-                    self.add_message_in_queue(socket, client_socket, b_msg)
+                    self.add_message_in_queue(socket, client_socket, msg)
 
             for socket in writable:
                 try:
@@ -90,7 +91,7 @@ class Room():
                 except queue.Empty:
                     self.outputs.remove(socket)
                 else:
-                    socket.send(next_msg)
+                    WebSocket.send(socket, next_msg, encoding)
 
             for socket in exception:
                 self.close_client_connection_to_room(socket)

@@ -1,6 +1,8 @@
 import select
 import socket
 from room_manager import RoomManager
+from websocket import WebSocket
+from socket import timeout
 
 class Server():
     def __init__(self) -> None:
@@ -27,11 +29,17 @@ class Server():
         for room in self.room_m.rooms.values():
             room.close_evt.set()
 
-    def add_connection(self, socket):
+    def add_connection(self, socket,encoding="utf-8"):
         new_socket, client_address = socket.accept()
-        print(f"SERVER - New connexion {client_address}")
-        new_socket.setblocking(False)  # as for server
-        self.inputs.append(new_socket)  # new input socket
+        try:
+            if WebSocket.handshake(new_socket, encoding):
+                print(f"SERVER - new connexion {client_address}")
+                self.inputs.append(new_socket)  # new input socket
+            else:
+                print("failed handshake")
+
+        except timeout:
+            print('websocket connection timeout')
     
     def close_client_connection(self, socket):
         print(f"Close client")
@@ -55,13 +63,11 @@ class Server():
                     # new_socket.send("which project ?".encode(encoding)) # tmp, dégagera quand protocole uniformisé
                    continue
 
-                b_msg = socket.recv(buff_size)
+                target = WebSocket.recv(socket, encoding)
 
-                if not b_msg:
+                if not target:
                     self.close_client_connection(socket)
                     continue
-
-                target = b_msg.decode(encoding)
 
                 if not target in self.room_m.rooms:
                     self.room_m.create_room(target, socket)
