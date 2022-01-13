@@ -94,10 +94,12 @@ class Room():
             
             if action == "update":
                 self.current_dict = self.master_json.create_from_path(msg["path"], self.current_dict, msg["content"])
-                self.message_manager.json_to_str(self.current_dict)
-                self.update_project()
+                return False
             elif action == "delete":
                 pass
+            elif action == "save":
+                self.message_manager.json_to_str(self.current_dict)
+                self.update_project()
             elif action == "generate":
                 pass
             elif action == "execute":

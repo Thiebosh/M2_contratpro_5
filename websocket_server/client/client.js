@@ -54,6 +54,7 @@ $(function () {
 
     $("#connectionButton").css("display","None");
     $("#createButton").css("display","");
+    $("#saveButton").css("display","");
     $("#exitRoomButton").css("display","");
     $("#message_input").css("display","");
     $("#roomNameInput").css("display","None");
@@ -67,8 +68,14 @@ $(function () {
     $("#message_output").empty();
     $("#connectionButton").css("display","");
     $("#createButton").css("display","None");
+    $("#saveButton").css("display","None");
     $("#exitRoomButton").css("display","None");
     $("#message_input").css("display","None");
     $("#roomNameInput").css("display","");
+  });
+
+  $("#saveButton").on("click", function(){
+    msg = JSON.stringify({"action":"save"})
+    socket.send(msg)
   });
 });
