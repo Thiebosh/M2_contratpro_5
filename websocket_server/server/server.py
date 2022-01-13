@@ -13,6 +13,7 @@ class Server():
         self.room_m = RoomManager()
         self.ip = os.environ.get("HOST")
         self.port = int(os.environ.get("PORT"))
+        self.encoding = "utf-8"
         self.init_server()
 
     def init_server(self, backlog=5):
@@ -33,10 +34,10 @@ class Server():
         for room in self.room_m.rooms.values():
             room.close_evt.set()
 
-    def add_connection(self, socket,encoding="utf-8"):
+    def add_connection(self, socket):
         new_socket, client_address = socket.accept()
         try:
-            if WebSocket.handshake(new_socket, encoding):
+            if WebSocket.handshake(new_socket, self.encoding):
                 print(f"SERVER - new connexion {client_address}")
                 self.inputs.append(new_socket)  # new input socket
             else:
@@ -50,7 +51,7 @@ class Server():
         self.inputs.remove(socket)
         socket.close()
 
-    def run(self, encoding="utf-8"):    
+    def run(self):    
         self.inputs.append(self.socket) # Contient tous les sockets (serveur + toutes les rooms)
 
         while self.inputs:
@@ -66,7 +67,7 @@ class Server():
                     # new_socket.send("which project ?".encode(encoding)) # tmp, dégagera quand protocole uniformisé
                    continue
 
-                target = WebSocket.recv(socket, encoding)
+                target = WebSocket.recv(socket, self.encoding)
 
                 if not target:
                     self.close_client_connection(socket)
@@ -76,7 +77,7 @@ class Server():
                 
                 if "action" in target and target["action"] == "connectRoom" :
                     if not target["roomName"] in self.room_m.rooms:
-                        self.room_m.create_room(target["roomName"], socket, self.callback_update_server_sockets)
+                        self.room_m.create_room(target["roomName"], socket, self.callback_update_server_sockets, self.encoding)
 
                     else:
                         self.room_m.add_client_to_room(target["roomName"], socket)
