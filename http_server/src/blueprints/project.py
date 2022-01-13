@@ -16,16 +16,18 @@ async def create():
     users_id = post.get("users_id", type=str, default=None)
 
     if not (project_name and users_id):
-        return "pas mes args", status.HTTP_400_BAD_REQUEST
+        return "", status.HTTP_400_BAD_REQUEST
 
     # verify if name does not exist
     filter = {
         "name": project_name
     }
+    fields = {
+        "_id": 0,
+        "name": 1
+    }
 
-    print(project_name, users_id)
-
-    if await current_app.config["partners"]["db"].find(COLLECTION, filter):
+    if await current_app.config["partners"]["db"].find_one(COLLECTION, filter, fields):
         return {
             "result": "already exist"
         }, status.HTTP_200_OK
@@ -45,7 +47,7 @@ async def create():
     }
 
     return {
-        "result": await current_app.config["partners"]["db"].insert(COLLECTION, query),
+        "success": await current_app.config["partners"]["db"].insert_one(COLLECTION, query),
     }, status.HTTP_200_OK
 
 
@@ -79,7 +81,7 @@ async def search():
     }
 
     return {
-        "result": await current_app.config["partners"]["db"].find(COLLECTION, filter, fields)
+        "result": await current_app.config["partners"]["db"].find_list(COLLECTION, filter, fields)
     }, status.HTTP_200_OK
 
 
@@ -97,7 +99,7 @@ async def connect():
     # verify if name exist and if user have rights on it
     query = ""
 
-    result = current_app.config["partners"]["db"].find(COLLECTION, query)
+    result = current_app.config["partners"]["db"].find_one(COLLECTION, query)
 
     return {
         "result": "success/failure",
@@ -120,7 +122,7 @@ async def update():
     # verify if name does not exist for other than id
     query = ""
 
-    result = current_app.config["partners"]["db"].find(COLLECTION, query)
+    result = current_app.config["partners"]["db"].find_one(COLLECTION, query)
 
     if result:
         return {
@@ -130,7 +132,7 @@ async def update():
     # update fields
     query = ""
 
-    result = current_app.config["partners"]["db"].update(COLLECTION, query)
+    result = current_app.config["partners"]["db"].update_one(COLLECTION, query)
 
     return {
         "result": "success/failure"
@@ -149,7 +151,7 @@ async def delete():
 
     query = ""
 
-    result = current_app.config["partners"]["db"].delete(COLLECTION, query)
+    result = current_app.config["partners"]["db"].delete_one(COLLECTION, query)
 
     return {
         "result": "success/failure"

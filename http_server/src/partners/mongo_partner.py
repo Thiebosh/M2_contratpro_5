@@ -16,7 +16,7 @@ class MongoPartner:
         self.conn.close()
 
 
-    async def insert(self, collection, data):
+    async def insert_one(self, collection, data):
         if collection not in self.collections:
             return False
 
@@ -37,7 +37,7 @@ class MongoPartner:
         return success
 
 
-    async def update(self, collection, data):
+    async def update_one(self, collection, data):
         if collection not in self.collections:
             return False
 
@@ -55,7 +55,14 @@ class MongoPartner:
             print(e)
 
 
-    async def find(self, collection, filter, fields=None):
+    async def find_one(self, collection, filter, fields=None):
+        if collection not in self.collections:
+            return False
+
+        return self.collections[collection].find_one(filter, fields)
+
+
+    async def find_list(self, collection, filter, fields=None):
         if collection not in self.collections:
             return False
 
@@ -69,7 +76,7 @@ class MongoPartner:
         return list(self.collections[collection].aggregate(aggregation))
 
 
-    async def delete(self, collection, filter):
+    async def delete_one(self, collection, filter):
         if collection not in self.collections:
             return False
 

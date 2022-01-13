@@ -12,29 +12,33 @@ async def create():
         return "", status.HTTP_400_BAD_REQUEST
 
     username = post.get("name", type=str, default=None)
-    password = post.get("password", type=str, default=None) # should have been hashed
+    password = post.get("password", type=str, default=None)
 
     if not (username and password):
         return "", status.HTTP_400_BAD_REQUEST
 
     # verify if username does not exist
     filter = {
-        "username": username
+        "name": username
+    }
+    fields = {
+        "_id": 0,
+        "name": 1
     }
 
-    if await current_app.config["partners"]["db"].find(COLLECTION, filter):
+    if await current_app.config["partners"]["db"].find_one(COLLECTION, filter, fields):
         return {
             "result": "already exist"
         }, status.HTTP_200_OK
 
     # create user
     doc = {
-        "username": username,
-        "password": password
+        "name": username,
+        "password": current_app.config["partners"]["crypt"].generate_password_hash(password).decode('utf-8')
     }
 
     return {
-        "success": await current_app.config["partners"]["db"].insert(COLLECTION, doc)
+        "success": await current_app.config["partners"]["db"].insert_one(COLLECTION, doc)
     }, status.HTTP_200_OK
 
 
@@ -51,7 +55,7 @@ async def search():
 
     # verify if username exist
     filter = {
-        "username": {
+        "name": {
             "$regex": username,
             "$options": "i"
         }
@@ -60,11 +64,11 @@ async def search():
         "_id": {
             "$toString": "$_id" # $toObjectId: "$_id" for reverse operation
         },
-        "username": 1
+        "name": 1
     }
 
     return {
-        "result": await current_app.config["partners"]["db"].find(COLLECTION, filter, fields)
+        "result": await current_app.config["partners"]["db"].find_list(COLLECTION, filter, fields)
     }, status.HTTP_200_OK
 
 
@@ -79,23 +83,24 @@ async def connect():
 
     # verify if match username and password
     filter = {
-        "username": username,
-        "password": password
+        "name": username,
     }
     fields = {
         "_id": {
             "$toString": "$_id" # $toObjectId: "$_id" for reverse operation
-        }
+        },
+        "password": 1
     }
 
-    result = await current_app.config["partners"]["db"].find(COLLECTION, filter, fields)
+    result = await current_app.config["partners"]["db"].find_one(COLLECTION, filter, fields)
 
-    return {
-        "result": True,
-        "id": result[0]["_id"]
-    } if result else {
-        "result": False
-    }, status.HTTP_200_OK
+    response = {
+        "result": current_app.config["partners"]["crypt"].check_password_hash(result["password"], password)
+    }
+    if response["result"]:
+        response["id"] = result["_id"]
+
+    return response, status.HTTP_200_OK
 
 
 @bp_account.route("/update", methods=['GET', 'POST'])
@@ -107,13 +112,13 @@ async def update():
         return "", status.HTTP_400_BAD_REQUEST
 
     user_id = post.get("id", type=int, default=None)
-    username = post.get("username", type=str, default=None)
+    username = post.get("name", type=str, default=None)
     password = post.get("password", type=str, default=None) # should have been hashed
 
     # verify if name does not exist for other than id
     query = ""
 
-    result = current_app.config["partners"]["db"].find(COLLECTION, query)
+    result = current_app.config["partners"]["db"].find_one(COLLECTION, query)
 
     if result:
         return {
@@ -123,7 +128,7 @@ async def update():
     # update fields
     query = ""
 
-    result = current_app.config["partners"]["db"].update(COLLECTION, query)
+    result = current_app.config["partners"]["db"].update_one(COLLECTION, query)
 
     return {
         "result": "success/failure"
@@ -142,7 +147,7 @@ async def delete():
 
     query = ""
 
-    result = current_app.config["partners"]["db"].delete(COLLECTION, query)
+    result = current_app.config["partners"]["db"].delete_one(COLLECTION, query)
 
     return {
         "result": "success/failure"
