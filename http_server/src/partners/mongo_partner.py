@@ -56,18 +56,18 @@ class MongoPartner:
             print(e)
 
 
-    async def find(self, collection, filter):
+    async def find(self, collection, filter, fields=None):
         if collection not in self.collections:
             return False
 
-        return list(self.collections[collection].find(filter))
+        return list(self.collections[collection].find(filter, fields))
 
 
     async def aggregate(self, collection, aggregation):
         if collection not in self.collections:
             return False
 
-        return list(self.collections[collection].aggregate(aggregation))[0]
+        return list(self.collections[collection].aggregate(aggregation))
 
 
     async def delete(self, collection, filter):

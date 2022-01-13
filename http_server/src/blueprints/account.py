@@ -15,14 +15,11 @@ async def create():
     password = post.get("password", type=str, default=None) # should have been hashed
 
     if not (username and password):
-        return "pas mes args", status.HTTP_400_BAD_REQUEST
+        return "", status.HTTP_400_BAD_REQUEST
 
     # verify if username does not exist
     filter = {
-        "username": {
-            "$regex": username,
-            "$options": "i"
-        }
+        "username": username
     }
 
     if await current_app.config["partners"]["db"].find(COLLECTION, filter):
@@ -43,7 +40,32 @@ async def create():
 
 @bp_account.route("/search", methods=['GET', 'POST'])
 async def search():
-    pass
+    post = request.args # (await request.form)
+    if len(post) != 1:
+        return "", status.HTTP_400_BAD_REQUEST
+
+    username = post.get("username", type=str, default=None)
+
+    if not username:
+        return "", status.HTTP_400_BAD_REQUEST
+
+    # verify if username does not exist
+    filter = {
+        "username": {
+            "$regex": username,
+            "$options": "i"
+        }
+    }
+    fields = {
+        "_id": {
+            "$toString": "$_id" # $toObjectId: "$_id" for reverse operation
+        },
+        "username": 1
+    }
+
+    return {
+        "result": await current_app.config["partners"]["db"].find(COLLECTION, filter, fields)
+    }, status.HTTP_200_OK
 
 
 @bp_account.route("/connect", methods=['GET', 'POST'])
