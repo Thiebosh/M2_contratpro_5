@@ -4,19 +4,22 @@ from .room_manager import RoomManager
 from .websocket import WebSocket
 from socket import timeout
 import json
+import os
 
 class Server():
     def __init__(self) -> None:
-        self.init_server()
         self.inputs = []
         self.polling_freq = 0.5
         self.room_m = RoomManager()
+        self.ip = os.environ.get("HOST")
+        self.port = int(os.environ.get("PORT"))
+        self.init_server()
 
-    def init_server(self, ip = "localhost", port=20002, backlog=5):
+    def init_server(self, backlog=5):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.setblocking(False)
 
-        self.socket.bind((ip, port))
+        self.socket.bind((self.ip, self.port))
         self.socket.listen(backlog)
 
     def read(self):
