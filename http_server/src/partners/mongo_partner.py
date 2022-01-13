@@ -23,7 +23,7 @@ class MongoPartner:
         success = False
         try:
             result = self.collections[collection].insert_one(data)
-            success = True
+            success = result.acknowledged
             print(f"{LOGGER_ID} inserted {result.inserted_id}")
 
         except WriteError as error:
@@ -37,14 +37,15 @@ class MongoPartner:
         return success
 
 
-    async def update_one(self, collection, data):
+    async def update_one(self, collection, filter, update):
         if collection not in self.collections:
             return False
 
+        success = False
         try:
-            result = self.collections[collection].update_one(data)
-
-            print(f"{LOGGER_ID} updated {len(result.inserted_ids)}/{len(data)} lines")
+            result = self.collections[collection].update_one(filter, update)
+            success = result.acknowledged
+            print(f"{LOGGER_ID} updated {result.modified_count} doc")
 
         except WriteError as error:
             print(LOGGER_ID, error.details)
@@ -53,6 +54,27 @@ class MongoPartner:
             print("something went wrong...")
             print(type(e))
             print(e)
+
+        return success
+
+
+    async def update_many(self, collection, filter, update):
+        if collection not in self.collections:
+            return False
+
+        try:
+            result = self.collections[collection].update_many(filter, update)
+            print(f"{LOGGER_ID} updated {result.modified_count}/{result.matched_count} doc")
+
+        except WriteError as error:
+            print(LOGGER_ID, error.details)
+
+        except Exception as e:
+            print("something went wrong...")
+            print(type(e))
+            print(e)
+
+        return result.deleted_count
 
 
     async def find_one(self, collection, filter, fields=None):
@@ -80,11 +102,11 @@ class MongoPartner:
         if collection not in self.collections:
             return False
 
+        success = False
         try:
             result = self.collections[collection].delete_one(filter)
-
-            print(LOGGER_ID, result)
-            # print(f"{LOGGER_ID} updated {len(result.inserted_ids)}/{len(data)} lines")
+            success = result.acknowledged
+            print(f"{LOGGER_ID} deleted {result.deleted_count} doc")
 
         except WriteError as error:
             print(LOGGER_ID, error.details)
@@ -93,3 +115,25 @@ class MongoPartner:
             print("something went wrong...")
             print(type(e))
             print(e)
+        
+        return success
+
+
+    async def delete_many(self, collection, filter):
+        if collection not in self.collections:
+            return False
+
+        try:
+            result = self.collections[collection].delete_many(filter)
+
+            print(f"{LOGGER_ID} deleted {result.deleted_count} docs")
+
+        except WriteError as error:
+            print(LOGGER_ID, error.details)
+
+        except Exception as e:
+            print("something went wrong...")
+            print(type(e))
+            print(e)
+        
+        return result.deleted_count

@@ -24,7 +24,7 @@ def create_app(config, db=None) -> Quart:
     # routes setup
     @app.route("/<path:_>")
     def not_found(_):
-        return "", status.HTTP_400_BAD_REQUEST
+        return "", status.HTTP_404_NOT_FOUND
 
     # register blueprints
     app.register_blueprint(bp_account, url_prefix="/account")
