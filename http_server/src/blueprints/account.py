@@ -7,11 +7,11 @@ COLLECTION = "accounts"
 
 @bp_account.route("/create", methods=['GET', 'POST'])
 async def create():
-    post = request.args # (await request.form)
+    post = request.args # await request.form
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
-    username = post.get("username", type=str, default=None)
+    username = post.get("name", type=str, default=None)
     password = post.get("password", type=str, default=None) # should have been hashed
 
     if not (username and password):
@@ -40,11 +40,11 @@ async def create():
 
 @bp_account.route("/search", methods=['GET', 'POST'])
 async def search():
-    post = request.args # (await request.form)
+    post = request.args # await request.form
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
-    username = post.get("username", type=str, default=None)
+    username = post.get("name", type=str, default=None)
 
     if not username:
         return "", status.HTTP_400_BAD_REQUEST
@@ -70,23 +70,31 @@ async def search():
 
 @bp_account.route("/connect", methods=['GET', 'POST'])
 async def connect():
-    return "log to account", 200
-
-    post = (await request.form)
+    post = request.args # await request.form
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
-    username = post.get("username", type=str, default=None)
+    username = post.get("name", type=str, default=None)
     password = post.get("password", type=str, default=None) # should have been hashed
 
     # verify if match username and password
-    query = ""
+    filter = {
+        "username": username,
+        "password": password
+    }
+    fields = {
+        "_id": {
+            "$toString": "$_id" # $toObjectId: "$_id" for reverse operation
+        }
+    }
 
-    result = current_app.config["partners"]["db"].find(COLLECTION, query)
+    result = await current_app.config["partners"]["db"].find(COLLECTION, filter, fields)
 
     return {
-        "result": "success/failure",
-        "id": 123
+        "result": True,
+        "id": result[0]["_id"]
+    } if result else {
+        "result": False
     }, status.HTTP_200_OK
 
 
@@ -94,7 +102,7 @@ async def connect():
 async def update():
     return "update account", 200
 
-    post = (await request.form)
+    post = await request.form
     if len(post) != 3:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -126,7 +134,7 @@ async def update():
 async def delete():
     return "delete account", 200
 
-    post = (await request.form)
+    post = await request.form
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 

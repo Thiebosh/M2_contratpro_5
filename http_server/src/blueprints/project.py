@@ -8,7 +8,7 @@ COLLECTION = "projects"
 
 @bp_project.route("/create", methods=['GET', 'POST'])
 async def create():
-    post = request.args # (await request.form)
+    post = request.args # await request.form
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -51,7 +51,7 @@ async def create():
 
 @bp_project.route("/search", methods=['GET', 'POST'])
 async def search():
-    post = request.args # (await request.form)
+    post = request.args # await request.form
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -87,7 +87,7 @@ async def search():
 async def connect():
     return "log to project", 200
 
-    post = (await request.form)
+    post = await request.form
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -109,7 +109,7 @@ async def connect():
 async def update():
     return "update project", 200
 
-    post = (await request.form)
+    post = await request.form
     if len(post) != 3:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -141,7 +141,7 @@ async def update():
 async def delete():
     return "delete project", 200
 
-    post = (await request.form)
+    post = await request.form
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
