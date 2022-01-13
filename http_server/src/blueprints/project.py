@@ -1,5 +1,6 @@
 from quart import Blueprint, json, request, current_app
 from flask_api import status
+from datetime import datetime
 
 bp_project = Blueprint("project", __name__)
 
@@ -11,7 +12,7 @@ async def create():
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
-    project_name = post.get("project", type=str, default=None)
+    project_name = post.get("name", type=str, default=None)
     users_id = post.get("users_id", type=str, default=None)
 
     if not (project_name and users_id):
@@ -19,42 +20,67 @@ async def create():
 
     # verify if name does not exist
     filter = {
-        "name": {
-            "$regex": project_name,
-            "$options": "i"
-        }
+        "name": project_name
     }
 
-    if current_app.config["partners"]["db"].find(COLLECTION, filter):
+    print(project_name, users_id)
+
+    if await current_app.config["partners"]["db"].find(COLLECTION, filter):
         return {
             "result": "already exist"
         }, status.HTTP_200_OK
 
     # create project
-    now = ""
-    needs = { "root": {} } # convert to string
+    users_id = json.loads(users_id)
+    needs = { "root": {} }
 
     query = {
         "name": project_name,
-        "users": users_id, # convert to json
-        "first_needs": now,
-        "last_needs": now,
-        "last_proto": now,
-        "needs": needs,
-        "session": ""
+        "users": users_id,
+        "creation": datetime.utcnow(),
+        "last_specs": None,
+        "last_proto": None,
+        "specs": needs,
+        "session": {}
     }
 
-    result = current_app.config["partners"]["db"].insert(COLLECTION, query)
-
     return {
-        "result": "success/failure",
-        "id": 456
+        "result": await current_app.config["partners"]["db"].insert(COLLECTION, query),
     }, status.HTTP_200_OK
 
 
 @bp_project.route("/search", methods=['GET', 'POST'])
 async def search():
-    pass
+    post = request.args # (await request.form)
+    if len(post) != 1:
+        return "", status.HTTP_400_BAD_REQUEST
+
+    project_name = post.get("name", type=str, default=None)
+
+    if not project_name:
+        return "", status.HTTP_400_BAD_REQUEST
+
+    # verify if project_name exist
+    filter = {
+        "name": {
+            "$regex": project_name,
+            "$options": "i"
+        }
+    }
+    fields = {
+        "_id": {
+            "$toString": "$_id" # $toObjectId: "$_id" for reverse operation
+        },
+        "name": 1,
+        "users": 1,
+        "creation": 1,
+        "last_specs": 1,
+        "last_proto": 1
+    }
+
+    return {
+        "result": await current_app.config["partners"]["db"].find(COLLECTION, filter, fields)
+    }, status.HTTP_200_OK
 
 
 @bp_project.route("/connect", methods=['GET', 'POST'])

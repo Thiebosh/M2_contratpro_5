@@ -5,7 +5,6 @@ LOGGER_ID = "MongoPartner:"
 
 class MongoPartner:
     def __init__(self, mongo_url):
-        print(mongo_url)
         self.conn = MongoClient(mongo_url, tlsAllowInvalidCertificates=True)
         self.collections = {
             "accounts": self.conn.spectry.accounts,

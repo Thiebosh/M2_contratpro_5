@@ -49,7 +49,7 @@ async def search():
     if not username:
         return "", status.HTTP_400_BAD_REQUEST
 
-    # verify if username does not exist
+    # verify if username exist
     filter = {
         "username": {
             "$regex": username,
