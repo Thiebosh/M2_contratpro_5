@@ -4,19 +4,23 @@ from .room_manager import RoomManager
 from .websocket import WebSocket
 from socket import timeout
 import json
+import os
 
 class Server():
     def __init__(self) -> None:
-        self.init_server()
         self.inputs = []
         self.polling_freq = 0.5
         self.room_m = RoomManager()
+        self.ip = os.environ.get("HOST")
+        self.port = int(os.environ.get("PORT"))
+        self.encoding = "utf-8"
+        self.init_server()
 
-    def init_server(self, ip = "localhost", port=20002, backlog=5):
+    def init_server(self, backlog=5):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.setblocking(False)
 
-        self.socket.bind((ip, port))
+        self.socket.bind((self.ip, self.port))
         self.socket.listen(backlog)
 
     def read(self):
@@ -30,10 +34,10 @@ class Server():
         for room in self.room_m.rooms.values():
             room.close_evt.set()
 
-    def add_connection(self, socket,encoding="utf-8"):
+    def add_connection(self, socket):
         new_socket, client_address = socket.accept()
         try:
-            if WebSocket.handshake(new_socket, encoding):
+            if WebSocket.handshake(new_socket, self.encoding):
                 print(f"SERVER - new connexion {client_address}")
                 self.inputs.append(new_socket)  # new input socket
             else:
@@ -47,7 +51,7 @@ class Server():
         self.inputs.remove(socket)
         socket.close()
 
-    def run(self, encoding="utf-8"):    
+    def run(self):    
         self.inputs.append(self.socket) # Contient tous les sockets (serveur + toutes les rooms)
 
         while self.inputs:
@@ -63,7 +67,7 @@ class Server():
                     # new_socket.send("which project ?".encode(encoding)) # tmp, dégagera quand protocole uniformisé
                    continue
 
-                target = WebSocket.recv(socket, encoding)
+                target = WebSocket.recv(socket, self.encoding)
 
                 if not target:
                     self.close_client_connection(socket)
@@ -71,12 +75,12 @@ class Server():
 
                 target = json.loads(target)
                 
-                if "connectRoom" in target:
-                    if not target["connectRoom"] in self.room_m.rooms:
-                        self.room_m.create_room(target["connectRoom"], socket, self.callback_update_server_sockets)
+                if "action" in target and target["action"] == "connectRoom" :
+                    if not target["roomName"] in self.room_m.rooms:
+                        self.room_m.create_room(target["roomName"], socket, self.callback_update_server_sockets, self.encoding)
 
                     else:
-                        self.room_m.add_message(target["connectRoom"], socket)
+                        self.room_m.add_client_to_room(target["roomName"], socket)
 
                 self.inputs.remove(socket)
 

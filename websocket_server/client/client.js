@@ -39,7 +39,7 @@ $(function () {
 
   $("#createButton").on("click", function(){
     json = {
-      "operation":"create",
+      "action":"update",
       "path":"root/screen",
       "content":{'name':'Home'}
   }
@@ -48,26 +48,34 @@ $(function () {
 
   $("#connectionButton").on("click", function(){
     let roomName = $("#roomNameInput").val(); 
-    msg = JSON.stringify({"connectRoom" : roomName})
+    msg = JSON.stringify({"action":"connectRoom", "roomName" : roomName})
     socket.send(msg);
     inRoom = true;
 
     $("#connectionButton").css("display","None");
     $("#createButton").css("display","");
+    $("#saveButton").css("display","");
     $("#exitRoomButton").css("display","");
     $("#message_input").css("display","");
     $("#roomNameInput").css("display","None");
   });
 
   $("#exitRoomButton").on("click", function(){
-    socket.send("exit")
+    msg = JSON.stringify({"action":"exitRoom"})
+    socket.send(msg)
     inRoom = false;
 
     $("#message_output").empty();
     $("#connectionButton").css("display","");
     $("#createButton").css("display","None");
+    $("#saveButton").css("display","None");
     $("#exitRoomButton").css("display","None");
     $("#message_input").css("display","None");
     $("#roomNameInput").css("display","");
+  });
+
+  $("#saveButton").on("click", function(){
+    msg = JSON.stringify({"action":"save"})
+    socket.send(msg)
   });
 });
