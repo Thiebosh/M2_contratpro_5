@@ -49,23 +49,59 @@ async def create():
     }, status.HTTP_200_OK
 
 
-@bp_project.route("/delete", methods=['GET', 'POST'])
-async def delete():
+@bp_project.route("/add_user", methods=['GET', 'POST'])
+async def add_user():
     post = request.args # await request.form
-    if len(post) != 1:
+    if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
     project_id = post.get("id", type=str, default=None)
+    user_id = post.get("user_id", type=str, default=None)
 
-    if not project_id:
+    if not (project_id and user_id):
         return "", status.HTTP_400_BAD_REQUEST
 
     filter = {
-        "_id": ObjectId(project_id)
+        "_id": ObjectId(project_id),
+        "users": {
+            "$ne": user_id
+        }
+    }
+    update = {
+        "$push": {
+            "users": user_id
+        }
     }
 
     return {
-        "deleted": await current_app.config["partners"]["db"].delete_one(COLLECTION, filter)
+        "updated": await current_app.config["partners"]["db"].update_one(COLLECTION, filter, update)
+    }, status.HTTP_200_OK
+
+
+@bp_project.route("/remove_user", methods=['GET', 'POST'])
+async def remove_user():
+    post = request.args # await request.form
+    if len(post) != 2:
+        return "", status.HTTP_400_BAD_REQUEST
+
+    project_id = post.get("id", type=str, default=None)
+    user_id = post.get("user_id", type=str, default=None)
+
+    if not (project_id and user_id):
+        return "", status.HTTP_400_BAD_REQUEST
+
+    filter = {
+        "_id": ObjectId(project_id),
+        "users": user_id
+    }
+    update = {
+        "$pull": {
+            "users": user_id
+        }
+    }
+
+    return {
+        "updated": await current_app.config["partners"]["db"].update_one(COLLECTION, filter, update)
     }, status.HTTP_200_OK
 
 
@@ -99,11 +135,21 @@ async def search_by_user():
     }, status.HTTP_200_OK
 
 
-@bp_project.route("/add_user", methods=['GET', 'POST'])
-async def add_user():
-    pass
+@bp_project.route("/delete", methods=['GET', 'POST'])
+async def delete():
+    post = request.args # await request.form
+    if len(post) != 1:
+        return "", status.HTTP_400_BAD_REQUEST
 
+    project_id = post.get("id", type=str, default=None)
 
-@bp_project.route("/remove_user", methods=['GET', 'POST'])
-async def remove_user():
-    pass
+    if not project_id:
+        return "", status.HTTP_400_BAD_REQUEST
+
+    filter = {
+        "_id": ObjectId(project_id)
+    }
+
+    return {
+        "deleted": await current_app.config["partners"]["db"].delete_one(COLLECTION, filter)
+    }, status.HTTP_200_OK
