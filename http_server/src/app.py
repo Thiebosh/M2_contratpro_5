@@ -1,6 +1,7 @@
 import os
 from quart import Quart, current_app
 from flask_api import status
+from simple_bcrypt import Bcrypt
 
 from partners.mongo_partner import MongoPartner
 
@@ -15,14 +16,15 @@ def create_app(config, db=None) -> Quart:
     app.url_map.strict_slashes = False
 
     # partners setup
-    app.config["partners"] = dict(
-        db = db or MongoPartner(mongo_url=f"mongodb+srv://{os.environ.get('MONGO_USERNAME')}:{os.environ.get('MONGO_PASSWORD')}@{os.environ.get('MONGO_URL')}")
-    )
+    app.config["partners"] = {
+        "db": db or MongoPartner(mongo_url=f"mongodb+srv://{os.environ.get('MONGO_USERNAME')}:{os.environ.get('MONGO_PASSWORD')}@{os.environ.get('MONGO_URL')}"),
+        "crypt": Bcrypt(app)
+    }
 
     # routes setup
     @app.route("/<path:_>")
     def not_found(_):
-        return "", status.HTTP_400_BAD_REQUEST
+        return "", status.HTTP_404_NOT_FOUND
 
     # register blueprints
     app.register_blueprint(bp_account, url_prefix="/account")

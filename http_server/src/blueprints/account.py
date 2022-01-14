@@ -1,141 +1,191 @@
-from quart import Blueprint, json, request, current_app
+from quart import Blueprint, request, current_app
 from flask_api import status
+from bson.objectid import ObjectId
 
 bp_account = Blueprint("account", __name__)
 
-COLLECTION = "accounts"
+COLLECTION_ACCOUNTS = "accounts"
+COLLECTION_PROJECTS = "projects"
+
+
+def hash_password(password):
+    return current_app.config["partners"]["crypt"].generate_password_hash(password).decode('utf-8')
+
 
 @bp_account.route("/create", methods=['GET', 'POST'])
 async def create():
-    post = request.args # (await request.form)
+    post = await request.form # request.args
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
-    username = post.get("username", type=str, default=None)
-    password = post.get("password", type=str, default=None) # should have been hashed
+    username = post.get("name", type=str, default=None)
+    password = post.get("password", type=str, default=None)
 
     if not (username and password):
         return "", status.HTTP_400_BAD_REQUEST
 
     # verify if username does not exist
-    filter = {
-        "username": username
+    filter_q = {
+        "name": username
+    }
+    fields = {
+        "_id": 0,
+        "name": 1
     }
 
-    if await current_app.config["partners"]["db"].find(COLLECTION, filter):
+    if await current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, filter_q, fields):
         return {
             "result": "already exist"
         }, status.HTTP_200_OK
 
     # create user
     doc = {
-        "username": username,
-        "password": password
+        "name": username,
+        "password": hash_password(password)
     }
 
     return {
-        "success": await current_app.config["partners"]["db"].insert(COLLECTION, doc)
+        "success": await current_app.config["partners"]["db"].insert_one(COLLECTION_ACCOUNTS, doc)
+    }, status.HTTP_200_OK
+
+
+@bp_account.route("/connect", methods=['GET', 'POST'])
+async def connect():
+    post = await request.form # request.args
+    if len(post) != 2:
+        return "", status.HTTP_400_BAD_REQUEST
+
+    username = post.get("name", type=str, default=None)
+    password = post.get("password", type=str, default=None) # should have been hashed
+
+    if not (username and password):
+        return "", status.HTTP_400_BAD_REQUEST
+
+    # verify if match username and password
+    filter_q = {
+        "name": username,
+    }
+    fields = {
+        "_id": {
+            "$toString": "$_id"
+        },
+        "password": 1
+    }
+
+    result = await current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, filter_q, fields)
+
+    response = {
+        "match": current_app.config["partners"]["crypt"].check_password_hash(result["password"], password)
+    }
+    if response["match"]:
+        response["id"] = result["_id"]
+
+    return response, status.HTTP_200_OK
+
+
+@bp_account.route("/update", methods=['GET', 'POST'])
+async def update():
+    post = await request.form # request.args
+    if len(post) != 3:
+        return "", status.HTTP_400_BAD_REQUEST
+
+    user_id = post.get("id", type=str, default=None)
+    username = post.get("name", type=str, default=None)
+    password = post.get("password", type=str, default=None)
+
+    if not (user_id and username and password):
+        return "", status.HTTP_400_BAD_REQUEST
+
+    user_id = ObjectId(user_id)
+
+    # verify if name does not exist for other than id
+    filter_q = {
+        "_id": {
+            "$ne": user_id
+        },
+        "name": username
+    }
+    fields = {
+        "_id": 0,
+        "name": 1
+    }
+
+    if await current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, filter_q, fields):
+        return {
+            "result": "already exist"
+        }, status.HTTP_200_OK
+
+    # update fields
+    filter_q = {
+        "_id": user_id
+    }
+    update_q = {
+        "$set": {
+            "name": username,
+            "password": hash_password(password)
+        }
+    }
+
+    return {
+        "updated": await current_app.config["partners"]["db"].update_one(COLLECTION_ACCOUNTS, filter_q, update_q)
     }, status.HTTP_200_OK
 
 
 @bp_account.route("/search", methods=['GET', 'POST'])
 async def search():
-    post = request.args # (await request.form)
+    post = await request.form # request.args
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
-    username = post.get("username", type=str, default=None)
+    username = post.get("name", type=str, default=None)
 
     if not username:
         return "", status.HTTP_400_BAD_REQUEST
 
-    # verify if username does not exist
-    filter = {
-        "username": {
+    filter_q = {
+        "name": {
             "$regex": username,
             "$options": "i"
         }
     }
     fields = {
         "_id": {
-            "$toString": "$_id" # $toObjectId: "$_id" for reverse operation
+            "$toString": "$_id"
         },
-        "username": 1
+        "name": 1
     }
 
     return {
-        "result": await current_app.config["partners"]["db"].find(COLLECTION, filter, fields)
-    }, status.HTTP_200_OK
-
-
-@bp_account.route("/connect", methods=['GET', 'POST'])
-async def connect():
-    return "log to account", 200
-
-    post = (await request.form)
-    if len(post) != 2:
-        return "", status.HTTP_400_BAD_REQUEST
-
-    username = post.get("username", type=str, default=None)
-    password = post.get("password", type=str, default=None) # should have been hashed
-
-    # verify if match username and password
-    query = ""
-
-    result = current_app.config["partners"]["db"].find(COLLECTION, query)
-
-    return {
-        "result": "success/failure",
-        "id": 123
-    }, status.HTTP_200_OK
-
-
-@bp_account.route("/update", methods=['GET', 'POST'])
-async def update():
-    return "update account", 200
-
-    post = (await request.form)
-    if len(post) != 3:
-        return "", status.HTTP_400_BAD_REQUEST
-
-    user_id = post.get("id", type=int, default=None)
-    username = post.get("username", type=str, default=None)
-    password = post.get("password", type=str, default=None) # should have been hashed
-
-    # verify if name does not exist for other than id
-    query = ""
-
-    result = current_app.config["partners"]["db"].find(COLLECTION, query)
-
-    if result:
-        return {
-            "result": "name already exist"
-        }, status.HTTP_200_OK
-    
-    # update fields
-    query = ""
-
-    result = current_app.config["partners"]["db"].update(COLLECTION, query)
-
-    return {
-        "result": "success/failure"
+        "result": await current_app.config["partners"]["db"].find_list(COLLECTION_ACCOUNTS, filter_q, fields)
     }, status.HTTP_200_OK
 
 
 @bp_account.route("/delete", methods=['GET', 'POST'])
 async def delete():
-    return "delete account", 200
-
-    post = (await request.form)
+    post = await request.form # request.args
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
-    user_id = post.get("id", type=int, default=None)
+    user_id = post.get("id", type=str, default=None)
 
-    query = ""
+    if not user_id:
+        return "", status.HTTP_400_BAD_REQUEST
 
-    result = current_app.config["partners"]["db"].delete(COLLECTION, query)
+    filter_user = {
+        "_id": ObjectId(user_id)
+    }
+    filter_unique_contrib_projects = {
+        "users": [user_id]
+    }
+    filter_one_contrib_projects = {}
+    update_one_contrib_projects = {
+        "$pull": {
+            "users": user_id
+        }
+    }
 
     return {
-        "result": "success/failure"
+        "deleted_user": await current_app.config["partners"]["db"].delete_one(COLLECTION_ACCOUNTS, filter_user),
+        "deleted_projects": await current_app.config["partners"]["db"].delete_many(COLLECTION_PROJECTS, filter_unique_contrib_projects),
+        "deleted_from_projects": await current_app.config["partners"]["db"].update_many(COLLECTION_PROJECTS, filter_one_contrib_projects, update_one_contrib_projects)
     }, status.HTTP_200_OK
