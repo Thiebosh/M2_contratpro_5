@@ -19,7 +19,15 @@ class MasterJson():
 		else:
 			f = open(file_path)
 			self.data = json.load(f)
-		
+	
+	def save_changes(self, dictionnary: dict = None):
+		f = open(self.file_path)
+		if dictionnary == None:
+			json.dump(self.data, f)
+		else:
+			json.dump(dictionnary, f)
+			
+
 	def consumer(self, path: str, action: str, value: str, value_type: str ):
 		"""[Consumer]
 
@@ -47,7 +55,7 @@ class MasterJson():
 		pass
 
 	@staticmethod
-	def create_from_path(string_path: str, dictionary: dict, value: str = None):
+	def create_from_path(string_path: str, dictionary: dict = {}, value: str = None):
 		"""Create New Dictionnary based on hierarchie path
 
 		Args:
@@ -71,6 +79,32 @@ class MasterJson():
 			else:
 					logging.debug("Creating new path  with value {}".format(string_path))
 					dictionary[parts[0]] = value
+		return dictionary
+
+	@staticmethod
+	def delete_from_path(string_path: str, dictionary: dict):
+		"""delete a key from dictionnary according to path
+
+		Args:
+			string_path (str): [path of the key]
+			dictionary (dict): [Dictionnary target]
+
+		Returns:
+			[type]: [Dictionnary modified]
+		"""
+		while string_path.startswith('/'):
+			string_path = string_path[1:]
+		parts = string_path.split('/', 1)
+		if len(parts) > 1:
+			branch = dictionary.setdefault(parts[0], {})
+			MasterJson.delete_from_path(parts[1], branch)
+		else:
+			if dictionary.__contains__(parts[0]):
+					# If there's an addition error here, it's because invalid data was added
+					logging.debug("Modify in path {} from {} to {}".format(string_path, dictionary[parts[0]], parts[0]))
+					dictionary.pop(parts[0], "Not Found")
+			else:
+					return "Key Not Found"
 		return dictionary
 
 	@staticmethod
