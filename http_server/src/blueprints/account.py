@@ -1,5 +1,4 @@
-from unittest import result
-from quart import Blueprint, json, request, current_app
+from quart import Blueprint, request, current_app
 from flask_api import status
 from bson.objectid import ObjectId
 
@@ -7,6 +6,11 @@ bp_account = Blueprint("account", __name__)
 
 COLLECTION_ACCOUNTS = "accounts"
 COLLECTION_PROJECTS = "projects"
+
+
+def hash_password(password):
+    return current_app.config["partners"]["crypt"].generate_password_hash(password).decode('utf-8')
+
 
 @bp_account.route("/create", methods=['GET', 'POST'])
 async def create():
@@ -37,7 +41,7 @@ async def create():
     # create user
     doc = {
         "name": username,
-        "password": current_app.config["partners"]["crypt"].generate_password_hash(password).decode('utf-8')
+        "password": hash_password(password)
     }
 
     return {
@@ -81,33 +85,49 @@ async def connect():
 
 @bp_account.route("/update", methods=['GET', 'POST'])
 async def update():
-    return "update account", 200
-
-    post = await request.form
+    post = request.args # await request.form
     if len(post) != 3:
         return "", status.HTTP_400_BAD_REQUEST
 
-    user_id = post.get("id", type=int, default=None)
+    user_id = post.get("id", type=str, default=None)
     username = post.get("name", type=str, default=None)
-    password = post.get("password", type=str, default=None) # should have been hashed
+    password = post.get("password", type=str, default=None)
+
+    if not (user_id and username and password):
+        return "", status.HTTP_400_BAD_REQUEST
+
+    user_id = ObjectId(user_id)
 
     # verify if name does not exist for other than id
-    query = ""
+    filter = {
+        "_id": {
+            "$ne": user_id
+        },
+        "name": username
+    }
+    fields = {
+        "_id": 0,
+        "name": 1
+    }
 
-    result = current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, query)
-
-    if result:
+    if await current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, filter, fields):
         return {
-            "result": "name already exist"
+            "result": "already exist"
         }, status.HTTP_200_OK
-    
-    # update fields
-    query = ""
 
-    result = current_app.config["partners"]["db"].update_one(COLLECTION_ACCOUNTS, query)
+    # update fields
+    filter = {
+        "_id": user_id
+    }
+    update = {
+        "$set": {
+            "name": username,
+            "password": hash_password(password)
+        }
+    }
 
     return {
-        "result": "success/failure"
+        "updated": await current_app.config["partners"]["db"].update_one(COLLECTION_ACCOUNTS, filter, update)
     }, status.HTTP_200_OK
 
 
