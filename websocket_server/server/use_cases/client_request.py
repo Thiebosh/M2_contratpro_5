@@ -85,6 +85,7 @@ class MasterJson():
 					logging.debug("Creating new path  with value {}".format(string_path))
 					dictionary[parts[0]] = value
 		self.data = dictionary
+		return True
 
 	def delete_from_path(self, string_path: str, dictionary: dict):
 		"""delete a key from dictionnary according to path
@@ -110,6 +111,7 @@ class MasterJson():
 			else:
 					return "Key Not Found"
 		self.data = dictionary
+		return True
 
 	@staticmethod
 	def edit_from_path(string_path: str, dictionnary: dict):
