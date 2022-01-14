@@ -1,6 +1,7 @@
 from quart import Blueprint, json, request, current_app
 from flask_api import status
 from datetime import datetime
+from bson.objectid import ObjectId
 
 bp_project = Blueprint("project", __name__)
 
@@ -33,77 +34,43 @@ async def create():
         }, status.HTTP_200_OK
 
     # create project
-    users_id = json.loads(users_id)
-    needs = { "root": {} }
-
-    query = {
+    doc = {
         "name": project_name,
-        "users": users_id,
+        "users": json.loads(users_id),
         "creation": datetime.utcnow(),
         "last_specs": None,
         "last_proto": None,
-        "specs": needs,
+        "specs": { "root": {} },
         "session": {}
     }
 
     return {
-        "success": await current_app.config["partners"]["db"].insert_one(COLLECTION, query),
-    }, status.HTTP_200_OK
-
-
-@bp_project.route("/update", methods=['GET', 'POST'])
-async def update():
-    return "update project", 200
-
-    post = await request.form
-    if len(post) != 3:
-        return "", status.HTTP_400_BAD_REQUEST
-
-    project_id = post.get("id", type=int, default=None)
-    project_name = post.get("project", type=str, default=None)
-    users_id = post.get("users_id", type=str, default=None) # convert to json
-
-    # verify if name does not exist for other than id
-    query = ""
-
-    result = current_app.config["partners"]["db"].find_one(COLLECTION, query)
-
-    if result:
-        return {
-            "result": "name already exist"
-        }, status.HTTP_200_OK
-    
-    # update fields
-    query = ""
-
-    result = current_app.config["partners"]["db"].update_one(COLLECTION, query)
-
-    return {
-        "result": "success/failure"
+        "success": await current_app.config["partners"]["db"].insert_one(COLLECTION, doc),
     }, status.HTTP_200_OK
 
 
 @bp_project.route("/delete", methods=['GET', 'POST'])
 async def delete():
-    return "delete project", 200
-
-    post = await request.form
+    post = request.args # await request.form
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
-    user_id = post.get("id", type=int, default=None)
+    project_id = post.get("id", type=str, default=None)
 
-    query = ""
+    if not project_id:
+        return "", status.HTTP_400_BAD_REQUEST
 
-    result = current_app.config["partners"]["db"].delete_one(COLLECTION, query)
+    filter = {
+        "_id": ObjectId(project_id)
+    }
 
     return {
-        "result": "success/failure"
+        "deleted": await current_app.config["partners"]["db"].delete_one(COLLECTION, filter)
     }, status.HTTP_200_OK
 
 
 @bp_project.route("/search", methods=['GET', 'POST'])
-async def search(): # vérifier utilité
+async def search(): # pas d'utilité
     post = request.args # await request.form
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
@@ -136,6 +103,16 @@ async def search(): # vérifier utilité
     }, status.HTTP_200_OK
 
 
-@bp_project.route("/for_user", methods=['GET', 'POST'])
-async def for_user():
+@bp_project.route("/add_user", methods=['GET', 'POST'])
+async def add_user():
+    pass
+
+
+@bp_project.route("/remove_user", methods=['GET', 'POST'])
+async def remove_user():
+    pass
+
+
+@bp_project.route("/search_by_user", methods=['GET', 'POST'])
+async def search_by_user():
     pass
