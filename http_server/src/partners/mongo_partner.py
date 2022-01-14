@@ -62,6 +62,7 @@ class MongoPartner:
         if collection not in self.collections:
             return False
 
+        result = 0
         try:
             result = self.collections[collection].update_many(filter, update)
             print(f"{LOGGER_ID} updated {result.modified_count}/{result.matched_count} doc")
@@ -74,7 +75,7 @@ class MongoPartner:
             print(type(e))
             print(e)
 
-        return result.deleted_count
+        return result.modified_count
 
 
     async def find_one(self, collection, filter, fields=None):
@@ -123,6 +124,7 @@ class MongoPartner:
         if collection not in self.collections:
             return False
 
+        result = 0
         try:
             result = self.collections[collection].delete_many(filter)
 
