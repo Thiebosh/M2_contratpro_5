@@ -1,33 +1,38 @@
 import json
 import logging
 from os import listdir, path, stat
-
-
+import os
+from pymongo import MongoClient
+from datetime import datetime
 	
 class MasterJson():
 
-	def __init__(self, file_path: str = None) -> None:
+	def __init__(self, project_name) -> None:
 		"""Initiate the Json Class handling the master version of the model
 
 		Args:
 			file_path (str, optional): [path of the master json file]. Defaults to None.
 		"""
-		self.file_path = file_path
-		if file_path == None:
-			logging.debug(" Creating new Master Json file ")
-			self.data = None
-		else:
-			f = open(file_path)
-			self.data = json.load(f)
+		self.project_name = project_name
+		self.conn = MongoClient(f"mongodb+srv://{os.environ.get('MONGO_USERNAME')}:{os.environ.get('MONGO_PASSWORD')}@{os.environ.get('MONGO_URL')}", tlsAllowInvalidCertificates=True)
+		self.projects = self.conn.spectry.projects
+		self.data = self.projects.find_one({"name":project_name})["specs"]
 	
-	def save_changes(self, dictionnary: dict = None):
-		f = open(self.file_path)
-		if dictionnary == None:
-			json.dump(self.data, f)
-		else:
-			json.dump(dictionnary, f)
-			
 
+	def update_project(self):
+		now = datetime.utcnow()
+		self.projects.update_one(
+            {"name":self.project_name}, 
+            { "$set":
+                {
+                    "last_specs":now, 
+                    "specs":self.data
+                }
+            }
+        )
+		print("Project well updated")
+
+		
 	def consumer(self, path: str, action: str, value: str, value_type: str ):
 		"""[Consumer]
 
@@ -53,6 +58,10 @@ class MasterJson():
 				hodler = self.data[key]
 		
 		pass
+
+	def create_path(self, string_path: str, dictionary: dict = {}, value: str = None):
+		self.current_dict = self.create_from_path(string_path, dictionary, value)
+		return True
 
 	@staticmethod
 	def create_from_path(string_path: str, dictionary: dict = {}, value: str = None):
