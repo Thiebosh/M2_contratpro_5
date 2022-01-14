@@ -1,6 +1,6 @@
+from datetime import datetime
 from quart import Blueprint, json, request, current_app
 from flask_api import status
-from datetime import datetime
 from bson.objectid import ObjectId
 
 bp_project = Blueprint("project", __name__)
@@ -20,7 +20,7 @@ async def create():
         return "", status.HTTP_400_BAD_REQUEST
 
     # verify if name does not exist
-    filter = {
+    filter_q = {
         "name": project_name
     }
     fields = {
@@ -28,7 +28,7 @@ async def create():
         "name": 1
     }
 
-    if await current_app.config["partners"]["db"].find_one(COLLECTION, filter, fields):
+    if await current_app.config["partners"]["db"].find_one(COLLECTION, filter_q, fields):
         return {
             "result": "already exist"
         }, status.HTTP_200_OK
@@ -61,20 +61,20 @@ async def add_user():
     if not (project_id and user_id):
         return "", status.HTTP_400_BAD_REQUEST
 
-    filter = {
+    filter_q = {
         "_id": ObjectId(project_id),
         "users": {
             "$ne": user_id
         }
     }
-    update = {
+    update_q = {
         "$push": {
             "users": user_id
         }
     }
 
     return {
-        "updated": await current_app.config["partners"]["db"].update_one(COLLECTION, filter, update)
+        "updated": await current_app.config["partners"]["db"].update_one(COLLECTION, filter_q, update_q)
     }, status.HTTP_200_OK
 
 
@@ -90,18 +90,18 @@ async def remove_user():
     if not (project_id and user_id):
         return "", status.HTTP_400_BAD_REQUEST
 
-    filter = {
+    filter_q = {
         "_id": ObjectId(project_id),
         "users": user_id
     }
-    update = {
+    update_q = {
         "$pull": {
             "users": user_id
         }
     }
 
     return {
-        "updated": await current_app.config["partners"]["db"].update_one(COLLECTION, filter, update)
+        "updated": await current_app.config["partners"]["db"].update_one(COLLECTION, filter_q, update_q)
     }, status.HTTP_200_OK
 
 
@@ -116,7 +116,7 @@ async def search_by_user():
     if not user_id:
         return "", status.HTTP_400_BAD_REQUEST
 
-    filter = {
+    filter_q = {
         "users": user_id
     }
     fields = {
@@ -131,7 +131,7 @@ async def search_by_user():
     }
 
     return {
-        "result": await current_app.config["partners"]["db"].find_list(COLLECTION, filter, fields)
+        "result": await current_app.config["partners"]["db"].find_list(COLLECTION, filter_q, fields)
     }, status.HTTP_200_OK
 
 
@@ -146,10 +146,10 @@ async def delete():
     if not project_id:
         return "", status.HTTP_400_BAD_REQUEST
 
-    filter = {
+    filter_q = {
         "_id": ObjectId(project_id)
     }
 
     return {
-        "deleted": await current_app.config["partners"]["db"].delete_one(COLLECTION, filter)
+        "deleted": await current_app.config["partners"]["db"].delete_one(COLLECTION, filter_q)
     }, status.HTTP_200_OK

@@ -37,13 +37,13 @@ class MongoPartner:
         return success
 
 
-    async def update_one(self, collection, filter, update):
+    async def update_one(self, collection, filter_q, update_q):
         if collection not in self.collections:
             return False
 
         success = False
         try:
-            result = self.collections[collection].update_one(filter, update)
+            result = self.collections[collection].update_one(filter_q, update_q)
             success = result.acknowledged
             print(f"{LOGGER_ID} updated {result.modified_count} doc")
 
@@ -58,13 +58,13 @@ class MongoPartner:
         return success
 
 
-    async def update_many(self, collection, filter, update):
+    async def update_many(self, collection, filter_q, update_q):
         if collection not in self.collections:
             return False
 
         result = 0
         try:
-            result = self.collections[collection].update_many(filter, update)
+            result = self.collections[collection].update_many(filter_q, update_q)
             print(f"{LOGGER_ID} updated {result.modified_count}/{result.matched_count} doc")
 
         except WriteError as error:
@@ -78,18 +78,18 @@ class MongoPartner:
         return result.modified_count
 
 
-    async def find_one(self, collection, filter, fields=None):
+    async def find_one(self, collection, filter_q, fields=None):
         if collection not in self.collections:
             return False
 
-        return self.collections[collection].find_one(filter, fields)
+        return self.collections[collection].find_one(filter_q, fields)
 
 
-    async def find_list(self, collection, filter, fields=None):
+    async def find_list(self, collection, filter_q, fields=None):
         if collection not in self.collections:
             return False
 
-        return list(self.collections[collection].find(filter, fields))
+        return list(self.collections[collection].find(filter_q, fields))
 
 
     async def aggregate(self, collection, aggregation):
@@ -99,13 +99,13 @@ class MongoPartner:
         return list(self.collections[collection].aggregate(aggregation))
 
 
-    async def delete_one(self, collection, filter):
+    async def delete_one(self, collection, filter_q):
         if collection not in self.collections:
             return False
 
         success = False
         try:
-            result = self.collections[collection].delete_one(filter)
+            result = self.collections[collection].delete_one(filter_q)
             success = result.acknowledged
             print(f"{LOGGER_ID} deleted {result.deleted_count} doc")
 
@@ -116,17 +116,17 @@ class MongoPartner:
             print("something went wrong...")
             print(type(e))
             print(e)
-        
+
         return success
 
 
-    async def delete_many(self, collection, filter):
+    async def delete_many(self, collection, filter_q):
         if collection not in self.collections:
             return False
 
         result = 0
         try:
-            result = self.collections[collection].delete_many(filter)
+            result = self.collections[collection].delete_many(filter_q)
 
             print(f"{LOGGER_ID} deleted {result.deleted_count} docs")
 
@@ -137,5 +137,5 @@ class MongoPartner:
             print("something went wrong...")
             print(type(e))
             print(e)
-        
+
         return result.deleted_count

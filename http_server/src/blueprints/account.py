@@ -25,7 +25,7 @@ async def create():
         return "", status.HTTP_400_BAD_REQUEST
 
     # verify if username does not exist
-    filter = {
+    filter_q = {
         "name": username
     }
     fields = {
@@ -33,7 +33,7 @@ async def create():
         "name": 1
     }
 
-    if await current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, filter, fields):
+    if await current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, filter_q, fields):
         return {
             "result": "already exist"
         }, status.HTTP_200_OK
@@ -62,7 +62,7 @@ async def connect():
         return "", status.HTTP_400_BAD_REQUEST
 
     # verify if match username and password
-    filter = {
+    filter_q = {
         "name": username,
     }
     fields = {
@@ -72,7 +72,7 @@ async def connect():
         "password": 1
     }
 
-    result = await current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, filter, fields)
+    result = await current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, filter_q, fields)
 
     response = {
         "result": current_app.config["partners"]["crypt"].check_password_hash(result["password"], password)
@@ -99,7 +99,7 @@ async def update():
     user_id = ObjectId(user_id)
 
     # verify if name does not exist for other than id
-    filter = {
+    filter_q = {
         "_id": {
             "$ne": user_id
         },
@@ -110,16 +110,16 @@ async def update():
         "name": 1
     }
 
-    if await current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, filter, fields):
+    if await current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, filter_q, fields):
         return {
             "result": "already exist"
         }, status.HTTP_200_OK
 
     # update fields
-    filter = {
+    filter_q = {
         "_id": user_id
     }
-    update = {
+    update_q = {
         "$set": {
             "name": username,
             "password": hash_password(password)
@@ -127,7 +127,7 @@ async def update():
     }
 
     return {
-        "updated": await current_app.config["partners"]["db"].update_one(COLLECTION_ACCOUNTS, filter, update)
+        "updated": await current_app.config["partners"]["db"].update_one(COLLECTION_ACCOUNTS, filter_q, update_q)
     }, status.HTTP_200_OK
 
 
@@ -143,7 +143,7 @@ async def search():
         return "", status.HTTP_400_BAD_REQUEST
 
     # verify if username exist
-    filter = {
+    filter_q = {
         "name": {
             "$regex": username,
             "$options": "i"
@@ -157,7 +157,7 @@ async def search():
     }
 
     return {
-        "result": await current_app.config["partners"]["db"].find_list(COLLECTION_ACCOUNTS, filter, fields)
+        "result": await current_app.config["partners"]["db"].find_list(COLLECTION_ACCOUNTS, filter_q, fields)
     }, status.HTTP_200_OK
 
 
