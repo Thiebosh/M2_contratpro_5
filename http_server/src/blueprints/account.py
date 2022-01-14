@@ -14,7 +14,7 @@ def hash_password(password):
 
 @bp_account.route("/create", methods=['GET', 'POST'])
 async def create():
-    post = request.args # await request.form
+    post = await request.form # request.args
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -51,7 +51,7 @@ async def create():
 
 @bp_account.route("/connect", methods=['GET', 'POST'])
 async def connect():
-    post = request.args # await request.form
+    post = await request.form # request.args
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -75,9 +75,9 @@ async def connect():
     result = await current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, filter_q, fields)
 
     response = {
-        "result": current_app.config["partners"]["crypt"].check_password_hash(result["password"], password)
+        "match": current_app.config["partners"]["crypt"].check_password_hash(result["password"], password)
     }
-    if response["result"]:
+    if response["match"]:
         response["id"] = result["_id"]
 
     return response, status.HTTP_200_OK
@@ -85,7 +85,7 @@ async def connect():
 
 @bp_account.route("/update", methods=['GET', 'POST'])
 async def update():
-    post = request.args # await request.form
+    post = await request.form # request.args
     if len(post) != 3:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -133,7 +133,7 @@ async def update():
 
 @bp_account.route("/search", methods=['GET', 'POST'])
 async def search():
-    post = request.args # await request.form
+    post = await request.form # request.args
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -142,7 +142,6 @@ async def search():
     if not username:
         return "", status.HTTP_400_BAD_REQUEST
 
-    # verify if username exist
     filter_q = {
         "name": {
             "$regex": username,
@@ -163,7 +162,7 @@ async def search():
 
 @bp_account.route("/delete", methods=['GET', 'POST'])
 async def delete():
-    post = request.args # await request.form
+    post = await request.form # request.args
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 

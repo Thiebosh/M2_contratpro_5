@@ -9,7 +9,7 @@ COLLECTION = "projects"
 
 @bp_project.route("/create", methods=['GET', 'POST'])
 async def create():
-    post = request.args # await request.form
+    post = await request.form # request.args
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -51,7 +51,7 @@ async def create():
 
 @bp_project.route("/add_user", methods=['GET', 'POST'])
 async def add_user():
-    post = request.args # await request.form
+    post = await request.form # request.args
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -80,7 +80,7 @@ async def add_user():
 
 @bp_project.route("/remove_user", methods=['GET', 'POST'])
 async def remove_user():
-    post = request.args # await request.form
+    post = await request.form # request.args
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -107,7 +107,7 @@ async def remove_user():
 
 @bp_project.route("/search_by_user", methods=['GET', 'POST'])
 async def search_by_user():
-    post = request.args # await request.form
+    post = await request.form # request.args
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -137,7 +137,7 @@ async def search_by_user():
 
 @bp_project.route("/delete", methods=['GET', 'POST'])
 async def delete():
-    post = request.args # await request.form
+    post = await request.form # request.args
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
