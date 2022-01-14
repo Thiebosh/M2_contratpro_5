@@ -69,27 +69,23 @@ async def delete():
     }, status.HTTP_200_OK
 
 
-@bp_project.route("/search", methods=['GET', 'POST'])
-async def search(): # pas d'utilité
+@bp_project.route("/search_by_user", methods=['GET', 'POST'])
+async def search_by_user():
     post = request.args # await request.form
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
-    project_name = post.get("name", type=str, default=None)
+    user_id = post.get("id", type=str, default=None)
 
-    if not project_name:
+    if not user_id:
         return "", status.HTTP_400_BAD_REQUEST
 
-    # verify if project_name exist
     filter = {
-        "name": {
-            "$regex": project_name,
-            "$options": "i"
-        }
+        "users": user_id
     }
     fields = {
         "_id": {
-            "$toString": "$_id" # $toObjectId: "$_id" for reverse operation
+            "$toString": "$_id"
         },
         "name": 1,
         "users": 1,
@@ -110,9 +106,4 @@ async def add_user():
 
 @bp_project.route("/remove_user", methods=['GET', 'POST'])
 async def remove_user():
-    pass
-
-
-@bp_project.route("/search_by_user", methods=['GET', 'POST'])
-async def search_by_user():
     pass

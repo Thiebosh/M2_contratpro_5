@@ -67,7 +67,7 @@ async def connect():
     }
     fields = {
         "_id": {
-            "$toString": "$_id" # $toObjectId: "$_id" for reverse operation
+            "$toString": "$_id"
         },
         "password": 1
     }
@@ -131,6 +131,36 @@ async def update():
     }, status.HTTP_200_OK
 
 
+@bp_account.route("/search", methods=['GET', 'POST'])
+async def search():
+    post = request.args # await request.form
+    if len(post) != 1:
+        return "", status.HTTP_400_BAD_REQUEST
+
+    username = post.get("name", type=str, default=None)
+
+    if not username:
+        return "", status.HTTP_400_BAD_REQUEST
+
+    # verify if username exist
+    filter = {
+        "name": {
+            "$regex": username,
+            "$options": "i"
+        }
+    }
+    fields = {
+        "_id": {
+            "$toString": "$_id"
+        },
+        "name": 1
+    }
+
+    return {
+        "result": await current_app.config["partners"]["db"].find_list(COLLECTION_ACCOUNTS, filter, fields)
+    }, status.HTTP_200_OK
+
+
 @bp_account.route("/delete", methods=['GET', 'POST'])
 async def delete():
     post = request.args # await request.form
@@ -159,34 +189,4 @@ async def delete():
         "deleted_user": await current_app.config["partners"]["db"].delete_one(COLLECTION_ACCOUNTS, filter_user),
         "deleted_projects": await current_app.config["partners"]["db"].delete_many(COLLECTION_PROJECTS, filter_unique_contrib_projects),
         "deleted_from_projects": await current_app.config["partners"]["db"].update_many(COLLECTION_PROJECTS, filter_one_contrib_projects, update_one_contrib_projects)
-    }, status.HTTP_200_OK
-
-
-@bp_account.route("/search", methods=['GET', 'POST'])
-async def search():
-    post = request.args # await request.form
-    if len(post) != 1:
-        return "", status.HTTP_400_BAD_REQUEST
-
-    username = post.get("name", type=str, default=None)
-
-    if not username:
-        return "", status.HTTP_400_BAD_REQUEST
-
-    # verify if username exist
-    filter = {
-        "name": {
-            "$regex": username,
-            "$options": "i"
-        }
-    }
-    fields = {
-        "_id": {
-            "$toString": "$_id" # $toObjectId: "$_id" for reverse operation
-        },
-        "name": 1
-    }
-
-    return {
-        "result": await current_app.config["partners"]["db"].find_list(COLLECTION_ACCOUNTS, filter, fields)
     }, status.HTTP_200_OK
