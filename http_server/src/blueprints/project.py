@@ -49,6 +49,37 @@ async def create():
     }, status.HTTP_200_OK
 
 
+@bp_project.route("/search_by_user", methods=['GET', 'POST'])
+async def search_by_user():
+    post = await request.form # request.args
+    if len(post) != 1:
+        return "", status.HTTP_400_BAD_REQUEST
+
+    user_id = post.get("id", type=str, default=None)
+
+    if not user_id:
+        return "", status.HTTP_400_BAD_REQUEST
+
+    filter_q = {
+        "users": user_id
+    }
+    fields = {
+        "_id": 0,
+        "id": {
+            "$toString": "$_id"
+        },
+        "name": 1,
+        "users": 1,
+        "creation": 1,
+        "last_specs": 1,
+        "last_proto": 1
+    }
+
+    return {
+        "result": await current_app.config["partners"]["db"].find_list(COLLECTION, filter_q, fields)
+    }, status.HTTP_200_OK
+
+
 @bp_project.route("/add_user", methods=['GET', 'POST'])
 async def add_user():
     post = await request.form # request.args
@@ -74,7 +105,7 @@ async def add_user():
     }
 
     return {
-        "updated": await current_app.config["partners"]["db"].update_one(COLLECTION, filter_q, update_q)
+        "success": await current_app.config["partners"]["db"].update_one(COLLECTION, filter_q, update_q)
     }, status.HTTP_200_OK
 
 
@@ -105,36 +136,6 @@ async def remove_user():
     }, status.HTTP_200_OK
 
 
-@bp_project.route("/search_by_user", methods=['GET', 'POST'])
-async def search_by_user():
-    post = await request.form # request.args
-    if len(post) != 1:
-        return "", status.HTTP_400_BAD_REQUEST
-
-    user_id = post.get("id", type=str, default=None)
-
-    if not user_id:
-        return "", status.HTTP_400_BAD_REQUEST
-
-    filter_q = {
-        "users": user_id
-    }
-    fields = {
-        "_id": {
-            "$toString": "$_id"
-        },
-        "name": 1,
-        "users": 1,
-        "creation": 1,
-        "last_specs": 1,
-        "last_proto": 1
-    }
-
-    return {
-        "result": await current_app.config["partners"]["db"].find_list(COLLECTION, filter_q, fields)
-    }, status.HTTP_200_OK
-
-
 @bp_project.route("/delete", methods=['GET', 'POST'])
 async def delete():
     post = await request.form # request.args
@@ -151,5 +152,5 @@ async def delete():
     }
 
     return {
-        "deleted": await current_app.config["partners"]["db"].delete_one(COLLECTION, filter_q)
+        "success": await current_app.config["partners"]["db"].delete_one(COLLECTION, filter_q)
     }, status.HTTP_200_OK
