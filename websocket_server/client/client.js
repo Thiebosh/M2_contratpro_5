@@ -37,11 +37,32 @@ $(function () {
     $(`<p>- client : ${input_msg.val()}</p>`).appendTo(output_msg);
   });
 
-  $("#createButton").on("click", function(){
+  $("#createNewScreenButton").on("click", function(){
+    json = {
+      "action":"create",
+      "path":"root/screen",
+      "content":{ "name": ""}
+  }
+
+  // {
+  //   "action":"update",
+  //   "path":"root",
+  //   "content":{'screen':[]}
+  // }
+
+  socket.send(JSON.stringify(json))
+  });
+
+  $("#createButton2").on("click", function(){
     json = {
       "action":"update",
-      "path":"root/screen",
-      "content":{'name':'Home'}
+      "path":"root/screen/0",
+      "content":{
+        'style':{
+          "color": "#6897bb",
+          "align": "center"
+        }
+      }
   }
   socket.send(JSON.stringify(json))
   });
@@ -53,7 +74,9 @@ $(function () {
     inRoom = true;
 
     $("#connectionButton").css("display","None");
-    $("#createButton").css("display","");
+    $("#createNewScreenButton").css("display","");
+    $("#createButton2").css("display","");
+    $("#saveButton").css("display","");
     $("#exitRoomButton").css("display","");
     $("#message_input").css("display","");
     $("#roomNameInput").css("display","None");
@@ -66,9 +89,16 @@ $(function () {
 
     $("#message_output").empty();
     $("#connectionButton").css("display","");
-    $("#createButton").css("display","None");
+    $("#createNewScreenButton").css("display","None");
+    $("#createButton2").css("display","None");
+    $("#saveButton").css("display","None");
     $("#exitRoomButton").css("display","None");
     $("#message_input").css("display","None");
     $("#roomNameInput").css("display","");
+  });
+
+  $("#saveButton").on("click", function(){
+    msg = JSON.stringify({"action":"save"})
+    socket.send(msg)
   });
 });

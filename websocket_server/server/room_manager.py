@@ -5,8 +5,8 @@ class RoomManager():
     def __init__(self) -> None:
         self.rooms = {}
 
-    def create_room(self, room_name, socket, callback_update_server_sockets):
-        room = Room(room_name, socket, callback_update_server_sockets, self.callback_remove_room)
+    def create_room(self, room_name, socket, callback_update_server_sockets, encoding):
+        room = Room(room_name, socket, callback_update_server_sockets, self.callback_remove_room, encoding)
         self.rooms[room_name] = room
 
         worker = threading.Thread(target=room.run)
