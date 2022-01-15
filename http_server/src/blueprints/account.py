@@ -35,7 +35,7 @@ async def create():
 
     if await current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, filter_q, fields):
         return {
-            "result": "already exist"
+            "success": "already exist"
         }, status.HTTP_200_OK
 
     # create user
@@ -74,13 +74,12 @@ async def connect():
 
     result = await current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, filter_q, fields)
 
-    response = {
-        "match": current_app.config["partners"]["crypt"].check_password_hash(result["password"], password)
-    }
-    if response["match"]:
-        response["id"] = result["_id"]
+    if not result:
+        return {"id": False}, status.HTTP_200_OK
 
-    return response, status.HTTP_200_OK
+    return {
+        "id": result["_id"] if current_app.config["partners"]["crypt"].check_password_hash(result["password"], password) else False
+    }, status.HTTP_200_OK
 
 
 @bp_account.route("/update", methods=['GET', 'POST'])
@@ -93,27 +92,28 @@ async def update():
     username = post.get("name", type=str, default=None)
     password = post.get("password", type=str, default=None)
 
-    if not (user_id and username and password):
+    if not (user_id and (username or password)):
         return "", status.HTTP_400_BAD_REQUEST
 
     user_id = ObjectId(user_id)
 
-    # verify if name does not exist for other than id
-    filter_q = {
-        "_id": {
-            "$ne": user_id
-        },
-        "name": username
-    }
-    fields = {
-        "_id": 0,
-        "name": 1
-    }
+    if username:
+        # verify if name does not exist for other than id
+        filter_q = {
+            "_id": {
+                "$ne": user_id
+            },
+            "name": username
+        }
+        fields = {
+            "_id": 0,
+            "name": 1
+        }
 
-    if await current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, filter_q, fields):
-        return {
-            "result": "already exist"
-        }, status.HTTP_200_OK
+        if await current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, filter_q, fields):
+            return {
+                "success": "already exist"
+            }, status.HTTP_200_OK
 
     # update fields
     filter_q = {
@@ -121,13 +121,14 @@ async def update():
     }
     update_q = {
         "$set": {
-            "name": username,
+            "name": username
+        } if username else {
             "password": hash_password(password)
         }
     }
 
     return {
-        "updated": await current_app.config["partners"]["db"].update_one(COLLECTION_ACCOUNTS, filter_q, update_q)
+        "success": await current_app.config["partners"]["db"].update_one(COLLECTION_ACCOUNTS, filter_q, update_q)
     }, status.HTTP_200_OK
 
 
@@ -149,7 +150,8 @@ async def search():
         }
     }
     fields = {
-        "_id": {
+        "_id": 0,
+        "id": {
             "$toString": "$_id"
         },
         "name": 1
@@ -185,7 +187,7 @@ async def delete():
     }
 
     return {
-        "deleted_user": await current_app.config["partners"]["db"].delete_one(COLLECTION_ACCOUNTS, filter_user),
+        "success": await current_app.config["partners"]["db"].delete_one(COLLECTION_ACCOUNTS, filter_user),
         "deleted_projects": await current_app.config["partners"]["db"].delete_many(COLLECTION_PROJECTS, filter_unique_contrib_projects),
         "deleted_from_projects": await current_app.config["partners"]["db"].update_many(COLLECTION_PROJECTS, filter_one_contrib_projects, update_one_contrib_projects)
     }, status.HTTP_200_OK
