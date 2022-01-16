@@ -1,5 +1,4 @@
 import queue
-from socket import socket
 import threading
 import select
 
@@ -7,9 +6,7 @@ from .message_manager import MessageManager
 from .websocket import WebSocket
 import json
 from .use_cases.client_request import MasterJson
-from pymongo import MongoClient
-import os
-from datetime import datetime
+from .utils import check_if_similar_keys
 from .socker_manager import SocketManager
 
 class Room():
@@ -107,7 +104,7 @@ class Room():
                 second_content = self.socket_managers[j].get_content()
 
                 # 1ST CASE
-                if (first_path == second_path) and (first_content in second_content or second_content in first_content):
+                if (first_path == second_path) and check_if_similar_keys(first_content, second_content):
                     self.socket_managers[i].failed = True
                     self.socket_managers[j].failed = True
                 
@@ -150,7 +147,7 @@ class Room():
 
                 self.socket_managers.append(SocketManager(socket, msg))
 
-            if num_it == 10:
+            if num_it == 10: #TODO : change use of num_it for message checking
                 # If only one msg, no conflict can be found so just execute function
                 if len(self.socket_managers) == 1:
                     if not self.check_and_execute_action_function(self.socket_managers[0]):
