@@ -30,7 +30,7 @@ async def create():
 
     if await current_app.config["partners"]["db"].find_one(COLLECTION, filter_q, fields):
         return {
-            "result": "already exist"
+            "success": "already exist"
         }, status.HTTP_200_OK
 
     # create project
@@ -132,7 +132,7 @@ async def remove_user():
     }
 
     return {
-        "updated": await current_app.config["partners"]["db"].update_one(COLLECTION, filter_q, update_q)
+        "success": await current_app.config["partners"]["db"].update_one(COLLECTION, filter_q, update_q)
     }, status.HTTP_200_OK
 
 

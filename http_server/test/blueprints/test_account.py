@@ -1,14 +1,19 @@
 import pytest
 from quart import Quart, Response
 from flask_api import status
-from ..mocks.mongo_partner import ID, PASSWORD, FIND_LIST, MANY_COUNT
+from ..mocks.mongo_partner import MongoPartnerMock, ID, PASSWORD, FIND_LIST, MANY_COUNT
 
 @pytest.mark.asyncio
 @pytest.mark.usefixtures("app")
 async def test_account_create_ok(app: Quart) -> None:
-    client = app.test_client()
+    # # mocker ici l'objet db...
+    # class db_mock(MongoPartnerMock):
+    #     async def find_one(self, *_):
+    #         return False
 
-    # mocker ici l'objet db...
+    # app.config["partners"]["db"] = db_mock()
+
+    client = app.test_client()
 
     form = {
         "name": "some",
@@ -18,7 +23,7 @@ async def test_account_create_ok(app: Quart) -> None:
 
     assert response.status_code == status.HTTP_200_OK
     assert response.mimetype == "application/json"
-    assert (await response.get_json())["result"] == "already exist"
+    assert (await response.get_json())["success"] == "already exist"
     # assert (await response.get_json())["success"] is True
 
 
@@ -38,7 +43,6 @@ async def test_account_connect_ok(app: Quart) -> None:
     assert response.status_code == status.HTTP_200_OK
     assert response.mimetype == "application/json"
     result = await response.get_json()
-    assert result["match"] is True
     assert result["id"] == ID
 
 
@@ -58,8 +62,8 @@ async def test_account_update_ok(app: Quart) -> None:
 
     assert response.status_code == status.HTTP_200_OK
     assert response.mimetype == "application/json"
-    assert (await response.get_json())["result"] == "already exist"
-    # assert (await response.get_json())["updated"] is True
+    assert (await response.get_json())["success"] == "already exist"
+    # assert (await response.get_json())["success"] is True
 
 
 @pytest.mark.asyncio
@@ -94,6 +98,6 @@ async def test_account_delete_ok(app: Quart) -> None:
     assert response.status_code == status.HTTP_200_OK
     assert response.mimetype == "application/json"
     result = await response.get_json()
-    assert  result["deleted_user"] is True
+    assert  result["success"] is True
     assert  result["deleted_projects"] == MANY_COUNT
     assert  result["deleted_from_projects"] == MANY_COUNT
