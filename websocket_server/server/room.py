@@ -101,10 +101,26 @@ class Room():
     def check_conflicts(self):
         for i in range(len(self.socket_managers)):
             for j in range(i+1, len(self.socket_managers)):
+                first_path = self.socket_managers[i].get_path()
+                second_path = self.socket_managers[j].get_path()
+                first_content = self.socket_managers[i].get_content()
+                second_content = self.socket_managers[j].get_content()
+
                 # 1ST CASE
-                if (self.socket_managers[i].get_path() == self.socket_managers[j].get_path()) and (self.socket_managers[i].get_content() == self.socket_managers[j].get_content()):
+                if (first_path == second_path) and (first_content in second_content or second_content in first_content):
                     self.socket_managers[i].failed = True
                     self.socket_managers[j].failed = True
+                
+                #2ND CASE
+                #DELETE
+                elif (first_path in second_path):
+                    if (self.socket_managers[i].get_action() == "delete"):
+                        self.socket_managers[i].failed = True
+                    
+                elif (second_path in first_path):
+                    if (self.socket_managers[j].get_action() == "delete"):
+                        self.socket_managers[j].failed = True
+
         return True
 
     def run(self, polling_freq=0.1):
