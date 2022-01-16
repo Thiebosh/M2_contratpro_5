@@ -1,7 +1,9 @@
 import pytest
 from quart import Quart, Response
 from flask_api import status
-from ..mocks.mongo_partner import ID, FIND_LIST
+from ..mocks.mongo_partner import DOC_LIST
+
+ID = "61e131ce9c11b699edc38a1e"
 
 @pytest.mark.asyncio
 @pytest.mark.usefixtures("app")
@@ -36,7 +38,7 @@ async def test_project_search_by_user_ok(app: Quart) -> None:
 
     assert response.status_code == status.HTTP_200_OK
     assert response.mimetype == "application/json"
-    assert (await response.get_json())["result"] == FIND_LIST
+    assert (await response.get_json())["result"] == DOC_LIST
 
 
 @pytest.mark.asyncio

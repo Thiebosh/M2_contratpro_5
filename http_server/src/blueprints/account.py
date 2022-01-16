@@ -66,7 +66,8 @@ async def connect():
         "name": username,
     }
     fields = {
-        "_id": {
+        "_id": 0,
+        "id": {
             "$toString": "$_id"
         },
         "password": 1
@@ -78,7 +79,7 @@ async def connect():
         return {"id": False}, status.HTTP_200_OK
 
     return {
-        "id": result["_id"] if current_app.config["partners"]["crypt"].check_password_hash(result["password"], password) else False
+        "id": result["id"] if current_app.config["partners"]["crypt"].check_password_hash(result["password"], password) else False
     }, status.HTTP_200_OK
 
 
