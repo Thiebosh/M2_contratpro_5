@@ -1,16 +1,13 @@
 import queue
-from socket import socket
 import threading
 import select
 
-from .message_manager import MessageManager
-from .websocket import WebSocket
+from message_manager import MessageManager
+from websocket import WebSocket
 import json
-from .use_cases.client_request import MasterJson
-from pymongo import MongoClient
-import os
-from datetime import datetime
-from .socker_manager import SocketManager
+from use_cases.client_request import MasterJson
+from utils import check_if_similar_keys
+from socker_manager import SocketManager
 
 class Room():
     def __init__(self, room_name, room_socket, callback_update_server_sockets, callback_remove_room, encoding) -> None:
@@ -55,7 +52,9 @@ class Room():
         self.inputs.append(socket)
         self.client_connection_queue[socket] = queue.Queue()
         print(f"{self.room_name} - Get client {socket.getpeername()}")
-
+        
+        self.client_connection_queue[socket].put("\n".join(self.master_json.data))
+        
         self.outputs.append(socket)
 
 
@@ -99,10 +98,26 @@ class Room():
     def check_conflicts(self):
         for i in range(len(self.socket_managers)):
             for j in range(i+1, len(self.socket_managers)):
+                first_path = self.socket_managers[i].get_path()
+                second_path = self.socket_managers[j].get_path()
+                first_content = self.socket_managers[i].get_content()
+                second_content = self.socket_managers[j].get_content()
+
                 # 1ST CASE
-                if (self.socket_managers[i].get_path() == self.socket_managers[j].get_path()) and (self.socket_managers[i].get_content() == self.socket_managers[j].get_content()):
+                if (first_path == second_path) and check_if_similar_keys(first_content, second_content):
                     self.socket_managers[i].failed = True
                     self.socket_managers[j].failed = True
+                
+                #2ND CASE
+                #DELETE
+                elif (first_path in second_path):
+                    if (self.socket_managers[i].get_action() == "delete"):
+                        self.socket_managers[i].failed = True
+                    
+                elif (second_path in first_path):
+                    if (self.socket_managers[j].get_action() == "delete"):
+                        self.socket_managers[j].failed = True
+
         return True
 
     def run(self, polling_freq=0.1):
@@ -132,7 +147,7 @@ class Room():
 
                 self.socket_managers.append(SocketManager(socket, msg))
 
-            if num_it == 10:
+            if num_it == 10: #TODO : change use of num_it for message checking
                 # If only one msg, no conflict can be found so just execute function
                 if len(self.socket_managers) == 1:
                     if not self.check_and_execute_action_function(self.socket_managers[0]):

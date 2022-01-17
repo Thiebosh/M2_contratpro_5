@@ -1,6 +1,5 @@
 import json
 import logging
-from os import listdir, path, stat
 import os
 from pymongo import MongoClient
 from datetime import datetime
