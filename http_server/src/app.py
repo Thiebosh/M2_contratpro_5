@@ -33,5 +33,4 @@ def create_app(config, db=None) -> Quart:
     return app
 
 async def close_app():
-    for partner in current_app.config["partners"].values():
-        await partner.close()
+    (partner.close() for partner in current_app.config["partners"].values())
