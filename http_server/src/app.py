@@ -26,6 +26,10 @@ def create_app(config, db=None) -> Quart:
     def not_found(_):
         return "", status.HTTP_404_NOT_FOUND
 
+    @app.route("/probe")
+    def probe():
+        return "alive", status.HTTP_200_OK
+
     # register blueprints
     app.register_blueprint(bp_account, url_prefix="/account")
     app.register_blueprint(bp_project, url_prefix="/project")
