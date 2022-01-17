@@ -1,7 +1,7 @@
 import select
 import socket
-from .room_manager import RoomManager
-from .websocket import WebSocket
+from room_manager import RoomManager
+from websocket import WebSocket
 from socket import timeout
 import json
 import os
