@@ -2,12 +2,12 @@ import queue
 import threading
 import select
 
-from .message_manager import MessageManager
-from .websocket import WebSocket
+from message_manager import MessageManager
+from websocket import WebSocket
 import json
-from .use_cases.client_request import MasterJson
-from .utils import check_if_similar_keys
-from .socker_manager import SocketManager
+from use_cases.client_request import MasterJson
+from utils import check_if_similar_keys
+from socker_manager import SocketManager
 
 class Room():
     def __init__(self, room_name, room_socket, callback_update_server_sockets, callback_remove_room, encoding) -> None:

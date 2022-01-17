@@ -1,7 +1,7 @@
 call ../_creds.bat
 
 SET HOST=localhost
-SET PORT=20002
+SET PORT=5001
 
-python .
-@REM pause
+python src
+pause
