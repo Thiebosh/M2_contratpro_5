@@ -1,5 +1,5 @@
 import threading
-from .room import Room
+from room import Room
 
 class RoomManager():
     def __init__(self) -> None:
