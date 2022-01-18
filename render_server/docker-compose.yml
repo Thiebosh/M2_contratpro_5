@@ -5,13 +5,15 @@ services:
     build:
       context: ./php-fpm
 
+    # volumes:
+    #   - ./src/:/var/www
+
   nginx:
     build:
       context: ./nginx
 
     volumes:
-      # - host:container
-      # - ../src:/var/www
+      # - ./src/:/var/www
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/sites/:/etc/nginx/sites-available
       - ./nginx/conf.d/:/etc/nginx/conf.d
