@@ -95,34 +95,40 @@ class Room():
         elif action == "execute":
             pass
 
-    def check_conflicts(self):
+    def check_conflicts(self, socket_manager):
+        conflict_sockets_list = []
         for i in range(len(self.socket_managers)):
-            for j in range(i+1, len(self.socket_managers)):
+            if self.socket_managers[i] == socket_manager:
+                continue
+            else:
                 first_path = self.socket_managers[i].get_path()
-                second_path = self.socket_managers[j].get_path()
+                second_path = socket_manager.get_path()
                 first_content = self.socket_managers[i].get_content()
-                second_content = self.socket_managers[j].get_content()
+                second_content = socket_manager.get_content()
 
                 # 1ST CASE
                 if (first_path == second_path) and check_if_similar_keys(first_content, second_content):
                     self.socket_managers[i].failed = True
-                    self.socket_managers[j].failed = True
+                    socket_manager.failed = True
+                    conflict_sockets_list.append(self.socket_managers[i])
                 
                 #2ND CASE
                 #DELETE
                 elif (first_path in second_path):
                     if (self.socket_managers[i].get_action() == "delete"):
                         self.socket_managers[i].failed = True
+                        conflict_sockets_list.append(self.socket_managers[i])
                     
                 elif (second_path in first_path):
-                    if (self.socket_managers[j].get_action() == "delete"):
-                        self.socket_managers[j].failed = True
-
-        return True
+                    if (socket_manager.get_action() == "delete"):
+                        socket_manager.failed = True
+                        conflict_sockets_list.append(self.socket_managers[i])
+        if len(conflict_sockets_list) > 0:
+            conflict_sockets_list.append(socket_manager)
+        return conflict_sockets_list
 
     def run(self, polling_freq=0.1):
         print(f"{self.room_name} - Create room")
-        num_it = 0
         while not self.close_evt.is_set() and self.inputs:
             with self.lock:
                 while not self.queue.empty():
@@ -132,7 +138,7 @@ class Room():
             except KeyboardInterrupt:
                 self.close()
                 break
-            
+
             for socket in readable: #Get all sockets and put the ones which have a msg to a list
                 msg = WebSocket.recv(socket, self.encoding)
                 if not msg:
@@ -146,38 +152,28 @@ class Room():
                     continue
 
                 self.socket_managers.append(SocketManager(socket, msg))
-
-            if num_it == 10: #TODO : change use of num_it for message checking
-                # If only one msg, no conflict can be found so just execute function
-                if len(self.socket_managers) == 1:
-                    if not self.check_and_execute_action_function(self.socket_managers[0]):
-                        for client_socket in self.client_connection_queue:
-                            self.add_message_in_queue(self.socket_managers[0].socket, client_socket, self.message_manager.str_message)                    
-                        self.socket_managers.clear()
-                        continue
-                    
-                if len(self.socket_managers) > 1: #If several msgs, check if there are conflicts
-                    #If conflicts, send notification to them to tell them there are conflicts, and for the others, just execute the action
-                    self.check_conflicts()
-                    for socket_manager in self.socket_managers:
-                        if not socket_manager.failed:
-                            self.check_and_execute_action_function(socket_manager)
-                            for client_socket in self.client_connection_queue:
-                                self.add_message_in_queue(socket_manager.socket, client_socket, self.message_manager.str_message)
-                        else:
-                            for client_socket in self.client_connection_queue:
-                                self.client_connection_queue[client_socket].put("CONFLICTS !")
-                                if client_socket not in self.outputs:
-                                    self.outputs.append(client_socket)
-
-                    self.socket_managers.clear()
             
-            # TODO if more than one msg and conflicts : msg removed --> to change
-            #add num iteration (sémaphore) beyond which we check conflicts
-            # if a msg has no conflicts with all of the others : execute action ! So don't return false in check_conflicts
 
-            # for client_socket in self.client_connection_queue:
-            #     self.add_message_in_queue(socket, client_socket, self.message_manager.str_message)
+            socket_managers = self.socket_managers.copy()
+            for socket_manager in socket_managers:
+                if socket_manager.to_handle:
+                    #If conflicts, send notification to them to tell them there are conflicts, and for the others, just execute the action
+                    conflict_sockets_list = self.check_conflicts(socket_manager)
+                    if len(conflict_sockets_list) == 0:
+                        self.check_and_execute_action_function(socket_manager)
+                        for client_socket in self.client_connection_queue:
+                            self.add_message_in_queue(socket_manager.socket, client_socket, self.message_manager.str_message)
+                        self.socket_managers.remove(socket_manager)
+                    else:       
+                        for socket_manager in conflict_sockets_list:
+                            self.client_connection_queue[socket_manager.socket].put("CONFLICTS !")
+                            if socket_manager.socket not in self.outputs:
+                                self.outputs.append(socket_manager.socket)
+                            self.socket_managers.remove(socket_manager)
+
+            for socket_manager in self.socket_managers:
+                    socket_manager.decrease_counter()
+
                 
             for socket in writable:
                 try:
@@ -189,10 +185,6 @@ class Room():
 
             for socket in exception:
                 self.close_client_connection_to_room(socket)
-
-            num_it += 1
-            if (num_it > 10):
-                num_it = 0
 
         self.master_json.update_project()
         print(f"{self.room_name} - Close room")
