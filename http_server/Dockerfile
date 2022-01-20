@@ -8,11 +8,6 @@ RUN pip install -U --no-cache-dir \
         simple_bcrypt==0.1.0
 
 EXPOSE 5000
-
 WORKDIR /src
-COPY src .
-
-RUN adduser --disabled-password runner && chown -R runner .
-USER runner
 
 CMD ["python", "."]

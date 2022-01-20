@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+    rest:
+        build: .
+        ports:
+            - "8000:5000"
+        env_file:
+            - ./.env
+            - ./../.env
+        volumes:
+            - "./src/:/src/"  
+        restart: on-failure
