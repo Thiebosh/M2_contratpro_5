@@ -1,13 +1,13 @@
 version: '3'
 
 services:
-    rest:
+    socket:
         build: .
         ports:
-            - "8000:5000"
+            - "8001:5001"
         env_file:
             - ./.env
             - ./../.env
         volumes:
             - "./src/:/src/"
-        restart: on-failure
+        # restart: on-failure

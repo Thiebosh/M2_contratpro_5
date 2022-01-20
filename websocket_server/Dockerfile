@@ -5,11 +5,6 @@ RUN pip install -U --no-cache-dir \
         pymongo[srv]==4.0.1
 
 EXPOSE 5001
-
 WORKDIR /src
-COPY src .
-
-RUN adduser --disabled-password runner && chown -R runner .
-USER runner
 
 CMD ["python", "."]
