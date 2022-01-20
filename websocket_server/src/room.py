@@ -110,22 +110,23 @@ class Room():
                 if (first_path == second_path) and check_if_similar_keys(first_content, second_content):
                     self.socket_managers[i].failed = True
                     socket_manager.failed = True
-                    conflict_sockets_list.append(self.socket_managers[i])
-                
+                    conflict_sockets_list.append(self.socket_managers[i]) # t'as la socket de self.socket_managers[i] : renvoie lui direct que ça merde et retire de la liste
+                    # ajoute retour true
                 #2ND CASE
                 #DELETE
                 elif (first_path in second_path):
                     if (self.socket_managers[i].get_action() == "delete"):
                         self.socket_managers[i].failed = True
-                        conflict_sockets_list.append(self.socket_managers[i])
-                    
+                        conflict_sockets_list.append(self.socket_managers[i]) # idem donc méthode dédiée
+                        # ajoute retour true
                 elif (second_path in first_path):
                     if (socket_manager.get_action() == "delete"):
                         socket_manager.failed = True
-                        conflict_sockets_list.append(self.socket_managers[i])
+                        conflict_sockets_list.append(self.socket_managers[i]) # idem, méthode
+                        # ajoute retour true
         if len(conflict_sockets_list) > 0:
-            conflict_sockets_list.append(socket_manager)
-        return conflict_sockets_list
+            conflict_sockets_list.append(socket_manager) # pris en compte par retour
+        return conflict_sockets_list # remplace par retour false
 
     def run(self, polling_freq=0.1):
         print(f"{self.room_name} - Create room")
@@ -154,22 +155,23 @@ class Room():
                 self.socket_managers.append(SocketManager(socket, msg))
             
 
-            socket_managers = self.socket_managers.copy()
+            socket_managers = self.socket_managers.copy() # pour la boucle for ?
             for socket_manager in socket_managers:
-                if socket_manager.to_handle:
+                if socket_manager.to_handle: # count == 0
                     #If conflicts, send notification to them to tell them there are conflicts, and for the others, just execute the action
-                    conflict_sockets_list = self.check_conflicts(socket_manager)
-                    if len(conflict_sockets_list) == 0:
+                    conflict_sockets_list = self.check_conflicts(socket_manager) # dans if et si true : renvoie message, retire de la liste et continue
+                    if len(conflict_sockets_list) == 0: # cas check conflicts == false
                         self.check_and_execute_action_function(socket_manager)
                         for client_socket in self.client_connection_queue:
                             self.add_message_in_queue(socket_manager.socket, client_socket, self.message_manager.str_message)
                         self.socket_managers.remove(socket_manager)
-                    else:       
+                    else: # cas check conflicts == true : mets dans une fonction, appelée par check conflicts + fait un appel pour socket_manager
                         for socket_manager in conflict_sockets_list:
                             self.client_connection_queue[socket_manager.socket].put("CONFLICTS !")
                             if socket_manager.socket not in self.outputs:
                                 self.outputs.append(socket_manager.socket)
                             self.socket_managers.remove(socket_manager)
+                    # remove la socket dans tous les cas car handled
 
             for socket_manager in self.socket_managers:
                     socket_manager.decrease_counter()
