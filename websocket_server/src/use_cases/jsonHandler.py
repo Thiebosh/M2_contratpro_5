@@ -4,7 +4,11 @@ import os
 from pymongo import MongoClient
 from datetime import datetime
 	
-class MasterJson():
+class JsonHandler():
+
+	@staticmethod
+	def check_if_similar_keys(dict1, dict2):
+		return not set(dict1).isdisjoint(dict2)
 
 	def __init__(self, project_name) -> None:
 		"""Initiate the Json Class handling the master version of the model
@@ -54,9 +58,7 @@ class MasterJson():
 				key = list_path[i]
 				if key.isnumeric():
 					key = int(key)
-				hodler = self.data[key]
-		
-		pass
+				# hodler = self.data[key]
 
 
 	def create_from_path(self, string_path: str, dictionary: dict = {}, value: str = None):
@@ -77,12 +79,12 @@ class MasterJson():
 			self.create_from_path(parts[1], branch, value)
 		else:
 			if dictionary.__contains__(parts[0]):
-					# If there's an addition error here, it's because invalid data was added
-					logging.debug("Modify in path {} from {} to {}".format(string_path, dictionary[parts[0]], value))
-					dictionary[parts[0]] = value
+				# If there's an addition error here, it's because invalid data was added
+				logging.debug("Modify in path {} from {} to {}".format(string_path, dictionary[parts[0]], value))
+				dictionary[parts[0]] = value
 			else:
-					logging.debug("Creating new path  with value {}".format(string_path))
-					dictionary[parts[0]] = value
+				logging.debug("Creating new path  with value {}".format(string_path))
+				dictionary[parts[0]] = value
 		self.data = dictionary
 		return True
 
@@ -104,11 +106,11 @@ class MasterJson():
 			self.delete_from_path(parts[1], branch)
 		else:
 			if dictionary.__contains__(parts[0]):
-					# If there's an addition error here, it's because invalid data was added
-					logging.debug("Modify in path {} from {} to {}".format(string_path, dictionary[parts[0]], parts[0]))
-					dictionary.pop(parts[0], "Not Found")
+				# If there's an addition error here, it's because invalid data was added
+				logging.debug("Modify in path {} from {} to {}".format(string_path, dictionary[parts[0]], parts[0]))
+				dictionary.pop(parts[0], "Not Found")
 			else:
-					return "Key Not Found"
+				return "Key Not Found"
 		self.data = dictionary
 		return True
 
