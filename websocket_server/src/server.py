@@ -60,11 +60,11 @@ class Server():
             except KeyboardInterrupt:
                 self.close()
                 break
+
             # handle inputs
             for socket in readable:
                 if socket is self.socket: # S'il y a une connexion, c'est le serveur qui va envoyer un message d'où le check
                    self.add_connection(socket)
-                    # new_socket.send("which project ?".encode(encoding)) # tmp, dégagera quand protocole uniformisé
                    continue
 
                 target = WebSocket.recv(socket, self.encoding)
