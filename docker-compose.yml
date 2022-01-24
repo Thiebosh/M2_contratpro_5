@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+    rest:
+        build: ./http_server/
+        ports:
+            - "8000:5000"
+        env_file:
+            - ./http_server/.env
+            - ./.env
+        volumes:
+            - "./http_server/src/:/src/"
+        restart: on-failure
+
+
+    socket:
+        build: ./websocket_server/
+        ports:
+            - "8001:5001"
+        env_file:
+            - ./websocket_server/.env
+            - ./.env
+        volumes:
+            - "./websocket_server/src/:/src/"
+
+    render:
+        build: ./render_server/
+        ports:
+            - "80:80"
+            - "433:433"
+        depends_on:
+            - socket
