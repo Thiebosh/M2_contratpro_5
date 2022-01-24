@@ -6,13 +6,8 @@ RUN pip install -U --no-cache-dir \
         flask_api==3.0.post1 \
         pymongo[srv]==4.0.1 \
         simple_bcrypt==0.1.0
-# run adduser --disabled-password runner &&\
-#     chown -R runner .
 
 EXPOSE 5000
-# USER runner
-
 WORKDIR /src
-COPY src .
 
 CMD ["python", "."]
