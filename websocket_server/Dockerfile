@@ -7,4 +7,6 @@ RUN pip install -U --no-cache-dir \
 EXPOSE 5001
 WORKDIR /src
 
+COPY src .
+
 CMD ["python", "."]

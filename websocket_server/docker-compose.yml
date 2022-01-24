@@ -8,6 +8,3 @@ services:
         env_file:
             - ./.env
             - ./../.env
-        volumes:
-            - "./src/:/src/"
-        # restart: on-failure
