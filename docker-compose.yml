@@ -6,30 +6,27 @@ services:
         ports:
             - "8000:5000"
         env_file:
-            - ./.env
             - ./http_server/.env
-        # restart: unless-stopped
+            - ./.env
+        volumes:
+            - "./http_server/src/:/src/"
+        restart: on-failure
 
-    # socket:
-    #     build:
-    #         context: .
-    #         dockerfile: ./websocket_server/
-    #     ports:
-    #         - "8001:5001"
-    #     env_file:
-    #         - ./.env
-    #         - ./websocket_server/.env
-    #     links:
-    #         - render
+
+    socket:
+        build: ./websocket_server/
+        ports:
+            - "8001:5001"
+        env_file:
+            - ./websocket_server/.env
+            - ./.env
+        volumes:
+            - "./websocket_server/src/:/src/"
 
     render:
-        build:
-            context: .
-            dockerfile: ./render_server/
+        build: ./render_server/
         ports:
             - "80:80"
             - "433:433"
-        # volumes:
-        #     - ":"
-        # depends_on:
-        #     - socket
+        depends_on:
+            - socket
