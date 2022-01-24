@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+    render:
+        build: .
+        ports:
+            - "80:80"
+            - "433:433"
