@@ -1,13 +1,16 @@
-version: '3'
+version: "3.7"
 
 services:
     rest:
-        build: .
+        build: 
+            context: .
+            args:
+                arg_port: 5000
         ports:
-            - "8000:5000"
+            - "8001:5000"
         env_file:
-            - ./.env
             - ./../.env
         volumes:
             - "./src/:/src/"
+        tty: true # bind console
         restart: on-failure

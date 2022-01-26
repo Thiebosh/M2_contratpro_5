@@ -1,10 +1,15 @@
-version: '3'
+version: "3.7"
 
 services:
     socket:
-        build: .
+        build:
+            context: .
+            args:
+                arg_port: 5000
         ports:
-            - "8001:5001"
+            - "8002:5000"
         env_file:
-            - ./.env
             - ./../.env
+        volumes:
+            - "./src/:/src/"
+        tty: true # bind console

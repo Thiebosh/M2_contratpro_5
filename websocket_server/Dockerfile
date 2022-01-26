@@ -4,7 +4,14 @@ RUN pip install -U --no-cache-dir \
         pip \
         pymongo[srv]==4.0.1
 
-EXPOSE 5001
+ARG arg_port
+
+EXPOSE $arg_port
+
+ENV HOST=0.0.0.0
+ENV PORT=$arg_port
+
 WORKDIR /src
+# copy auto restart script and use it in cmd because it's dev
 
 CMD ["python", "."]
