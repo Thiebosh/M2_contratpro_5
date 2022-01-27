@@ -38,6 +38,10 @@ if (isset($_GET['action'])) {
             }
         break;
 
+        case "probe":
+            echo("alive");
+            exit();
+
         default:
             echo("400"); // error msg
             exit();

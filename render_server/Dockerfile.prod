@@ -1,0 +1,9 @@
+FROM php:7
+
+ARG arg_port
+
+EXPOSE $arg_port
+
+COPY src /app
+
+CMD ["php", "-S", "0.0.0.0:5000", "/app/index.php"]

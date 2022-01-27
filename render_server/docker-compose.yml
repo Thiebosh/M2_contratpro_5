@@ -1,8 +1,13 @@
-version: '3'
+version: "3.7"
 
 services:
     render:
-        build: .
+        build:
+            context: .
+            args:
+                arg_port: 5000
         ports:
-            - "80:80"
-            - "433:433"
+            - "8003:5000"
+        volumes:
+            - "./src/:/app/"
+        tty: true # bind console
