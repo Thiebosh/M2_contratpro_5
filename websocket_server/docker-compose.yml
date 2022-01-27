@@ -12,4 +12,5 @@ services:
             - ./../.env
         volumes:
             - "./src/:/src/"
+            - "./cpp/:/src/brique2/cpp/"
         tty: true # bind console
