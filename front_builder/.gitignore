@@ -1,0 +1,9 @@
+# FOLDERS
+.idea/
+node_modules/
+dist/
+dist-ssr/
+
+# FILES
+.DS_Store
+*.local
