@@ -1,32 +1,52 @@
-version: '3'
+version: "3.7"
 
 services:
-    rest:
-        build: ./http_server/
-        ports:
-            - "8000:5000"
-        env_file:
-            - ./http_server/.env
-            - ./.env
-        volumes:
-            - "./http_server/src/:/src/"
-        restart: on-failure
+    # front:
+    #     build:
+    #         context: ./front_builder/
+    #         dockerfile: Dockerfile.prod
+    #         args:
+    #             arg_port: 5000
+    #     ports:
+    #         - "80:5000" # http
+    #         - "443:5000" # https
+    #     # restart: always
 
+    rest:
+        build:
+            context: ./http_server/
+            dockerfile: Dockerfile.prod
+            args:
+                arg_port: 5000
+        ports:
+            - "8001:5000"
+        env_file:
+            - ./.env
+        tty: true # bind console
+        restart: always
 
     socket:
-        build: ./websocket_server/
+        build:
+            context: ./websocket_server/
+            dockerfile: Dockerfile.prod
+            args:
+                arg_port: 5000
         ports:
-            - "8001:5001"
+            - "8002:5000"
         env_file:
-            - ./websocket_server/.env
             - ./.env
-        volumes:
-            - "./websocket_server/src/:/src/"
+        tty: true # bind console
+        restart: always
 
     render:
-        build: ./render_server/
+        build:
+            context: ./render_server/
+            dockerfile: Dockerfile.prod
+            args:
+                arg_port: 5000
         ports:
-            - "80:80"
-            - "433:433"
+            - "8003:5000"
+        tty: true # bind console
+        restart: always
         depends_on:
             - socket
