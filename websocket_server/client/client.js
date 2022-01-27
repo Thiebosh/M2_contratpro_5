@@ -1,5 +1,5 @@
 $(function () {
-  let socket = new WebSocket("ws://127.0.0.1:8001");
+  let socket = new WebSocket("ws://127.0.0.1:8002");
 
   const input_msg = $("#message_input");
   const output_msg = $("#message_output");

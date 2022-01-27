@@ -1,16 +1,10 @@
-FROM php:fpm-alpine
+FROM php:7
 
-RUN apk add nginx supervisor
+ARG arg_port
 
-COPY nginx/nginx.conf /etc/nginx/
-COPY nginx/conf.d/ /etc/nginx/conf.d/
-COPY nginx/sites/ /etc/nginx/sites-available/
+RUN echo "php -S 0.0.0.0:${arg_port} /app/index.php" > /home/docker_entrypoint.sh &&\
+    chmod 755 /home/docker_entrypoint.sh
 
-COPY ./supervisord.conf /etc/
+EXPOSE $arg_port
 
-COPY src/ /var/www/
-RUN chmod 755 /var/www/*
-
-EXPOSE 80 443
-
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+CMD ["./home/docker_entrypoint.sh"]

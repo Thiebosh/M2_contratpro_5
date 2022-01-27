@@ -1,0 +1,36 @@
+# first stage : build cpp exe
+FROM frolvlad/alpine-gxx:latest as build
+
+RUN apk add \
+        make \
+        flex \
+        bison
+
+WORKDIR /src
+COPY cpp .
+
+RUN make build
+
+
+# second stage : prepare server environment
+FROM python:3.9-slim-buster
+
+RUN pip install -U --no-cache-dir \
+        pip \
+        pymongo[srv]==4.0.1
+RUN apt update &&\
+    apt install -y \
+        g++
+
+ARG arg_port
+
+EXPOSE $arg_port
+
+ENV HOST=0.0.0.0
+ENV PORT=$arg_port
+
+WORKDIR /src
+COPY src .
+COPY --from=build /src/prototypeur.exe /src/brique2/cpp/
+
+CMD ["python", "."]
