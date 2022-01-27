@@ -10,7 +10,7 @@ services:
     #     ports:
     #         - "80:5000" # http
     #         - "443:5000" # https
-    #     restart: always
+    #     # restart: always
 
     rest:
         build:
