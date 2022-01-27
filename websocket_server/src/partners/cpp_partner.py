@@ -1,8 +1,9 @@
 import asyncio
 from subprocess import Popen, PIPE
 
-def generate_files(specs):
-    asyncio.run(cpp_call(specs))
+# exemple de lancement, facultatif quand tout async
+# def generate_files(specs):
+#     asyncio.run(cpp_call(specs))
 
 async def cpp_call(specs):
     path = "exe_path"
@@ -24,4 +25,4 @@ async def cpp_call(specs):
 
     # group and parse lines
 
-    return True
+    # return lines / dict / other
