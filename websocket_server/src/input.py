@@ -1,10 +1,9 @@
-class SocketManager():
+class Input():
     def __init__(self, socket, msg) -> None:
         self.socket = socket
         self.msg = msg
         self.counter = 10
         self.failed = False
-        self.to_handle = False
     
     def get_action(self):
         return self.msg["action"]
@@ -17,7 +16,5 @@ class SocketManager():
     
     def decrease_counter(self):
         self.counter -= 1
-        if self.counter == 0:
-            self.to_handle = True
 
     
