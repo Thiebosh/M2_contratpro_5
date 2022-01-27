@@ -15,5 +15,6 @@ ENV HOST=0.0.0.0
 ENV PORT=$arg_port
 
 WORKDIR /src
+COPY src .
 
 CMD ["python", "."]
