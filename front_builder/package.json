@@ -2,7 +2,7 @@
   "name": "front_builder",
   "version": "0.0.0",
   "scripts": {
-    "start": "tsc && vite build && serve -s build",
+    "start": "serve -s build",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview"
