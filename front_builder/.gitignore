@@ -1,9 +1,5 @@
-# FOLDERS
-.idea/
-node_modules/
-dist/
-dist-ssr/
-
-# FILES
+node_modules
 .DS_Store
+dist
+dist-ssr
 *.local

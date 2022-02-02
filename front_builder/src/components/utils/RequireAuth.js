@@ -1,9 +1,8 @@
 import {Navigate, useLocation} from "react-router-dom";
 
 import useAuth from '../../providers/AuthProvider';
-import {ReactElement} from "react";
 
-export default function RequireAuth({ element }: {element: ReactElement}) {
+export default function RequireAuth({ element }) {
   const {authed} = useAuth();
   const location = useLocation();
 
