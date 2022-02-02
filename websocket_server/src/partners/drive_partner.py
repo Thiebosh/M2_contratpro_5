@@ -1,216 +1,141 @@
-from googleapiclient.discovery import build
-from googleapiclient.http import MediaFileUpload
-from google_auth_oauthlib.flow import InstalledAppFlow
+import os
+import io
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
-import os
-import re
-from threading import Thread, Lock, Event
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import Resource, build
+from googleapiclient.http import MediaIoBaseUpload, MediaIoBaseDownload
 
-DRIVE_FOLDER = "\\drive_access"
-RESULT_FOLDER = "\\results"
+# If modifying these scopes, delete the file token.json.
+SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly',
+          'https://www.googleapis.com/auth/drive']
 
-# elements to reach into drive account
-DRIVE_FOLDER_IMGS = 'images'
-DRIVE_CSV_RESULTS = 'Results_project'
-CSV_RESULT_SHEET_ORD = "Orders!A:"  # fin calculée
-CSV_RESULT_SHEET_MAP = "Map_coordinates!A:"  # fin calculée
-CSV_RESULT_SHEET_EXE = "Executions!A:"  # fin calculée
-
-# global credentials to access drive account
-CREDS_DRIVE = 'credentialsDrive.json'
-CREDS_SHEET = 'credentialsSheets.json'
-
-# If modifying these scopes, delete json token files
-SCOPES_DRIVE = ['https://www.googleapis.com/auth/drive.metadata.readonly',
-                'https://www.googleapis.com/auth/drive']
-SCOPES_SHEET = ['https://www.googleapis.com/auth/spreadsheets']
-
-# filenames with temporary access token
-TOKEN_DRIVE = 'token_drive.json'
-TOKEN_SHEET = 'token_sheets.json'
-
-# alias of googleapiclient.discovery library
-FOLDER = 'application/vnd.google-apps.folder'
-CSV = 'application/vnd.google-apps.spreadsheet'
-DOC = 'application/vnd.google-apps.document'
-IMG_URL_ACCESS = "https://drive.google.com/uc?export=view&id="
+MIMETYPE_FOLDER = "application/vnd.google-apps.folder"
 
 
-class Synchronize:
-    def __init__(self, path):
-        self.path = path
-        self.configfile = ""
-        self.datafile = ""
+class DrivePartner:
+    def __init__(self):
+        self.service:Resource = build('drive', 'v3', credentials=self._get_creds('credentials.json', 'token.json', SCOPES))
 
-        credsDrive = self.get_cred(TOKEN_DRIVE, SCOPES_DRIVE, CREDS_DRIVE)
-        credsSheet = self.get_cred(TOKEN_SHEET, SCOPES_SHEET, CREDS_SHEET)
 
-        self.serviceDrive = build('drive', 'v3', credentials=credsDrive)
-        self.serviceSheet = build('sheets', 'v4', credentials=credsSheet)
-
-        self.results_id = ""
-        self.img_folder_id = ""
-        query = f"name='{DRIVE_CSV_RESULTS}' or\
-                  name='{DRIVE_FOLDER_IMGS}'"
-        for file in self.serviceDrive.files().list(q=query).execute()["files"]:
-            if file['mimeType'] == CSV and file['name'] == DRIVE_CSV_RESULTS:
-                self.results_id = file['id']
-
-            elif file['mimeType'] == FOLDER and file['name'] == DRIVE_FOLDER_IMGS:
-                self.img_folder_id = file['id']
-
-        if not self.results_id or not self.img_folder_id:
-            print("Verify names between drive and synchronize.py")
-            exit()
-
-        self.config_id = None
-        self.input_id = None
-        self.folder_id = None
-        self.imgs_id = []
-
-    def get_cred(self, token_file, scope, cred_file):
-        cred = None
-        token_file = self.path+DRIVE_FOLDER+"\\"+token_file
+    def _get_creds(self, cred_file, token_file, scopes):
+        creds = None
 
         if os.path.exists(token_file):
-            cred = Credentials.from_authorized_user_file(token_file, scope)
+            creds = Credentials.from_authorized_user_file(token_file, scopes)
 
-        if not cred or not cred.valid:
-            if cred and cred.expired and cred.refresh_token:
-                cred.refresh(Request())
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                creds.refresh(Request())
             else:
-                flow = InstalledAppFlow.from_client_secrets_file(self.path+DRIVE_FOLDER+"\\"+cred_file, scope)
-                cred = flow.run_local_server(port=0)
+                flow = InstalledAppFlow.from_client_secrets_file(cred_file, scopes)
+                creds = flow.run_local_server(port=0)
 
             with open(token_file, 'w') as token:
-                token.write(cred.to_json())
+                token.write(creds.to_json())
 
-        return cred
-
-    def set_configfile(self, configfile):
-        self.configfile = configfile
-
-        query = f"name='{configfile}'"
-        for file in self.serviceDrive.files().list(q=query).execute()["files"]:
-            if file['mimeType'] == DOC and file['name'] == configfile:
-                self.config_id = file['id']
-
-        if not self.config_id:
-            print("Verify config filename between drive and input args")
-            exit()
-
-        return self
-
-    def set_datafile(self, datafile):
-        self.datafile = datafile
-
-        query = f"name='{datafile}'"
-        for file in self.serviceDrive.files().list(q=query).execute()["files"]:
-            if file['mimeType'] == DOC and file['name'] == datafile:
-                self.input_id = file['id']
-
-        if not self.input_id:
-            print("Verify data filename between drive and config file")
-            exit()
-
-        return self
-
-    def get_config(self):
-        return self.serviceDrive.files() \
-                .export(fileId=self.config_id, mimeType="text/plain") \
-                .execute().decode("utf-8")[1:]  # remove BOM character
-
-    def get_input(self):
-        return self.serviceDrive.files() \
-                .export(fileId=self.input_id, mimeType="text/plain") \
-                .execute().decode("utf-8")
-
-    def remove_imgs(self, regex, extension):
-        query = f"'{self.img_folder_id}' in parents and mimeType='image/{extension}'"
-
-        for file in self.serviceDrive.files().list(q=query).execute()["files"]:
-            if not regex.match(file["name"]):
-                continue
-
-            self.serviceDrive.files().delete(fileId=file["id"]).execute()
-
-    def upload_imgs(self, is_gif):
-        reg = "^"+self.datafile+"_[0-9]+\.{0}$"
-
-        extension = "gif" if is_gif else "png"
-        self.remove_imgs(re.compile(r""+reg.format(extension)), extension)
-
-        regex = re.compile(r""+reg.format("gif" if is_gif else "png"))
-
-        file_metadata = {'name': '', 'parents': [self.img_folder_id]}
-
-        imgs_id_lock = Lock()
-        interrupt_event = Event()
-        threads = []
-        for file in os.listdir(self.path+RESULT_FOLDER):
-            if not regex.match(file):
-                continue
-
-            file_metadata['name'] = file
-
-            print(file)
-            args = (interrupt_event, self.serviceDrive, self.path+RESULT_FOLDER+"\\"+file, file_metadata, self.imgs_id, imgs_id_lock)
-            threads.append(Thread(target=self.execute_upload, args=args))
-            threads[-1].start()
-
-        for thread in threads:
-            thread.join()
-
-        if interrupt_event.is_set():
-            print("Close program")
-            exit()
-
-    def execute_upload(self, interrupt_event, serviceDrive, filenamepath, file_metadata, imgs_id, imgs_id_lock):
-        # doit faire en sorte que la classe étende thread, sinon c'est mort
-        try:
-            media = MediaFileUpload(filenamepath, mimetype='image/gif')
-
-            res = serviceDrive.files().create(body=file_metadata,
-                                              media_body=media,
-                                              fields='id')\
-                                      .execute()
-            with imgs_id_lock:
-                imgs_id.append(res["id"])
-
-        except KeyboardInterrupt:
-            interrupt_event.set()
-            return
-
-    def upload_csv(self, valuesOrders, valuesCoords, valuesExes, nb_exe):
-        nb_exe = max(nb_exe, len(self.imgs_id))
-        ids_by_exe = [[id for id, line in enumerate(valuesExes[:-1]) if line[1] == str(exe_id)] for exe_id in range(nb_exe+1)]
-
-        for lines, img_id in zip(ids_by_exe, self.imgs_id):
-            for line in lines:
-                valuesExes[line][-1] = IMG_URL_ACCESS+img_id
-
-        bodyOrd = {'values': valuesOrders}
-        bodyMap = {'values': valuesCoords}
-        bodyExe = {'values': valuesExes}
-
-        # save outputs on drive
-        drive_csv = self.serviceSheet.spreadsheets().values()
-        csv_id = self.results_id
-
-        csv_range_ord = CSV_RESULT_SHEET_ORD+shift_letter('A', len(valuesOrders[0]))
-        csv_range_map = CSV_RESULT_SHEET_MAP+shift_letter('A', len(valuesCoords[0]))
-        csv_range_exe = CSV_RESULT_SHEET_EXE+shift_letter('A', len(valuesExes[0]))
-
-        drive_csv.clear(spreadsheetId=csv_id, range=csv_range_ord).execute()
-        drive_csv.clear(spreadsheetId=csv_id, range=csv_range_map).execute()
-        drive_csv.clear(spreadsheetId=csv_id, range=csv_range_exe).execute()
-
-        drive_csv.update(spreadsheetId=csv_id, range=csv_range_ord, body=bodyOrd, valueInputOption="USER_ENTERED").execute()
-        drive_csv.update(spreadsheetId=csv_id, range=csv_range_map, body=bodyMap, valueInputOption="USER_ENTERED").execute()
-        drive_csv.update(spreadsheetId=csv_id, range=csv_range_exe, body=bodyExe, valueInputOption="USER_ENTERED").execute()
+        return creds
 
 
-def shift_letter(letter, shift):
-    start = ord('a') if letter.islower() else ord('A')
-    return chr((ord(letter) - start + shift) % 26 + start)
+    def _create_folder(self, name, parent=None):
+        if parent:
+            parent_id = self.get_folder_id(parent)
+            if not parent_id:
+                return None
+
+        metadata = {
+            "name": name,
+            "mimeType": MIMETYPE_FOLDER,
+            "parents": [parent_id if parent else "root"]
+        }
+        # print("_create_folder : ", metadata)
+
+        results = self.service.files().create(body=metadata).execute()
+        # print("_create_folder : ", results["id"])
+
+        return results["id"]
+
+
+    def _get_folder_id(self, name, parent=None):
+        query = "trashed=false" +\
+                f" and name='{name}'" +\
+                f" and '{self._get_folder_id(parent) if parent else 'root'}' in parents"
+        # print("_get_folder_id : ", query)
+
+        results = self.service.files().list(fields="nextPageToken, files(id, name)", q=query).execute()
+        items = results.get('files', [])
+        # print("_get_folder_id : ", items)
+
+        if len(items) > 1:
+            return None # throw error ?
+
+        if not items:
+            return self._create_folder(name, parent)
+
+        return items[0]["id"]
+
+
+    def _get_files_ids(self, parent=None):
+        query = "trashed=false" +\
+                f" and mimeType!='{MIMETYPE_FOLDER}'" +\
+                f" and '{self._get_folder_id(parent) if parent else 'root'}' in parents"
+        print("_get_files_ids : ", query)
+
+        results = self.service.files().list(fields="nextPageToken, files(id, name)", q=query).execute()
+        items = results.get('files', [])
+        print("_get_files_ids : ", items)
+
+        return items
+
+
+    def _get_file_content(self, id):
+        content_buffer = io.BytesIO()
+        downloader = MediaIoBaseDownload(content_buffer, self.service.files().get_media(fileId=id))
+
+        while downloader.next_chunk()[1] is False:
+            continue
+
+        content_buffer.seek(0)
+        return content_buffer.read().decode('UTF-8')
+
+
+    def download_files_from_folder(self, parent=None):
+        return [{
+                    "name": file["name"],
+                    "content": self._get_file_content(file["id"])
+                }
+                for file in self._get_files_ids(parent)]
+
+
+    def _create_file(self, name, content, parent_id=None):
+        metadata = {
+            'name': name,
+            'mimetype': 'application/vnd.google-apps.document',
+            "parents": [parent_id if parent_id else "root"]
+        }
+        media = MediaIoBaseUpload(io.BytesIO(content.encode('utf-8')), mimetype="text/plain", resumable=True)
+        print("_create_file : ", metadata)
+
+        results = self.service.files().create(body=metadata, media_body=media).execute()
+        print("_create_file : ", results["id"])
+
+        return results["id"]
+
+
+    def _reset_folder(self, parent_id=None):
+        pass
+        # https://stackoverflow.com/questions/33692184/how-to-delete-multiple-files-at-once-using-google-drive-api
+
+
+    def upload_files_to_folder(self, files, parent=None):
+        parent_id = None
+        if parent:
+            parent_id = self._get_folder_id(parent)
+            if not parent_id:
+                return None
+
+        self._reset_folder(parent_id)
+
+        results = [self._create_file(file["name"], file["content"], parent_id) for file in files]
+
+        return not None in results
