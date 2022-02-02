@@ -61,13 +61,13 @@ class Room():
         self.callback_update_server_sockets(socket)
 
 
-    def add_message_in_queue(self, socket_sender, socket_reciever, msg):
-        if socket_reciever == socket_sender:
+    def add_message_in_queue(self, socket_sender, socket_receiver, msg):
+        if socket_receiver == socket_sender:
             return
 
-        self.client_connection_queue[socket_reciever].put(msg)
-        if socket_reciever not in self.outputs:
-            self.outputs.append(socket_reciever)
+        self.client_connection_queue[socket_receiver].put(msg)
+        if socket_receiver not in self.outputs:
+            self.outputs.append(socket_receiver)
 
 
     def send_conflict_message(self, input_to_process):
