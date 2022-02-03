@@ -1,5 +1,5 @@
 from input import Input
-from use_cases.jsonHandler import JsonHandler
+from brique1.jsonHandler import JsonHandler
 
 class InputManager():
     def __init__(self, room_name, send_conflict_message_callback) -> None:
