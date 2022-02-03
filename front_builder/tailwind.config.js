@@ -12,7 +12,14 @@ module.exports = {
       },
     },
   },
+  variants: {
+    backgroundColor: ['responsive', 'hover', 'focus', 'active']
+  },
   plugins: [
-    require('@themesberg/flowbite/plugin')
+    require('@themesberg/flowbite/plugin'),
+    require('@tailwindcss/typography'),
+    require('@tailwindcss/forms'),
+    require('@tailwindcss/line-clamp'),
+    require('@tailwindcss/aspect-ratio'),
   ],
 }
