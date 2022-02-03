@@ -6,7 +6,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import Resource, build
 from googleapiclient.http import MediaIoBaseUpload, MediaIoBaseDownload, BatchHttpRequest
 from googleapiclient.errors import HttpError, BatchError
-
+import pathlib
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/drive']
@@ -16,11 +16,12 @@ MIMETYPE_TEXTFILE = "text/plain"
 
 ENCODING = "utf-8"
 
+RELATIVE_PATH = "drive_access"
+
 
 class DrivePartner:
     def __init__(self):
-        print(os.path)
-        self.service:Resource = build('drive', 'v3', credentials=self._get_creds("drive_access", "credentials.json", "token.json", SCOPES))
+        self.service:Resource = build('drive', 'v3', credentials=self._get_creds("credentials.json", "token.json", SCOPES))
 
 
     def download_files_from_folder(self, name):
@@ -41,11 +42,14 @@ class DrivePartner:
         return not None in results
 
 
-    def _get_creds(self, path, cred_file, token_file, scopes):
+    def _get_creds(self, cred_file, token_file, scopes):
         creds = None
 
-        cred_file = f"{path}/{cred_file}"
-        token_file = f"{path}/{token_file}"
+        path = str(pathlib.Path(__file__).parent.absolute())
+        cred_file = f"{path}/{RELATIVE_PATH}/{cred_file}"
+        token_file = f"{path}/{RELATIVE_PATH}/{token_file}"
+        print(cred_file)
+        print(token_file)
 
         if os.path.exists(f"{path}/{token_file}"):
             creds = Credentials.from_authorized_user_file(token_file, scopes)
