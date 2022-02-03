@@ -22,6 +22,24 @@ class DrivePartner:
         self.service:Resource = build('drive', 'v3', credentials=self._get_creds('credentials.json', 'token.json', SCOPES))
 
 
+    def download_files_from_folder(self, name):
+        return [{
+                    "name": file["name"],
+                    "content": self._get_file_content(file["id"])
+                }
+                for file in self._get_files_ids(self._get_folder_id(name))]
+
+
+    def upload_files_to_folder(self, files, parent=None):
+        parent_id = self._get_parent_id(parent)
+
+        self._reset_folder(parent_id)
+
+        results = [self._create_file(file["name"], file["content"], parent_id) for file in files]
+
+        return not None in results
+
+
     def _get_creds(self, cred_file, token_file, scopes):
         creds = None
 
@@ -110,14 +128,6 @@ class DrivePartner:
         return content_buffer.read().decode(ENCODING)
 
 
-    def download_files_from_folder(self, name):
-        return [{
-                    "name": file["name"],
-                    "content": self._get_file_content(file["id"])
-                }
-                for file in self._get_files_ids(self._get_folder_id(name))]
-
-
     def _create_file(self, name, content, parent_id=None):
         metadata = {
             "name": name,
@@ -144,13 +154,3 @@ class DrivePartner:
             batch.execute()
         except BatchError as error:
             raise Exception("DrivePartner - _reset_folder: execution error", error)
-
-
-    def upload_files_to_folder(self, files, parent=None):
-        parent_id = self._get_parent_id(parent)
-
-        self._reset_folder(parent_id)
-
-        results = [self._create_file(file["name"], file["content"], parent_id) for file in files]
-
-        return not None in results
