@@ -9,6 +9,7 @@ import RequireAuth from "./components/utils/RequireAuth";
 import NavBar from "./components/navigation/NavBar";
 import Layout from "./components/navigation/Layout";
 import Login from "./pages/Login";
+import Profile from "./pages/Profile";
 
 function App() {
 
@@ -21,6 +22,7 @@ function App() {
           <Route index element={<Home/>}/>
           <Route path="dashboard/*" element={<Dashboard/>}/>
           <Route path="about" element={<About/>}/>
+          <Route path="profile" element={<Profile/>}/>
           <Route path="*" element={<NotFound/>}/>
         </Route>
 
