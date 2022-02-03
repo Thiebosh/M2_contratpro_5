@@ -1,10 +1,22 @@
+import os
 from input import Input
 from brique1.jsonHandler import JsonHandler
+from brique2.files_generator import FilesGenerator
+
+from partners.mongo_partner import MongoPartner
+from partners.drive_partner import DrivePartner
+from partners.cpp_partner import CppPartner
 
 class InputManager():
     def __init__(self, room_name, send_conflict_message_callback) -> None:
         self.inputs = []
-        self.master_json = JsonHandler(room_name)
+        partners = {
+            "db": MongoPartner(f"mongodb+srv://{os.environ.get('MONGO_USERNAME')}:{os.environ.get('MONGO_PASSWORD')}@{os.environ.get('MONGO_URL')}"),
+            # "drive": DrivePartner(),
+            "cpp": CppPartner()
+        }
+        self.master_json = JsonHandler(partners, room_name)
+        # self.files_generator = FilesGenerator(partners, room_name)
         self.send_conflict_message_callback = send_conflict_message_callback
 
     def add_new_input(self, socket, msg):

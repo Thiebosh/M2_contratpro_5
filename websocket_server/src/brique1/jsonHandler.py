@@ -1,34 +1,33 @@
 import json
 import logging
-import os
-from pymongo import MongoClient
 from datetime import datetime
-	
+
+COLLECTION_PROJECTS = "projects"
+
 class JsonHandler():
 
 	@staticmethod
 	def check_if_similar_keys(dict1, dict2):
 		return not set(dict1).isdisjoint(dict2)
 
-	def __init__(self, project_name) -> None:
+	def __init__(self, partners, project_name) -> None:
 		"""Initiate the Json Class handling the master version of the model
 
 		Args:
 			file_path (str, optional): [path of the master json file]. Defaults to None.
 		"""
+		self.partners = partners
 		self.project_name = project_name
-		self.conn = MongoClient(f"mongodb+srv://{os.environ.get('MONGO_USERNAME')}:{os.environ.get('MONGO_PASSWORD')}@{os.environ.get('MONGO_URL')}", tlsAllowInvalidCertificates=True)
-		self.projects = self.conn.spectry.projects
-		self.data = self.projects.find_one({"name":project_name})["specs"]
-	
+		self.data = self.partners["db"].find_one(COLLECTION_PROJECTS, {"name":project_name}, {"_id": 0,"specs": 1})["specs"]
+
 
 	def update_project(self):
-		now = datetime.utcnow()
-		self.projects.update_one(
+		self.partners["db"].update_one(
+			COLLECTION_PROJECTS,
             {"name":self.project_name}, 
             { "$set":
                 {
-                    "last_specs":now, 
+                    "last_specs":datetime.utcnow(), 
                     "specs":self.data
                 }
             }

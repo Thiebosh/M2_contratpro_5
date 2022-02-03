@@ -19,7 +19,8 @@ ENCODING = "utf-8"
 
 class DrivePartner:
     def __init__(self):
-        self.service:Resource = build('drive', 'v3', credentials=self._get_creds('credentials.json', 'token.json', SCOPES))
+        print(os.path)
+        self.service:Resource = build('drive', 'v3', credentials=self._get_creds("drive_access", "credentials.json", "token.json", SCOPES))
 
 
     def download_files_from_folder(self, name):
@@ -40,10 +41,13 @@ class DrivePartner:
         return not None in results
 
 
-    def _get_creds(self, cred_file, token_file, scopes):
+    def _get_creds(self, path, cred_file, token_file, scopes):
         creds = None
 
-        if os.path.exists(token_file):
+        cred_file = f"{path}/{cred_file}"
+        token_file = f"{path}/{token_file}"
+
+        if os.path.exists(f"{path}/{token_file}"):
             creds = Credentials.from_authorized_user_file(token_file, scopes)
 
         if not creds or not creds.valid:

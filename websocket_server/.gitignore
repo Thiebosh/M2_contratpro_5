@@ -6,4 +6,5 @@
 **/compilation
 **/prototypeur.exe
 
-**/token_*.json
+**/credentials.json
+**/token.json
