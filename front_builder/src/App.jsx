@@ -1,4 +1,4 @@
-import {BrowserRouter, Routes, Route} from "react-router-dom";
+import {BrowserRouter, Route, Routes} from "react-router-dom";
 
 import './App.css'
 import Home from "./pages/Home";
@@ -6,7 +6,6 @@ import NotFound from "./pages/NotFound";
 import Dashboard from "./pages/Dashboard";
 import About from "./pages/About";
 import RequireAuth from "./components/utils/RequireAuth";
-import NavBar from "./components/navigation/NavBar";
 import Layout from "./components/navigation/Layout";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
