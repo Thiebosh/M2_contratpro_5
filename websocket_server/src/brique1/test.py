@@ -26,10 +26,10 @@ def dictizeString(string, dictionary):
 		dictizeString(parts[1], branch)
 	else:
 		if dictionary.__contains__(parts[0]):
-				# If there's an addition error here, it's because invalid data was added
-				dictionary[parts[0]] += 1
+			# If there's an addition error here, it's because invalid data was added
+			dictionary[parts[0]] += 1
 		else:
-				dictionary[parts[0]] = 1
+			dictionary[parts[0]] = 1
 
 def delete_from_path(string_path: str, dictionary: dict):
 	"""Create New Dictionnary based on hierarchie path
@@ -49,11 +49,11 @@ def delete_from_path(string_path: str, dictionary: dict):
 		delete_from_path(parts[1], branch)
 	else:
 		if dictionary.__contains__(parts[0]):
-				# If there's an addition error here, it's because invalid data was added
-				debug.logging("Modify in path {} from {} to {}".format(string_path, dictionary[parts[0]], parts[0]))
-				dictionary.pop(parts[0], "Not Found")
+			# If there's an addition error here, it's because invalid data was added
+			debug.logging("Modify in path {} from {} to {}".format(string_path, dictionary[parts[0]], parts[0]))
+			dictionary.pop(parts[0], "Not Found")
 		else:
-				return "Key Not Found"
+			return "Key Not Found"
 	return dictionary
 
 def create_from_path(string_path: str, dictionary: dict, value: str = None):
@@ -74,12 +74,12 @@ def create_from_path(string_path: str, dictionary: dict, value: str = None):
 		create_from_path(parts[1], branch, value)
 	else:
 		if dictionary.__contains__(parts[0]):
-				# If there's an addition error here, it's because invalid data was added
-				logging.debug("Modify in path {} from {} to {}".format(string_path, dictionary[parts[0]], value))
-				dictionary[parts[0]] = value
+			# If there's an addition error here, it's because invalid data was added
+			logging.debug("Modify in path {} from {} to {}".format(string_path, dictionary[parts[0]], value))
+			dictionary[parts[0]] = value
 		else:
-				logging.debug("Creating new path  with value {}".format(string_path))
-				dictionary[parts[0]] = value
+			logging.debug("Creating new path  with value {}".format(string_path))
+			dictionary[parts[0]] = value
 	return dictionary
 
 d = {}

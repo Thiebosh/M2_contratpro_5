@@ -1,4 +1,3 @@
-import os
 from quart import Quart, current_app
 from flask_api import status
 from simple_bcrypt import Bcrypt
@@ -17,7 +16,7 @@ def create_app(config, db=None) -> Quart:
 
     # partners setup
     app.config["partners"] = {
-        "db": db or MongoPartner(mongo_url=f"mongodb+srv://{os.environ.get('MONGO_USERNAME')}:{os.environ.get('MONGO_PASSWORD')}@{os.environ.get('MONGO_URL')}"),
+        "db": db or MongoPartner(mongo_url=app.config["MONGO_URL"]),
         "crypt": Bcrypt(app)
     }
 
@@ -37,4 +36,5 @@ def create_app(config, db=None) -> Quart:
     return app
 
 async def close_app():
-    (partner.close() for partner in current_app.config["partners"].values())
+    for partner in current_app.config["partners"].values():
+        partner.close()
