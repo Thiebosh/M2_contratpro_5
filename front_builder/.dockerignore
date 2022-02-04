@@ -1,7 +1,18 @@
 **/.vscode/
 
-node_modules
-build
+**/__pycache__/
+**/.pytest_cache/
+
+# git files
+readme.md
+.gitignore
+
+# docker files
 .dockerignore
 Dockerfile
 Dockerfile.prod
+docker-compose.yml
+
+# react files
+node_modules
+build
