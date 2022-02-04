@@ -12,11 +12,11 @@ class InputManager():
         self.inputs = []
         partners = {
             "db": MongoPartner(f"mongodb+srv://{os.environ.get('MONGO_USERNAME')}:{os.environ.get('MONGO_PASSWORD')}@{os.environ.get('MONGO_URL')}"),
-            # "drive": DrivePartner(),
+            "drive": DrivePartner(),
             "cpp": CppPartner()
         }
         self.master_json = JsonHandler(partners, room_name)
-        # self.files_generator = FilesGenerator(partners, room_name)
+        self.files_generator = FilesGenerator(partners, room_name)
         self.send_conflict_message_callback = send_conflict_message_callback
 
     def add_new_input(self, socket, msg):

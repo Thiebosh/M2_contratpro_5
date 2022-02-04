@@ -34,7 +34,7 @@ class JsonHandler():
         )
 		print("Project well updated")
 
-		
+
 	def consumer(self, path: str, action: str, value: str, value_type: str ):
 		"""[Consumer]
 

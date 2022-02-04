@@ -2,6 +2,7 @@ import os
 import io
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
+from google.oauth2.service_account import Credentials as Creds
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import Resource, build
 from googleapiclient.http import MediaIoBaseUpload, MediaIoBaseDownload, BatchHttpRequest
@@ -21,7 +22,7 @@ RELATIVE_PATH = "drive_access"
 
 class DrivePartner:
     def __init__(self):
-        self.service:Resource = build('drive', 'v3', credentials=self._get_creds("credentials.json", "token.json", SCOPES))
+        self.service:Resource = build('drive', 'v3', credentials=self._get_creds("service_account.json", SCOPES))
 
 
     def download_files_from_folder(self, name):
@@ -42,29 +43,10 @@ class DrivePartner:
         return not None in results
 
 
-    def _get_creds(self, cred_file, token_file, scopes):
-        creds = None
-
+    def _get_creds(self, cred_file, scopes):
         path = str(pathlib.Path(__file__).parent.absolute())
         cred_file = f"{path}/{RELATIVE_PATH}/{cred_file}"
-        token_file = f"{path}/{RELATIVE_PATH}/{token_file}"
-        print(cred_file)
-        print(token_file)
-
-        if os.path.exists(f"{path}/{token_file}"):
-            creds = Credentials.from_authorized_user_file(token_file, scopes)
-
-        if not creds or not creds.valid:
-            if creds and creds.expired and creds.refresh_token:
-                creds.refresh(Request())
-            else:
-                flow = InstalledAppFlow.from_client_secrets_file(cred_file, scopes)
-                creds = flow.run_local_server(port=0)
-
-            with open(token_file, 'w') as token:
-                token.write(creds.to_json())
-
-        return creds
+        return Creds.from_service_account_file(cred_file, scopes=scopes)
 
 
     def _create_folder(self, name, parent_id=None):
