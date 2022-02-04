@@ -8,6 +8,7 @@ from input_manager import InputManager
 
 class Room():
     def __init__(self, room_name, room_socket, callback_update_server_sockets, callback_remove_room, encoding) -> None:
+        print(f"{room_name} - Create room")
         self.close_evt = threading.Event()
         self.queue = queue.Queue()
         self.lock = threading.Lock()
@@ -21,19 +22,18 @@ class Room():
 
         self.encoding = encoding
         self.input_manager = InputManager(room_name, self.send_conflict_message)
-        
+
 
     def get_param(self):
         return {
-                "close_evt": self.close_evt,
-                "add_queue": self.queue,
-                "add_lock": self.lock
+            "close_evt": self.close_evt,
+            "add_queue": self.queue,
+            "add_lock": self.lock
         }
-    
+
 
     def read(self, polling_freq):
-        readable, writable, exception = select.select(self.inputs, self.outputs, self.inputs, polling_freq)
-        return readable, writable, exception
+        return select.select(self.inputs, self.outputs, self.inputs, polling_freq)
 
 
     def close(self):
@@ -47,9 +47,8 @@ class Room():
         self.inputs.append(socket)
         self.client_connection_queue[socket] = queue.Queue()
         print(f"{self.room_name} - Get client {socket.getpeername()}")
-        
-        self.client_connection_queue[socket].put("\n".join(self.input_manager.master_json.data))
-        
+
+        self.client_connection_queue[socket].put(json.dumps({"init": self.input_manager.master_json.data}))
         self.outputs.append(socket)
 
 
@@ -62,11 +61,13 @@ class Room():
         self.callback_update_server_sockets(socket)
 
 
-    def add_message_in_queue(self, socket, client_socket, b_msg):
-        if client_socket != socket:
-            self.client_connection_queue[client_socket].put(b_msg)
-            if client_socket not in self.outputs:
-                self.outputs.append(client_socket)
+    def add_message_in_queue(self, socket_sender, socket_receiver, msg):
+        if socket_receiver == socket_sender:
+            return
+
+        self.client_connection_queue[socket_receiver].put(msg)
+        if socket_receiver not in self.outputs:
+            self.outputs.append(socket_receiver)
 
 
     def send_conflict_message(self, input_to_process):
@@ -76,7 +77,7 @@ class Room():
 
 
     def run(self, polling_freq=0.1):
-        print(f"{self.room_name} - Create room")
+        print(f"{self.room_name} - Room ready")
         while not self.close_evt.is_set() and self.inputs:
             with self.lock:
                 while not self.queue.empty():
@@ -92,7 +93,7 @@ class Room():
                 if not msg:
                     self.close_client_connection_to_room(socket)
                     continue
-                
+
                 msg = json.loads(msg)
 
                 if msg["action"] == "exitRoom":
@@ -100,17 +101,27 @@ class Room():
                     continue
 
                 self.input_manager.add_new_input(socket, msg)
-            
 
-            for input_to_process in self.input_manager.get_inputs_copy():
-                if input_to_process.counter == 0:
-                    #If no conflicts, execute the action ; in every case : remove socket from list
-                    if not self.input_manager.check_conflicts(input_to_process):
-                        self.input_manager.check_and_execute_action_function(input_to_process)
-                        for client_socket in self.client_connection_queue:
-                            self.add_message_in_queue(input_to_process.socket, client_socket, json.dumps(self.input_manager.master_json.data))
-                            #json_dumps(...) to change : should be only the last modification accepted by the server, not all the json
-                    self.input_manager.inputs.remove(input_to_process)
+
+            conflicts = []
+            for input_to_process in self.input_manager.inputs:
+                if input_to_process.counter != 0 or input_to_process in conflicts:
+                    continue
+
+                #If no conflicts, execute the action ; in every case : remove socket from list
+                socket_conflicts = self.input_manager.check_conflicts(input_to_process)
+                if socket_conflicts:
+                    conflicts += socket_conflicts
+                    continue
+
+                self.input_manager.check_and_execute_action_function(input_to_process)
+
+                for client_socket in self.client_connection_queue:
+                    self.add_message_in_queue(input_to_process.socket, client_socket, json.dumps(self.input_manager.master_json.data))
+                    #json_dumps(...) to change : should be only the last modification accepted by the server, not all the json
+
+            conflicts = set(conflicts)
+            self.input_manager.inputs = [input_unit for input_unit in self.input_manager.inputs if input_unit.counter != 0 and input not in conflicts]
 
             self.input_manager.decrease_counter_on_all_inputs()
 

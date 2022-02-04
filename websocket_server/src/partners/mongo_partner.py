@@ -7,7 +7,6 @@ class MongoPartner:
     def __init__(self, mongo_url):
         self.conn = MongoClient(mongo_url, tlsAllowInvalidCertificates=True)
         self.collections = {
-            "accounts": self.conn.spectry.accounts,
             "projects": self.conn.spectry.projects
         }
 
@@ -16,7 +15,7 @@ class MongoPartner:
         self.conn.close()
 
 
-    async def insert_one(self, collection, data):
+    def insert_one(self, collection, data):
         if collection not in self.collections:
             return False
 
@@ -37,7 +36,7 @@ class MongoPartner:
         return success
 
 
-    async def update_one(self, collection, filter_q, update_q):
+    def update_one(self, collection, filter_q, update_q):
         if collection not in self.collections:
             return False
 
@@ -58,7 +57,7 @@ class MongoPartner:
         return success
 
 
-    async def update_many(self, collection, filter_q, update_q):
+    def update_many(self, collection, filter_q, update_q):
         if collection not in self.collections:
             return False
 
@@ -78,28 +77,28 @@ class MongoPartner:
         return result.modified_count
 
 
-    async def find_one(self, collection, filter_q, fields=None):
+    def find_one(self, collection, filter_q, fields=None):
         if collection not in self.collections:
             return False
 
         return self.collections[collection].find_one(filter_q, fields)
 
 
-    async def find_list(self, collection, filter_q, fields=None):
+    def find_list(self, collection, filter_q, fields=None):
         if collection not in self.collections:
             return False
 
         return list(self.collections[collection].find(filter_q, fields))
 
 
-    async def aggregate(self, collection, aggregation):
+    def aggregate(self, collection, aggregation):
         if collection not in self.collections:
             return False
 
         return list(self.collections[collection].aggregate(aggregation))
 
 
-    async def delete_one(self, collection, filter_q):
+    def delete_one(self, collection, filter_q):
         if collection not in self.collections:
             return False
 
@@ -120,7 +119,7 @@ class MongoPartner:
         return success
 
 
-    async def delete_many(self, collection, filter_q):
+    def delete_many(self, collection, filter_q):
         if collection not in self.collections:
             return False
 
