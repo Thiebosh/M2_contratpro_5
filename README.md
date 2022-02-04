@@ -13,3 +13,7 @@ The docker-compose at root folder start all services in prod config (cold reload
 - rest: http://localhost:8001/probe
 - socket: open client and verify console logs
 - render: http://localhost:8003/?action=probe
+
+
+# Pipeline CI/CD
+https://docs.github.com/en/actions/migrating-to-github-actions/migrating-from-gitlab-cicd-to-github-actions

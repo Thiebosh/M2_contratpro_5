@@ -8,6 +8,7 @@ import os
 
 class Server():
     def __init__(self) -> None:
+        print("Starting server...")
         self.inputs = []
         self.polling_freq = 0.5
         self.room_m = RoomManager()
@@ -26,7 +27,7 @@ class Server():
     def read(self):
         readable, _, exception = select.select(self.inputs, [], self.inputs, self.polling_freq)
         return readable, exception
-            
+
     def close(self):
         print("Get close signal")
         for socket in self.inputs:
@@ -51,8 +52,10 @@ class Server():
         self.inputs.remove(socket)
         socket.close()
 
-    def run(self):    
+    def run(self):
         self.inputs.append(self.socket) # Contient tous les sockets (serveur + toutes les rooms)
+
+        print("Server ready")
 
         while self.inputs:
             try:
@@ -74,7 +77,7 @@ class Server():
                     continue
 
                 target = json.loads(target)
-                
+
                 if "action" in target and target["action"] == "connectRoom" :
                     if not target["roomName"] in self.room_m.rooms:
                         self.room_m.create_room(target["roomName"], socket, self.callback_update_server_sockets, self.encoding)
@@ -91,6 +94,8 @@ class Server():
 
             self.room_m.rooms = {key: values for key, values in self.room_m.rooms.items() if not values.get_param()["close_evt"].is_set()}
 
-    
+        print("Closing server...")
+
+
     def callback_update_server_sockets(self,socket):
         self.inputs.append(socket)
