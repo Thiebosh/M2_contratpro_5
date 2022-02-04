@@ -64,14 +64,19 @@ class InputManager():
         if input_to_process.failed : 
             return
         action = input_to_process.get_action()
-        
-        if action == "update":
-            self.master_json.create_from_path(input_to_process.get_path(), self.master_json.data, input_to_process.get_content())
-                # Send notif to other clients to reload their json
+
+        if action == "create":
+            self.master_json.add_element(input_to_process.get_path().split("/"), input_to_process.get_content())
+            # Send notif to other clients to reload their json
+        elif action == "update":
+            self.master_json.create_from_path(input_to_process.get_path().split("/"), input_to_process.get_content())
+            # Send notif to other clients to reload their json
         elif action == "delete":
-            self.master_json.delete_from_path(input_to_process.get_path(), self.master_json.data, input_to_process.get_content())
+            self.master_json.delete_from_path(input_to_process.get_path().split("/"), input_to_process.get_content())
+            # Send notif to other clients to reload their json
         elif action == "save":
-            self.master_json.update_project()        
+            result = self.master_json.update_storage()
+            print(f"Project {'well' if result else 'not'} updated")
         elif action == "generate":
             return
         elif action == "execute":
