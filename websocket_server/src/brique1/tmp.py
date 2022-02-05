@@ -31,7 +31,7 @@ print("retour : ", result, " - ", handler.data)
 # # modify_element : return true
 print("modify element")
 result = handler.modify_element("root/screen/0/name".split("/"), "other")
-print("retour : ", result, " - ", handler.data) # not good...
+print("retour : ", result, " - ", handler.data)
 
 # # modify_element : return false
 result = handler.modify_element("root/screen/5/name".split("/"), "other")

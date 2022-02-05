@@ -102,4 +102,11 @@ class JsonHandler():
         if type(content) not in (int, float, str):
             return False
 
-        return self.remove_element(path[:-1], path[-1]) and self.add_element(path[:-1], {path[-1]: content})
+        container = self._path_climber(path[:-1], self.data)
+
+        if container is False or path[-1] not in container.keys():
+            return False
+
+        container[path[-1]] = content
+
+        return True
