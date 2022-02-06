@@ -1,28 +1,18 @@
-import os
 import io
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
 from google.oauth2.service_account import Credentials as Creds
-from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import Resource, build
 from googleapiclient.http import MediaIoBaseUpload, MediaIoBaseDownload, BatchHttpRequest
 from googleapiclient.errors import HttpError, BatchError
-import pathlib
-
-# If modifying these scopes, delete the file token.json.
-SCOPES = ['https://www.googleapis.com/auth/drive']
 
 MIMETYPE_FOLDER = "application/vnd.google-apps.folder"
 MIMETYPE_TEXTFILE = "text/plain"
 
 ENCODING = "utf-8"
 
-RELATIVE_PATH = "drive_access"
-
 
 class DrivePartner:
-    def __init__(self):
-        self.service:Resource = build('drive', 'v3', credentials=self._get_creds("service_account.json", SCOPES))
+    def __init__(self, creds_relative_path, scopes):
+        self.service:Resource = build('drive', 'v3', credentials=Creds.from_service_account_file(creds_relative_path, scopes=scopes))
 
 
     def download_files_from_folder(self, name):
@@ -33,20 +23,14 @@ class DrivePartner:
                 for file in self._get_files_ids(self._get_folder_id(name))]
 
 
-    def upload_files_to_folder(self, files, parent=None):
-        parent_id = self._get_parent_id(parent)
+    def upload_files_to_folder(self, name, files):
+        folder_id = self._get_parent_id(name)
 
-        self._reset_folder(parent_id)
+        self._reset_folder(folder_id)
 
-        results = [self._create_file(file["name"], file["content"], parent_id) for file in files]
+        results = [self._create_file(file["name"], file["content"], folder_id) for file in files]
 
         return not None in results
-
-
-    def _get_creds(self, cred_file, scopes):
-        path = str(pathlib.Path(__file__).parent.absolute())
-        cred_file = f"{path}/{RELATIVE_PATH}/{cred_file}"
-        return Creds.from_service_account_file(cred_file, scopes=scopes)
 
 
     def _create_folder(self, name, parent_id=None):

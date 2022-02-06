@@ -5,7 +5,10 @@ RUN pip install -U --no-cache-dir \
         quart==0.16.1 \
         flask_api==3.0.post1 \
         pymongo[srv]==4.0.1 \
-        simple_bcrypt==0.1.0
+        simple_bcrypt==0.1.0 \
+        google-api-python-client>=2.0.2 \
+        google-auth-httplib2>=0.1.0 \
+        google-auth-oauthlib>=0.4.3
 
 ARG arg_port
 
