@@ -1,4 +1,3 @@
-pip
 quart==0.16.1
 flask_api==3.0.post1
 pymongo[srv]==4.0.1

@@ -32,6 +32,9 @@ EXPOSE $arg_port
 ENV HOST=0.0.0.0
 ENV PORT=$arg_port
 
+WORKDIR /credentials
+COPY credentials .
+
 WORKDIR /src
 COPY src .
 COPY --from=build /src/prototypeur.exe /src/brique2/cpp/

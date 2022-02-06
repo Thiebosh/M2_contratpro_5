@@ -13,4 +13,5 @@ services:
         volumes:
             - "./src/:/src/"
             - "./cpp/:/src/brique2/cpp/"
+            - "./credentials/:/credentials/"
         tty: true # bind console

@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import os
+import pathlib
 
 @dataclass
 class Config:
@@ -12,6 +13,8 @@ class Config:
     BCRYPT_HANDLE_LONG_PASSWORDS = False
 
     MONGO_URL = f"mongodb+srv://{os.environ.get('MONGO_USERNAME')}:{os.environ.get('MONGO_PASSWORD')}@{os.environ.get('MONGO_URL')}"
+    DRIVE_PATH = f"{pathlib.Path(__file__).parent.absolute()}/../credentials/service_account.json"
+    DRIVE_SCOPES = ['https://www.googleapis.com/auth/drive']
 
 @dataclass
 class ProductionConfig(Config):
