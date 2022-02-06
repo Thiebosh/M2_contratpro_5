@@ -1,4 +1,5 @@
 import queue
+from re import S
 import threading
 import select
 
@@ -7,7 +8,7 @@ import json
 from input_manager import InputManager
 
 class Room():
-    def __init__(self, room_name, room_socket, callback_update_server_sockets, callback_remove_room, encoding) -> None:
+    def __init__(self, room_name, room_socket, partners, callback_update_server_sockets, callback_remove_room, encoding) -> None:
         print(f"{room_name} - Create room")
         self.close_evt = threading.Event()
         self.queue = queue.Queue()
@@ -19,9 +20,10 @@ class Room():
         self.client_connection_queue = {self.room_socket: queue.Queue()}
         self.callback_update_server_sockets = callback_update_server_sockets
         self.callback_remove_room = callback_remove_room
-
+        self.partners = partners
+        
         self.encoding = encoding
-        self.input_manager = InputManager(room_name, self.send_conflict_message)
+        self.input_manager = InputManager(room_name, self.partners, self.send_conflict_message)
 
 
     def get_param(self):
