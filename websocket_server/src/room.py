@@ -137,6 +137,7 @@ class Room():
             for socket in exception:
                 self.close_client_connection_to_room(socket)
 
-        self.input_manager.master_json.update_project()
+        result = self.input_manager.master_json.update_storage()
+        print(f"Project {'well' if result else 'not'} updated")
         print(f"{self.room_name} - Close room")
         self.callback_remove_room(self.room_name)

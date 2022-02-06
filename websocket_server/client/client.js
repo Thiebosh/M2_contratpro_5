@@ -37,20 +37,22 @@ $(function () {
     $(`<p>- client : ${input_msg.val()}</p>`).appendTo(output_msg);
   });
 
+  $("#addScreenOptionButton").on("click", function(){
+    json = {
+      "action":"create",
+      "path":"root",
+      "content":{ "screen": []}
+    }
+    socket.send(JSON.stringify(json))
+  });
+
   $("#createNewScreenButton").on("click", function(){
     json = {
       "action":"create",
       "path":"root/screen",
       "content":{ "name": ""}
-  }
-
-  // {
-  //   "action":"update",
-  //   "path":"root",
-  //   "content":{'screen':[]}
-  // }
-
-  socket.send(JSON.stringify(json))
+    }
+    socket.send(JSON.stringify(json))
   });
 
   $("#createButton2").on("click", function(){
@@ -74,6 +76,7 @@ $(function () {
     inRoom = true;
 
     $("#connectionButton").css("display","None");
+    $("#addScreenOptionButton").css("display","");
     $("#createNewScreenButton").css("display","");
     $("#createButton2").css("display","");
     $("#saveButton").css("display","");
@@ -89,6 +92,7 @@ $(function () {
 
     $("#message_output").empty();
     $("#connectionButton").css("display","");
+    $("#addScreenOptionButton").css("display","None");
     $("#createNewScreenButton").css("display","None");
     $("#createButton2").css("display","None");
     $("#saveButton").css("display","None");
