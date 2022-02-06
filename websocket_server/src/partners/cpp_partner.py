@@ -6,6 +6,9 @@ class CppPartner():
         self.exe_path = "./exe_path"
         self.freq = 0.4
 
+    def copy_partner(self):
+        return CppPartner()
+
     async def call(self, specs):
         args = (specs,)
         process = Popen([self.exe_path, *args], stdout=PIPE, stderr=PIPE, text=True)

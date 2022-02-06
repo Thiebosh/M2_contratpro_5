@@ -5,11 +5,14 @@ LOGGER_ID = "MongoPartner:"
 
 class MongoPartner:
     def __init__(self, mongo_url):
+        self.mongo_url = mongo_url
         self.conn = MongoClient(mongo_url, tlsAllowInvalidCertificates=True)
         self.collections = {
             "projects": self.conn.spectry.projects
         }
 
+    def copy_partner(self):
+        return MongoPartner(self.mongo_url)
 
     def close(self):
         self.conn.close()
