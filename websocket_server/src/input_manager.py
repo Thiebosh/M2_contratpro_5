@@ -44,6 +44,7 @@ class InputManager():
             #DELETE
             elif first_path in second_path and current_input.get_action() == "delete":
                 #No removing on input_to_process because its action will be executed, it's the current_input deletion which conflict
+                input_to_process.failed = True
                 self.send_conflict_message_callback(current_input)
                 conflict_list.append(current_input)
 
