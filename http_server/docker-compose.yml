@@ -12,5 +12,6 @@ services:
             - ./../.env
         volumes:
             - "./src/:/src/"
+            - "./credentials/:/credentials/"
         tty: true # bind console
         restart: on-failure

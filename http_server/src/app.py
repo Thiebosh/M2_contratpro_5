@@ -3,12 +3,13 @@ from flask_api import status
 from simple_bcrypt import Bcrypt
 
 from partners.mongo_partner import MongoPartner
+from partners.drive_partner import DrivePartner
 
 from blueprints.account import bp_account
 from blueprints.project import bp_project
 
 
-def create_app(config, db=None) -> Quart:
+def create_app(config, db=None, nas=None) -> Quart:
     # base setup
     app = Quart(__name__)
     app.config.from_object(config)
@@ -17,6 +18,7 @@ def create_app(config, db=None) -> Quart:
     # partners setup
     app.config["partners"] = {
         "db": db or MongoPartner(mongo_url=app.config["MONGO_URL"]),
+        "nas": nas or DrivePartner(creds_relative_path=app.config["DRIVE_PATH"], scopes=app.config["DRIVE_SCOPES"]),
         "crypt": Bcrypt(app)
     }
 

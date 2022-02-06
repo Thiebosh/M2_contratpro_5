@@ -187,6 +187,16 @@ async def delete():
         }
     }
 
+    fields = {
+        "_id": 0,
+        "id": {
+            "$toString": "$_id"
+        },
+    }
+    for project in await current_app.config["partners"]["db"].find_list(COLLECTION_PROJECTS, filter_unique_contrib_projects, fields):
+        print(project)
+        current_app.config["partners"]["nas"].remove_folder(project["id"])
+
     return {
         "success": await current_app.config["partners"]["db"].delete_one(COLLECTION_ACCOUNTS, filter_user),
         "deleted_projects": await current_app.config["partners"]["db"].delete_many(COLLECTION_PROJECTS, filter_unique_contrib_projects),
