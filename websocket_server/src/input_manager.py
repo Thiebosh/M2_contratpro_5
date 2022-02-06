@@ -1,4 +1,5 @@
 import os
+import pathlib
 from input import Input
 from brique1.jsonHandler import JsonHandler
 from brique2.files_generator import FilesGenerator
@@ -12,7 +13,7 @@ class InputManager():
         self.inputs = []
         partners = {
             "db": MongoPartner(f"mongodb+srv://{os.environ.get('MONGO_USERNAME')}:{os.environ.get('MONGO_PASSWORD')}@{os.environ.get('MONGO_URL')}"),
-            "drive": DrivePartner(),
+            "drive": DrivePartner(creds_relative_path=f"{pathlib.Path(__file__).parent.absolute()}/../credentials/service_account.json", scopes=['https://www.googleapis.com/auth/drive']),
             "cpp": CppPartner()
         }
         self.master_json = JsonHandler(partners, room_name)
@@ -64,14 +65,19 @@ class InputManager():
         if input_to_process.failed : 
             return
         action = input_to_process.get_action()
-        
-        if action == "update":
-            self.master_json.create_from_path(input_to_process.get_path(), self.master_json.data, input_to_process.get_content())
-                # Send notif to other clients to reload their json
+
+        if action == "create":
+            self.master_json.add_element(input_to_process.get_path().split("/"), input_to_process.get_content())
+            # Send notif to other clients to reload their json
+        elif action == "update":
+            self.master_json.modify_element(input_to_process.get_path().split("/"), input_to_process.get_content())
+            # Send notif to other clients to reload their json
         elif action == "delete":
-            self.master_json.delete_from_path(input_to_process.get_path(), self.master_json.data, input_to_process.get_content())
+            self.master_json.remove_element(input_to_process.get_path().split("/"), input_to_process.get_content())
+            # Send notif to other clients to reload their json
         elif action == "save":
-            self.master_json.update_project()        
+            result = self.master_json.update_storage()
+            print(f"Project {'well' if result else 'not'} updated")
         elif action == "generate":
             return
         elif action == "execute":

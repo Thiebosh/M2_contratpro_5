@@ -152,5 +152,6 @@ async def delete():
     }
 
     return {
-        "success": await current_app.config["partners"]["db"].delete_one(COLLECTION, filter_q)
+        "success": await current_app.config["partners"]["db"].delete_one(COLLECTION, filter_q) \
+                    and current_app.config["partners"]["nas"].remove_folder(project_id)
     }, status.HTTP_200_OK
