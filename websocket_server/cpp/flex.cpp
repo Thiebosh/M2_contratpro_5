@@ -1,6 +1,7 @@
 %option noyywrap
 %{
-    #include "compiled.bison.cpp"
+    #include <iostream>
+    #include "compiled.bison.hpp"
 
     char* unquote(char* input, int length);
 %}
@@ -39,7 +40,7 @@ EOL     \r\n|\r|\n
 {COLOR} { yylval.string = unquote(yytext,yyleng); return COLOR_VALUE; }
 
 [ \t]|{EOL} { }
-.           { cout << endl << "Error - raw text : '" << yytext[0] << "'" << endl; exit(1); }
+.           { std::cout << std::endl << "Error - raw text : '" << yytext[0] << "'" << std::endl; exit(1); }
 
 %%
 

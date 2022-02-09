@@ -19,7 +19,7 @@ class CppPartner():
                 break
             await asyncio.sleep(self.freq)
 
-        lines = process.communicate()[0].split("\n\n")
+        lines = process.communicate()[0].split("\n\n\n")
         lines = [ # example
             'ecran1.html \
             <section style="background-color: #6897bb; margin: auto; "> \
