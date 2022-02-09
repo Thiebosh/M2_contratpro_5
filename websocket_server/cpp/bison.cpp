@@ -1,39 +1,8 @@
 %define parse.error verbose
 %{
+    #include "../core.cpp"
+
     #define YYDEBUG 1
-
-    #include <iostream>
-    #include <string>
-    #include <map>
-
-    using namespace std;
-
-    enum class container {
-        root,
-        screen,
-        block,
-        text
-    };
-
-    container currentContainer = container::root;
-    string currentHtml = "";
-    map<string, string> htmlContent;
-    int indent = 0; //tmp
-
-    map<container, string> colorContainer = {
-		{container::screen, "background-color: "},
-		{container::block, "background-color: "},
-		{container::text, "color: "}
-	};
-    map<string, map<container, string>> alignContainer = {
-        {"center", 
-            {
-                {container::screen, "margin: auto; "},
-                {container::block, "margin: auto; "},
-                {container::text, "text-align: center; "}
-            }
-        }
-    };
 
     extern FILE *yyin;
     extern int yylex ();
@@ -80,7 +49,7 @@ proto_files
         array
         {
             --indent;
-            htmlContent[currentHtml] += "</article>";
+            htmlContent[currentHtmlPage] += "</section>";
         }
     ;
 
@@ -102,11 +71,11 @@ fields
 
 field
     :   NAME STR_VALUE
-        { 
+        {
             switch(currentContainer) {
                 case container::screen:
-                    currentHtml = $2;
-                    htmlContent.insert({currentHtml, "<article>\n"});
+                    currentHtmlPage = $2;
+                    htmlContent.insert({currentHtmlPage, "<section>\n"});
                     indent++;
                     break;
             }
@@ -115,51 +84,51 @@ field
     |   BLOCK
         {
             currentContainer = container::block;
-            htmlContent[currentHtml] += string(indent++, '\t') + "<div>\n";
+            htmlContent[currentHtmlPage] += (INDENT ? string(indent++, '\t') : "") + "<div>\n";
         }
         doc
         {
-            htmlContent[currentHtml] += string(--indent, '\t') + "</div>\n";
+            htmlContent[currentHtmlPage] += (INDENT ? string(--indent, '\t') : "") + "</div>\n";
         }
     |   TEXT
         {
             currentContainer = container::text;
-            htmlContent[currentHtml] += string(indent++, '\t') + "<p>\n";
+            htmlContent[currentHtmlPage] += (INDENT ? string(indent++, '\t') : "") + "<p>\n";
         }
         doc
         {
-            htmlContent[currentHtml] += string(--indent, '\t') + "</p>\n";
+            htmlContent[currentHtmlPage] += (INDENT ? string(--indent, '\t') : "") + "</p>\n";
         }
     |   VALUE STR_VALUE
         {
-            htmlContent[currentHtml] += string(indent, '\t') + $2 + '\n';
+            htmlContent[currentHtmlPage] += (INDENT ? string(indent, '\t') : "") + $2 + '\n';
         }
     |   STYLE
         {
-            htmlContent[currentHtml].pop_back();
-            htmlContent[currentHtml].pop_back();
-            htmlContent[currentHtml] += " style=\"";
+            htmlContent[currentHtmlPage].pop_back();
+            htmlContent[currentHtmlPage].pop_back();
+            htmlContent[currentHtmlPage] += " style=\"";
         }
         doc
         {
-            htmlContent[currentHtml].pop_back();
-            htmlContent[currentHtml] += "\">\n";
+            htmlContent[currentHtmlPage].pop_back();
+            htmlContent[currentHtmlPage] += "\">\n";
         }
     |   COLOR COLOR_VALUE
         {
-            htmlContent[currentHtml] += colorContainer[currentContainer] + $2 + "; ";
+            htmlContent[currentHtmlPage] += colorContainer[currentContainer] + $2 + "; ";
         }
     |   COLOR STR_VALUE
         {
-            htmlContent[currentHtml] += colorContainer[currentContainer] + $2 + "; ";
+            htmlContent[currentHtmlPage] += colorContainer[currentContainer] + $2 + "; ";
         }
     |   DECO STR_VALUE
         {
-            htmlContent[currentHtml] += "text-decoration: " + (string)$2 + "; ";
+            htmlContent[currentHtmlPage] += "text-decoration: " + (string)$2 + "; ";
         }
     |   ALIGN STR_VALUE
         {
-            htmlContent[currentHtml] += alignContainer[$2][currentContainer] + " ";
+            htmlContent[currentHtmlPage] += alignContainer[$2][currentContainer] + " ";
         }
     ;
 
@@ -167,16 +136,10 @@ field
 
 int main(int argc, char **argv) {
     if (yyin = fopen("needs.json","r")) {//fournit à flex le fichier à parser
-        cout << "acquisition fichier ok" << endl << endl;
         yyparse();//parse le fichier
     }
 
-    cout << endl << endl << "fin de parcours." << endl << endl;
-
-    cout << "affiche contenu écrans :" << endl;
-	for (auto file : htmlContent) cout << file.first << ".html" << endl << file.second << endl << endl;
-
-    cout << "fin d'exécution." << endl;
+    outputResultFiles();
 
     return 0;
 }
