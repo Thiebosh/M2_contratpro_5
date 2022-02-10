@@ -3,19 +3,15 @@ import pathlib
 from input import Input
 from brique1.jsonHandler import JsonHandler
 from brique2.files_generator import FilesGenerator
-
+from partners.cpp_partner import CppPartner
 from partners.mongo_partner import MongoPartner
 from partners.drive_partner import DrivePartner
-from partners.cpp_partner import CppPartner
 
 class InputManager():
-    def __init__(self, room_name, send_conflict_message_callback) -> None:
+    def __init__(self, room_name, partners, send_conflict_message_callback) -> None:
         self.inputs = []
-        partners = {
-            "db": MongoPartner(f"mongodb+srv://{os.environ.get('MONGO_USERNAME')}:{os.environ.get('MONGO_PASSWORD')}@{os.environ.get('MONGO_URL')}"),
-            "drive": DrivePartner(creds_relative_path=f"{pathlib.Path(__file__).parent.absolute()}/../credentials/service_account.json", scopes=['https://www.googleapis.com/auth/drive']),
-            "cpp": CppPartner()
-        }
+        self.partners = partners
+        
         self.master_json = JsonHandler(partners, room_name)
         self.files_generator = FilesGenerator(partners, room_name)
         self.send_conflict_message_callback = send_conflict_message_callback
@@ -48,6 +44,7 @@ class InputManager():
             #DELETE
             elif first_path in second_path and current_input.get_action() == "delete":
                 #No removing on input_to_process because its action will be executed, it's the current_input deletion which conflict
+                input_to_process.failed = True
                 self.send_conflict_message_callback(current_input)
                 conflict_list.append(current_input)
 

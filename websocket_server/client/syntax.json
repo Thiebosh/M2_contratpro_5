@@ -1,0 +1,107 @@
+{
+    "root": {
+        "type": "object",
+        "values": [
+            "screen"
+        ]
+    },
+    "style": {
+        "type": "object",
+        "values": [
+            "?name",
+            "?color",
+            "?align",
+            "?decoration"
+        ]
+    },
+    "block": {
+        "type": "object",
+        "values": [
+            "?name",
+            "?style",
+            "?content"
+        ]
+    },
+    "text": {
+        "type": "object",
+        "values": [
+            "?style",
+            "textValue"
+        ]
+    },
+
+    "screen": {
+        "type": "array",
+        "values": [
+            "name",
+            "?inputHome",
+            "?style",
+            "?content"
+        ]
+    },
+    "content": {
+        "type": "array",
+        "values": [
+            "?block",
+            "?text",
+            "?inputNumber"
+        ]
+    },
+
+    "name": {
+        "type": "field",
+        "field": "inputText"
+    },
+    "textValue": {
+        "type": "field",
+        "field": "inputText"
+    },
+    "numberValue": {
+        "type": "field",
+        "field": "inputNumber"
+    },
+    "color": {
+        "type": "field",
+        "field": "inputColor"
+    },
+    "align": {
+        "type": "field",
+        "field": "selectAlign"
+    },
+    "decoration": {
+        "type": "field",
+        "field": "selectDecoration"
+    },
+
+    "inputHome": {
+        "type": "radio",
+        "global": "true"
+    },
+    "inputText": {
+        "type": "textarea"
+    },
+    "inputNumber": {
+        "type": "number"
+    },
+    "inputColor": {
+        "type": "color"
+    },
+    "selectAlign": {
+        "type": "select",
+        "values": [
+            "center",
+            "right",
+            "left",
+            "top",
+            "bottom"
+        ]
+    },
+    "selectDecoration": {
+        "type": "select",
+        "values": [
+            "none",
+            "underline",
+            "italic"
+        ]
+    }
+}
