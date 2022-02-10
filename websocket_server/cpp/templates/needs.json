@@ -20,7 +20,7 @@
                                             "color": "red",
                                             "decoration": "underline"
                                         },
-                                        "value": "hello world"
+                                        "textValue": "hello world"
                                     }
                                 },
                                 {
@@ -31,7 +31,7 @@
                                         "content": [
                                             {
                                                 "text": {
-                                                    "value": "some nested text"
+                                                    "textValue": "some nested text"
                                                 }
                                             }
                                         ]
@@ -42,7 +42,7 @@
                                         "style": {
                                             "color": "red"
                                         },
-                                        "value": "other text"
+                                        "textValue": "other text"
                                     }
                                 }
                             ]
@@ -60,7 +60,7 @@
                                             "color": "green",
                                             "decoration": "italic"
                                         },
-                                        "value": "hello world1"
+                                        "textValue": "hello world1"
                                     }
                                 },
                                 {
@@ -68,7 +68,7 @@
                                         "style": {
                                             "color": "lightblue"
                                         },
-                                        "value": "hello world2"
+                                        "textValue": "hello world2"
                                     }
                                 }
                             ]

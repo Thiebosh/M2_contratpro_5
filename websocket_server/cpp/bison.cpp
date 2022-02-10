@@ -32,7 +32,7 @@
 %token CONTENT
 %token BLOCK
 %token TEXT
-%token VALUE
+%token TEXTVALUE
 %token TRUE
 
 %token <string> STR_VALUE
@@ -111,7 +111,7 @@ field
         {
             fileContent[currentPage] += (INDENT ? string(--indent, '\t') : "") + "</p>\n";
         }
-    |   VALUE STR_VALUE
+    |   TEXTVALUE STR_VALUE
         {
             fileContent[currentPage] += (INDENT ? string(indent, '\t') : "") + $2 + '\n';
         }

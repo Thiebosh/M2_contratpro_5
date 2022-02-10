@@ -37,7 +37,7 @@ EOL     \r\n|\r|\n
 {KEY_}content{_KEY}      { return CONTENT; }
 {KEY_}block{_KEY}        { return BLOCK; }
 {KEY_}text{_KEY}         { return TEXT; }
-{KEY_}value{_KEY}        { return VALUE; }
+{KEY_}textValue{_KEY}    { return TEXTVALUE; }
 
 {TEXT}  { yylval.string = unquote(yytext,yyleng); return STR_VALUE; }
 {COLOR} { yylval.string = unquote(yytext,yyleng); return COLOR_VALUE; }
