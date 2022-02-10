@@ -24,9 +24,12 @@ EOL     \r\n|\r|\n
 "]" { return CLOSE_ARRAY; }
 ,   { return NEXT; }
 
+"(T|t)rue" { return TRUE; }
+
 {KEY_}root{_KEY}         { return ROOT; }
 {KEY_}screen{_KEY}       { return SCREEN; }
 {KEY_}name{_KEY}         { return NAME; }
+{KEY_}home{_KEY}         { return HOME; }
 {KEY_}style{_KEY}        { return STYLE; }
 {KEY_}align{_KEY}        { return ALIGN; }
 {KEY_}color{_KEY}        { return COLOR; }

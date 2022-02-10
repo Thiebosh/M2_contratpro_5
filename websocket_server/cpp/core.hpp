@@ -4,47 +4,48 @@
 #include <map>
 #include <vector>
 
+#include "error.hpp"
+
 #define INDENT true
 
 using namespace std;
 
-enum class container {
+enum class Container {
     root,
     screen,
     block,
     text
 };
 
-container currentContainer = container::root;
+Container currentContainer = Container::root;
 string currentPage = "";
+string defaultPage = "";
 std::map<string, string> fileContent;
 int indent = 0; //tmp
 std::vector<string> htmlPages;
 
-std::map<container, string> colorContainer = {
-    {container::screen, "background-color: "},
-    {container::block, "background-color: "},
-    {container::text, "color: "}
+std::map<Container, string> colorContainer = {
+    {Container::screen, "background-color: "},
+    {Container::block, "background-color: "},
+    {Container::text, "color: "}
 };
-std::map<string, std::map<container, string>> alignContainer = {
+std::map<string, std::map<Container, string>> alignContainer = {
     {"center", 
         {
-            {container::screen, "margin: auto; "},
-            {container::block, "margin: auto; "},
-            {container::text, "text-align: center; "}
+            {Container::screen, "margin: auto; "},
+            {Container::block, "margin: auto; "},
+            {Container::text, "text-align: center; "}
         }
     }
 };
 
 void outputResultFiles() {
-    if (!htmlPages.size()) {
-        cout << "error - no files" << endl;
-        return;
-    }
+    if (!htmlPages.size()) displayError(ErrorType::input, ErrorObject::no_files_transmitted, "");
 
     // print routeur.php
     cout << "routeur.php" << endl;
     std::ifstream routeur_template("templates/routeur.php");
+    if (!routeur_template.is_open()) displayError(ErrorType::internal, ErrorObject::template_not_found, "templates/routeur.php");
     std::string lineBuffer;
     bool setDefaultFlag = false;
     while (routeur_template) {
@@ -54,7 +55,7 @@ void outputResultFiles() {
             std::size_t found = lineBuffer.find("\"\"");
             if (found != std::string::npos) {
                 setDefaultFlag = true;
-                lineBuffer.insert(found+1, htmlPages[0]); // could specify default page
+                lineBuffer.insert(found+1, defaultPage != "" ? defaultPage : htmlPages[0]);
             }
         }
 

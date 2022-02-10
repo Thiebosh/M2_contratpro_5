@@ -23,6 +23,7 @@
 
 %token ROOT
 %token SCREEN
+%token HOME
 %token NAME
 %token STYLE
 %token ALIGN
@@ -32,6 +33,7 @@
 %token BLOCK
 %token TEXT
 %token VALUE
+%token TRUE
 
 %token <string> STR_VALUE
 %token <string> COLOR_VALUE
@@ -46,7 +48,7 @@ proto_files
     :   proto_files NEXT proto_files
     |   SCREEN
         {
-            currentContainer = container::screen;
+            currentContainer = Container::screen;
         }
         array
         {
@@ -75,7 +77,7 @@ field
     :   NAME STR_VALUE
         {
             switch(currentContainer) {
-                case container::screen:
+                case Container::screen:
                     currentPage = $2;
                     currentPage.append(".html");
                     htmlPages.push_back(currentPage);
@@ -84,10 +86,16 @@ field
                     break;
             }
         }
+    |   HOME TRUE
+        {
+            if (defaultPage != "") displayError(ErrorType::input, ErrorObject::defaultPage_already_defined, "");
+            if (currentPage == "") displayError(ErrorType::generation, ErrorObject::defaultPage_no_value, "");
+            defaultPage = currentPage;
+        }
     |   CONTENT array
     |   BLOCK
         {
-            currentContainer = container::block;
+            currentContainer = Container::block;
             fileContent[currentPage] += (INDENT ? string(indent++, '\t') : "") + "<div>\n";
         }
         doc
@@ -96,7 +104,7 @@ field
         }
     |   TEXT
         {
-            currentContainer = container::text;
+            currentContainer = Container::text;
             fileContent[currentPage] += (INDENT ? string(indent++, '\t') : "") + "<p>\n";
         }
         doc
