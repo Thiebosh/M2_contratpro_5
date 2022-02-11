@@ -76,6 +76,11 @@ class InputManager():
             result = self.master_json.update_storage()
             print(f"Project {'well' if result else 'not'} updated")
         elif action == "generate":
+            # result = self.files_generator.generate_files(self.master_json.data)
+            with open(f"{pathlib.Path(__file__).parent.absolute()}/brique2/needs.json", 'r') as file:
+                test = file.read().replace('\n', '')
+            result = self.files_generator.generate_files(test)
+            print(f"Project {'well' if result else 'not'} generated")
             return
         elif action == "execute":
             return
