@@ -75,20 +75,20 @@
 
     "inputHome": {
         "type": "input",
-        "specific": "radio",
+        "nature": "radio",
         "global": "true"
     },
     "inputText": {
         "type": "input",
-        "specific": "textarea"
+        "nature": "textarea"
     },
     "inputNumber": {
         "type": "input",
-        "specific": "number"
+        "nature": "number"
     },
     "inputColor": {
         "type": "input",
-        "specific": "color"
+        "nature": "color"
     },
 
     "selectAlign": {
