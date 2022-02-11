@@ -38,6 +38,7 @@ class InputManager():
             # 1ST CASE
             if (first_path == second_path) and JsonHandler.check_if_similar_keys(first_content, second_content):
                 input_to_process.failed = True
+                current_input.failed = True
                 self.send_conflict_message_callback(current_input)
                 conflict_list.append(current_input)
             #2ND CASE
@@ -45,11 +46,13 @@ class InputManager():
             elif first_path in second_path and current_input.get_action() == "delete":
                 #No removing on input_to_process because its action will be executed, it's the current_input deletion which conflict
                 input_to_process.failed = True
+                current_input.failed = True
                 self.send_conflict_message_callback(current_input)
                 conflict_list.append(current_input)
 
             elif second_path in first_path and input_to_process.get_action() == "delete":
                 input_to_process.failed = True
+                current_input.failed = True
                 self.send_conflict_message_callback(current_input)
                 conflict_list.append(current_input)
 

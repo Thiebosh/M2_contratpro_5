@@ -106,24 +106,24 @@ class Room():
 
 
             conflicts = []
-            for input_to_process in self.input_manager.inputs:
+
+            for input_to_process in self.input_manager.inputs.copy():
                 if input_to_process.counter != 0 or input_to_process in conflicts:
                     continue
-
+                
                 #If no conflicts, execute the action ; in every case : remove socket from list
                 socket_conflicts = self.input_manager.check_conflicts(input_to_process)
                 if socket_conflicts:
                     conflicts += socket_conflicts
+                    self.input_manager.inputs.remove(input_to_process)
                     continue
 
                 self.input_manager.check_and_execute_action_function(input_to_process)
 
                 for client_socket in self.client_connection_queue:
                     self.add_message_in_queue(input_to_process.socket, client_socket, json.dumps(self.input_manager.master_json.data))
-                    #json_dumps(...) to change : should be only the last modification accepted by the server, not all the json
-
-            conflicts = set(conflicts)
-            self.input_manager.inputs = [input_unit for input_unit in self.input_manager.inputs if input_unit.counter != 0 and input not in conflicts]
+                    #json_dumps(...) to change : should be  only the last modification accepted by the server, not all the json
+                self.input_manager.inputs.remove(input_to_process)
 
             self.input_manager.decrease_counter_on_all_inputs()
 
