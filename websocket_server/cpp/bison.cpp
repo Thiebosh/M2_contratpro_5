@@ -147,7 +147,7 @@ field
 %%
 
 int main(int argc, char **argv) {
-    if (yyin = fopen("templates/needs.json","r")) {//fournit à flex le fichier à parser
+    if (yyin = fopen(argv[1], "r")) {//fournit à flex le fichier à parser
         yyparse();//parse le fichier
     }
 

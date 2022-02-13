@@ -1,27 +1,28 @@
 import select
 import socket
 from room_manager import RoomManager
-from websocket import WebSocket
 from socket import timeout
 import json
 import os
+import pathlib
 
+from partners.websocket_partner import WebSocketPartner
 from partners.mongo_partner import MongoPartner
 from partners.drive_partner import DrivePartner
 from partners.cpp_partner import CppPartner
-import pathlib
 
 class Server():
-    def __init__(self) -> None:
+    def __init__(self, websocket=None, db=None, drive=None, cpp=None) -> None:
         print("Starting server...")
-        partners = {
-            "db": MongoPartner(f"mongodb+srv://{os.environ.get('MONGO_USERNAME')}:{os.environ.get('MONGO_PASSWORD')}@{os.environ.get('MONGO_URL')}"),
-            "drive": DrivePartner(creds_relative_path=f"{pathlib.Path(__file__).parent.absolute()}/../credentials/service_account.json", scopes=['https://www.googleapis.com/auth/drive']),
-            "cpp": CppPartner()
+        self.partners = {
+            "websocket": websocket or WebSocketPartner(),
+            "db": db or MongoPartner(f"mongodb+srv://{os.environ.get('MONGO_USERNAME')}:{os.environ.get('MONGO_PASSWORD')}@{os.environ.get('MONGO_URL')}"),
+            "drive": drive or DrivePartner(creds_relative_path=f"{pathlib.Path(__file__).parent.absolute()}/../credentials/service_account.json", scopes=['https://www.googleapis.com/auth/drive']),
+            "cpp": cpp or CppPartner()
         }
         self.inputs = []
         self.polling_freq = 0.5
-        self.room_m = RoomManager(partners)
+        self.room_m = RoomManager(self.partners)
         self.ip = os.environ.get("HOST")
         self.port = int(os.environ.get("PORT"))
         self.encoding = "utf-8"
@@ -48,7 +49,7 @@ class Server():
     def add_connection(self, socket):
         new_socket, client_address = socket.accept()
         try:
-            if WebSocket.handshake(new_socket, self.encoding):
+            if self.partners["websocket"].handshake(new_socket, self.encoding):
                 print(f"SERVER - new connexion {client_address}")
                 self.inputs.append(new_socket)  # new input socket
             else:
@@ -80,7 +81,7 @@ class Server():
                    self.add_connection(socket)
                    continue
 
-                target = WebSocket.recv(socket, self.encoding)
+                target = self.partners["websocket"].recv(socket, self.encoding)
 
                 if not target:
                     self.close_client_connection(socket)
