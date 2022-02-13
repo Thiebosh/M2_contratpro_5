@@ -52,22 +52,23 @@ class InputManager():
 
         if action == "create":
             self.master_json.add_element(input_to_process.get_path().split("/"), input_to_process.get_content())
-            # Send notif to other clients to reload their json
+
         elif action == "update":
             self.master_json.modify_element(input_to_process.get_path().split("/"), input_to_process.get_content())
-            # Send notif to other clients to reload their json
+
         elif action == "delete":
             self.master_json.remove_element(input_to_process.get_path().split("/"), input_to_process.get_content())
-            # Send notif to other clients to reload their json
+
         elif action == "save":
             result = self.master_json.update_storage()
             print(f"Project {'well' if result else 'not'} updated")
+
         elif action == "generate":
             # result = self.files_generator.generate_files(self.master_json.data)
             with open(f"{pathlib.Path(__file__).parent.absolute()}/brique2/needs.json", 'r') as file:
                 test = file.read().replace('\n', '')
             result = self.files_generator.generate_files(test)
             print(f"Project {'well' if result else 'not'} generated")
-            return
+
         elif action == "execute":
-            return
+            pass

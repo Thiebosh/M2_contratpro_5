@@ -87,7 +87,7 @@ class Room():
             self.input_manager.check_and_execute_action_function(input_to_process)
 
             for client_socket in self.client_connection_queue:
-                self.add_message_in_queue(input_to_process.socket, client_socket, json.dumps(self.input_manager.master_json.data))
+                self.add_message_in_queue(input_to_process.socket, client_socket, json.dumps(input_to_process.msg))
                 #json_dumps(...) to change : should be  only the last modification accepted by the server, not all the json
 
         self.input_manager.inputs = [input_unit for input_unit in self.input_manager.inputs if input_unit.counter != 0 and input_unit not in conflicts]
