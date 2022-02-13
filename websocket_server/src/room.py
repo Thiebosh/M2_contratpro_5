@@ -1,27 +1,23 @@
 import queue
-from re import S
 import threading
 import select
-
-from websocket import WebSocket
 import json
 from input_manager import InputManager
 
 class Room():
-    def __init__(self, room_name, room_socket, partners, callback_update_server_sockets, callback_remove_room, encoding) -> None:
+    def __init__(self, room_name, partners, callback_update_server_sockets, callback_remove_room, encoding) -> None:
         print(f"{room_name} - Create room")
         self.close_evt = threading.Event()
         self.queue = queue.Queue()
         self.lock = threading.Lock()
         self.room_name = room_name
-        self.room_socket = room_socket
-        self.inputs = [self.room_socket]
+        self.inputs = []
         self.outputs = []
-        self.client_connection_queue = {self.room_socket: queue.Queue()}
+        self.client_connection_queue = {}
         self.callback_update_server_sockets = callback_update_server_sockets
         self.callback_remove_room = callback_remove_room
         self.partners = partners
-        
+
         self.encoding = encoding
         self.input_manager = InputManager(room_name, self.partners, self.send_conflict_message)
 
@@ -44,8 +40,7 @@ class Room():
             socket.close()
 
 
-    def open_client_connection_to_room(self):
-        socket = self.queue.get() # When "get" called, it removes item from queue
+    def open_client_connection_to_room(self, socket):
         self.inputs.append(socket)
         self.client_connection_queue[socket] = queue.Queue()
         print(f"{self.room_name} - Get client {socket.getpeername()}")
@@ -78,12 +73,34 @@ class Room():
             self.outputs.append(input_to_process.socket)
 
 
+    def process_running_inputs(self):
+        conflicts = []
+
+        for input_to_process in self.input_manager.inputs:
+            if input_to_process.counter != 0 or input_to_process in conflicts:
+                continue
+
+            #If no conflicts, execute the action ; in every case : remove socket from list
+            if self.input_manager.check_conflicts(input_to_process, conflicts):
+                continue
+
+            self.input_manager.check_and_execute_action_function(input_to_process)
+
+            for client_socket in self.client_connection_queue:
+                self.add_message_in_queue(input_to_process.socket, client_socket, json.dumps(self.input_manager.master_json.data))
+                #json_dumps(...) to change : should be  only the last modification accepted by the server, not all the json
+
+        self.input_manager.inputs = [input_unit for input_unit in self.input_manager.inputs if input_unit.counter != 0 and input_unit not in conflicts]
+
+        self.input_manager.decrease_counter_on_all_inputs()
+
+
     def run(self, polling_freq=0.1):
         print(f"{self.room_name} - Room ready")
         while not self.close_evt.is_set() and self.inputs:
             with self.lock:
                 while not self.queue.empty():
-                    self.open_client_connection_to_room()
+                    self.open_client_connection_to_room(self.queue.get()) # When "get" called, it removes item from queue
             try:
                 readable, writable, exception = self.read(polling_freq)
             except KeyboardInterrupt:
@@ -91,7 +108,7 @@ class Room():
                 break
 
             for socket in readable: #Get all sockets and put the ones which have a msg to a list
-                msg = WebSocket.recv(socket, self.encoding)
+                msg = self.partners["websocket"].recv(socket, self.encoding)
                 if not msg:
                     self.close_client_connection_to_room(socket)
                     continue
@@ -104,42 +121,20 @@ class Room():
 
                 self.input_manager.add_new_input(socket, msg)
 
+            self.process_running_inputs()
 
-            conflicts = []
-
-            for input_to_process in self.input_manager.inputs.copy():
-                if input_to_process.counter != 0 or input_to_process in conflicts:
-                    continue
-                
-                #If no conflicts, execute the action ; in every case : remove socket from list
-                socket_conflicts = self.input_manager.check_conflicts(input_to_process)
-                if socket_conflicts:
-                    conflicts += socket_conflicts
-                    self.input_manager.inputs.remove(input_to_process)
-                    continue
-
-                self.input_manager.check_and_execute_action_function(input_to_process)
-
-                for client_socket in self.client_connection_queue:
-                    self.add_message_in_queue(input_to_process.socket, client_socket, json.dumps(self.input_manager.master_json.data))
-                    #json_dumps(...) to change : should be  only the last modification accepted by the server, not all the json
-                self.input_manager.inputs.remove(input_to_process)
-
-            self.input_manager.decrease_counter_on_all_inputs()
-
-                
             for socket in writable:
                 try:
                     next_msg = self.client_connection_queue[socket].get_nowait()  # unqueue msg
                 except queue.Empty:
                     self.outputs.remove(socket)
                 else:
-                    WebSocket.send(socket, next_msg, self.encoding)
+                    self.partners["websocket"].send(socket, next_msg, self.encoding)
 
             for socket in exception:
                 self.close_client_connection_to_room(socket)
 
         result = self.input_manager.master_json.update_storage()
-        print(f"Project {'well' if result else 'not'} updated")
+        print(f"{self.room_name} - Project {'well' if result else 'not'} updated")
         print(f"{self.room_name} - Close room")
         self.callback_remove_room(self.room_name)

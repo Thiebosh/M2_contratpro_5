@@ -2,7 +2,7 @@ class Input():
     def __init__(self, socket, msg) -> None:
         self.socket = socket
         self.msg = msg
-        self.counter = 10
+        self.counter = 30
         self.failed = False
 
     def get_action(self):
