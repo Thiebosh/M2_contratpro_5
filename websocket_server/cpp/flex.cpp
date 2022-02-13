@@ -1,6 +1,7 @@
 %option noyywrap
 %{
-    #include "compiled.bison.cpp"
+    #include <iostream>
+    #include "compiled.bison.hpp"
 
     char* unquote(char* input, int length);
 %}
@@ -23,9 +24,12 @@ EOL     \r\n|\r|\n
 "]" { return CLOSE_ARRAY; }
 ,   { return NEXT; }
 
+"(T|t)rue" { return TRUE; }
+
 {KEY_}root{_KEY}         { return ROOT; }
 {KEY_}screen{_KEY}       { return SCREEN; }
 {KEY_}name{_KEY}         { return NAME; }
+{KEY_}home{_KEY}         { return HOME; }
 {KEY_}style{_KEY}        { return STYLE; }
 {KEY_}align{_KEY}        { return ALIGN; }
 {KEY_}color{_KEY}        { return COLOR; }
@@ -33,13 +37,13 @@ EOL     \r\n|\r|\n
 {KEY_}content{_KEY}      { return CONTENT; }
 {KEY_}block{_KEY}        { return BLOCK; }
 {KEY_}text{_KEY}         { return TEXT; }
-{KEY_}value{_KEY}        { return VALUE; }
+{KEY_}textValue{_KEY}    { return TEXTVALUE; }
 
 {TEXT}  { yylval.string = unquote(yytext,yyleng); return STR_VALUE; }
 {COLOR} { yylval.string = unquote(yytext,yyleng); return COLOR_VALUE; }
 
 [ \t]|{EOL} { }
-.           { cout << endl << "Error - raw text : '" << yytext[0] << "'" << endl; exit(1); }
+.           { std::cout << std::endl << "Error - raw text : '" << yytext[0] << "'" << std::endl; exit(1); }
 
 %%
 

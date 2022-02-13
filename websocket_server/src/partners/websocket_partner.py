@@ -2,7 +2,10 @@ import base64
 import hashlib
 import struct
 
-class WebSocket():
+class WebSocketPartner():
+    def copy_partner(self):
+        return WebSocketPartner()
+
     @staticmethod
     def handshake(conn, encoding):
         key = None
