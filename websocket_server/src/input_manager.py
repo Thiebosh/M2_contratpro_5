@@ -1,6 +1,6 @@
 import pathlib
 from input import Input
-from brique1.jsonHandler import JsonHandler
+from brique1.json_handler import JsonHandler
 from brique2.files_generator import FilesGenerator
 
 class InputManager():
