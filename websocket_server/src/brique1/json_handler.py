@@ -12,15 +12,17 @@ class JsonHandler():
         self.partners = partners
         self.project_name = project_name
         self.data = self.partners["db"].find_one(COLLECTION_PROJECTS, {"name":project_name}, {"_id": 0,"specs": 1})["specs"]
+        self.updated = False
 
 
     def update_storage(self):
-        return self.partners["db"].update_one(
+        print(f"{self.project_name} - {'' if self.updated else 'no '}need of db update")
+        return True if not self.updated else self.partners["db"].update_one(
             COLLECTION_PROJECTS,
-            {"name":self.project_name}, 
+            {"name":self.project_name},
             {"$set":
                 {
-                    "last_specs":datetime.utcnow(), 
+                    "last_specs":datetime.utcnow(),
                     "specs":self.data
                 }
             }
@@ -74,6 +76,7 @@ class JsonHandler():
         else:
             False
 
+        self.updated = True
         return True
 
 
@@ -93,6 +96,7 @@ class JsonHandler():
                 return False
 
             del container[int(target)]
+            self.updated = True
             return True
 
         return False
@@ -109,4 +113,5 @@ class JsonHandler():
 
         container[path[-1]] = content
 
+        self.updated = True
         return True

@@ -40,9 +40,15 @@ class FilesGenerator():
     def get_files(self):
         return self.files
 
-    async def generate_files(self, specs_json):
-        self.files = await self.partners["cpp"].call(specs_json)
+    def generate_files(self, specs_json): # async
+        self.files = self.partners["cpp"].call(specs_json) # await
 
-        self.partners["drive"].upload_files_to_folder(self.project_id, self.files)
+        result = self.partners["drive"].upload_files_to_folder(self.project_id, self.files)
+        if not result:
+            return False
 
-        return self.files
+        # send to php
+        # if not result:
+        #     return False
+
+        return True
