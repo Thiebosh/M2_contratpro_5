@@ -5,7 +5,7 @@ from brique2.files_generator import FilesGenerator
 
 class InputManager():
     def __init__(self, room_name, partners, send_conflict_message_callback) -> None:
-        self.inputs = []
+        self.inputs:"list[Input]" = []
         self.partners = partners
 
         self.master_json = JsonHandler(partners, room_name)
@@ -19,9 +19,9 @@ class InputManager():
         for input in self.inputs:
             input.decrease_counter()
 
-    def check_conflicts(self, input_to_process, conflicts=[]):
+    def check_conflicts(self, input_to_process):
         for current_input in self.inputs:
-            if current_input == input_to_process or current_input in conflicts:
+            if current_input == input_to_process or current_input.failed:
                 continue
 
             first_path = current_input.get_path()
@@ -32,16 +32,13 @@ class InputManager():
             if (first_path == second_path) and JsonHandler.check_if_similar_keys(first_content, second_content) \
                 or first_path in second_path and current_input.get_action() == "delete" \
                 or second_path in first_path and input_to_process.get_action() == "delete":
-                input_to_process.failed = True
-                current_input.failed = True
+                if not input_to_process.failed:
+                    input_to_process.failed = True
+                    self.send_conflict_message_callback(input_to_process)
 
-                if current_input not in conflicts:
-                    conflicts.append(current_input)
+                if not current_input.failed:
+                    current_input.failed = True
                     self.send_conflict_message_callback(current_input)
-
-        if input_to_process.failed and input_to_process not in conflicts:
-            conflicts.append(input_to_process)
-            self.send_conflict_message_callback(input_to_process)
 
         return input_to_process.failed
 
