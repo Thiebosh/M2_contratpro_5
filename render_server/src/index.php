@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once("controllers/directory_manager.php")
+require_once("controllers/directory_manager.php");
 
 // a mettre dans un fichier "return_codes.php" et a inclure ici et dans les controleurs
 $SUCCESS = "200";
@@ -45,5 +45,5 @@ if (isset($_GET['action'])) {
     }
 }
 
-echo($BAD_REQUEST); // error msg
+echo($BAD_REQUEST);
 exit();
