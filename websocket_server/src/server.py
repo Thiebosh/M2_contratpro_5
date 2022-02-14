@@ -10,15 +10,17 @@ from partners.websocket_partner import WebSocketPartner
 from partners.mongo_partner import MongoPartner
 from partners.drive_partner import DrivePartner
 from partners.cpp_partner import CppPartner
+from partners.php_partner import PhpPartner
 
 class Server():
-    def __init__(self, websocket=None, db=None, drive=None, cpp=None) -> None:
+    def __init__(self, websocket=None, db=None, storage=None, generator=None, renderer=None) -> None:
         print("Starting server...")
         self.partners = {
             "websocket": websocket or WebSocketPartner(),
             "db": db or MongoPartner(f"mongodb+srv://{os.environ.get('MONGO_USERNAME')}:{os.environ.get('MONGO_PASSWORD')}@{os.environ.get('MONGO_URL')}"),
-            "drive": drive or DrivePartner(creds_relative_path=f"{pathlib.Path(__file__).parent.absolute()}/../credentials/service_account.json", scopes=['https://www.googleapis.com/auth/drive']),
-            "cpp": cpp or CppPartner()
+            "storage": storage or DrivePartner(creds_path=f"{pathlib.Path(__file__).parent.absolute()}/../credentials/service_account.json", scopes=['https://www.googleapis.com/auth/drive']),
+            "generator": generator or CppPartner(exe_path="/src/brique2/cpp/prototypeur.exe"),
+            "renderer": renderer or PhpPartner(base_url=os.environ.get('PHP_URL'))
         }
         self.inputs = []
         self.polling_freq = 0.5
