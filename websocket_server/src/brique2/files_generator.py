@@ -20,7 +20,7 @@ class FilesGenerator():
             raise Exception("FilesGenerator - __init__: unknow project name")
 
         ## tmp upload files => test download
-        # self.partners["drive"].upload_files_to_folder(self.project_id, [
+        # self.partners["storage"].upload_files_to_folder(self.project_id, [
         #     {
         #         "name": "test1.py",
         #         "content": "# !/usr/bin/python3 \n\ndef print_sorted(liste):\n    return sorted(liste)\n\n1"
@@ -34,17 +34,17 @@ class FilesGenerator():
         #         "content": "# !/usr/bin/python3 \n\ndef print_sorted(liste):\n    return sorted(liste)\n\n3"
         #     },
         # ])
-        self.files = self.partners["drive"].download_files_from_folder(self.project_id)
+        self.files = self.partners["storage"].download_files_from_folder(self.project_id)
         # print(self.files) # => working proof
-        # self.files = self.partners["drive"].upload_files_to_folder(self.project_id, []) # add in rest server for cleaning deleting projects
+        # self.files = self.partners["storage"].upload_files_to_folder(self.project_id, []) # add in rest server for cleaning deleting projects
 
     def get_files(self):
         return self.files
 
     def generate_files(self, specs_json): # async
-        self.files = self.partners["cpp"].call(self.project_name, specs_json) # await
+        self.files = self.partners["generator"].call(self.project_name, specs_json) # await
 
-        result = self.partners["drive"].upload_files_to_folder(self.project_id, self.files)
+        result = self.partners["storage"].upload_files_to_folder(self.project_id, self.files)
         if not result:
             return False
 
