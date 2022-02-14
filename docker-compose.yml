@@ -31,12 +31,15 @@ services:
             dockerfile: Dockerfile.prod
             args:
                 arg_port: 5000
+                php_url: "render:5000"
         ports:
             - "8002:5000"
         env_file:
             - ./.env
         tty: true # bind console
         restart: always
+        depends_on:
+            - render
 
     render:
         build:
@@ -48,5 +51,3 @@ services:
             - "8003:5000"
         tty: true # bind console
         restart: always
-        depends_on:
-            - socket

@@ -2,6 +2,7 @@ import pathlib
 from input import Input
 from brique1.json_handler import JsonHandler
 from brique2.files_generator import FilesGenerator
+from brique3.render_page import RenderPage
 
 class InputManager():
     def __init__(self, room_name, partners, send_conflict_message_callback) -> None:
@@ -10,6 +11,7 @@ class InputManager():
 
         self.master_json = JsonHandler(partners, room_name)
         self.files_generator = FilesGenerator(partners, room_name)
+        self.render_page = RenderPage(partners, room_name)
         self.send_conflict_message_callback = send_conflict_message_callback
 
     def add_new_input(self, socket, msg):
@@ -68,4 +70,5 @@ class InputManager():
             print(f"Project {'well' if result else 'not'} generated")
 
         elif action == "execute":
-            pass
+            result = self.render_page.page(input_to_process.get_page())
+            print(result)
