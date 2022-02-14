@@ -13,7 +13,6 @@ class CppPartner():
 
     def call(self, project_name, specs): # async
         filepath = f"/src/brique2/cpp/{project_name}.json"
-        print(filepath)
         open(filepath, "w").write(specs)
         args = (filepath,)
         process = Popen([self.exe_path, *args], stdout=PIPE, stderr=PIPE, text=True)
@@ -25,7 +24,6 @@ class CppPartner():
             time.sleep(self.freq) # await asyncio.sleep(self.freq)
 
         if os.path.exists(filepath):
-            print("remove file")
             os.remove(filepath)
 
         lines = process.communicate()[0].split("\n\n\n\n")
