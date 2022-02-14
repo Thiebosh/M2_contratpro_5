@@ -4,8 +4,8 @@ import time
 import os
 
 class CppPartner():
-    def __init__(self) -> None:
-        self.exe_path = "/src/brique2/cpp/prototypeur.exe"
+    def __init__(self, exe_path) -> None:
+        self.exe_path = exe_path
         self.freq = 0.4
 
     def copy_partner(self):

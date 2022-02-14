@@ -18,9 +18,9 @@ class Server():
         self.partners = {
             "websocket": websocket or WebSocketPartner(),
             "db": db or MongoPartner(f"mongodb+srv://{os.environ.get('MONGO_USERNAME')}:{os.environ.get('MONGO_PASSWORD')}@{os.environ.get('MONGO_URL')}"),
-            "storage": storage or DrivePartner(creds_relative_path=f"{pathlib.Path(__file__).parent.absolute()}/../credentials/service_account.json", scopes=['https://www.googleapis.com/auth/drive']),
-            "generator": generator or CppPartner(),
-            "renderer": renderer or PhpPartner()
+            "storage": storage or DrivePartner(creds_path=f"{pathlib.Path(__file__).parent.absolute()}/../credentials/service_account.json", scopes=['https://www.googleapis.com/auth/drive']),
+            "generator": generator or CppPartner(exe_path="/src/brique2/cpp/prototypeur.exe"),
+            "renderer": renderer or PhpPartner(base_url=os.environ.get('PHP_URL'))
         }
         self.inputs = []
         self.polling_freq = 0.5
