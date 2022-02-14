@@ -14,5 +14,8 @@ class Input():
     def get_content(self):
         return self.msg["content"]
 
+    def get_page(self):
+        return self.msg["page"]
+
     def decrease_counter(self):
         self.counter -= 1
