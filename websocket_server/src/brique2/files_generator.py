@@ -4,9 +4,10 @@ COLLECTION_PROJECTS = "projects"
 class FilesGenerator():
     def __init__(self, partners, project_name) -> None:
         self.partners = partners
+        self.project_name = project_name
 
         filter_q = {
-            "name": project_name
+            "name": self.project_name
         }
         fields = {
             "_id": 0,
@@ -41,7 +42,7 @@ class FilesGenerator():
         return self.files
 
     def generate_files(self, specs_json): # async
-        self.files = self.partners["cpp"].call(specs_json) # await
+        self.files = self.partners["cpp"].call(self.project_name, specs_json) # await
 
         result = self.partners["drive"].upload_files_to_folder(self.project_id, self.files)
         if not result:
