@@ -1,18 +1,14 @@
 <?php
 $default_page = ""
-$project_name = __DIR__
+$dir = __DIR__
 
-if (isset($_GET["page"])) {
-    $page = filter_input(INPUT_GET, "page", FILTER_SANITIZE_STRING);
-    
-    if ($page && file_exists("{$project_name}/{$page}")) {
-        require_once("{$project_name}/{$page}")
-        exit()
-    }
+if (file_exists("{$project_name}/{$post['page']}")) {
+    require_once("{$dir}/{$post['page']}")
+    exit()
 }
 
 if (file_exists("{$project_name}/{$default_page}")) {
-    require_once("{$project_name}/{$default_page}")
+    require_once("{$dir}/{$default_page}")
     exit()
 }
 

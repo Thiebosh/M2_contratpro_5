@@ -14,11 +14,13 @@ RUN apt update &&\
         bison
 
 ARG arg_port
+ARG php_url
 
 EXPOSE $arg_port
 
 ENV HOST=0.0.0.0
 ENV PORT=$arg_port
+ENV PHP_URL=$php_url
 
 WORKDIR /src
 
