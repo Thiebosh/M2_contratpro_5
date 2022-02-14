@@ -24,26 +24,27 @@ if (isset($_GET['action'])) {
             exit();
 
         case 'create_folder': //localhost:80/index.php?action=create_folder&project_name=test
-            echo((new DirectoryManager)->create_folder());
+            http_response_code((new DirectoryManager)->create_folder());
             exit();
 
         case 'create_file': //localhost:80/index.php?action=create_file&project_name=test&file_name=exemple.html&file_content="un peu de texte"
-            echo((new DirectoryManager)->create_folder());
+            http_response_code((new DirectoryManager)->create_folder());
             exit();
 
         case 'remove_files': //localhost:80/index.php?action=remove_files&project_name=test
-            echo((new DirectoryManager)->remove_files());
+            http_response_code((new DirectoryManager)->remove_files());
             exit();
 
         case 'remove_folder': //localhost:80/index.php?action=remove_folder&project_name=test
-            echo((new DirectoryManager)->remove_folder());
+            http_response_code((new DirectoryManager)->remove_folder());
             exit();
 
         case "probe":
             echo("alive");
+            http_response_code($SUCCESS);
             exit();
     }
 }
 
-echo($BAD_REQUEST);
+http_response_code($BAD_REQUEST);
 exit();

@@ -11,14 +11,14 @@ ENCODING = "utf-8"
 
 
 class DrivePartner:
-    def __init__(self, creds_relative_path, scopes):
-        self.creds_relative_path = creds_relative_path
+    def __init__(self, creds_path, scopes):
+        self.creds_path = creds_path
         self.scopes = scopes
-        self.service:Resource = build('drive', 'v3', credentials=Creds.from_service_account_file(creds_relative_path, scopes=scopes))
+        self.service:Resource = build('drive', 'v3', credentials=Creds.from_service_account_file(creds_path, scopes=scopes))
 
 
     def copy_partner(self):
-        return DrivePartner(self.creds_relative_path, self.scopes)
+        return DrivePartner(self.creds_path, self.scopes)
 
 
     def download_files_from_folder(self, name):
