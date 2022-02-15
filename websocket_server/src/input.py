@@ -19,3 +19,9 @@ class Input():
 
     def decrease_counter(self):
         self.counter -= 1
+
+    def get_msg_with_author(self):
+        return {
+            "author": str(self.socket), # make client object with socket and username
+            **self.msg
+        }

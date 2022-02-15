@@ -4,5 +4,6 @@ class RenderPage():
         self.partners = partners
         self.project_name = project_name
 
+
     def page(self, page):
-        return self.partners["renderer"].call_project_page(self.project_name, page)
+        return self.partners["renderer"].get_project_page(self.project_name, page)

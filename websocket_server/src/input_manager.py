@@ -1,18 +1,24 @@
 import pathlib
 from input import Input
 from brique1.json_handler import JsonHandler
-from brique2.files_generator import FilesGenerator
+from brique2.files_manager import FilesManager
 from brique3.render_page import RenderPage
 
 class InputManager():
     def __init__(self, room_name, partners, send_conflict_message_callback) -> None:
-        self.inputs:"list[Input]" = []
         self.partners = partners
-
-        self.master_json = JsonHandler(partners, room_name)
-        self.files_generator = FilesGenerator(partners, room_name)
-        self.render_page = RenderPage(partners, room_name)
+        self.room_name = room_name
         self.send_conflict_message_callback = send_conflict_message_callback
+
+        self.inputs:"list[Input]" = []
+
+        self.json_handler = JsonHandler(partners, room_name)
+        self.files_manager = FilesManager(partners, room_name)
+        self.render_page = RenderPage(partners, room_name)
+
+    def close(self):
+        self.json_handler.close()
+        self.files_manager.close()
 
     def add_new_input(self, socket, msg):
         self.inputs.append(Input(socket, msg))
@@ -50,24 +56,27 @@ class InputManager():
         action = input_to_process.get_action()
 
         if action == "create":
-            self.master_json.add_element(input_to_process.get_path().split("/"), input_to_process.get_content())
+            self.json_handler.add_element(input_to_process.get_path().split("/"), input_to_process.get_content())
 
         elif action == "update":
-            self.master_json.modify_element(input_to_process.get_path().split("/"), input_to_process.get_content())
+            self.json_handler.modify_element(input_to_process.get_path().split("/"), input_to_process.get_content())
 
         elif action == "delete":
-            self.master_json.remove_element(input_to_process.get_path().split("/"), input_to_process.get_content())
+            self.json_handler.remove_element(input_to_process.get_path().split("/"), input_to_process.get_content())
 
         elif action == "save":
-            result = self.master_json.update_storage()
+            result = self.json_handler.update_storage()
             print(f"Project {'well' if result else 'not'} updated")
 
         elif action == "generate":
-            # result = self.files_generator.generate_files(self.master_json.data)
+            # result = self.files_manager.generate_files(self.json_handler.data)
             with open(f"{pathlib.Path(__file__).parent.absolute()}/brique2/needs.json", 'r') as file:
                 test = file.read().replace('\n', '')
-            result = self.files_generator.generate_files(test)
-            print(f"Project {'well' if result else 'not'} generated")
+            result = self.files_manager.generate_files(test)
+            print(f"{self.room_name} - Project files {'well' if result else 'not'} generated")
+
+            result = self.files_manager.update_stored_files()
+            print(f"{self.room_name} - Project files {'well' if result else 'not'} updated")
 
         elif action == "execute":
             result = self.render_page.page(input_to_process.get_page())
