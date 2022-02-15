@@ -1,15 +1,15 @@
 # first stage : build cpp exe
-FROM frolvlad/alpine-gxx:latest as build
+# FROM frolvlad/alpine-gxx:latest as build
 
-RUN apk add \
-        make \
-        flex \
-        bison
+# RUN apk add \
+#         make \
+#         flex \
+#         bison
 
-WORKDIR /src
-COPY cpp .
+# WORKDIR /src
+# COPY cpp .
 
-RUN make build
+# RUN make build
 
 
 # second stage : prepare server environment
@@ -21,9 +21,15 @@ RUN pip install -U --no-cache-dir \
         google-api-python-client>=2.0.2 \
         google-auth-httplib2>=0.1.0 \
         google-auth-oauthlib>=0.4.3
+# RUN apt update &&\
+#     apt install -y \
+#         g++
 RUN apt update &&\
     apt install -y \
-        g++
+        g++ \
+        make \
+        flex \
+        bison
 
 ARG arg_port
 ARG php_url
@@ -39,6 +45,10 @@ COPY credentials .
 
 WORKDIR /src
 COPY src .
-COPY --from=build /src/prototypeur.exe /src/brique2/cpp/
+COPY cpp /src/brique2/cpp/
+# COPY --from=build /src/prototypeur.exe /src/brique2/cpp/
 
-CMD ["python", "."]
+# CMD ["python", "."]
+CMD cd brique2/cpp && \
+    make build && \
+    python ../../

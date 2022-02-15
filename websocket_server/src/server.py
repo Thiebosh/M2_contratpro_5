@@ -29,6 +29,7 @@ class Server():
         self.port = int(os.environ.get("PORT"))
         self.encoding = "utf-8"
         self.init_server()
+        print("server started")
 
     def init_server(self, backlog=5):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

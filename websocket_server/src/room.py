@@ -6,7 +6,7 @@ from input_manager import InputManager
 
 class Room():
     def __init__(self, room_name, partners, callback_update_server_sockets, callback_remove_room, encoding) -> None:
-        print(f"{room_name} - Create room")
+        print(f"{room_name} - Create room...")
         self.close_evt = threading.Event()
         self.queue = queue.Queue()
         self.lock = threading.Lock()
@@ -20,6 +20,16 @@ class Room():
 
         self.encoding = encoding
         self.input_manager = InputManager(room_name, self.partners, self.send_conflict_message)
+        print(f"{room_name} - Room created")
+
+
+    def close(self):
+        print(f"{self.room_name} - Closing room...")
+        for socket in self.inputs:
+            socket.close()
+        self.input_manager.close()
+        self.callback_remove_room(self.room_name)
+        print(f"{self.room_name} - Room closed")
 
 
     def get_param(self):
@@ -34,18 +44,12 @@ class Room():
         return select.select(self.inputs, self.outputs, self.inputs, polling_freq)
 
 
-    def close(self):
-        print(f"{self.room_name} - Get close signal")
-        for socket in self.inputs:
-            socket.close()
-
-
     def open_client_connection_to_room(self, socket):
         self.inputs.append(socket)
         self.client_connection_queue[socket] = queue.Queue()
         print(f"{self.room_name} - Get client {socket.getpeername()}")
 
-        self.client_connection_queue[socket].put(json.dumps({"init": self.input_manager.master_json.data}))
+        self.client_connection_queue[socket].put(json.dumps({"init": self.input_manager.json_handler.data}))
         self.outputs.append(socket)
 
 
@@ -85,8 +89,7 @@ class Room():
             self.input_manager.check_and_execute_action_function(input_to_process)
 
             for client_socket in self.client_connection_queue:
-                self.add_message_in_queue(input_to_process.socket, client_socket, json.dumps(input_to_process.msg))
-                #json_dumps(...) to change : should be  only the last modification accepted by the server, not all the json
+                self.add_message_in_queue(input_to_process.socket, client_socket, json.dumps(input_to_process.get_msg_with_author()))
 
         self.input_manager.inputs = [input_unit for input_unit in self.input_manager.inputs if input_unit.counter != 0 and not input_unit.failed]
 
@@ -102,7 +105,6 @@ class Room():
             try:
                 readable, writable, exception = self.read(polling_freq)
             except KeyboardInterrupt:
-                self.close()
                 break
 
             for socket in readable: #Get all sockets and put the ones which have a msg to a list
@@ -132,7 +134,4 @@ class Room():
             for socket in exception:
                 self.close_client_connection_to_room(socket)
 
-        result = self.input_manager.master_json.update_storage()
-        print(f"{self.room_name} - Project {'well' if result else 'not'} updated")
-        print(f"{self.room_name} - Close room")
-        self.callback_remove_room(self.room_name)
+        self.close()
