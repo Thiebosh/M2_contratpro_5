@@ -15,6 +15,11 @@ class JsonHandler():
         self.updated = False
 
 
+    def close(self):
+        result = self.update_storage()
+        print(f"{self.project_name} - Mongo - Project {'well' if result else 'not'} updated")
+
+
     def update_storage(self):
         print(f"{self.project_name} - {'' if self.updated else 'no '}need of db update")
         return True if not self.updated else self.partners["db"].update_one(
