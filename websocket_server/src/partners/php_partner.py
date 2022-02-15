@@ -3,7 +3,7 @@ from requests.exceptions import RequestException
 
 class PhpPartner():
     def __init__(self, base_url, state=None) -> None:
-        self.base_url = f"http://{base_url}"
+        self.base_url = base_url
         self.state = state or False
 
         if state == None:

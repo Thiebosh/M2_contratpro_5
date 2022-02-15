@@ -7,6 +7,8 @@ services:
     #         dockerfile: Dockerfile.prod
     #         args:
     #             arg_port: 5000
+    #             rest_url: "http://rest:5000"
+    #             ws_url: "ws://socket:5000"
     #     ports:
     #         - "80:5000" # http
     #         - "443:5000" # https
@@ -31,7 +33,7 @@ services:
             dockerfile: Dockerfile.prod
             args:
                 arg_port: 5000
-                php_url: "render:5000"
+                php_url: "http://render:5000"
         ports:
             - "8002:5000"
         env_file:
