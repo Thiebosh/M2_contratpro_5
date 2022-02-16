@@ -1,13 +1,13 @@
 <?php
 class DirectoryManager {
-    private string $emplacement = "projects";
+    private static string $emplacement = "projects";
 
     public static function folder_exist($path) : bool {
         return true ? true : false; // test existence
     }
 
     public static function file_exist($path) : bool {
-        return file_exists("{$this->emplacement}/{$path}") ? true : false; // test existence
+        return file_exists("{DirectoryManager::emplacement}/{$path}") ? true : false; // test existence
     }
 
     public function create_folder() : string {
@@ -16,7 +16,7 @@ class DirectoryManager {
         $post['project_name'] = filter_input(INPUT_GET, 'project_name', FILTER_SANITIZE_STRING); # INPUT_POST
         if (in_array(false, $post, true)) return $BAD_REQUEST;
 
-        $path = "{$this->emplacement}/{$post['project_name']}";
+        $path = "{DirectoryManager::emplacement}/{$post['project_name']}";
 
         if (self::folder_exist($path)) return $SUCCESS;
 
@@ -35,7 +35,7 @@ class DirectoryManager {
 
         if (!self::folder_exist($path)) return $ERROR;
 
-        $result = file_put_contents("{$this->emplacement}/{$post['project_name']}/{$post['file_name']}", $post['file_content']);
+        $result = file_put_contents("{DirectoryManager::emplacement}/{$post['project_name']}/{$post['file_name']}", $post['file_content']);
 
         return $result !== false ? $SUCCESS : $ERROR;
     }

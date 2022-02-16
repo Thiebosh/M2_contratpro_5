@@ -47,6 +47,8 @@ class FilesManager():
         if not result:
             print(f"{self.project_name} - PHP - files not uploaded") # exception ?
             return
+        # for file in self.files:
+        #     print(file)
 
 
     def close(self):

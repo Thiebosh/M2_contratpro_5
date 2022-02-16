@@ -82,6 +82,7 @@ $(function () {
     $("#createButton2").css("display","");
     $("#saveButton").css("display","");
     $("#generateButton").css("display","");
+    $("#executeButton").css("display","");
     $("#exitRoomButton").css("display","");
     $("#message_input").css("display","");
     $("#roomNameInput").css("display","None");
@@ -101,6 +102,7 @@ $(function () {
     $("#createButton2").css("display","None");
     $("#saveButton").css("display","None");
     $("#generateButton").css("display","None");
+    $("#executeButton").css("display","None");
     $("#exitRoomButton").css("display","None");
     $("#message_input").css("display","None");
     $("#roomNameInput").css("display","");
@@ -115,6 +117,11 @@ $(function () {
 
   $("#generateButton").on("click", function(){
     msg = JSON.stringify({"action":"generate"})
+    socket.send(msg)
+  });
+
+  $("#executeButton").on("click", function(){
+    msg = JSON.stringify({"action":"execute", "page": "ecran1.html"})
     socket.send(msg)
   });
 });
