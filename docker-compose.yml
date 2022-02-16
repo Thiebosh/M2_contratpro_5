@@ -39,7 +39,7 @@ services:
         env_file:
             - ./.env
         tty: true # bind console
-        restart: always
+        # restart: always
         depends_on:
             - render
 
