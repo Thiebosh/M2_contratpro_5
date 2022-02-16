@@ -4,7 +4,6 @@ from room_manager import RoomManager
 from socket import timeout
 import json
 import os
-import pathlib
 
 from partners.websocket_partner import WebSocketPartner
 from partners.mongo_partner import MongoPartner
@@ -92,12 +91,13 @@ class Server():
 
                 target = json.loads(target)
 
-                if "action" in target and target["action"] == "connectRoom" :
+                if "action" in target and target["action"] == "connectRoom" and "author" in target:
+                    # plus tard : recupere name dans la db ici plutot que dans target
                     if not target["roomName"] in self.room_m.rooms:
-                        self.room_m.create_room(target["roomName"], socket, self.callback_update_server_sockets, self.encoding)
+                        self.room_m.create_room(target["roomName"], socket, target["author"], self.callback_update_server_sockets, self.encoding)
 
                     else:
-                        self.room_m.add_client_to_room(target["roomName"], socket)
+                        self.room_m.add_client_to_room(target["roomName"], socket, target["author"])
 
                 self.inputs.remove(socket)
 

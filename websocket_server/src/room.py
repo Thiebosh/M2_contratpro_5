@@ -11,6 +11,7 @@ class Room():
         self.queue = queue.Queue()
         self.lock = threading.Lock()
         self.room_name = room_name
+        self.socket_name = {}
         self.inputs = []
         self.outputs = []
         self.client_connection_queue = {}
@@ -44,10 +45,11 @@ class Room():
         return select.select(self.inputs, self.outputs, self.inputs, polling_freq)
 
 
-    def open_client_connection_to_room(self, socket):
+    def open_client_connection_to_room(self, socket, name):
         self.inputs.append(socket)
+        self.socket_name[socket] = name
         self.client_connection_queue[socket] = queue.Queue()
-        print(f"{self.room_name} - Get client {socket.getpeername()}")
+        print(f"{self.room_name} - Get client {socket.getpeername()} named '{name}'")
 
         self.client_connection_queue[socket].put(json.dumps({"init": self.input_manager.json_handler.data}))
         self.outputs.append(socket)
@@ -59,6 +61,7 @@ class Room():
             self.outputs.remove(socket)
         self.inputs.remove(socket)
         del self.client_connection_queue[socket]
+        del self.socket_name[socket]
         self.callback_update_server_sockets(socket)
 
 
@@ -88,8 +91,9 @@ class Room():
 
             self.input_manager.check_and_execute_action_function(input_to_process)
 
+            msg = json.dumps({"author": self.socket_name[input_to_process.get_socket()], **input_to_process.get_msg()})
             for client_socket in self.client_connection_queue:
-                self.add_message_in_queue(input_to_process.socket, client_socket, json.dumps(input_to_process.get_msg_with_author()))
+                self.add_message_in_queue(input_to_process.socket, client_socket, msg)
 
         self.input_manager.inputs = [input_unit for input_unit in self.input_manager.inputs if input_unit.counter != 0 and not input_unit.failed]
 
@@ -101,7 +105,8 @@ class Room():
         while not self.close_evt.is_set() and self.inputs:
             with self.lock:
                 while not self.queue.empty():
-                    self.open_client_connection_to_room(self.queue.get()) # When "get" called, it removes item from queue
+                    client = self.queue.get()
+                    self.open_client_connection_to_room(client["socket"], client["name"]) # When "get" called, it removes item from queue
             try:
                 readable, writable, exception = self.read(polling_freq)
             except KeyboardInterrupt:
