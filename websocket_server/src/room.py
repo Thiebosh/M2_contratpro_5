@@ -65,10 +65,7 @@ class Room():
         self.callback_update_server_sockets(socket)
 
 
-    def add_message_in_queue(self, socket_sender, socket_receiver, msg):
-        if socket_receiver == socket_sender:
-            return
-
+    def add_message_in_queue(self, socket_receiver, msg):
         self.client_connection_queue[socket_receiver].put(msg)
         if socket_receiver not in self.outputs:
             self.outputs.append(socket_receiver)
@@ -89,11 +86,17 @@ class Room():
             if self.input_manager.check_conflicts(input_to_process):
                 continue
 
-            self.input_manager.check_and_execute_action_function(input_to_process)
+            result = self.input_manager.check_and_execute_action_function(input_to_process)
+            self.add_message_in_queue(input_to_process.socket, json.dumps({input_to_process.get_action(): result}))
+
+            if result is False:
+                continue
 
             msg = json.dumps({"author": self.socket_name[input_to_process.get_socket()], **input_to_process.get_msg()})
             for client_socket in self.client_connection_queue:
-                self.add_message_in_queue(input_to_process.socket, client_socket, msg)
+                if input_to_process.socket == client_socket:
+                    continue
+                self.add_message_in_queue(client_socket, msg)
 
         self.input_manager.inputs = [input_unit for input_unit in self.input_manager.inputs if input_unit.counter != 0 and not input_unit.failed]
 

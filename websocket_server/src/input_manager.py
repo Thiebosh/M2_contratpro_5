@@ -52,21 +52,22 @@ class InputManager():
 
     def check_and_execute_action_function(self, input_to_process):
         if input_to_process.failed : 
-            return
-        action = input_to_process.get_action()
+            return False
 
+        action = input_to_process.get_action()
         if action == "create":
-            self.json_handler.add_element(input_to_process.get_path().split("/"), input_to_process.get_content())
+            return self.json_handler.add_element(input_to_process.get_path().split("/"), input_to_process.get_content())
 
         elif action == "update":
-            self.json_handler.modify_element(input_to_process.get_path().split("/"), input_to_process.get_content())
+            return self.json_handler.modify_element(input_to_process.get_path().split("/"), input_to_process.get_content())
 
         elif action == "delete":
-            self.json_handler.remove_element(input_to_process.get_path().split("/"), input_to_process.get_content())
+            return self.json_handler.remove_element(input_to_process.get_path().split("/"), input_to_process.get_content())
 
         elif action == "save":
             result = self.json_handler.update_storage()
             print(f"Project {'well' if result else 'not'} updated")
+            return result
 
         elif action == "generate":
             # result = self.files_manager.generate_files(self.json_handler.data)
@@ -77,7 +78,11 @@ class InputManager():
 
             result = self.files_manager.update_stored_files()
             print(f"{self.room_name} - Project files {'well' if result else 'not'} updated")
+            return result
 
         elif action == "execute":
             result = self.render_page.page(input_to_process.get_page())
             print(result)
+            return False
+
+        return False
