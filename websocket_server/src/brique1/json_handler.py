@@ -11,8 +11,9 @@ class JsonHandler():
     def __init__(self, partners, project_name) -> None:
         self.partners = partners
         self.project_name = project_name
+        self.current_version_stored = True
+        self.current_version_generated = False # add field to db
         self.data = self.partners["db"].find_one(COLLECTION_PROJECTS, {"name":project_name}, {"_id": 0,"specs": 1})["specs"]
-        self.updated = False
 
 
     def close(self):
@@ -21,8 +22,11 @@ class JsonHandler():
 
 
     def update_storage(self):
-        print(f"{self.project_name} - {'' if self.updated else 'no '}need of db update")
-        return True if not self.updated else self.partners["db"].update_one(
+        print(f"{self.project_name} - {'' if self.current_version_stored else 'no '}need of db update")
+        if self.current_version_stored:
+            return True
+
+        self.current_version_stored = self.partners["db"].update_one(
             COLLECTION_PROJECTS,
             {"name":self.project_name},
             {"$set":
@@ -32,6 +36,7 @@ class JsonHandler():
                 }
             }
         )
+        return self.current_version_stored
 
 
     def _path_climber(self, path:"list[str]", container):
@@ -81,7 +86,7 @@ class JsonHandler():
         else:
             False
 
-        self.updated = True
+        self.current_version_stored = False
         return True
 
 
@@ -101,7 +106,7 @@ class JsonHandler():
                 return False
 
             del container[int(target)]
-            self.updated = True
+            self.current_version_stored = False
             return True
 
         return False
@@ -118,5 +123,5 @@ class JsonHandler():
 
         container[path[-1]] = content
 
-        self.updated = True
+        self.current_version_stored = False
         return True
