@@ -6,6 +6,7 @@ class FilesManager():
     def __init__(self, partners, project_name) -> None:
         self.partners = partners
         self.project_name = project_name
+        self.current_version_stored = True
 
         filter_q = {
             "name": self.project_name
@@ -47,6 +48,8 @@ class FilesManager():
         if not result:
             print(f"{self.project_name} - PHP - files not uploaded") # exception ?
             return
+        # for file in self.files:
+        #     print(file)
 
 
     def close(self):
@@ -75,11 +78,15 @@ class FilesManager():
             return False
 
         self.files = [{"name": line.split("\n")[0], "content": line[line.find("\n")+1:]} for line in chunks][:-1]
+        self.current_version_stored = False
 
         return True
 
 
     def update_stored_files(self):
+        if self.current_version_stored:
+            return True
+
         result = self.partners["storage"].upload_files_to_folder(self.project_id, self.files)
         if not result:
             print(f"{self.project_name} - Project upload to storage failed")
@@ -95,4 +102,5 @@ class FilesManager():
             print(f"{self.project_name} - Project upload to renderer step2/2 failed")
             return
 
+        self.current_version_stored = True
         return True

@@ -77,9 +77,9 @@ class PhpPartner():
         if not self.state:
             return False
 
-        print("call to ", f"{self.base_url}?action=render&project={project_name}&page={page}")
+        print("call to ", f"{self.base_url}?action=generate&project_name={project_name}&page={page}")
         try:
-            result = requests.get(url=f"{self.base_url}?action=render&project={project_name}&page={page}")
+            result = requests.get(url=f"{self.base_url}?action=generate&project_name={project_name}&page={page}")
         except RequestException:
             print("big exception") # serveur not started or bad url
             return False
