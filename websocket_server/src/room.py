@@ -101,7 +101,7 @@ class Room():
 
         self.input_manager.inputs = [input_unit for input_unit in self.input_manager.inputs if input_unit.check_datetime() and not input_unit.failed]
 
-    def run(self, polling_freq=0.1):
+    async def run(self, polling_freq=0.1):
         print(f"{self.room_name} - Room ready")
         while not self.close_evt.is_set() and self.inputs:
             with self.lock:

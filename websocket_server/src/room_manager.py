@@ -1,5 +1,6 @@
 import threading
 from room import Room
+import asyncio
 
 class RoomManager():
     def __init__(self, partners) -> None:
@@ -14,7 +15,7 @@ class RoomManager():
         room.open_client_connection_to_room(socket, name)
         self.rooms[room_name] = room
 
-        worker = threading.Thread(target=room.run)
+        worker = threading.Thread(target=lambda:asyncio.run(room.run()))
         worker.setDaemon(True)
         worker.start()
 
