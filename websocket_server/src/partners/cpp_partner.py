@@ -9,12 +9,9 @@ class CppPartner():
         self.exe_path = exe_path
 
         if state == None:
-            print("path : ", exe_path)
-            if os.path.exists(exe_path):
-                self.state = True
-                print("path is correct")
-            else:
-                print("path is incorrect")
+            self.state = os.path.exists(exe_path)
+            # print("cpp - path : ", exe_path)
+            print(f"cpp - path is {'correct' if self.state else 'incorrect'}")
 
     def copy_partner(self):
         return CppPartner(exe_path=self.exe_path, state=True)

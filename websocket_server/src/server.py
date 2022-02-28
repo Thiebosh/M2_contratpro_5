@@ -4,7 +4,6 @@ from room_manager import RoomManager
 from socket import timeout
 import json
 import os
-import pathlib
 
 from partners.websocket_partner import WebSocketPartner
 from partners.mongo_partner import MongoPartner
@@ -18,8 +17,8 @@ class Server():
         self.partners = {
             "websocket": websocket or WebSocketPartner(),
             "db": db or MongoPartner(f"mongodb+srv://{os.environ.get('MONGO_USERNAME')}:{os.environ.get('MONGO_PASSWORD')}@{os.environ.get('MONGO_URL')}"),
-            "storage": storage or DrivePartner(creds_path=f"{pathlib.Path(__file__).parent.absolute()}/../credentials/service_account.json", scopes=['https://www.googleapis.com/auth/drive']),
-            "generator": generator or CppPartner(exe_path="/src/brique2/cpp/prototypeur.exe"),
+            "storage": storage or DrivePartner(creds_path=os.environ.get('DRIVE_PATH'), scopes=['https://www.googleapis.com/auth/drive']),
+            "generator": generator or CppPartner(exe_path=os.environ.get('CPP_PATH')),
             "renderer": renderer or PhpPartner(base_url=os.environ.get('PHP_URL'))
         }
         self.inputs = []
@@ -92,12 +91,13 @@ class Server():
 
                 target = json.loads(target)
 
-                if "action" in target and target["action"] == "connectRoom" :
+                if "action" in target and target["action"] == "connectRoom" and "author" in target:
+                    # plus tard : recupere name dans la db ici plutot que dans target
                     if not target["roomName"] in self.room_m.rooms:
-                        self.room_m.create_room(target["roomName"], socket, self.callback_update_server_sockets, self.encoding)
+                        self.room_m.create_room(target["roomName"], socket, target["author"], self.callback_update_server_sockets, self.encoding)
 
                     else:
-                        self.room_m.add_client_to_room(target["roomName"], socket)
+                        self.room_m.add_client_to_room(target["roomName"], socket, target["author"])
 
                 self.inputs.remove(socket)
 

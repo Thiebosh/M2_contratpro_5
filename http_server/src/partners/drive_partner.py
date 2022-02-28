@@ -8,6 +8,10 @@ class DrivePartner:
         self.service:Resource = build('drive', 'v3', credentials=Creds.from_service_account_file(creds_relative_path, scopes=scopes))
 
 
+    def close(self):
+        pass
+
+
     def remove_folder(self, name):
         id_folder = self._get_folder_id(name)
         return True if not id_folder else self.service.files().delete(fileId=id_folder).execute()
