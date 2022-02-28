@@ -3,6 +3,7 @@ class DirectoryManager {
     private static string $emplacement;
 
     public function __construct($emplacement){
+        if (!is_dir($emplacement)) mkdir($emplacement, 0777, true);
         $this->$emplacement= $emplacement;
     }
 

@@ -11,7 +11,7 @@ $ERROR = "500";
 function generate($root_path) {
     global $SUCCESS, $BAD_REQUEST, $ERROR;
 
-    //echo("\ncall generate");
+    echo("\ncall generate");
     if (!isset($_GET['project_name'], $_GET['page'])) {# $_POST
         http_response_code($BAD_REQUEST);
         exit();
@@ -24,18 +24,26 @@ function generate($root_path) {
         exit();
     }
 
-    //echo("\nargs ok");
+    echo("\nargs ok");
 
     $dir_path = "{$root_path}/{$post['project_name']}";
     $file_path = "{$root_path}/{$post['project_name']}/routeur.php";
+    echo("\n");
+    echo($dir_path);
+    echo("\n");
+    echo(is_dir($dir_path)? 'true' : 'false');
+    echo("\n");
+    echo($file_path);
+    echo("\n");
+    echo(file_exists($file_path)? 'true' : 'false');
     if (!is_dir($dir_path) || !file_exists($file_path)) {
-        //echo("\ngot an error");
-        //echo($ERROR);
+        echo("\ngot an error");
+        echo($ERROR);
         http_response_code($ERROR);
         exit();
     }
 
-    //echo("\nfile exists");
+    echo("\nfile exists");
     include_once($file_path);
     http_response_code($SUCCESS);
     exit();

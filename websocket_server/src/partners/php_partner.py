@@ -24,11 +24,16 @@ class PhpPartner():
         if not self.state:
             return False
 
-        # try:
-        #     result = requests.get(url=f"{self.base_url}?action=...")
-        # except RequestException:
-        #     print("big exception")
-        #     return False
+        print("call to ", f"{self.base_url}?action=create_folder&project_name={project_name}")
+        try:
+            result = requests.get(url=f"{self.base_url}?action=create_folder&project_name={project_name}")
+        except RequestException:
+            print("big exception") # serveur not started or bad url
+            return False
+
+        print("status_code", result.status_code)
+        print("content\n________\n", result.content.decode("utf-8"))
+        print("________\nfinish")
 
         return True
 
@@ -37,12 +42,21 @@ class PhpPartner():
         if not self.state:
             return False
 
-        # for file in files:
-        #     try:
-        #         result = requests.get(url=f"{self.base_url}?action=...")
-        #     except RequestException:
-        #         print("big exception")
-        #         return False
+        print("upload all files")
+
+        for file in files:
+            print("call to ", f"{self.base_url}?action=create_file&project_name={project_name}&file_name={file}")
+            try:
+                result = requests.get(url=f"{self.base_url}?action=create_file&project_name={project_name}&file_name={file}")
+            except RequestException:
+                print("big exception") # serveur not started or bad url
+                return False
+
+            print("status_code", result.status_code)
+            print("content\n________\n", result.content.decode("utf-8"))
+            print("________\nfinish")
+
+        print("finish all files")
 
         return True
 
