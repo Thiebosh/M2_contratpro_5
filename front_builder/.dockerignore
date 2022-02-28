@@ -1,12 +1,5 @@
-node_modules/
-build/
-
-.dockerignore
-Dockerfile
-Dockerfile.prod
-
 # git files
-readme.md
+README.md
 .gitignore
 
 # docker files
@@ -16,5 +9,5 @@ Dockerfile.prod
 docker-compose.yml
 
 # react files
-node_modules
-build
+node_modules/
+build/
