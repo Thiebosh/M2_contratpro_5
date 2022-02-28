@@ -23,9 +23,10 @@ function generate($root_path) {
     }
 
     echo("\nargs ok");
-    $path = "{$root_path}/{$post['project_name']}/routeur.php";
-    echo("\n".$path);
-    if (!is_dir("{$root_path}/{$post['project_name']}") || !file_exists($path)) {
+
+    $dir_path = "{$root_path}/{$post['project_name']}";
+    $file_path = "{$root_path}/{$post['project_name']}/routeur.php";
+    if (!(is_dir($dir_path) && file_exists($file_path))) {
         http_response_code($ERROR);
         exit();
     }

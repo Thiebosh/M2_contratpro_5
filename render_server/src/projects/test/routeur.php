@@ -1,6 +1,7 @@
 <?php
 $default_page = "";
 echo("\ndans le routeur du projet !");
+exit();
 
 if (file_exists("{$project_name}/{$post['page']}")) {
     echo("la page demandée existe!");
