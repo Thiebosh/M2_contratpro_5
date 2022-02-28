@@ -2,8 +2,8 @@
 class DirectoryManager {
     private static string $emplacement;
 
-    public DirectoryManager(String $emplacement){
-        $this->$emplacement= $emplacement;
+    public function __construct($emplacement) {
+        $this->$emplacement = $emplacement;
     }
 
     public static function folder_exist($path) : bool {
