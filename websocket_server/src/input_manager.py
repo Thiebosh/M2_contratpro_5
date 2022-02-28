@@ -23,10 +23,6 @@ class InputManager():
     def add_new_input(self, socket, msg):
         self.inputs.append(Input(socket, msg))
 
-    def decrease_counter_on_all_inputs(self):
-        for input in self.inputs:
-            input.decrease_counter()
-
     def check_conflicts(self, input_to_process):
         for current_input in self.inputs:
             if current_input == input_to_process or current_input.failed:
