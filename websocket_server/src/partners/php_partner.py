@@ -45,9 +45,9 @@ class PhpPartner():
         print("upload all files")
 
         for file in files:
-            print("call to ", f"{self.base_url}?action=create_file&project_name={project_name}&file_name={file}")
+            print("call to ", f"{self.base_url}?action=create_file&project_name={project_name}&file_name={file['name']}&file_content={file['content']}")
             try:
-                result = requests.get(url=f"{self.base_url}?action=create_file&project_name={project_name}&file_name={file}")
+                result = requests.get(url=f"{self.base_url}?action=create_file&project_name={project_name}&file_name={file['name']}&file_content={file['content']}")
             except RequestException:
                 print("big exception") # serveur not started or bad url
                 return False

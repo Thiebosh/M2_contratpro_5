@@ -7,12 +7,12 @@ class DirectoryManager {
         $this->$emplacement= $emplacement;
     }
 
-    public function create_folder($path) : boolval {
+    public function create_folder($path) : bool {
         $path = "{DirectoryManager::emplacement}/{$path}";
         return (is_dir($path)) ? true : mkdir($path, 0777, true);
     }
 
-    public function create_file($path, $content) : boolval {
+    public function create_file($path, $content) : bool {
         $path = "{DirectoryManager::emplacement}/{$path}";
         return (!is_dir($path)) ? false : file_put_contents($path, $content) !== false;
     }
