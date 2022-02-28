@@ -16,7 +16,7 @@ services:
 
     rest:
         build:
-            context: ./http_server/
+            context: ./rest_server/
             dockerfile: Dockerfile.prod
             args:
                 arg_port: 5000
