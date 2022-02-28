@@ -9,30 +9,31 @@ $SUCCESS = "200";
 $BAD_REQUEST = "400";
 $ERROR = "500";
 
-function generate() {
-    var_dump(__DIR__);
-    echo("call generate\n");
+function generate($root_path) {
+    echo("\ncall generate");
     if (!isset($_GET['project_name'], $_GET['page'])) return $BAD_REQUEST; # $_POST
 
     $post['project_name'] = filter_input(INPUT_GET, 'project_name', FILTER_SANITIZE_STRING); # INPUT_POST
     $post['page'] = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_STRING); # INPUT_POST
     if (in_array(false, $post, true)) return $BAD_REQUEST;
 
-    echo("args ok\n");
-    $path = __DIR__."/projects/{$post['project_name']}/routeur.php";
-    if (!file_exists($path)) return $ERROR;
+    echo("\nargs ok");
+    $path = "{$root_path}/{$post['project_name']}/routeur.php";
+    echo("\n".$path);
+    if (!is_dir("{$root_path}/{$post['project_name']}") || !file_exists($path)) return $ERROR;
 
-    echo("file exists\n");
+    echo("\nfile exists");
     require_once($path);
     return $SUCCESS;
 }
 
-$directoryManager = new DirectoryManager(__DIR__."/projects");
 
+$root_path = __DIR__."/projects";
+$directoryManager = new DirectoryManager($root_path);
 if (isset($_GET['action'])) {
     switch ($action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING)) {
         case 'generate':
-            http_response_code(generate());
+            http_response_code(generate($root_path));
             exit();
 
         case 'create_folder': //localhost:80/index.php?action=create_folder&project_name=test
