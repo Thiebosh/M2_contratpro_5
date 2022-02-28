@@ -2,12 +2,8 @@
 class DirectoryManager {
     private static string $emplacement;
 
-    public function __construct($emplacement) {
-        $this->$emplacement = $emplacement;
-    }
-
-    public static function folder_exist($path) : bool {
-        return true ? true : false; // test existence
+    public function __construct($emplacement){
+        $this->$emplacement= $emplacement;
     }
 
     public static function file_exist($path) : bool {
@@ -22,7 +18,7 @@ class DirectoryManager {
 
         $path = "{DirectoryManager::emplacement}/{$post['project_name']}";
 
-        if (self::folder_exist($path)) return $SUCCESS;
+        if (is_dir($path)) return $SUCCESS;
 
         $result = mkdir($path, 0777, true);
 
@@ -37,7 +33,7 @@ class DirectoryManager {
         $post['file_content'] = filter_input(INPUT_GET, 'file_content', FILTER_SANITIZE_STRING); # INPUT_POST
         if (in_array(false, $post, true)) return $BAD_REQUEST;
 
-        if (!self::folder_exist($path)) return $ERROR;
+        if (!is_dir($path)) return $ERROR;
 
         $result = file_put_contents("{DirectoryManager::emplacement}/{$post['project_name']}/{$post['file_name']}", $post['file_content']);
 
@@ -50,9 +46,9 @@ class DirectoryManager {
         $post['project_name'] = filter_input(INPUT_GET, 'project_name', FILTER_SANITIZE_STRING); # INPUT_POST
         if (in_array(false, $post, true)) return $BAD_REQUEST;
 
-        if (!self::folder_exist($path)) return $ERROR;
+        if (!is_dir($path)) return $ERROR;
 
-        // remove all files in folder
+        $result = unlink($path); //deleted file 
 
         return $result ? $SUCCESS : $ERROR;
     }
@@ -63,11 +59,18 @@ class DirectoryManager {
         $post['project_name'] = filter_input(INPUT_GET, 'project_name', FILTER_SANITIZE_STRING); # INPUT_POST
         if (in_array(false, $post, true)) return $BAD_REQUEST;
 
-        if (self::folder_exist($path)) return $SUCCESS;
+        if (is_dir($path)) return $SUCCESS;
 
-        // remove all files in folder (or folder deletion recursive ?)
-        // remove folder
+        foreach(glob($dir . "/*") as $element){
+            if(is_dir($element)){
+                remove_folder($element); // On rappel la fonction remove_folder           
+                if(!rmdir($element)) return $ERROR; // Une fois le dossier courant vidé, on le supprime
+            } else { // Sinon c'est un fichier, on le supprime
+                if(!unlink($element)) return $ERROR;
+            }
+            // On passe à l'élément suivant
+        }
 
-        return $result ? $SUCCESS : $ERROR;
+        return $SUCCESS ;
     }
 }
