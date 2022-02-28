@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+
 require_once("controllers/directory_manager.php");
 
 // a mettre dans un fichier "return_codes.php" et a inclure ici et dans les controleurs
@@ -9,18 +10,19 @@ $BAD_REQUEST = "400";
 $ERROR = "500";
 
 function generate() {
-    echo("call generate<br>");
+    var_dump(__DIR__);
+    echo("call generate\n");
     if (!isset($_GET['project_name'], $_GET['page'])) return $BAD_REQUEST; # $_POST
 
     $post['project_name'] = filter_input(INPUT_GET, 'project_name', FILTER_SANITIZE_STRING); # INPUT_POST
     $post['page'] = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_STRING); # INPUT_POST
     if (in_array(false, $post, true)) return $BAD_REQUEST;
 
-    echo("args ok<br>");
-    $path = "{$post['project_name']}/routeur.php";
-    if (!DirectoryManager::file_exist($path)) return $ERROR;
+    echo("args ok\n");
+    $path = __DIR__."/projects/{$post['project_name']}/routeur.php";
+    if (!file_exists($path)) return $ERROR;
 
-    echo("file exists<br>");
+    echo("file exists\n");
     require_once($path);
     return $SUCCESS;
 }
