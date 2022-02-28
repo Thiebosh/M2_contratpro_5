@@ -10,7 +10,7 @@ class InputManager():
         self.room_name = room_name
         self.send_conflict_message_callback = send_conflict_message_callback
 
-        self.inputs:"list[Input]" = []
+        self.inputs: "list[Input]" = []
 
         self.json_handler = JsonHandler(partners, room_name)
         self.files_manager = FilesManager(partners, room_name)
@@ -33,9 +33,9 @@ class InputManager():
             first_content = current_input.get_content()
             second_content = input_to_process.get_content()
 
-            if (first_path == second_path) and JsonHandler.check_if_similar_keys(first_content, second_content) \
-                or first_path in second_path and current_input.get_action() == "delete" \
-                or second_path in first_path and input_to_process.get_action() == "delete":
+            if (first_path == second_path and JsonHandler.check_if_similar_keys(first_content, second_content)) \
+                or (first_path in second_path and current_input.get_action() == "delete")\
+                or (second_path in first_path and input_to_process.get_action() == "delete"):
                 if not input_to_process.failed:
                     input_to_process.failed = True
                     self.send_conflict_message_callback(input_to_process)
@@ -46,34 +46,35 @@ class InputManager():
 
         return input_to_process.failed
 
+
     def check_and_execute_action_function(self, input_to_process):
-        if input_to_process.failed : 
+        if input_to_process.failed:
             return False
 
         action = input_to_process.get_action()
         if action == "create":
-            result = self.json_handler.add_element(input_to_process.get_path().split("/"), input_to_process.get_content())
-            return result
+            result = self.json_handler.add_element(input_to_process.get_path().split("/"),
+                                                   input_to_process.get_content())
 
         elif action == "update":
-            result = self.json_handler.modify_element(input_to_process.get_path().split("/"), input_to_process.get_content())
-            return result
+            result = self.json_handler.modify_element(input_to_process.get_path().split("/"),
+                                                      input_to_process.get_content())
 
         elif action == "delete":
-            result = self.json_handler.remove_element(input_to_process.get_path().split("/"), input_to_process.get_content())
-            return result
+            result = self.json_handler.remove_element(input_to_process.get_path().split("/"),
+                                                      input_to_process.get_content())
 
         elif action == "save":
             result = self.json_handler.update_storage()
             print(f"Project {'well' if result else 'not'} updated")
-            return result
 
         elif action == "generate":
             if self.json_handler.current_version_generated:
                 return True
 
             # result = self.files_manager.generate_files(self.json_handler.data)
-            with open(f"{pathlib.Path(__file__).parent.absolute()}/brique2/needs.json", 'r') as file:
+            with open(f"{pathlib.Path(__file__).parent.absolute()}/brique2/needs.json",
+                      'r') as file:
                 test = file.read().replace('\n', '')
             result = self.files_manager.generate_files(test)
             print(f"{self.room_name} - Project files {'well' if result else 'not'} generated")
@@ -86,11 +87,9 @@ class InputManager():
             result = self.files_manager.update_stored_files()
             print(f"{self.room_name} - Project files {'well' if result else 'not'} updated")
 
-            return result
-
         elif action == "execute":
             result = self.render_page.page(input_to_process.get_page())
             print(result)
-            return False
+            result = False
 
-        return False
+        return result

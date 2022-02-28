@@ -3,7 +3,6 @@ import threading
 import select
 import json
 from input_manager import InputManager
-from datetime import datetime, timedelta
 
 class Room():
     def __init__(self, room_name, partners, callback_update_server_sockets, callback_remove_room, encoding) -> None:

@@ -90,17 +90,17 @@ class FilesManager():
         result = self.partners["storage"].upload_files_to_folder(self.project_id, self.files)
         if not result:
             print(f"{self.project_name} - Project upload to storage failed")
-            return
+            return False
 
         result = self.partners["renderer"].unset_project_files(self.project_name) # use id when ready
         if not result:
             print(f"{self.project_name} - Project upload to renderer step1/2 failed")
-            return
+            return False
 
         result = self.partners["renderer"].set_project_files(self.project_name, self.files) # use id when ready
         if not result:
             print(f"{self.project_name} - Project upload to renderer step2/2 failed")
-            return
+            return False
 
         self.current_version_stored = True
         return True
