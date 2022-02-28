@@ -5,6 +5,9 @@ class Input():
         self.counter = 10
         self.failed = False
 
+    def get_socket(self):
+        return self.socket
+
     def get_action(self):
         return self.msg["action"]
 
@@ -20,8 +23,5 @@ class Input():
     def decrease_counter(self):
         self.counter -= 1
 
-    def get_msg_with_author(self):
-        return {
-            "author": str(self.socket), # make client object with socket and username
-            **self.msg
-        }
+    def get_msg(self):
+        return self.msg

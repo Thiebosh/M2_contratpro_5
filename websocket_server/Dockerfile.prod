@@ -39,6 +39,8 @@ EXPOSE $arg_port
 ENV HOST=0.0.0.0
 ENV PORT=$arg_port
 ENV PHP_URL=$php_url
+ENV CPP_PATH="/src/brique2/cpp/prototypeur.exe"
+ENV DRIVE_PATH="/credentials/service_account.json"
 
 WORKDIR /credentials
 COPY credentials .

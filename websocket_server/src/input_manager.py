@@ -52,32 +52,49 @@ class InputManager():
 
     def check_and_execute_action_function(self, input_to_process):
         if input_to_process.failed : 
-            return
-        action = input_to_process.get_action()
+            return False
 
+        action = input_to_process.get_action()
         if action == "create":
-            self.json_handler.add_element(input_to_process.get_path().split("/"), input_to_process.get_content())
+            result = self.json_handler.add_element(input_to_process.get_path().split("/"), input_to_process.get_content())
+            return result
 
         elif action == "update":
-            self.json_handler.modify_element(input_to_process.get_path().split("/"), input_to_process.get_content())
+            result = self.json_handler.modify_element(input_to_process.get_path().split("/"), input_to_process.get_content())
+            return result
 
         elif action == "delete":
-            self.json_handler.remove_element(input_to_process.get_path().split("/"), input_to_process.get_content())
+            result = self.json_handler.remove_element(input_to_process.get_path().split("/"), input_to_process.get_content())
+            return result
 
         elif action == "save":
             result = self.json_handler.update_storage()
             print(f"Project {'well' if result else 'not'} updated")
+            return result
 
         elif action == "generate":
+            if self.json_handler.current_version_generated:
+                return True
+
             # result = self.files_manager.generate_files(self.json_handler.data)
             with open(f"{pathlib.Path(__file__).parent.absolute()}/brique2/needs.json", 'r') as file:
                 test = file.read().replace('\n', '')
             result = self.files_manager.generate_files(test)
             print(f"{self.room_name} - Project files {'well' if result else 'not'} generated")
 
+            if result is False:
+                return False
+
+            self.json_handler.current_version_generated = result
+
             result = self.files_manager.update_stored_files()
             print(f"{self.room_name} - Project files {'well' if result else 'not'} updated")
+
+            return result
 
         elif action == "execute":
             result = self.render_page.page(input_to_process.get_page())
             print(result)
+            return False
+
+        return False
