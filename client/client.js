@@ -70,8 +70,9 @@ $(function () {
   });
 
   $("#connectionButton").on("click", function(){
-    let roomName = $("#roomNameInput").val(); 
-    msg = JSON.stringify({"action":"connectRoom", "roomName" : roomName})
+    let roomName = $("#roomNameInput").val();
+    let authorName = $("#userNameInput").val();
+    msg = JSON.stringify({"action":"connectRoom", "roomName" : roomName, "author": authorName})
     socket.send(msg);
     inRoom = true;
 
@@ -81,9 +82,12 @@ $(function () {
     $("#createButton2").css("display","");
     $("#saveButton").css("display","");
     $("#generateButton").css("display","");
+    $("#executeButton").css("display","");
     $("#exitRoomButton").css("display","");
     $("#message_input").css("display","");
     $("#roomNameInput").css("display","None");
+    $("#userNameInput").css("display","None");
+    $(".login").css("display","None");
   });
 
   $("#exitRoomButton").on("click", function(){
@@ -98,9 +102,12 @@ $(function () {
     $("#createButton2").css("display","None");
     $("#saveButton").css("display","None");
     $("#generateButton").css("display","None");
+    $("#executeButton").css("display","None");
     $("#exitRoomButton").css("display","None");
     $("#message_input").css("display","None");
     $("#roomNameInput").css("display","");
+    $("#userNameInput").css("display","");
+    $(".login").css("display","");
   });
 
   $("#saveButton").on("click", function(){
@@ -110,6 +117,11 @@ $(function () {
 
   $("#generateButton").on("click", function(){
     msg = JSON.stringify({"action":"generate"})
+    socket.send(msg)
+  });
+
+  $("#executeButton").on("click", function(){
+    msg = JSON.stringify({"action":"execute", "page": "ecran1.html"})
     socket.send(msg)
   });
 });
