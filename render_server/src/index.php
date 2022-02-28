@@ -9,11 +9,9 @@ $BAD_REQUEST = "400";
 $ERROR = "500";
 
 function generate($root_path) {
-    global $SUCCESS;
-    global $BAD_REQUEST;
-    global $ERROR;
+    global $SUCCESS, $BAD_REQUEST, $ERROR;
 
-    echo("\ncall generate");
+    //echo("\ncall generate");
     if (!isset($_GET['project_name'], $_GET['page'])) {# $_POST
         http_response_code($BAD_REQUEST);
         exit();
@@ -26,16 +24,18 @@ function generate($root_path) {
         exit();
     }
 
-    echo("\nargs ok");
+    //echo("\nargs ok");
 
     $dir_path = "{$root_path}/{$post['project_name']}";
     $file_path = "{$root_path}/{$post['project_name']}/routeur.php";
     if (!is_dir($dir_path) || !file_exists($file_path)) {
+        //echo("\ngot an error");
+        //echo($ERROR);
         http_response_code($ERROR);
         exit();
     }
 
-    echo("\nfile exists");
+    //echo("\nfile exists");
     include_once($file_path);
     http_response_code($SUCCESS);
     exit();
@@ -51,11 +51,37 @@ if (isset($_GET['action'])) {
             exit();
 
         case 'create_folder': //localhost:80/index.php?action=create_folder&project_name=test
-            http_response_code($directoryManager->create_folder());
+            if (!isset($_GET['project_name'])) { # $_POST
+                http_response_code($BAD_REQUEST);
+                exit();
+            }
+
+            $post['project_name'] = filter_input(INPUT_GET, 'project_name', FILTER_SANITIZE_STRING); # INPUT_POST
+            if (in_array(false, $post, true)) {
+                http_response_code($BAD_REQUEST);
+                exit();
+            }
+
+            $result = $directoryManager->create_folder($post['project_name']);
+            http_response_code($result ? $SUCCESS : $ERROR);
             exit();
 
         case 'create_file': //localhost:80/index.php?action=create_file&project_name=test&file_name=exemple.html&file_content="un peu de texte"
-            http_response_code($directoryManager->create_folder());
+            if (!isset($_GET['project_name'], $_GET['file_name'], $_GET['file_content'])) { # $_POST
+                http_response_code($BAD_REQUEST);
+                exit();
+            }
+    
+            $post['project_name'] = filter_input(INPUT_GET, 'project_name', FILTER_SANITIZE_STRING); # INPUT_POST
+            $post['file_name'] = filter_input(INPUT_GET, 'file_name', FILTER_SANITIZE_STRING); # INPUT_POST
+            $post['file_content'] = filter_input(INPUT_GET, 'file_content', FILTER_SANITIZE_STRING); # INPUT_POST
+            if (in_array(false, $post, true)) {
+                http_response_code($BAD_REQUEST);
+                exit();
+            }
+
+            $result = $directoryManager->create_file("{$post['project_name']}/{$post['file_name']}", $post['file_content']);
+            http_response_code($result ? $SUCCESS : $ERROR);
             exit();
 
         case 'remove_files': //localhost:80/index.php?action=remove_files&project_name=test

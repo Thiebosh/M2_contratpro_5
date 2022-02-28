@@ -85,6 +85,7 @@ class PhpPartner():
             return False
 
         print("status_code", result.status_code)
-        print("content", result.content.decode("utf-8"))
+        print("content\n________\n", result.content.decode("utf-8"))
+        print("________\nfinish")
 
         return True
