@@ -49,7 +49,6 @@ class Room():
         self.inputs.append(socket)
         self.socket_name[socket] = name
         self.client_connection_queue[socket] = queue.Queue()
-        print(f"{self.room_name} - Get client {socket.getpeername()} named '{name}'")
 
         self.client_connection_queue[socket].put(json.dumps({"init": self.input_manager.json_handler.data}))
         self.outputs.append(socket)
