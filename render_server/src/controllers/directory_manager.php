@@ -14,6 +14,7 @@ class DirectoryManager {
     }
 
     public function create_file($path, $content) : bool {
+        
         $path = "{$this->root_path}/{$path}";
         return (!is_dir(implode("/", array_slice(explode("/", $path), 0, -1)))) ? false : file_put_contents($path, $content) !== false;
     }
@@ -23,8 +24,15 @@ class DirectoryManager {
         if (!file_exists($path)) return true;
         if (!is_dir($path)) return false;
 
-        // scan all files in directory and delete them all, return false if pb
-        //foreach($files as $file) if (!unlink("{$path}/{$file}")) return false;
+        foreach(glob($path . "/*") as $element){
+            if(is_dir($element)){
+                remove_files($element); // On rappel la fonction remove_folder           
+                if(!rmdir($element)) return false; // Une fois le dossier courant vidé, on le supprime
+            } else { // Sinon c'est un fichier, on le supprime
+                if(!unlink($element)) return false;
+            }
+            // On passe à l'élément suivant
+        }
 
         return true;
     }
@@ -33,20 +41,7 @@ class DirectoryManager {
         $path = "{$this->root_path}/{$path}";
         if (!file_exists($path)) return true;
         if (!is_dir($path)) return false;
-
-        // return false if folder contains content
-
-        // deplacer ce bloc au dessus ?
-        /*foreach(glob($dir . "/*") as $element){
-            if(is_dir($element)){
-                remove_folder($element); // On rappel la fonction remove_folder           
-                if(!rmdir($element)) return $ERROR; // Une fois le dossier courant vidé, on le supprime
-            } else { // Sinon c'est un fichier, on le supprime
-                if(!unlink($element)) return $ERROR;
-            }
-            // On passe à l'élément suivant
-        }*/
-
+        
         return rmdir($element);
     }
 
