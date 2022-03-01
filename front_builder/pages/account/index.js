@@ -1,5 +1,4 @@
-import { Avatar, Flex, Stack, Wrap, WrapItem } from "@chakra-ui/react";
-import { Input } from "postcss";
+import { Input, Avatar, Flex, Stack, Wrap, WrapItem } from "@chakra-ui/react";
 
 export default function Account() {
   const name = "Benjamin";
