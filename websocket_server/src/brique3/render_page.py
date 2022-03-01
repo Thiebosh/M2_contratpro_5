@@ -1,4 +1,3 @@
-
 class RenderPage():
     def __init__(self, partners, project_name) -> None:
         self.partners = partners
