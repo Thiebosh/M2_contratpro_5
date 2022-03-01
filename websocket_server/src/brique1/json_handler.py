@@ -13,7 +13,7 @@ class JsonHandler():
         self.project_name = project_name
         self.current_version_stored = True
         self.current_version_generated = False # add field to db
-        self.data = self.partners["db"].find_one(COLLECTION_PROJECTS, {"name":project_name}, {"_id": 0,"specs": 1})["specs"]
+        self.data = self.partners["db"].find_one(COLLECTION_PROJECTS, {"name":project_name}, {"_id": 0, "specs": 1})["specs"]
 
 
     def close(self):
@@ -29,10 +29,9 @@ class JsonHandler():
         self.current_version_stored = self.partners["db"].update_one(
             COLLECTION_PROJECTS,
             {"name":self.project_name},
-            {"$set":
-                {
-                    "last_specs":datetime.utcnow(),
-                    "specs":self.data
+            {"$set": {
+                "last_specs":datetime.utcnow(),
+                "specs":self.data
                 }
             }
         )
@@ -59,7 +58,7 @@ class JsonHandler():
         return container[key] if len(path) == 1 else self._path_climber(path[1:], container[key])
 
 
-    def add_element(self, path:"list[str]", content):
+    def add_element(self, path: "list[str]", content):
         container = self._path_climber(path, self.data)
 
         if container is False:
@@ -84,13 +83,13 @@ class JsonHandler():
             container.update(content)
 
         else:
-            False
+            return False
 
         self.current_version_stored = False
         return True
 
 
-    def remove_element(self, path:"list[str]", target:str):
+    def remove_element(self, path: "list[str]", target: str):
         container = self._path_climber(path, self.data)
 
         if container is False:
@@ -99,9 +98,9 @@ class JsonHandler():
         container_type = type(container)
 
         if container_type is dict:
-            return not not container.pop(target, None)
+            return not container.pop(target, None)
 
-        elif container_type is list:
+        if container_type is list:
             if not (target.isnumeric() and len(container) > int(target)):
                 return False
 
@@ -112,7 +111,7 @@ class JsonHandler():
         return False
 
 
-    def modify_element(self, path:"list[str]", content):
+    def modify_element(self, path: "list[str]", content):
         if type(content) not in (int, float, str):
             return False
 

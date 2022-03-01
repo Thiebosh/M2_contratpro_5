@@ -1,8 +1,10 @@
+from datetime import datetime, timedelta
+
 class Input():
     def __init__(self, socket, msg) -> None:
         self.socket = socket
         self.msg = msg
-        self.counter = 10
+        self.datetime = datetime.now()
         self.failed = False
 
     def get_socket(self):
@@ -20,8 +22,8 @@ class Input():
     def get_page(self):
         return self.msg["page"]
 
-    def decrease_counter(self):
-        self.counter -= 1
-
     def get_msg(self):
         return self.msg
+
+    def check_datetime(self):
+        return datetime.now() - self.datetime <= timedelta(seconds=1)
