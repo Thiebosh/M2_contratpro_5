@@ -21,7 +21,7 @@ export default function() {
           <Link to="/dashboard">Dashboard</Link>
         </li>
         <li>
-          <Link to="/about">About</Link>
+          <Link to="/projets">Projets</Link>
         </li>
       </ul>
       {authed && (
