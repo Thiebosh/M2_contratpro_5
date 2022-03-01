@@ -5,12 +5,13 @@ require_once("controllers/directory_manager.php");
 
 $SUCCESS = "200";
 $BAD_REQUEST = "400";
+$NOT_FOUND = "404";
 $ERROR = "500";
 
 $directoryManager = new DirectoryManager(__DIR__."/projects");
 if (isset($_GET['action'])) {
     switch ($action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING)) {
-        case 'generate':
+        case 'execute':
             if (!isset($_POST['project_name'], $_POST['page'])) {
                 http_response_code($BAD_REQUEST);
                 exit();
@@ -89,7 +90,7 @@ if (isset($_GET['action'])) {
                 exit();
             }
 
-            $result = $directoryManager->remove_folder();
+            $result = $directoryManager->remove_folder($post['project_name']);
             http_response_code($result ? $SUCCESS : $ERROR);
             exit();
 

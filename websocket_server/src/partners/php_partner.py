@@ -15,7 +15,7 @@ class PhpPartner():
 
 
     def _get(self, endpoint, print_=False):
-        print("call to", endpoint)
+        print("php - call", endpoint)
         try:
             result = requests.get(url=f"{self.base_url}?action={endpoint}")
         except RequestException:
@@ -31,7 +31,7 @@ class PhpPartner():
 
 
     def _post(self, endpoint, data, print_=False):
-        print("call to ",endpoint)
+        print("php - call to ",endpoint)
         try:
             result = requests.post(url=f"{self.base_url}?action={endpoint}", data=data)
         except RequestException:
@@ -40,17 +40,39 @@ class PhpPartner():
 
         if print_:
             print("status_code", result.status_code)
+            if result.status_code != 200:
+                print("data : ", data)
+
             print("content\n________\n", result.content.decode("utf-8"))
             print("________\nfinish")
 
         return result.status_code == 200, result.content.decode("utf-8")
 
 
+    def _postWithCode(self, endpoint, data, print_=False):
+        print("php - call to ",endpoint)
+        try:
+            result = requests.post(url=f"{self.base_url}?action={endpoint}", data=data)
+        except RequestException:
+            print("big exception") # serveur not started or bad url
+            return False, ""
+
+        if print_:
+            print("status_code", result.status_code)
+            if result.status_code != 200:
+                print("data : ", data)
+
+            print("content\n________\n", result.content.decode("utf-8"))
+            print("________\nfinish")
+
+        return result.status_code, result.content.decode("utf-8")
+
+
     def set_project_folder(self, project_name):
         if not self.state:
             return False
 
-        return self._post("create_folder", { "project_name": project_name }, True)[0]
+        return self._post("create_folder", { "project_name": project_name })[0]
 
 
     def set_project_files(self, project_name, files):
@@ -65,7 +87,7 @@ class PhpPartner():
                 "file_name": file['name'],
                 "file_content": file['content']
             }
-            if not self._post("create_file", data, True)[0]:
+            if not self._post("create_file", data)[0]:
                 return False
 
         print("finish all files")
@@ -77,14 +99,14 @@ class PhpPartner():
         if not self.state:
             return False
 
-        return self._post("remove_files", { "project_name": project_name }, True)[0]
+        return self._post("remove_files", { "project_name": project_name })[0]
 
 
     def unset_project_folder(self, project_name):
         if not self.state:
             return False
 
-        return self._post("remove_folder", { "project_name": project_name }, True)[0]
+        return self._post("remove_folder", { "project_name": project_name })[0]
 
 
     def get_project_page(self, project_name, page):
@@ -95,4 +117,4 @@ class PhpPartner():
             "project_name": project_name,
             "page": page
         }
-        return self._post("generate", data, True)
+        return self._postWithCode("execute", data)
