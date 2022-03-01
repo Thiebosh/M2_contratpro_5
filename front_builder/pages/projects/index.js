@@ -1,11 +1,13 @@
 import {
   Avatar,
   Box,
+  Container,
   Center,
   Flex,
   IconButton,
   Table,
   TableCaption,
+  SimpleGrid,
   Tbody,
   Td,
   Text,
@@ -37,56 +39,54 @@ export default function Projets() {
   }, []);
 
   return (
-    <div className="projetsPage">
-      <Flex>
-        <div className="avatar">
-          <Wrap>
-            <WrapItem>
-              <Avatar size="xl" src="https://bit.ly/code-beast" />
-            </WrapItem>
-          </Wrap>
-        </div>
+    <Container maxW="container.xl">
+      <Box className="header" m={5}>
+        <Wrap>
+          <WrapItem>
+            <Avatar size="xl" src="https://bit.ly/code-beast" />
+          </WrapItem>
+          <WrapItem>
+            <Center w="200px" h="100px">
+              <Text fontSize="xl">Projets en cours...</Text>
+            </Center>
+          </WrapItem>
+        </Wrap>
+      </Box>
 
-        <div className="container">
-          <Wrap direction="column">
-            <WrapItem>
-              <Center w="300px" h="80px">
-                <Text fontSize="2xl">Projets en cours...</Text>
-              </Center>
-            </WrapItem>
-            <Table variant="simple">
-              <TableCaption>Liste des projets en cours</TableCaption>
-              <div className="numberProjects"></div>
-              <Thead>
-                <Tr>
-                  <Th>Nom</Th>
-                  <Th>Date de création</Th>
-                  <Th>Dernière modification au</Th>
-                  <Th>Action</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                <Tr>
-                  <Td>BenPorj</Td>
-                  <Td> 20/01/2022</Td>
-                  <Td>12/10/2020</Td>
-                  <Td>
-                    <IconButton aria-label="modifier" icon={<EditIcon />} />
-                  </Td>
-                </Tr>
-                <Tr>
-                  <Td>Bennne</Td>
-                  <Td>12/10/2020</Td>
-                  <Td>28/11/2020</Td>
-                  <Td>
-                    <IconButton aria-label="modifier" icon={<EditIcon />} />
-                  </Td>
-                </Tr>
-              </Tbody>
-            </Table>
-          </Wrap>
-        </div>
-      </Flex>
-    </div>
+      <Box className="container">
+        <Wrap direction="column">
+          <Table variant="simple">
+            <TableCaption>Liste des projets en cours</TableCaption>
+            <div className="numberProjects"></div>
+            <Thead>
+              <Tr>
+                <Th>Nom</Th>
+                <Th>Date de création</Th>
+                <Th>Dernière modification au</Th>
+                <Th>Action</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              <Tr>
+                <Td>BenPorj</Td>
+                <Td> 20/01/2022</Td>
+                <Td>12/10/2020</Td>
+                <Td>
+                  <IconButton aria-label="modifier" icon={<EditIcon />} />
+                </Td>
+              </Tr>
+              <Tr>
+                <Td>Bennne</Td>
+                <Td>12/10/2020</Td>
+                <Td>28/11/2020</Td>
+                <Td>
+                  <IconButton aria-label="modifier" icon={<EditIcon />} />
+                </Td>
+              </Tr>
+            </Tbody>
+          </Table>
+        </Wrap>
+      </Box>
+    </Container>
   );
 }
