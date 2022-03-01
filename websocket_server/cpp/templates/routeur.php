@@ -1,6 +1,9 @@
 <?php
 $default_page = "";
 
+echo("hello world!");
+exit();
+
 if (file_exists("{$project_name}/{$post['page']}")) {
     echo("la page demandée existe!");
     include_once(__DIR__."/{$post['page']}");

@@ -77,7 +77,7 @@ class Room():
             self.outputs.append(input_to_process.socket)
 
 
-    def process_running_inputs(self):
+    async def process_running_inputs(self):
         for input_to_process in self.input_manager.inputs:
             if (input_to_process.check_datetime()) or input_to_process.failed:
                 continue
@@ -86,7 +86,7 @@ class Room():
             if self.input_manager.check_conflicts(input_to_process):
                 continue
 
-            result = self.input_manager.check_and_execute_action_function(input_to_process)
+            result = await self.input_manager.check_and_execute_action_function(input_to_process)
             self.add_message_in_queue(input_to_process.socket, json.dumps({input_to_process.get_action(): result}))
 
             if result is False:
@@ -126,7 +126,7 @@ class Room():
 
                 self.input_manager.add_new_input(socket, msg)
 
-            self.process_running_inputs()
+            await self.process_running_inputs()
 
             for socket in writable:
                 try:
