@@ -5,6 +5,7 @@ require_once("controllers/directory_manager.php");
 
 $SUCCESS = "200";
 $BAD_REQUEST = "400";
+$NOT_FOUND = "404";
 $ERROR = "500";
 
 $directoryManager = new DirectoryManager(__DIR__."/projects");

@@ -14,9 +14,9 @@ class DirectoryManager {
     }
 
     public function create_file($path, $content) : bool {
-        
         $path = "{$this->root_path}/{$path}";
-        return (!is_dir(implode("/", array_slice(explode("/", $path), 0, -1)))) ? false : file_put_contents($path, $content) !== false;
+        if (!is_dir(implode("/", array_slice(explode("/", $path), 0, -1))) || file_exists($path)) return false;
+        return file_put_contents($path, $content) !== false;
     }
 
     public function remove_files($path) : bool {
@@ -25,7 +25,6 @@ class DirectoryManager {
         if (!is_dir($path)) return false;
 
         foreach(glob($path . "/*") as $element){
-            
             if(!unlink($element)) return false;
         }
 
