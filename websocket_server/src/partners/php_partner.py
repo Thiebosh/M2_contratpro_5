@@ -24,7 +24,7 @@ class PhpPartner():
         if not self.state:
             return False
 
-        print("call to ", f"{self.base_url}?action=create_folder&project_name={project_name}")
+        print("call to create_folder")
         try:
             result = requests.get(url=f"{self.base_url}?action=create_folder&project_name={project_name}")
         except RequestException:
@@ -45,7 +45,7 @@ class PhpPartner():
         print("upload all files")
 
         for file in files:
-            print("call to ", f"{self.base_url}?action=create_file&project_name={project_name}&file_name={file['name']}&file_content={file['content']}")
+            print("call to create_file")
             try:
                 result = requests.get(url=f"{self.base_url}?action=create_file&project_name={project_name}&file_name={file['name']}&file_content={file['content']}")
             except RequestException:
@@ -91,7 +91,7 @@ class PhpPartner():
         if not self.state:
             return False
 
-        print("call to ", f"{self.base_url}?action=generate&project_name={project_name}&page={page}")
+        print("call to generate")
         try:
             result = requests.get(url=f"{self.base_url}?action=generate&project_name={project_name}&page={page}")
         except RequestException:

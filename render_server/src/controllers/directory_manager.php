@@ -1,28 +1,29 @@
 <?php
 class DirectoryManager {
-    private static string $emplacement;
+    private string $root_path;
 
-    public function __construct($emplacement){
-        if (!is_dir($emplacement)) mkdir($emplacement, 0777, true);
-        $this->$emplacement= $emplacement;
+    public function __construct($root_path){
+        if (!is_dir($root_path)) mkdir($root_path, 0777, true);
+        $this->root_path= $root_path;
     }
 
     public function create_folder($path) : bool {
-        $path = "{DirectoryManager::emplacement}/{$path}";
+        $path = "{$this->root_path}/{$path}";
+        echo("\n".$path);
         return (is_dir($path)) ? true : mkdir($path, 0777, true);
     }
 
     public function create_file($path, $content) : bool {
-        $path = "{DirectoryManager::emplacement}/{$path}";
-        echo($path);
-        echo(implode("/", array_slice(explode("/", $path), 0, -1)));
-        echo(is_dir(implode("/", array_slice(explode("/", $path), 0, -1))));
-        if (!is_dir(implode("/", array_slice(explode("/", $path), 0, -1)))) return false
+        $path = "{$this->root_path}/{$path}";
+        echo("\n".$path);
+        echo("\n".implode("/", array_slice(explode("/", $path), 0, -1)));
+        echo("\n".is_dir(implode("/", array_slice(explode("/", $path), 0, -1)))? 'true' : 'false');
+        if (!is_dir(implode("/", array_slice(explode("/", $path), 0, -1)))) return false;
         return (!is_dir(implode("/", array_slice(explode("/", $path), 0, -1)))) ? false : file_put_contents($path, $content) !== false;
     }
 
     public function remove_files($path) : bool {
-        $path = "{DirectoryManager::emplacement}/{$path}";
+        $path = "{$this->root_path}/{$path}";
         if (!file_exists($path)) return true;
         if (!is_dir($path)) return false;
 
@@ -33,7 +34,7 @@ class DirectoryManager {
     }
 
     public function remove_folder($path) : bool {
-        $path = "{DirectoryManager::emplacement}/{$path}";
+        $path = "{$this->root_path}/{$path}";
         if (!file_exists($path)) return true;
         if (!is_dir($path)) return false;
 
@@ -51,5 +52,22 @@ class DirectoryManager {
         }*/
 
         return rmdir($element);
+    }
+
+    public function include_file($path, $filename) {
+        $dir_path = "{$this->root_path}/{$path}";
+        $file_path = "{$dir_path}/{$filename}";
+
+        /*
+            echo("\n".$dir_path);
+            echo("\n".is_dir($dir_path)? 'true' : 'false');
+            echo("\n".$file_path);
+            echo("\n".file_exists($file_path)? 'true' : 'false');
+        */
+
+        if (!(is_dir($dir_path) && file_exists($file_path))) return false;
+
+        include_once($file_path);
+        return true;
     }
 }

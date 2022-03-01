@@ -3,59 +3,28 @@ session_start();
 
 require_once("controllers/directory_manager.php");
 
-// a mettre dans un fichier "return_codes.php" et a inclure ici et dans les controleurs
 $SUCCESS = "200";
 $BAD_REQUEST = "400";
 $ERROR = "500";
 
-function generate($root_path) {
-    global $SUCCESS, $BAD_REQUEST, $ERROR;
-
-    echo("\ncall generate");
-    if (!isset($_GET['project_name'], $_GET['page'])) {# $_POST
-        http_response_code($BAD_REQUEST);
-        exit();
-    }
-
-    $post['project_name'] = filter_input(INPUT_GET, 'project_name', FILTER_SANITIZE_STRING); # INPUT_POST
-    $post['page'] = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_STRING); # INPUT_POST
-    if (in_array(false, $post, true)) {
-        http_response_code($BAD_REQUEST);
-        exit();
-    }
-
-    echo("\nargs ok");
-
-    $dir_path = "{$root_path}/{$post['project_name']}";
-    $file_path = "{$root_path}/{$post['project_name']}/routeur.php";
-    echo("\n");
-    echo($dir_path);
-    echo("\n");
-    echo(is_dir($dir_path)? 'true' : 'false');
-    echo("\n");
-    echo($file_path);
-    echo("\n");
-    echo(file_exists($file_path)? 'true' : 'false');
-    if (!is_dir($dir_path) || !file_exists($file_path)) {
-        echo("\ngot an error");
-        echo($ERROR);
-        http_response_code($ERROR);
-        exit();
-    }
-
-    echo("\nfile exists");
-    include_once($file_path);
-    http_response_code($SUCCESS);
-    exit();
-}
-
-
-$root_path = __DIR__."/projects";
-$directoryManager = new DirectoryManager($root_path);
+$directoryManager = new DirectoryManager(__DIR__."/projects");
 if (isset($_GET['action'])) {
     switch ($action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING)) {
         case 'generate':
-            generate($root_path);
+            if (!isset($_GET['project_name'], $_GET['page'])) {# $_POST
+                http_response_code($BAD_REQUEST);
+                exit();
+            }
+
+            $post['project_name'] = filter_input(INPUT_GET, 'project_name', FILTER_SANITIZE_STRING); # INPUT_POST
+            $post['page'] = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_STRING); # INPUT_POST
+            if (in_array(false, $post, true)) {
+                http_response_code($BAD_REQUEST);
+                exit();
+            }
+
+            $result = $directoryManager->include_file($post['project_name'], "routeur.php");
+            http_response_code($result ? $SUCCESS : $ERROR);
             exit();
 
         case 'create_folder': //localhost:80/index.php?action=create_folder&project_name=test
