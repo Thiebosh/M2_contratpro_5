@@ -54,13 +54,6 @@ class DirectoryManager {
         $dir_path = "{$this->root_path}/{$path}";
         $file_path = "{$dir_path}/{$filename}";
 
-        /*
-            echo("\n".$dir_path);
-            echo("\n".is_dir($dir_path)? 'true' : 'false');
-            echo("\n".$file_path);
-            echo("\n".file_exists($file_path)? 'true' : 'false');
-        */
-
         if (!(is_dir($dir_path) && file_exists($file_path))) return false;
 
         include_once($file_path);
