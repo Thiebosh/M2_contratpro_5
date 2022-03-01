@@ -1,9 +1,9 @@
 import select
 import socket
-from room_manager import RoomManager
-from socket import timeout
 import json
 import os
+from socket import timeout
+from room_manager import RoomManager
 
 from partners.websocket_partner import WebSocketPartner
 from partners.mongo_partner import MongoPartner
@@ -43,13 +43,13 @@ class Server():
 
     def close(self):
         print("Get close signal")
-        for socket in self.inputs:
-            socket.close()
+        for input_socket in self.inputs:
+            input_socket.close()
         for room in self.room_m.rooms.values():
             room.close_evt.set()
 
-    def add_connection(self, socket):
-        new_socket, client_address = socket.accept()
+    def add_connection(self, input_socket):
+        new_socket, client_address = input_socket.accept()
         try:
             if self.partners["websocket"].handshake(new_socket, self.encoding):
                 print(f"SERVER - new connexion {client_address}")
@@ -59,9 +59,9 @@ class Server():
 
         except timeout:
             print('websocket connection timeout')
-    
+
     def close_client_connection(self, socket):
-        print(f"Close client")
+        print("Close client")
         self.inputs.remove(socket)
         socket.close()
 
@@ -78,15 +78,15 @@ class Server():
                 break
 
             # handle inputs
-            for socket in readable:
-                if socket is self.socket: # S'il y a une connexion, c'est le serveur qui va envoyer un message d'où le check
-                   self.add_connection(socket)
-                   continue
+            for input_socket in readable:
+                if input_socket is self.socket: # S'il y a une connexion, c'est le serveur qui va envoyer un message d'où le check
+                    self.add_connection(input_socket)
+                    continue
 
-                target = self.partners["websocket"].recv(socket, self.encoding)
+                target = self.partners["websocket"].recv(input_socket, self.encoding)
 
                 if not target:
-                    self.close_client_connection(socket)
+                    self.close_client_connection(input_socket)
                     continue
 
                 target = json.loads(target)
@@ -94,17 +94,17 @@ class Server():
                 if "action" in target and target["action"] == "connectRoom" and "author" in target:
                     # plus tard : recupere name dans la db ici plutot que dans target
                     if not target["roomName"] in self.room_m.rooms:
-                        self.room_m.create_room(target["roomName"], socket, target["author"], self.callback_update_server_sockets, self.encoding)
+                        self.room_m.create_room(target["roomName"], input_socket, target["author"], self.callback_update_server_sockets, self.encoding)
 
                     else:
-                        self.room_m.add_client_to_room(target["roomName"], socket, target["author"])
+                        self.room_m.add_client_to_room(target["roomName"], input_socket, target["author"])
 
-                self.inputs.remove(socket)
+                self.inputs.remove(input_socket)
 
             # handle except
-            for socket in exception:
-                self.inputs.remove(socket)
-                socket.close()
+            for input_socket in exception:
+                self.inputs.remove(input_socket)
+                input_socket.close()
 
             self.room_m.rooms = {key: values for key, values in self.room_m.rooms.items() if not values.get_param()["close_evt"].is_set()}
 

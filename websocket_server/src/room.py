@@ -79,7 +79,7 @@ class Room():
 
     def process_running_inputs(self):
         for input_to_process in self.input_manager.inputs:
-            if input_to_process.counter != 0 or input_to_process.failed:
+            if (input_to_process.check_datetime()) or input_to_process.failed:
                 continue
 
             #If no conflicts, execute the action ; in every case : remove socket from list
@@ -98,12 +98,9 @@ class Room():
                     continue
                 self.add_message_in_queue(client_socket, msg)
 
-        self.input_manager.inputs = [input_unit for input_unit in self.input_manager.inputs if input_unit.counter != 0 and not input_unit.failed]
+        self.input_manager.inputs = [input_unit for input_unit in self.input_manager.inputs if input_unit.check_datetime() and not input_unit.failed]
 
-        self.input_manager.decrease_counter_on_all_inputs()
-
-
-    def run(self, polling_freq=0.1):
+    async def run(self, polling_freq=0.1):
         print(f"{self.room_name} - Room ready")
         while not self.close_evt.is_set() and self.inputs:
             with self.lock:
