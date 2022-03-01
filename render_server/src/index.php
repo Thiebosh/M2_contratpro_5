@@ -51,7 +51,7 @@ if (isset($_GET['action'])) {
 
             $post['project_name'] = filter_input(INPUT_POST, 'project_name', FILTER_SANITIZE_STRING);
             $post['file_name'] = filter_input(INPUT_POST, 'file_name', FILTER_SANITIZE_STRING);
-            $post['file_content'] = filter_input(INPUT_POST, 'file_content', FILTER_SANITIZE_STRING);
+            $post['file_content'] = $_POST["file_content"];
             if (in_array(false, $post, true)) {
                 http_response_code($BAD_REQUEST);
                 exit();
