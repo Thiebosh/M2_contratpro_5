@@ -35,7 +35,7 @@ class DirectoryManager {
         if (!file_exists($path)) return true;
         if (!is_dir($path)) return false;
 
-        return rmdir($element);
+        return rmdir($path);
     }
 
     public function include_file($path, $filename) {

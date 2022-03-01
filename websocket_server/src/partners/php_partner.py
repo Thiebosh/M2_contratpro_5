@@ -40,6 +40,9 @@ class PhpPartner():
 
         if print_:
             print("status_code", result.status_code)
+            if result.status_code != 200:
+                print("data : ", data)
+
             print("content\n________\n", result.content.decode("utf-8"))
             print("________\nfinish")
 
@@ -78,7 +81,7 @@ class PhpPartner():
         if not self.state:
             return False
 
-        return self._post("remove_files", { "project_name": project_name }, True)[0]
+        return self._post("remove_files", { "project_name": project_name })[0]
 
 
     def unset_project_folder(self, project_name):
@@ -86,7 +89,7 @@ class PhpPartner():
         if not self.state:
             return False
 
-        return self._post("remove_folder", { "project_name": project_name }, True)[0]
+        return self._post("remove_folder", { "project_name": project_name })[0]
 
 
     def get_project_page(self, project_name, page):
@@ -97,4 +100,4 @@ class PhpPartner():
             "project_name": project_name,
             "page": page
         }
-        return self._post("generate", data, True)
+        return self._post("generate", data)
