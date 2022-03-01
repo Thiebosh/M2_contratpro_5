@@ -47,7 +47,7 @@ class InputManager():
         return input_to_process.failed
 
 
-    def check_and_execute_action_function(self, input_to_process):
+    async def check_and_execute_action_function(self, input_to_process):
         if input_to_process.failed:
             return False
 
@@ -70,13 +70,13 @@ class InputManager():
 
         elif action == "generate":
             if self.json_handler.current_version_generated:
+                print(f"{self.room_name} - Project files already generated")
                 return True
 
             # result = self.files_manager.generate_files(self.json_handler.data)
-            with open(f"{pathlib.Path(__file__).parent.absolute()}/brique2/needs.json",
-                      'r') as file:
+            with open(f"{pathlib.Path(__file__).parent.absolute()}/brique2/needs.json", 'r') as file:
                 test = file.read().replace('\n', '')
-            result = self.files_manager.generate_files(test)
+            result = await self.files_manager.generate_files(test)
             print(f"{self.room_name} - Project files {'well' if result else 'not'} generated")
 
             if result is False:
