@@ -88,8 +88,9 @@ class InputManager():
             print(f"{self.room_name} - Project files {'well' if result else 'not'} updated")
 
         elif action == "execute":
-            result = self.render_page.page(input_to_process.get_page())
-            print(result)
-            result = False
+            success, content = self.render_page.page(input_to_process.get_page())
+            print("content recieved : ")
+            print(content)
+            return success
 
         return result
