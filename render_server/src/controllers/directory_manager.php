@@ -15,17 +15,7 @@ class DirectoryManager {
 
     public function create_file($path, $content) : bool {
         $path = "{$this->root_path}/{$path}";
-        echo("\n".$path);
-        echo("\n".implode("/", array_slice(explode("/", $path), 0, -1)));
-        echo("\n".is_dir(implode("/", array_slice(explode("/", $path), 0, -1)))? 'true' : 'false');
-        if (!is_dir(implode("/", array_slice(explode("/", $path), 0, -1)))) return false;
-        //return (!is_dir(implode("/", array_slice(explode("/", $path), 0, -1)))) ? false : file_put_contents($path, $content) !== false;
-        if (file_put_contents($path, $content) !== false) {
-            echo("tout se passe bien");
-            echo(file_exists($path) ? "true" : "false");
-            return true;
-        }
-        return false;
+        return (!is_dir(implode("/", array_slice(explode("/", $path), 0, -1)))) ? false : file_put_contents($path, $content) !== false;
     }
 
     public function remove_files($path) : bool {
