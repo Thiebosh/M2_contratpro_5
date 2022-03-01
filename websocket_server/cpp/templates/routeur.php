@@ -1,19 +1,19 @@
 <?php
-$default_page = ""
-$dir = __DIR__
-echo("dans le routeur du projet !");
+$default_page = "";
 
 if (file_exists("{$project_name}/{$post['page']}")) {
     echo("la page demandée existe!");
-    require_once("{$dir}/{$post['page']}")
-    exit()
+    include_once(__DIR__."/{$post['page']}");
+    http_response_code($SUCCESS);
+    exit();
 }
 
 if (file_exists("{$project_name}/{$default_page}")) {
     echo("la page par défaut existe!");
-    require_once("{$dir}/{$default_page}")
-    exit()
+    include_once(__DIR__."/{$default_page}");
+    http_response_code($SUCCESS);
+    exit();
 }
 
-echo("Generation error : No page found")
-exit()
+http_response_code($NOT_FOUND);
+exit();

@@ -1,4 +1,5 @@
 from quart import Quart, current_app
+from quart_cors import cors
 from flask_api import status
 from simple_bcrypt import Bcrypt
 
@@ -12,6 +13,7 @@ from blueprints.project import bp_project
 def create_app(config, db=None, nas=None) -> Quart:
     # base setup
     app = Quart(__name__)
+    app = cors(app, allow_origin="*")
     app.config.from_object(config)
     app.url_map.strict_slashes = False
 
