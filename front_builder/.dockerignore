@@ -1,7 +1,9 @@
-**/.vscode/
+node_modules/
+build/
 
-**/__pycache__/
-**/.pytest_cache/
+.dockerignore
+Dockerfile
+Dockerfile.prod
 
 # git files
 readme.md
