@@ -21,21 +21,24 @@ import {
 
 import { EditIcon } from "@chakra-ui/icons";
 import { useEffect } from "react";
-import axios from "axios";
+import $ from "jquery";
 
 export default function Projets() {
   useEffect(() => {
-    axios
-      .post("/user", {
-        firstName: "Fred",
-        lastName: "Flintstone",
-      })
-      .then(function (response) {
-        console.log(response);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+    $.ajax({
+      url: "http://localhost:8001/account/connect",
+      type: "POST",
+      data: {
+        name: "test",
+        password: "test",
+      },
+      success: function (resp) {
+        console.log(resp.id);
+      },
+      error: function () {
+        console.log("failure");
+      },
+    });
   }, []);
 
   return (
