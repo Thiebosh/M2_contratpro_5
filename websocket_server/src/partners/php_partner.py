@@ -49,6 +49,25 @@ class PhpPartner():
         return result.status_code == 200, result.content.decode("utf-8")
 
 
+    def _postWithCode(self, endpoint, data, print_=False):
+        print("php - call to ",endpoint)
+        try:
+            result = requests.post(url=f"{self.base_url}?action={endpoint}", data=data)
+        except RequestException:
+            print("big exception") # serveur not started or bad url
+            return False, ""
+
+        if print_:
+            print("status_code", result.status_code)
+            if result.status_code != 200:
+                print("data : ", data)
+
+            print("content\n________\n", result.content.decode("utf-8"))
+            print("________\nfinish")
+
+        return result.status_code, result.content.decode("utf-8")
+
+
     def set_project_folder(self, project_name):
         if not self.state:
             return False
@@ -98,4 +117,4 @@ class PhpPartner():
             "project_name": project_name,
             "page": page
         }
-        return self._post("execute", data)
+        return self._postWithCode("execute", data)
