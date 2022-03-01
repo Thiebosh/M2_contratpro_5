@@ -86,7 +86,7 @@ async def connect():
 @bp_account.route("/update", methods=['GET', 'POST'])
 async def update():
     post = await request.form # request.args
-    if len(post) != 3:
+    if 2 <= len(post) <= 3:
         return "", status.HTTP_400_BAD_REQUEST
 
     user_id = post.get("id", type=str, default=None)

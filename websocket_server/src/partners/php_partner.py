@@ -14,43 +14,35 @@ class PhpPartner():
         return PhpPartner(base_url=self.base_url, state=self.state)
 
 
-    def _get(self, endpoint, print_=False):
-        print("call to", endpoint)
+    def _call(self, method_callback, endpoint, print_=False, get_code=False):
+        print("php - call", endpoint)
         try:
-            result = requests.get(url=f"{self.base_url}?action={endpoint}")
+            result = method_callback()
         except RequestException:
-            print("big exception") # serveur not started or bad url
-            return False, ""
+            raise Exception("php - server not started")
 
         if print_:
-            print("status_code", result.status_code)
-            print("content\n________\n", result.content.decode("utf-8"))
-            print("________\nfinish")
+            print(f"php - status_code {result.status_code}")
+            print("php - content")
+            print(result.content.decode("utf-8"))
+            print("php - finish")
 
-        return result.status_code == 200, result.content.decode("utf-8")
+        return result.status_code if get_code else result.status_code == 200, result.content.decode("utf-8")
 
 
-    def _post(self, endpoint, data, print_=False):
-        print("call to ",endpoint)
-        try:
-            result = requests.post(url=f"{self.base_url}?action={endpoint}", data=data)
-        except RequestException:
-            print("big exception") # serveur not started or bad url
-            return False, ""
+    def _get(self, endpoint, print_=False, get_code=False):
+        return self._call(lambda: requests.get(url=f"{self.base_url}?action={endpoint}"), endpoint, print_, get_code)
 
-        if print_:
-            print("status_code", result.status_code)
-            print("content\n________\n", result.content.decode("utf-8"))
-            print("________\nfinish")
 
-        return result.status_code == 200, result.content.decode("utf-8")
+    def _post(self, endpoint, data, print_=False, get_code=False):
+        return self._call(lambda: requests.post(url=f"{self.base_url}?action={endpoint}", data=data), endpoint, print_, get_code)
 
 
     def set_project_folder(self, project_name):
         if not self.state:
             return False
 
-        return self._post("create_folder", { "project_name": project_name }, True)[0]
+        return self._post("create_folder", { "project_name": project_name })[0]
 
 
     def set_project_files(self, project_name, files):
@@ -65,7 +57,7 @@ class PhpPartner():
                 "file_name": file['name'],
                 "file_content": file['content']
             }
-            if not self._post("create_file", data, True)[0]:
+            if not self._post("create_file", data)[0]:
                 return False
 
         print("finish all files")
@@ -77,14 +69,14 @@ class PhpPartner():
         if not self.state:
             return False
 
-        return self._post("remove_files", { "project_name": project_name }, True)[0]
+        return self._post("remove_files", { "project_name": project_name })[0]
 
 
     def unset_project_folder(self, project_name):
         if not self.state:
             return False
 
-        return self._post("remove_folder", { "project_name": project_name }, True)[0]
+        return self._post("remove_folder", { "project_name": project_name })[0]
 
 
     def get_project_page(self, project_name, page):
@@ -95,4 +87,4 @@ class PhpPartner():
             "project_name": project_name,
             "page": page
         }
-        return self._post("generate", data, True)
+        return self._post("execute", data, get_code=True)

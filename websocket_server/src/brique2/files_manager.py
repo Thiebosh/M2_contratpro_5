@@ -6,7 +6,7 @@ class FilesManager():
     def __init__(self, partners, project_name) -> None:
         self.partners = partners
         self.project_name = project_name
-        self.current_version_stored = True
+        self.files_currently_stored = True
 
         filter_q = {
             "name": self.project_name
@@ -21,40 +21,48 @@ class FilesManager():
         if not self.project_id:
             raise Exception("FilesGenerator - __init__: unknow project name")
 
-        ## tmp upload files => test download
-        # self.partners["storage"].upload_files_to_folder(self.project_id, [
-        #     {
-        #         "name": "test1.py",
-        #         "content": "# !/usr/bin/python3 \n\ndef print_sorted(liste):\n    return sorted(liste)\n\n1"
-        #     },
-        #     {
-        #         "name": "test2.py",
-        #         "content": "# !/usr/bin/python3 \n\ndef print_sorted(liste):\n    return sorted(liste)\n\n2"
-        #     },
-        #     {
-        #         "name": "test3.py",
-        #         "content": "# !/usr/bin/python3 \n\ndef print_sorted(liste):\n    return sorted(liste)\n\n3"
-        #     },
-        # ])
         self.files = self.partners["storage"].download_files_from_folder(self.project_id)
-        # print(self.files) # => working proof
-        # self.files = self.partners["storage"].upload_files_to_folder(self.project_id, []) # add in rest server for cleaning deleting projects
 
-        result = self.partners["renderer"].set_project_folder(self.project_name)
-        if not result:
-            print(f"{self.project_name} - PHP - folder not created") # exception ?
-            return
-        result = self.partners["renderer"].set_project_files(self.project_name, self.files)
-        if not result:
-            print(f"{self.project_name} - PHP - files not uploaded") # exception ?
-            return
-        # for file in self.files:
-        #     print(file)
+        if not self.partners["renderer"].set_project_folder(self.project_name):
+            raise Exception(f"{self.project_name} - PHP - folder not created")
+
+        # tmp secure
+        if not self.partners["renderer"].unset_project_files(self.project_name):
+            raise Exception(f"{self.project_name} - PHP - folder emptiness pb")
+
+        if not self.partners["renderer"].set_project_files(self.project_name, self.files):
+            raise Exception(f"{self.project_name} - PHP - files not uploaded")
+
+
+    def _test(self):
+        self.partners["storage"].upload_files_to_folder(self.project_id, [
+            {
+                "name": "test1.py",
+                "content": "# !/usr/bin/python3 \n\ndef print_sorted(liste):\n    return sorted(liste)\n\n1"
+            },
+            {
+                "name": "test2.py",
+                "content": "# !/usr/bin/python3 \n\ndef print_sorted(liste):\n    return sorted(liste)\n\n2"
+            },
+            {
+                "name": "test3.py",
+                "content": "# !/usr/bin/python3 \n\ndef print_sorted(liste):\n    return sorted(liste)\n\n3"
+            },
+        ])
+
+        self.files = self.partners["storage"].download_files_from_folder(self.project_id)
+        print(self.files) # => working proof
+
+        self.files = self.partners["storage"].upload_files_to_folder(self.project_id, []) # add in rest server for cleaning deleting projects
 
 
     def close(self):
+        result = self.partners["renderer"].unset_project_files(self.project_name)
+        print(f"{self.project_name} - PHP - Project files {'well' if result else 'not'} removed")
+        if result is False:
+            return
         result = self.partners["renderer"].unset_project_folder(self.project_name)
-        print(f"{self.project_name} - PHP - Project {'well' if result else 'not'} removed")
+        print(f"{self.project_name} - PHP - Project directory {'well' if result else 'not'} removed")
 
 
     async def generate_files(self, specs_json):
@@ -78,13 +86,15 @@ class FilesManager():
             return False
 
         self.files = [{"name": line.split("\n")[0], "content": line[line.find("\n")+1:]} for line in chunks][:-1]
-        self.current_version_stored = False
+        self.files_currently_stored = False
+        print(self.files)
 
         return True
 
 
     def update_stored_files(self):
-        if self.current_version_stored:
+        if self.files_currently_stored:
+            print(f"{self.project_name} - Project files already stored")
             return True
 
         result = self.partners["storage"].upload_files_to_folder(self.project_id, self.files)
@@ -102,5 +112,5 @@ class FilesManager():
             print(f"{self.project_name} - Project upload to renderer step2/2 failed")
             return False
 
-        self.current_version_stored = True
+        self.files_currently_stored = True
         return True

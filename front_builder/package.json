@@ -9,35 +9,24 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@algolia/client-search": "^4.12.1",
     "@babel/core": "^7.17.5",
     "@chakra-ui/icons": "^1.1.7",
     "@chakra-ui/react": "^1.8.5",
     "@chakra-ui/system": "^1.11.1",
     "@emotion/react": "^11.8.1",
     "@emotion/styled": "^11.8.1",
-    "@headlessui/react": "^1.4.3",
     "@heroicons/react": "^1.0.5",
-    "@tailwindcss/aspect-ratio": "^0.4.0",
-    "@tailwindcss/forms": "^0.4.0",
-    "@tailwindcss/line-clamp": "^0.3.1",
-    "@tailwindcss/typography": "^0.5.1",
-    "@themesberg/flowbite": "^1.3.0",
-    "@types/react": "^17.0.38",
-    "autoprefixer": "^10.4.2",
     "axios": "^0.26.0",
     "framer-motion": "^6.2.8",
     "next": "12.1.0",
     "next-auth": "^4.2.1",
-    "postcss": "^8.4.6",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "tailwindcss": "^3.0.18"
+    "react-dom": "^17.0.2"
   },
   "devDependencies": {
     "eslint": "8.10.0",
     "eslint-config-next": "12.1.0",
     "prettier": "^2.5.1",
-    "typescript": "^4.5.5"
+    "typescript": "^4.6.2"
   }
 }

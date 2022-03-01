@@ -1,6 +1,7 @@
 <?php
 $default_page = "";
-echo("\ndans le routeur du projet !");
+
+echo("hello world!");
 exit();
 
 if (file_exists("{$project_name}/{$post['page']}")) {
@@ -17,6 +18,5 @@ if (file_exists("{$project_name}/{$default_page}")) {
     exit();
 }
 
-echo("Generation error : No page found");
-http_response_code($ERROR);
+http_response_code($NOT_FOUND);
 exit();
