@@ -26,6 +26,10 @@ class FilesManager():
         if not self.partners["renderer"].set_project_folder(self.project_name):
             raise Exception(f"{self.project_name} - PHP - folder not created")
 
+        # tmp secure
+        if not self.partners["renderer"].unset_project_files(self.project_name):
+            raise Exception(f"{self.project_name} - PHP - folder emptiness pb")
+
         if not self.partners["renderer"].set_project_files(self.project_name, self.files):
             raise Exception(f"{self.project_name} - PHP - files not uploaded")
 
