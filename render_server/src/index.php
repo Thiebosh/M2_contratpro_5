@@ -11,7 +11,7 @@ $ERROR = "500";
 $directoryManager = new DirectoryManager(__DIR__."/projects");
 if (isset($_GET['action'])) {
     switch ($action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING)) {
-        case 'generate':
+        case 'execute':
             if (!isset($_POST['project_name'], $_POST['page'])) {
                 http_response_code($BAD_REQUEST);
                 exit();
