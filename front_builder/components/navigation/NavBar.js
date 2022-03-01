@@ -1,46 +1,53 @@
+import React from "react";
 import {
-  Box,
-  Flex,
   Avatar,
-  HStack,
-  Link,
-  IconButton,
+  Box,
   Button,
+  Flex,
+  HStack,
+  IconButton,
   Menu,
   MenuButton,
-  MenuList,
-  MenuItem,
   MenuDivider,
-  useDisclosure,
-  useColorModeValue,
+  MenuItem,
+  MenuList,
   Stack,
   useColorMode,
+  useColorModeValue,
+  useDisclosure,
 } from "@chakra-ui/react";
-import { HamburgerIcon, CloseIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
+import { CloseIcon, HamburgerIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
+import { useRouter } from "next/router";
+import Link from "next/link";
 
-const Links = [{ label: "Dashboard", href: "/dashboard" }];
+const links = [
+  { label: "Home", href: "/" },
+  { label: "Dashboard", href: "/dashboard" },
+  { label: "Projects", href: "/projects" },
+];
+
+const accountLinks = [
+  { label: "Account", href: "/account" },
+  { label: "Settings", href: "/account/settings" },
+];
 
 const NavLink = ({ link }) => (
-  <Link
-    px={2}
-    py={1}
-    rounded={"md"}
-    _hover={{
-      textDecoration: "none",
-      bg: useColorModeValue("gray.200", "gray.700"),
-    }}
-    href={link.href}
-  >
-    {link.label}
+  <Link href={link.href}>
+    <a>
+      <Button colorScheme="teal" variant="ghost">
+        {link.label}
+      </Button>
+    </a>
   </Link>
 );
 
 export default function Simple() {
+  const router = useRouter();
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
-    <Box bg={useColorModeValue("gray.100", "gray.900")} px={4}>
+    <Box boxShadow="base" px={4}>
       <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
         <IconButton
           size={"md"}
@@ -53,7 +60,7 @@ export default function Simple() {
         <HStack spacing={8} alignItems={"center"}>
           <Box>LOGO</Box>
           <HStack as={"nav"} spacing={4} display={{ base: "none", md: "flex" }}>
-            {Links.map((link) => (
+            {links.map((link) => (
               <NavLink key={link.label} link={link} />
             ))}
           </HStack>
@@ -82,10 +89,19 @@ export default function Simple() {
               />
             </MenuButton>
             <MenuList>
-              <MenuItem>Link 1</MenuItem>
-              <MenuItem>Link 2</MenuItem>
+              {accountLinks.map((link) => (
+                <Link href={link.href} key={link.href}>
+                  <a>
+                    <MenuItem>{link.label}</MenuItem>
+                  </a>
+                </Link>
+              ))}
               <MenuDivider />
-              <MenuItem>Link 3</MenuItem>
+              <Link href="/account/logout">
+                <a>
+                  <MenuItem>Logout</MenuItem>
+                </a>
+              </Link>
             </MenuList>
           </Menu>
         </Flex>
@@ -94,7 +110,7 @@ export default function Simple() {
       {isOpen ? (
         <Box pb={4} display={{ md: "none" }}>
           <Stack as={"nav"} spacing={4}>
-            {Links.map((link) => (
+            {links.map((link) => (
               <NavLink key={link} link={link} />
             ))}
           </Stack>
