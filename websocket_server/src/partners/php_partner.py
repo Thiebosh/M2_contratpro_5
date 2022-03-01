@@ -15,7 +15,7 @@ class PhpPartner():
 
 
     def _get(self, endpoint, print_=False):
-        print("call to", endpoint)
+        print("php - call", endpoint)
         try:
             result = requests.get(url=f"{self.base_url}?action={endpoint}")
         except RequestException:
@@ -31,7 +31,7 @@ class PhpPartner():
 
 
     def _post(self, endpoint, data, print_=False):
-        print("call to ",endpoint)
+        print("php - call to ",endpoint)
         try:
             result = requests.post(url=f"{self.base_url}?action={endpoint}", data=data)
         except RequestException:
@@ -100,4 +100,4 @@ class PhpPartner():
             "project_name": project_name,
             "page": page
         }
-        return self._post("generate", data)
+        return self._post("execute", data)
