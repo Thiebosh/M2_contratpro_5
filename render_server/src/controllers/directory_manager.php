@@ -9,7 +9,6 @@ class DirectoryManager {
 
     public function create_folder($path) : bool {
         $path = "{$this->root_path}/{$path}";
-        echo("\n".$path);
         return (is_dir($path)) ? true : mkdir($path, 0777, true);
     }
 
