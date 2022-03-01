@@ -77,7 +77,6 @@ class PhpPartner():
 
 
     def unset_project_files(self, project_name):
-        print("call unset_project_files")
         if not self.state:
             return False
 
@@ -85,7 +84,6 @@ class PhpPartner():
 
 
     def unset_project_folder(self, project_name):
-        print("call unset_project_folder")
         if not self.state:
             return False
 

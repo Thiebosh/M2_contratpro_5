@@ -6,7 +6,7 @@ class FilesManager():
     def __init__(self, partners, project_name) -> None:
         self.partners = partners
         self.project_name = project_name
-        self.current_version_stored = True
+        self.files_currently_stored = True
 
         filter_q = {
             "name": self.project_name
@@ -86,14 +86,15 @@ class FilesManager():
             return False
 
         self.files = [{"name": line.split("\n")[0], "content": line[line.find("\n")+1:]} for line in chunks][:-1]
-        self.current_version_stored = False
+        self.files_currently_stored = False
+        print(self.files)
 
         return True
 
 
     def update_stored_files(self):
-        print("is current stored ? ", self.current_version_stored)
-        if self.current_version_stored:
+        if self.files_currently_stored:
+            print(f"{self.project_name} - Project files already stored")
             return True
 
         result = self.partners["storage"].upload_files_to_folder(self.project_id, self.files)
@@ -111,5 +112,5 @@ class FilesManager():
             print(f"{self.project_name} - Project upload to renderer step2/2 failed")
             return False
 
-        self.current_version_stored = True
+        self.files_currently_stored = True
         return True
