@@ -17,6 +17,7 @@ specifiers:
   '@themesberg/flowbite': ^1.3.0
   '@types/react': ^17.0.38
   autoprefixer: ^10.4.2
+  axios: ^0.26.0
   eslint: 8.10.0
   eslint-config-next: 12.1.0
   framer-motion: ^6.2.8
@@ -46,6 +47,7 @@ dependencies:
   '@themesberg/flowbite': 1.3.0_d85258bd3c0b79ff110511b71a550096
   '@types/react': 17.0.39
   autoprefixer: 10.4.2_postcss@8.4.7
+  axios: 0.26.0
   framer-motion: 6.2.8_react-dom@17.0.2+react@17.0.2
   next: 12.1.0_33bdac975a6e334c49640fab91e2abb4
   next-auth: 4.2.1_react-dom@17.0.2+react@17.0.2
@@ -1936,6 +1938,14 @@ packages:
     engines: {node: '>=4'}
     dev: true
 
+  /axios/0.26.0:
+    resolution: {integrity: sha512-lKoGLMYtHvFrPVt3r+RBMp9nh34N0M8zEfCWqdWZx6phynIEhQqAdydpyBAAG211zlhX9Rgu08cOamy6XjE5Og==}
+    dependencies:
+      follow-redirects: 1.14.9
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
   /axobject-query/2.2.0:
     resolution: {integrity: sha512-Td525n+iPOOyUQIeBfcASuG6uJsDOITl7Mds5gFyerkWiX7qhUTdYUBlSgNMyVqtSJqwpt1kXGLdUt6SykLMRA==}
     dev: true
@@ -2584,6 +2594,16 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       tslib: 2.3.1
+    dev: false
+
+  /follow-redirects/1.14.9:
+    resolution: {integrity: sha512-MQDfihBQYMcyy5dhRDJUHcw7lb2Pv/TuE6xP1vyraLukNDHKbDxDNaOE3NbCAdKQApno+GPRyo1YAp89yCjK4w==}
+    engines: {node: '>=4.0'}
+    peerDependencies:
+      debug: '*'
+    peerDependenciesMeta:
+      debug:
+        optional: true
     dev: false
 
   /fraction.js/4.1.3:
