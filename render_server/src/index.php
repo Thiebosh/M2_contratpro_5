@@ -89,7 +89,7 @@ if (isset($_GET['action'])) {
                 exit();
             }
 
-            $result = $directoryManager->remove_folder();
+            $result = $directoryManager->remove_folder($post['project_name']);
             http_response_code($result ? $SUCCESS : $ERROR);
             exit();
 

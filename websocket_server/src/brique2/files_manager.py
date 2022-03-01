@@ -53,8 +53,12 @@ class FilesManager():
 
 
     def close(self):
+        result = self.partners["renderer"].unset_project_files(self.project_name)
+        print(f"{self.project_name} - PHP - Project files {'well' if result else 'not'} removed")
+        if result is False:
+            return
         result = self.partners["renderer"].unset_project_folder(self.project_name)
-        print(f"{self.project_name} - PHP - Project {'well' if result else 'not'} removed")
+        print(f"{self.project_name} - PHP - Project directory {'well' if result else 'not'} removed")
 
 
     async def generate_files(self, specs_json):
