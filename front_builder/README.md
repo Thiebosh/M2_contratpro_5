@@ -11,7 +11,7 @@ npm run dev
 
 ```shell
 npm install
-npm run build
+npm run start
 ```
 
 Serve static files from build/ folder
