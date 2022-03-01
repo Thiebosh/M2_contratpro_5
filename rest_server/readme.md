@@ -71,7 +71,7 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 - "name" (str) : une partie du nom de l'utilisateur recherché.
 
 **Retours :**
-- { "result": [{"id": "str", "name"}, ...] } : la liste des utilisateurs dont le nom contient le motif recherché et l'identifiant de compte associé.
+- { "result": [{"id": "str", "name": "str"}, ...] } : la liste des utilisateurs dont le nom contient le motif recherché et l'identifiant de compte associé.
 
 
 # /account/delete

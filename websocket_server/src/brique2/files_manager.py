@@ -57,12 +57,12 @@ class FilesManager():
         print(f"{self.project_name} - PHP - Project {'well' if result else 'not'} removed")
 
 
-    def generate_files(self, specs_json): # async
+    async def generate_files(self, specs_json):
         filepath = f"/src/brique2/cpp/{self.project_name}.json"
         open(filepath, "w").write(specs_json)
         args = (filepath,)
 
-        lines, retcode = self.partners["generator"].call(args) # await
+        lines, retcode = await self.partners["generator"].call(args)
 
         if os.path.exists(filepath):
             os.remove(filepath)
@@ -90,17 +90,17 @@ class FilesManager():
         result = self.partners["storage"].upload_files_to_folder(self.project_id, self.files)
         if not result:
             print(f"{self.project_name} - Project upload to storage failed")
-            return
+            return False
 
         result = self.partners["renderer"].unset_project_files(self.project_name) # use id when ready
         if not result:
             print(f"{self.project_name} - Project upload to renderer step1/2 failed")
-            return
+            return False
 
         result = self.partners["renderer"].set_project_files(self.project_name, self.files) # use id when ready
         if not result:
             print(f"{self.project_name} - Project upload to renderer step2/2 failed")
-            return
+            return False
 
         self.current_version_stored = True
         return True
