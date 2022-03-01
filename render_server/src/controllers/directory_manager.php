@@ -14,31 +14,33 @@ class DirectoryManager {
 
     public function create_file($path, $content) : bool {
         $path = "{DirectoryManager::emplacement}/{$path}";
-        return (!is_dir($path)) ? false : file_put_contents($path, $content) !== false;
+        echo($path);
+        echo(implode("/", array_slice(explode("/", $path), 0, -1)));
+        echo(is_dir(implode("/", array_slice(explode("/", $path), 0, -1))));
+        if (!is_dir(implode("/", array_slice(explode("/", $path), 0, -1)))) return false
+        return (!is_dir(implode("/", array_slice(explode("/", $path), 0, -1)))) ? false : file_put_contents($path, $content) !== false;
     }
 
-    public function remove_files() : string {
-        if (!isset($_GET['project_name'])) return $BAD_REQUEST; # $_POST
+    public function remove_files($path) : bool {
+        $path = "{DirectoryManager::emplacement}/{$path}";
+        if (!file_exists($path)) return true;
+        if (!is_dir($path)) return false;
 
-        $post['project_name'] = filter_input(INPUT_GET, 'project_name', FILTER_SANITIZE_STRING); # INPUT_POST
-        if (in_array(false, $post, true)) return $BAD_REQUEST;
+        // scan all files in directory and delete them all, return false if pb
+        //foreach($files as $file) if (!unlink("{$path}/{$file}")) return false;
 
-        if (!is_dir($path)) return $ERROR;
-
-        $result = unlink($path); //deleted file 
-
-        return $result ? $SUCCESS : $ERROR;
+        return true;
     }
 
-    public function remove_folder() : string {
-        if (!isset($_GET['project_name'])) return $BAD_REQUEST; # $_POST
+    public function remove_folder($path) : bool {
+        $path = "{DirectoryManager::emplacement}/{$path}";
+        if (!file_exists($path)) return true;
+        if (!is_dir($path)) return false;
 
-        $post['project_name'] = filter_input(INPUT_GET, 'project_name', FILTER_SANITIZE_STRING); # INPUT_POST
-        if (in_array(false, $post, true)) return $BAD_REQUEST;
+        // return false if folder contains content
 
-        if (is_dir($path)) return $SUCCESS;
-
-        foreach(glob($dir . "/*") as $element){
+        // deplacer ce bloc au dessus ?
+        /*foreach(glob($dir . "/*") as $element){
             if(is_dir($element)){
                 remove_folder($element); // On rappel la fonction remove_folder           
                 if(!rmdir($element)) return $ERROR; // Une fois le dossier courant vidé, on le supprime
@@ -46,8 +48,8 @@ class DirectoryManager {
                 if(!unlink($element)) return $ERROR;
             }
             // On passe à l'élément suivant
-        }
+        }*/
 
-        return $SUCCESS ;
+        return rmdir($element);
     }
 }

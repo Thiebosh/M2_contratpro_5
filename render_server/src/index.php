@@ -79,7 +79,7 @@ if (isset($_GET['action'])) {
                 http_response_code($BAD_REQUEST);
                 exit();
             }
-    
+
             $post['project_name'] = filter_input(INPUT_GET, 'project_name', FILTER_SANITIZE_STRING); # INPUT_POST
             $post['file_name'] = filter_input(INPUT_GET, 'file_name', FILTER_SANITIZE_STRING); # INPUT_POST
             $post['file_content'] = filter_input(INPUT_GET, 'file_content', FILTER_SANITIZE_STRING); # INPUT_POST
@@ -93,11 +93,35 @@ if (isset($_GET['action'])) {
             exit();
 
         case 'remove_files': //localhost:80/index.php?action=remove_files&project_name=test
-            http_response_code($directoryManager->remove_files());
+            if (!isset($_GET['project_name'])) { # $_POST
+                http_response_code($BAD_REQUEST);
+                exit();
+            }
+
+            $post['project_name'] = filter_input(INPUT_GET, 'project_name', FILTER_SANITIZE_STRING); # INPUT_POST
+            if (in_array(false, $post, true)) {
+                http_response_code($BAD_REQUEST);
+                exit();
+            }
+
+            $result = $directoryManager->remove_files($post['project_name']);
+            http_response_code($result ? $SUCCESS : $ERROR);
             exit();
 
         case 'remove_folder': //localhost:80/index.php?action=remove_folder&project_name=test
-            http_response_code($directoryManager->remove_folder());
+            if (!isset($_GET['project_name'])) { # $_POST
+                http_response_code($BAD_REQUEST);
+                exit();
+            }
+
+            $post['project_name'] = filter_input(INPUT_GET, 'project_name', FILTER_SANITIZE_STRING); # INPUT_POST
+            if (in_array(false, $post, true)) {
+                http_response_code($BAD_REQUEST);
+                exit();
+            }
+
+            $result = $directoryManager->remove_folder();
+            http_response_code($result ? $SUCCESS : $ERROR);
             exit();
 
         case "probe":
