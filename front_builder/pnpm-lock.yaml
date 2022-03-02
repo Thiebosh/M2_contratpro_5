@@ -9,6 +9,7 @@ specifiers:
   '@emotion/styled': ^11.8.1
   '@heroicons/react': ^1.0.5
   axios: ^0.26.0
+  dayjs: ^1.10.8
   eslint: 8.10.0
   eslint-config-next: 12.1.0
   framer-motion: ^6.2.8
@@ -30,6 +31,7 @@ dependencies:
   '@emotion/styled': 11.8.1_7bc0ec014b637b45269c22b8dde35ecd
   '@heroicons/react': 1.0.5_react@17.0.2
   axios: 0.26.0
+  dayjs: 1.10.8
   framer-motion: 6.2.8_react-dom@17.0.2+react@17.0.2
   iron-session: 6.0.5_next@12.1.0
   jquery: 3.6.0
@@ -1910,6 +1912,10 @@ packages:
   /damerau-levenshtein/1.0.8:
     resolution: {integrity: sha512-sdQSFB7+llfUcQHUQO3+B8ERRj0Oa4w9POWMI/puGtuf7gFywGmkaLCElnudfTiKZV+NvHqL0ifzdrI8Ro7ESA==}
     dev: true
+
+  /dayjs/1.10.8:
+    resolution: {integrity: sha512-wbNwDfBHHur9UOzNUjeKUOJ0fCb0a52Wx0xInmQ7Y8FstyajiV1NmK1e00cxsr9YrE9r7yAChE0VvpuY5Rnlow==}
+    dev: false
 
   /debug/2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
