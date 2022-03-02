@@ -13,7 +13,7 @@ async function loginRoute(req, res) {
 
   if (username === "test" && password === "test") {
     req.session.user = {
-      id: 1,
+      id: "61e131ce9c11b699edc38a1e",
       admin: true,
     };
     await req.session.save();
