@@ -70,34 +70,27 @@ var svg = d3.select("body").append("svg")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
-// treeData = [
-// 	{
-// 		"name" : "Root",
-// 		"parent" : "null",
-// 		"path":"root",
-// 		"children" : [
-// 			{
-// 			"name":"Screens",
-// 			"parent":"Root",
-// 			"path":"root_screens",
-// 			"children": [
-// 				{
-// 					"name":"+",
-// 					"parent":"Screens",
-// 					"type" : "add",
-// 				}
-// 			]
-// 			}
-// 		]
-// 	}
-// ]
+treeData = [
+	{
+		"name" : "Root",
+		"parent" : "null",
+		"path":"root",
+		"children" : [
+			{
+			"name":"Screens",
+			"parent":"Root",
+			"path":"root_screens",
+			"children": []
+			}
+		]
+	}
+]
 // root = treeData[0];
 // root.x0 = height/2;
 // root.y0 = 0;
   
 // update(root);
 
-// d3.select(self.frameElement).style("height", "500px");
 
 
 
@@ -105,73 +98,49 @@ var svg = d3.select("body").append("svg")
 
 
 
-
-// root = new MainNode()
-// root = new MainNode()
-// test = root.addChild("test");
-// test2 = root.addChild("test2");
-// test3 = root.addChild("test3");
-// test2.addChild("bébé")
-
-
-// dat = root.toJson()
-// update(dat)
-
-
-
-
-function addScreenNode(data, d){
-	let node = d3.select("#" + data["path"]);	
-	data["name"] = "Screen " + String(d.parent.children.length - 1);
-	// const fields = {"name": "Name : " + data["name"],
-	// 				"parent":data["name"],
-	// 				"path":data["path"] + "_name"
-	// }
-	// console.log(data)
-	// data["children"] = [fields]
-	node.select("text")
-	.text(d.parent.children.length - 1)
-	.attr("text-anchor", "middle");
-	node.on("click", function(node){
-		editNode(node);
-	});
-}
-
-function saveNodeName(node){
-	node.name = $("#nodeName").val();
-	d3.select("#" + node.path).select("text").text(node.name);
-	$("#nodeSettings").modal("hide");
-}
 
 
 
 class Node {
-	constructor(name, parent= null, root= null){
+	constructor(name, parent= null){
 		this.name = name;
 		this.children = [];
 		this.parent = parent;
 		this.path = parent == null ? "root" : parent.path + "_" + name;
-		this.root = root;
+		this.root = parent == null ? this : parent.root;
 		this.depth = parent == null ? 0 : this.parent.depth + 1 ;
+		this.element = null;
 
 	}
 
-	addChild(name){
-		let child = new Node(name, this);
+	addChildToChildren(child){
+		if (!this.children) {
+			this.children = [];
+		}
 		this.children.push(child);
+	}
+
+	addArrayChild(name){
+		let child = new ArrayNode(name, this);
+		this.addChildToChildren(child);
+		this.update(child.parent);
+		return child;
+	}
+
+	addObjectChild(name){
+		let child = new ObjectNode(name, this);
+		this.addChildToChildren(child);
 		this.update(child.parent);
 		return child;
 	}
 
 	addAddingChild(){
 		let child = new AddingNode(this);
-		this.children.push(child);
-		this.update(child.parent);
+		this.addChildToChildren(child);
 		return child;
 	}
 
 	click(){
-
 	}
 
 	editNode(node){
@@ -179,34 +148,37 @@ class Node {
 		$("#nodeName").attr("placeholder", node.name);
 		$("#nodeName").on("keypress", function(e){
 			if(e.keyCode == 13){
-				this.blur();
-				saveNodeName(node);
+				$("#nodeName").blur();
+				this.saveNodeName(node);
 				$("#nodeName").off("keypress");
 			}
-		});
+		}.bind(this));
 		$("#nodeSettings").attr("nodeId", node.path);
 		$("#nodeSettings").modal("show");
 	}
 
+	saveNodeName(node){
+		node.name = $("#nodeName").val();
+		d3.select("#" + node.path).select("text").text(node.name);
+		$("#nodeSettings").modal("hide");
+	}
+
 	update(source) {
 		// Compute the new tree layout.
-		// console.log(this)
-		var nodes = tree.nodes(this.toJson()).reverse(),
+		var nodes = tree.nodes(this.root).reverse(),
 			links = tree.links(nodes);
 		// Normalize for fixed-depth.
-		nodes.forEach(function(d) { d.y = d.depth * 180; });
-
+		nodes.forEach(function(d) {d.y = d.depth * 180; });
 		// Update the nodes…
 		var node = svg.selectAll("g.node")
 			.data(nodes, function(d) { return d.id || (d.id = ++i); });
 
 		// Enter any new nodes at the parent's previous position.
-		// console.log(source)
 		var nodeEnter = node.enter().append("g")
 		.attr("class", function(d){return d.type ? "node " + d.type : "node"})
 		.attr("id", function(d){return d.path})
 		.attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
-		.on("click", this.click);
+		.on("click", function(d){d.click();});
 		
 		nodeEnter.append("circle")
 		.attr("r", 30)
@@ -276,13 +248,6 @@ class Node {
 		});
 		}
 
-	toJson(){
-		let data = {"name" : this.name,
-		"parent" : this.parent,
-		"children": this.children
-		}
-		return data;
-	}
 
 }
 
@@ -292,11 +257,6 @@ class MainNode extends Node {
 		this.x0 = 250;
 		this.y0 = 0;
 		this.root = this;
-		this.initNodes();
-	}
-
-	initNodes(){
-		this.addChild("Screens");
 	}
 }
 
@@ -306,29 +266,40 @@ class AddingNode extends Node {
 	}
 	
 	click() {
-		var data = {
-			"name":"",
-			"parent":this.parent.name,
-			"children":[],
-			"path":this.parent.path
-		};
-		data["path"] += "_" + String(this.parent.children.length - 1);
-		this.parent.children.splice(-1, 0, data);
-		update(this.parent);
-		addScreenNode(data, this);	
+		let screenNode = new ObjectNode("Screen " + (this.parent.children.length), this.parent)
+		screenNode.path = this.parent.path + "_" + String(this.parent.children.length - 1);
+		this.parent.children.splice(-1, 0, screenNode);
+		this.update(this.parent)
+		let node = d3.select("#" + screenNode.path);
+		node.select("text")
+		.text(this.parent.children.length - 1)
+		.attr("text-anchor", "middle");
+		node.on("click", function(node){
+			this.editNode(node);
+		}.bind(this));
 	}
 }
 
-class ScreenNode extends Node {
+class ArrayNode extends Node {
 	constructor(name, parent){
 		super(name, parent);
+		this.addAddingChild();
 	}
 }
 
+class ObjectNode extends Node {
+	constructor(name, parent){
+		super(name, parent);
+		this.addAddingChild();
+	}
+}
+
+function createTreeFromJson(json){
+
+}
 
 test = new MainNode();
-test.addAddingChild();
-
+screens = test.addArrayChild("Screen")
 </script>
 	
   </body>

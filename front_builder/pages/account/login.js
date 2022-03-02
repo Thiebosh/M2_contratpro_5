@@ -33,7 +33,7 @@ export default function Login() {
 
   return (
     <Flex
-      minH={"100vh"}
+      minH={"80vh"}
       align={"center"}
       justify={"center"}
       bg={useColorModeValue("gray.50", "gray.800")}
@@ -58,15 +58,8 @@ export default function Login() {
               <Input type="password" name={"password"} ref={passwordInput} />
             </FormControl>
             <Stack spacing={10}>
-              <Stack
-                direction={{ base: "column", sm: "row" }}
-                align={"start"}
-                justify={"space-between"}
-              >
-                <Checkbox>Remember me</Checkbox>
-                <Link color={"blue.400"}>Forgot password?</Link>
-              </Stack>
               <Button
+                mt={4}
                 bg={"blue.400"}
                 color={"white"}
                 _hover={{
@@ -87,14 +80,12 @@ export default function Login() {
 export const getServerSideProps = withSessionSsr(
   async function getServerSideProps({ req, res }) {
     const { user } = req.session;
-    console.log("user", user);
 
     if (user) {
       return {
         redirect: {
           destination: "/dashboard",
           permanent: false,
-          statusCode: 302,
         },
       };
     }

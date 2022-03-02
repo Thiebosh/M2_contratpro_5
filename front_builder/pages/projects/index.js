@@ -20,6 +20,7 @@ import dayjs from "dayjs";
 import { EditIcon } from "@chakra-ui/icons";
 import { useEffect, useState } from "react";
 import $ from "jquery";
+import requireAuth from "../../components/utils/requireAuth";
 
 const idUser = "61dda39cbac26d9cb4cd6d7e";
 
@@ -45,7 +46,7 @@ export default function Projets() {
   }, []);
 
   return (
-    <Container maxW="container.xl">
+    <Container maxW={"container.xl"} py={8}>
       <Box className="header" m={5}>
         <Wrap>
           <WrapItem>
@@ -90,3 +91,5 @@ export default function Projets() {
     </Container>
   );
 }
+
+export const getServerSideProps = requireAuth;
