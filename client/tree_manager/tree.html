@@ -120,22 +120,7 @@ var svg = d3.select("body").append("svg")
 
 
 
-function addScreenNode(data, d){
-	let node = d3.select("#" + data["path"]);	
-	data["name"] = "Screen " + String(d.parent.children.length - 1);
-	// const fields = {"name": "Name : " + data["name"],
-	// 				"parent":data["name"],
-	// 				"path":data["path"] + "_name"
-	// }
-	// console.log(data)
-	// data["children"] = [fields]
-	node.select("text")
-	.text(d.parent.children.length - 1)
-	.attr("text-anchor", "middle");
-	node.on("click", function(node){
-		editNode(node);
-	});
-}
+
 
 function saveNodeName(node){
 	node.name = $("#nodeName").val();
@@ -153,11 +138,15 @@ class Node {
 		this.path = parent == null ? "root" : parent.path + "_" + name;
 		this.root = root;
 		this.depth = parent == null ? 0 : this.parent.depth + 1 ;
+		this.element = null;
 
 	}
 
 	addChild(name){
-		let child = new Node(name, this);
+		let child = new Node(name, this, this.root);
+		if (!this.children) {
+			this.children = [];
+		}
 		this.children.push(child);
 		this.update(child.parent);
 		return child;
@@ -165,13 +154,15 @@ class Node {
 
 	addAddingChild(){
 		let child = new AddingNode(this);
+		if (!this.children) {
+			this.children = [];
+		}
 		this.children.push(child);
-		this.update(child.parent);
+		this.update(this);
 		return child;
 	}
 
 	click(){
-
 	}
 
 	editNode(node){
@@ -190,12 +181,10 @@ class Node {
 
 	update(source) {
 		// Compute the new tree layout.
-		// console.log(this)
-		var nodes = tree.nodes(this.toJson()).reverse(),
+		var nodes = tree.nodes(this.root).reverse(),
 			links = tree.links(nodes);
 		// Normalize for fixed-depth.
-		nodes.forEach(function(d) { d.y = d.depth * 180; });
-
+		nodes.forEach(function(d) {d.y = d.depth * 180; });
 		// Update the nodes…
 		var node = svg.selectAll("g.node")
 			.data(nodes, function(d) { return d.id || (d.id = ++i); });
@@ -206,7 +195,7 @@ class Node {
 		.attr("class", function(d){return d.type ? "node " + d.type : "node"})
 		.attr("id", function(d){return d.path})
 		.attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
-		.on("click", this.click);
+		.on("click", function(d){d.click();});
 		
 		nodeEnter.append("circle")
 		.attr("r", 30)
@@ -292,30 +281,26 @@ class MainNode extends Node {
 		this.x0 = 250;
 		this.y0 = 0;
 		this.root = this;
-		this.initNodes();
-	}
-
-	initNodes(){
-		this.addChild("Screens");
 	}
 }
 
 class AddingNode extends Node {
 	constructor(parent){
-		super("+", parent);
+		super("+", parent, parent.root);
 	}
 	
 	click() {
-		var data = {
-			"name":"",
-			"parent":this.parent.name,
-			"children":[],
-			"path":this.parent.path
-		};
-		data["path"] += "_" + String(this.parent.children.length - 1);
-		this.parent.children.splice(-1, 0, data);
-		update(this.parent);
-		addScreenNode(data, this);	
+		let screenNode = new ScreenNode("Screen " + (this.parent.children.length), this.parent)
+		screenNode.path = this.parent.path + "_" + String(this.parent.children.length - 1);
+		this.parent.children.splice(-1, 0, screenNode);
+		this.update(this.parent)
+		let node = d3.select("#" + screenNode.path);
+		node.select("text")
+		.text(this.parent.children.length - 1)
+		.attr("text-anchor", "middle");
+		node.on("click", function(node){
+			this.editNode(node);
+		}.bind(this));
 	}
 }
 
@@ -327,8 +312,9 @@ class ScreenNode extends Node {
 
 
 test = new MainNode();
-test.addAddingChild();
-
+screens = test.addChild("Screens")
+// screens.addAddingChild();
+screens.addAddingChild()
 </script>
 	
   </body>
