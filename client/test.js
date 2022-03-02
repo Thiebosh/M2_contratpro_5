@@ -1,9 +1,10 @@
 $(function () {
   $.ajax({
-    url: "http://localhost:8001/project/search_by_user",
+    url: "http://localhost:8001/project/update",
     type: "POST",
     data: {
-      id: "61e1519c4a9b46d72791e0e7",
+      id: "621f800a3be54c21de916f1e",
+      name: "autre que test"
     },
     success: function (resp) {
       $("pre").text(JSON.stringify(resp, null, 2));
