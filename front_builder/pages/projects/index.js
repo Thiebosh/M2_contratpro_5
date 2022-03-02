@@ -7,6 +7,7 @@ import {
   Flex,
   Heading,
   IconButton,
+  Select,
   Table,
   TableCaption,
   Tbody,
@@ -19,15 +20,16 @@ import {
   WrapItem,
 } from "@chakra-ui/react";
 import dayjs from "dayjs";
+
+import { AddIcon, DeleteIcon, EditIcon, SettingsIcon } from "@chakra-ui/icons";
 import { useEffect, useState } from "react";
-import { AddIcon, EditIcon } from "@chakra-ui/icons";
 import Link from "next/link";
 import $ from "jquery";
 import requireAuth from "../../components/utils/requireAuth";
 
-const idUser = "61dda39cbac26d9cb4cd6d7e";
+const idUser = "bentest";
 
-export default function Projets() {
+export default function Projects() {
   const [projects, setProjects] = useState([]);
 
   useEffect(() => {
@@ -79,7 +81,7 @@ export default function Projets() {
                 <Th>Nom</Th>
                 <Th>Date de création</Th>
                 <Th>Dernière modification au</Th>
-                <Th>Action</Th>
+                <Th>Actions</Th>
               </Tr>
             </Thead>
             <Tbody>
@@ -89,7 +91,24 @@ export default function Projets() {
                   <Td>{dayjs(project.creation).format("D MMMM YYYY")}</Td>
                   <Td>{dayjs(project.last_specs).format("D MMMM YYYY")}</Td>
                   <Td>
-                    <IconButton aria-label="modifier" icon={<EditIcon />} />
+                    <Link href="/dashboard">
+                      <IconButton
+                        aria-label="modifier"
+                        mx={1}
+                        icon={<EditIcon />}
+                      />
+                    </Link>
+                    <IconButton
+                      aria-label="settings"
+                      mx={1}
+                      icon={<SettingsIcon />}
+                    />
+                    <IconButton
+                      aria-label="delete"
+                      mx={1}
+                      icon={<DeleteIcon />}
+                      //onClick={this.handleClick(console.log("ffff"))}
+                    />
                   </Td>
                 </Tr>
               ))}
@@ -99,6 +118,22 @@ export default function Projets() {
       </Box>
     </Container>
   );
+
+  function deleteProject(projectID) {
+    $.ajax({
+      url: "http://localhost:8001/project/delete",
+      type: "POST",
+      data: {
+        id: projectID,
+      },
+      success: function (resp) {
+        console.log(resp);
+      },
+      error: function () {
+        console.log("failure");
+      },
+    });
+  }
 }
 
 export const getServerSideProps = requireAuth;
