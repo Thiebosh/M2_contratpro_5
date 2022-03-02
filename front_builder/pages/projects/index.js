@@ -1,8 +1,11 @@
 import {
   Avatar,
   Box,
+  Button,
   Center,
   Container,
+  Flex,
+  Heading,
   IconButton,
   Table,
   TableCaption,
@@ -16,9 +19,9 @@ import {
   WrapItem,
 } from "@chakra-ui/react";
 import dayjs from "dayjs";
-
-import { EditIcon } from "@chakra-ui/icons";
 import { useEffect, useState } from "react";
+import { AddIcon, EditIcon } from "@chakra-ui/icons";
+import Link from "next/link";
 import $ from "jquery";
 import requireAuth from "../../components/utils/requireAuth";
 
@@ -47,24 +50,30 @@ export default function Projets() {
 
   return (
     <Container maxW={"container.xl"} py={8}>
-      <Box className="header" m={5}>
+      <Flex m={5} justifyContent={"space-between"}>
         <Wrap>
           <WrapItem>
             <Avatar size="xl" src="https://bit.ly/code-beast" />
           </WrapItem>
           <WrapItem>
             <Center w="200px" h="100px">
-              <Text fontSize="xl">Projets en cours...</Text>
+              <Heading>Projets</Heading>
             </Center>
           </WrapItem>
         </Wrap>
-      </Box>
+        <Box>
+          <Link href="/projects/create">
+            <Button leftIcon={<AddIcon />} colorScheme={"blue"}>
+              New project
+            </Button>
+          </Link>
+        </Box>
+      </Flex>
 
       <Box className="container">
         <Wrap direction="column">
           <Table variant="simple">
             <TableCaption>Liste des projets en cours</TableCaption>
-            <div className="numberProjects"></div>
             <Thead>
               <Tr>
                 <Th>Nom</Th>
@@ -75,7 +84,7 @@ export default function Projets() {
             </Thead>
             <Tbody>
               {projects.map((project) => (
-                <Tr>
+                <Tr key={project._id}>
                   <Td>{project.name}</Td>
                   <Td>{dayjs(project.creation).format("D MMMM YYYY")}</Td>
                   <Td>{dayjs(project.last_specs).format("D MMMM YYYY")}</Td>
