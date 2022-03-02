@@ -1,39 +1,42 @@
 import {
   Avatar,
   Box,
-  Container,
   Center,
-  Flex,
+  Container,
   IconButton,
   Table,
   TableCaption,
-  SimpleGrid,
   Tbody,
   Td,
   Text,
-  Tfoot,
   Th,
   Thead,
   Tr,
   Wrap,
   WrapItem,
 } from "@chakra-ui/react";
+import dayjs from "dayjs";
 
 import { EditIcon } from "@chakra-ui/icons";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import $ from "jquery";
 
+const idUser = "61dda39cbac26d9cb4cd6d7e";
+
 export default function Projets() {
+  const [projects, setProjects] = useState([]);
+
   useEffect(() => {
+    const dataProjects = {
+      id: idUser,
+    };
     $.ajax({
-      url: "http://localhost:8001/account/connect",
+      url: "http://localhost:8001/project/search_by_user",
       type: "POST",
-      data: {
-        name: "test",
-        password: "test",
-      },
+      data: dataProjects,
       success: function (resp) {
-        console.log(resp.id);
+        setProjects(resp.result);
+        console.log(resp);
       },
       error: function () {
         console.log("failure");
@@ -70,22 +73,16 @@ export default function Projets() {
               </Tr>
             </Thead>
             <Tbody>
-              <Tr>
-                <Td>BenPorj</Td>
-                <Td> 20/01/2022</Td>
-                <Td>12/10/2020</Td>
-                <Td>
-                  <IconButton aria-label="modifier" icon={<EditIcon />} />
-                </Td>
-              </Tr>
-              <Tr>
-                <Td>Bennne</Td>
-                <Td>12/10/2020</Td>
-                <Td>28/11/2020</Td>
-                <Td>
-                  <IconButton aria-label="modifier" icon={<EditIcon />} />
-                </Td>
-              </Tr>
+              {projects.map((project) => (
+                <Tr>
+                  <Td>{project.name}</Td>
+                  <Td>{dayjs(project.creation).format("D MMMM YYYY")}</Td>
+                  <Td>{dayjs(project.last_specs).format("D MMMM YYYY")}</Td>
+                  <Td>
+                    <IconButton aria-label="modifier" icon={<EditIcon />} />
+                  </Td>
+                </Tr>
+              ))}
             </Tbody>
           </Table>
         </Wrap>
