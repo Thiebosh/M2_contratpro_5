@@ -22,6 +22,7 @@ import {
 import { EditIcon } from "@chakra-ui/icons";
 import { useEffect } from "react";
 import $ from "jquery";
+import requireAuth from "../../components/utils/requireAuth";
 
 export default function Projets() {
   useEffect(() => {
@@ -42,7 +43,7 @@ export default function Projets() {
   }, []);
 
   return (
-    <Container maxW="container.xl">
+    <Container maxW={"container.xl"} py={8}>
       <Box className="header" m={5}>
         <Wrap>
           <WrapItem>
@@ -93,3 +94,5 @@ export default function Projets() {
     </Container>
   );
 }
+
+export const getServerSideProps = requireAuth;

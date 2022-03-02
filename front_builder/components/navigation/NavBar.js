@@ -13,38 +13,37 @@ import {
   MenuList,
   Stack,
   useColorMode,
-  useColorModeValue,
   useDisclosure,
 } from "@chakra-ui/react";
 import { CloseIcon, HamburgerIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
 import Link from "next/link";
 
-const links = [
-  { label: "Home", href: "/" },
-  { label: "Dashboard", href: "/dashboard" },
-  { label: "Projects", href: "/projects" },
-];
-
-const accountLinks = [
-  { label: "Account", href: "/account" },
-  { label: "Settings", href: "/account/settings" },
-];
-
 const NavLink = ({ link }) => (
   <Link href={link.href}>
     <a>
-      <Button colorScheme="teal" variant="ghost">
+      <Button colorScheme="blue" variant="ghost">
         {link.label}
       </Button>
     </a>
   </Link>
 );
 
-export default function Simple() {
+export default function NavBar() {
   const router = useRouter();
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const links = [
+    { label: "Home", href: "/" },
+    { label: "Dashboard", href: "/dashboard" },
+    { label: "Projects", href: "/projects" },
+  ];
+
+  const accountLinks = [
+    { label: "Account", href: "/account" },
+    { label: "Settings", href: "/account/settings" },
+  ];
 
   return (
     <Box boxShadow="base" px={4}>
@@ -81,12 +80,7 @@ export default function Simple() {
               cursor={"pointer"}
               minW={0}
             >
-              <Avatar
-                size={"sm"}
-                src={
-                  "https://images.unsplash.com/photo-1493666438817-866a91353ca9?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9"
-                }
-              />
+              <Avatar size={"sm"} bg={"blue.500"} />
             </MenuButton>
             <MenuList>
               {accountLinks.map((link) => (

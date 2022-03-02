@@ -7,12 +7,11 @@ import {
   Wrap,
   WrapItem,
 } from "@chakra-ui/react";
-import RequireAuth from "../../components/utils/RequireAuth";
-import { withSessionSsr } from "../../lib/withSession";
+import requireAuth from "../../components/utils/requireAuth";
 
 export default function Account() {
   return (
-    <Container maxW="container.lg">
+    <Container maxW={"container.xl"}>
       <Flex>
         <div className="avatar">
           <Wrap>
@@ -32,23 +31,4 @@ export default function Account() {
   );
 }
 
-export const getServerSideProps = withSessionSsr(
-  async function getServerSideProps({ req, res }) {
-    const { user } = req.session;
-    console.log("user", user);
-    console.log("session", req.session);
-
-    if (!user) {
-      return {
-        redirect: {
-          destination: "/account/login",
-          permanent: false,
-        },
-      };
-    }
-
-    return {
-      props: { user },
-    };
-  }
-);
+export const getServerSideProps = requireAuth;
