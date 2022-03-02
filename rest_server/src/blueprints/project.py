@@ -49,6 +49,52 @@ async def create():
     }, status.HTTP_200_OK
 
 
+@bp_project.route("/update", methods=['POST'])
+async def update():
+    post = await request.form
+    if len(post) != 2:
+        return "", status.HTTP_400_BAD_REQUEST
+
+    project_id = post.get("id", type=str, default=None)
+    project_name = post.get("name", type=str, default=None)
+
+    if not (project_id and project_name):
+        return "", status.HTTP_400_BAD_REQUEST
+
+    project_id = ObjectId(project_id)
+
+    # verify if name does not exist for other than id
+    filter_q = {
+        "_id": {
+            "$ne": project_id
+        },
+        "name": project_name
+    }
+    fields = {
+        "_id": 0,
+        "name": 1
+    }
+
+    if await current_app.config["partners"]["db"].find_one(COLLECTION, filter_q, fields):
+        return {
+            "success": "already exist"
+        }, status.HTTP_200_OK
+
+    # update fields
+    filter_q = {
+        "_id": project_id
+    }
+    update_q = {
+        "$set": {
+            "name": project_name
+        }
+    }
+
+    return {
+        "success": await current_app.config["partners"]["db"].update_one(COLLECTION, filter_q, update_q)
+    }, status.HTTP_200_OK
+
+
 @bp_project.route("/search_by_user", methods=['POST'])
 async def search_by_user():
     post = await request.form

@@ -55,8 +55,8 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 - "id" (str) : l'identifiant du compte à modifier.
 
 **Arguments optionnels : un des deux**
-- "name" (str) : le nom (actuel ou nouveau) que l'utilisateur souhaite associer au compte.
-- "password" (str) : le mot de passe en clair (actuel ou nouveau) que l'utilisateur souhaite associer au compte.
+- "name" (str) : le nouveau nom que l'utilisateur souhaite associer au compte.
+- "password" (str) : le nouveau mot de passe (en clair) que l'utilisateur souhaite associer au compte.
 
 **Retours :**
 - { "success": "already exist" } : le nom de compte est déjà utilisé.
@@ -100,6 +100,19 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 - { "success": "already exist" } : le nom de projet est déjà utilisé.
 - { "success": False } : le nom de projet est disponible mais l'intégration en base de données a échoué.
 - { "success": True } : le nom de projet est disponible et l'intégration en base de données a réussi.
+
+
+# /project/update
+**Utilisation :** mettre à jour les informations d'un projet.
+
+**Arguments requis :**
+- "id" (str) : l'identifiant du compte à modifier.
+- "name" (str) : le nouveau nom que l'utilisateur souhaite associer au projet.
+
+**Retours :**
+- { "success": "already exist" } : le nom de projet est déjà utilisé.
+- { "success": False } : l'intégration en base de données a échoué.
+- { "success": True } : l'intégration en base de données a réussi.
 
 
 # /project/search_by_user
