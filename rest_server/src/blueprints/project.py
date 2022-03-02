@@ -7,9 +7,9 @@ bp_project = Blueprint("project", __name__)
 
 COLLECTION = "projects"
 
-@bp_project.route("/create", methods=['GET', 'POST'])
+@bp_project.route("/create", methods=['POST'])
 async def create():
-    post = await request.form # request.args
+    post = await request.form
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -49,9 +49,9 @@ async def create():
     }, status.HTTP_200_OK
 
 
-@bp_project.route("/search_by_user", methods=['GET', 'POST'])
+@bp_project.route("/search_by_user", methods=['POST'])
 async def search_by_user():
-    post = await request.form # request.args
+    post = await request.form
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -80,9 +80,9 @@ async def search_by_user():
     }, status.HTTP_200_OK
 
 
-@bp_project.route("/add_user", methods=['GET', 'POST'])
+@bp_project.route("/add_user", methods=['POST'])
 async def add_user():
-    post = await request.form # request.args
+    post = await request.form
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -109,9 +109,9 @@ async def add_user():
     }, status.HTTP_200_OK
 
 
-@bp_project.route("/remove_user", methods=['GET', 'POST'])
+@bp_project.route("/remove_user", methods=['POST'])
 async def remove_user():
-    post = await request.form # request.args
+    post = await request.form 
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -136,9 +136,9 @@ async def remove_user():
     }, status.HTTP_200_OK
 
 
-@bp_project.route("/delete", methods=['GET', 'POST'])
+@bp_project.route("/delete", methods=['POST'])
 async def delete():
-    post = await request.form # request.args
+    post = await request.form
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
