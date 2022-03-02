@@ -1,7 +1,9 @@
 <?php
 session_start();
 
+
 require_once("controllers/directory_manager.php");
+
 
 $SUCCESS = "200";
 $BAD_REQUEST = "400";
@@ -94,10 +96,33 @@ if (isset($_GET['action'])) {
             http_response_code($result ? $SUCCESS : $ERROR);
             exit();
 
+        case 'get_session':
+
+            if(!isset($_SESSION["data"])) {
+                echo("{}");
+            }
+            echo (json_encode($_SESSION["data"]));
+            exit();
+        
+        case 'set_session':
+            if(!isset($_POST['session'])) {
+                http_response_code($BAD_REQUEST);
+                exit();
+            }
+            $post['session'] = filter_input(INPUT_POST, 'session', FILTER_SANITIZE_STRING);
+            if (in_array(false, $post, true)) {
+                http_response_code($BAD_REQUEST);
+                exit();
+            }
+            $_SESSION = json_decode($_POST['session']);
+            http_response_code($SUCCESS);
+            exit();
+        
         case "probe":
             echo("alive");
             http_response_code($SUCCESS);
             exit();
+
     }
 }
 
