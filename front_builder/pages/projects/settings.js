@@ -14,18 +14,17 @@ import { useRef } from "react";
 import $ from "jquery";
 import requireAuth from "../../components/utils/requireAuth";
 
-export default function ProjectsCreate({ user }) {
+export default function Settings({ user }) {
   const toast = useToast();
   const renameInput = useRef();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     $.ajax({
-      url: "http://localhost:8001/project/create",
+      url: "http://localhost:8001/project/delete",
       type: "POST",
       data: {
-        name: renameInput.current.value,
-        user_id: user.id,
+        id: projectID,
       },
       success: function (resp) {
         toast({
