@@ -70,21 +70,21 @@ var svg = d3.select("body").append("svg")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
-treeData = [
-	{
-		"name" : "Root",
-		"parent" : "null",
-		"path":"root",
-		"children" : [
-			{
-			"name":"Screens",
-			"parent":"Root",
-			"path":"root_screens",
-			"children": []
-			}
-		]
-	}
-]
+// treeData = [
+// 	{
+// 		"name" : "Root",
+// 		"parent" : "null",
+// 		"path":"root",
+// 		"children" : [
+// 			{
+// 			"name":"Screens",
+// 			"parent":"Root",
+// 			"path":"root_screens",
+// 			"children": []
+// 			}
+// 		]
+// 	}
+// ]
 // root = treeData[0];
 // root.x0 = height/2;
 // root.y0 = 0;
@@ -109,7 +109,6 @@ class Node {
 		this.path = parent == null ? "root" : parent.path + "_" + name;
 		this.root = parent == null ? this : parent.root;
 		this.depth = parent == null ? 0 : this.parent.depth + 1 ;
-		this.element = null;
 
 	}
 
@@ -267,7 +266,7 @@ class AddingNode extends Node {
 	
 	click() {
 		let screenNode = new ObjectNode("Screen " + (this.parent.children.length), this.parent)
-		screenNode.path = this.parent.path + "_" + String(this.parent.children.length - 1);
+		screenNode.path = this.parent.path.concat("_",String(this.parent.children.length - 1));
 		this.parent.children.splice(-1, 0, screenNode);
 		this.update(this.parent)
 		let node = d3.select("#" + screenNode.path);
@@ -294,12 +293,27 @@ class ObjectNode extends Node {
 	}
 }
 
-function createTreeFromJson(json){
-
+class FieldNode extends Node {
+	constructor(name, parent){
+		super(name, parent);
+	}
 }
 
-test = new MainNode();
-screens = test.addArrayChild("Screen")
+// function createTreeFromJson(json){
+// 	let test  = $.getJSON("syntax/syntax.json", function(data){
+// 		console.log(JSON.stringify(data))
+// 	});
+// 	console.log(test);
+// 	$.getJSON("example.json",function(json){
+// 		root = new MainNode();
+
+// 		console.log(json[Object.keys(json)[0]]);
+// 	})
+
+// }
+// createTreeFromJson("");
+// test = new MainNode();
+// screens = test.addArrayChild("Screen");
 </script>
 	
   </body>
