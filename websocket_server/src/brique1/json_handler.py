@@ -13,7 +13,26 @@ class JsonHandler():
         self.project_name = project_name
         self.json_currently_stored = True
         self.current_version_generated = False # add field to db
-        self.data = self.partners["db"].find_one(COLLECTION_PROJECTS, {"name":project_name}, {"_id": 0, "specs": 1})["specs"]
+
+        aggregation = [
+            {
+                "$match": {
+                    "name": project_name
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "specs": 1,
+                }
+            },
+            {
+                "$replaceRoot": {
+                    "newRoot": "$specs"
+                }
+            }
+        ]
+        self.data = self.partners["db"].aggregate_list(COLLECTION_PROJECTS, aggregation)[0]
 
 
     def close(self):
