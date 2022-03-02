@@ -1,39 +1,46 @@
 import {
   Avatar,
   Box,
-  Container,
+  Button,
   Center,
+  Container,
   Flex,
+  Heading,
   IconButton,
   Table,
   TableCaption,
-  SimpleGrid,
   Tbody,
   Td,
   Text,
-  Tfoot,
   Th,
   Thead,
   Tr,
   Wrap,
   WrapItem,
 } from "@chakra-ui/react";
-
-import { EditIcon } from "@chakra-ui/icons";
-import { useEffect } from "react";
+import dayjs from "dayjs";
+import { useEffect, useState } from "react";
+import { AddIcon, EditIcon } from "@chakra-ui/icons";
+import Link from "next/link";
 import $ from "jquery";
+import requireAuth from "../../components/utils/requireAuth";
+
+const idUser = "61dda39cbac26d9cb4cd6d7e";
 
 export default function Projets() {
+  const [projects, setProjects] = useState([]);
+
   useEffect(() => {
+    const dataProjects = {
+      id: idUser,
+    };
     $.ajax({
-      url: "http://localhost:8001/account/connect",
+      url: "http://localhost:8001/project/search_by_user",
       type: "POST",
-      data: {
-        name: "test",
-        password: "test",
-      },
+      data: dataProjects,
       success: function (resp) {
-        console.log(resp.id);
+        setProjects(resp.result);
+        console.log(resp);
       },
       error: function () {
         console.log("failure");
@@ -42,25 +49,31 @@ export default function Projets() {
   }, []);
 
   return (
-    <Container maxW="container.xl">
-      <Box className="header" m={5}>
+    <Container maxW={"container.xl"} py={8}>
+      <Flex m={5} justifyContent={"space-between"}>
         <Wrap>
           <WrapItem>
             <Avatar size="xl" src="https://bit.ly/code-beast" />
           </WrapItem>
           <WrapItem>
             <Center w="200px" h="100px">
-              <Text fontSize="xl">Projets en cours...</Text>
+              <Heading>Projets</Heading>
             </Center>
           </WrapItem>
         </Wrap>
-      </Box>
+        <Box>
+          <Link href="/projects/create">
+            <Button leftIcon={<AddIcon />} colorScheme={"blue"}>
+              New project
+            </Button>
+          </Link>
+        </Box>
+      </Flex>
 
       <Box className="container">
         <Wrap direction="column">
           <Table variant="simple">
             <TableCaption>Liste des projets en cours</TableCaption>
-            <div className="numberProjects"></div>
             <Thead>
               <Tr>
                 <Th>Nom</Th>
@@ -70,22 +83,16 @@ export default function Projets() {
               </Tr>
             </Thead>
             <Tbody>
-              <Tr>
-                <Td>BenPorj</Td>
-                <Td> 20/01/2022</Td>
-                <Td>12/10/2020</Td>
-                <Td>
-                  <IconButton aria-label="modifier" icon={<EditIcon />} />
-                </Td>
-              </Tr>
-              <Tr>
-                <Td>Bennne</Td>
-                <Td>12/10/2020</Td>
-                <Td>28/11/2020</Td>
-                <Td>
-                  <IconButton aria-label="modifier" icon={<EditIcon />} />
-                </Td>
-              </Tr>
+              {projects.map((project) => (
+                <Tr key={project._id}>
+                  <Td>{project.name}</Td>
+                  <Td>{dayjs(project.creation).format("D MMMM YYYY")}</Td>
+                  <Td>{dayjs(project.last_specs).format("D MMMM YYYY")}</Td>
+                  <Td>
+                    <IconButton aria-label="modifier" icon={<EditIcon />} />
+                  </Td>
+                </Tr>
+              ))}
             </Tbody>
           </Table>
         </Wrap>
@@ -93,3 +100,5 @@ export default function Projets() {
     </Container>
   );
 }
+
+export const getServerSideProps = requireAuth;

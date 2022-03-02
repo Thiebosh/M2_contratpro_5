@@ -1,4 +1,4 @@
-import { withSessionRoute } from "../../../lib/withSession";
+import { withSessionRoute, withSessionSsr } from "../../../lib/withSession";
 
 export default withSessionRoute(loginRoute);
 
@@ -13,7 +13,7 @@ async function loginRoute(req, res) {
 
   if (username === "test" && password === "test") {
     req.session.user = {
-      id: 1,
+      id: "61e131ce9c11b699edc38a1e",
       admin: true,
     };
     await req.session.save();
@@ -22,3 +22,24 @@ async function loginRoute(req, res) {
     res.status(403).json({ message: "Wrong credentials" });
   }
 }
+
+export const getServerSideProps = withSessionSsr(
+  async function getServerSideProps({ req, res }) {
+    const { user } = req.session;
+    console.log("user", user);
+    console.log("session", req.session);
+
+    if (!user) {
+      return {
+        redirect: {
+          destination: "/account/login",
+          permanent: false,
+        },
+      };
+    }
+
+    return {
+      props: { user },
+    };
+  }
+);
