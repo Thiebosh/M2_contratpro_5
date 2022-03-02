@@ -1,11 +1,18 @@
-import { Input, Avatar, Flex, Stack, Wrap, WrapItem } from "@chakra-ui/react";
+import {
+  Avatar,
+  Container,
+  Flex,
+  Input,
+  Stack,
+  Wrap,
+  WrapItem,
+} from "@chakra-ui/react";
+import RequireAuth from "../../components/utils/RequireAuth";
+import { withSessionSsr } from "../../lib/withSession";
 
 export default function Account() {
-  const name = "Benjamin";
-  const password = "ben";
-
   return (
-    <div className="profilePage">
+    <Container maxW="container.lg">
       <Flex>
         <div className="avatar">
           <Wrap>
@@ -21,6 +28,27 @@ export default function Account() {
           </Stack>
         </div>
       </Flex>
-    </div>
+    </Container>
   );
 }
+
+export const getServerSideProps = withSessionSsr(
+  async function getServerSideProps({ req, res }) {
+    const { user } = req.session;
+    console.log("user", user);
+    console.log("session", req.session);
+
+    if (!user) {
+      return {
+        redirect: {
+          destination: "/account/login",
+          permanent: false,
+        },
+      };
+    }
+
+    return {
+      props: { user },
+    };
+  }
+);
