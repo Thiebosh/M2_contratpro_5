@@ -1,92 +1,104 @@
 import {
   Avatar,
   Box,
+  Button,
   Center,
+  Container,
   Flex,
+  Heading,
   IconButton,
   Table,
   TableCaption,
   Tbody,
   Td,
   Text,
-  Tfoot,
   Th,
   Thead,
   Tr,
   Wrap,
   WrapItem,
 } from "@chakra-ui/react";
+import dayjs from "dayjs";
+import { useEffect, useState } from "react";
+import { AddIcon, EditIcon } from "@chakra-ui/icons";
+import Link from "next/link";
+import $ from "jquery";
+import requireAuth from "../../components/utils/requireAuth";
 
-import { EditIcon } from "@chakra-ui/icons";
-import { useEffect } from "react";
-import axios from "axios";
+const idUser = "61dda39cbac26d9cb4cd6d7e";
 
 export default function Projets() {
+  const [projects, setProjects] = useState([]);
+
   useEffect(() => {
-    axios
-      .post("/user", {
-        firstName: "Fred",
-        lastName: "Flintstone",
-      })
-      .then(function (response) {
-        console.log(response);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+    const dataProjects = {
+      id: idUser,
+    };
+    $.ajax({
+      url: "http://localhost:8001/project/search_by_user",
+      type: "POST",
+      data: dataProjects,
+      success: function (resp) {
+        setProjects(resp.result);
+        console.log(resp);
+      },
+      error: function () {
+        console.log("failure");
+      },
+    });
   }, []);
 
   return (
-    <div className="projetsPage">
-      <Flex>
-        <div className="avatar">
-          <Wrap>
-            <WrapItem>
-              <Avatar size="xl" src="https://bit.ly/code-beast" />
-            </WrapItem>
-          </Wrap>
-        </div>
-
-        <div className="container">
-          <Wrap direction="column">
-            <WrapItem>
-              <Center w="300px" h="80px">
-                <Text fontSize="2xl">Projets en cours...</Text>
-              </Center>
-            </WrapItem>
-            <Table variant="simple">
-              <TableCaption>Liste des projets en cours</TableCaption>
-              <div className="numberProjects"></div>
-              <Thead>
-                <Tr>
-                  <Th>Nom</Th>
-                  <Th>Date de création</Th>
-                  <Th>Dernière modification au</Th>
-                  <Th>Action</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                <Tr>
-                  <Td>BenPorj</Td>
-                  <Td> 20/01/2022</Td>
-                  <Td>12/10/2020</Td>
-                  <Td>
-                    <IconButton aria-label="modifier" icon={<EditIcon />} />
-                  </Td>
-                </Tr>
-                <Tr>
-                  <Td>Bennne</Td>
-                  <Td>12/10/2020</Td>
-                  <Td>28/11/2020</Td>
-                  <Td>
-                    <IconButton aria-label="modifier" icon={<EditIcon />} />
-                  </Td>
-                </Tr>
-              </Tbody>
-            </Table>
-          </Wrap>
-        </div>
+    <Container maxW={"container.xl"} py={8}>
+      <Flex m={5} justifyContent={"space-between"}>
+        <Wrap>
+          <WrapItem>
+            <Avatar size="xl" src="https://bit.ly/code-beast" />
+          </WrapItem>
+          <WrapItem>
+            <Center w="200px" h="100px">
+              <Heading>Projets</Heading>
+            </Center>
+          </WrapItem>
+        </Wrap>
+        <Box>
+          <Link href="/projects/create">
+            <Button leftIcon={<AddIcon />} colorScheme={"blue"}>
+              New project
+            </Button>
+          </Link>
+        </Box>
       </Flex>
-    </div>
+
+      <Box className="container">
+        <Wrap direction="column">
+          <Table variant="simple">
+            <TableCaption>Liste des projets en cours</TableCaption>
+            <Thead>
+              <Tr>
+                <Th>Nom</Th>
+                <Th>Date de création</Th>
+                <Th>Dernière modification au</Th>
+                <Th>Action</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {projects.map((project) => (
+                <Tr key={project._id}>
+                  <Td>{project.name}</Td>
+                  <Td>{dayjs(project.creation).format("D MMMM YYYY")}</Td>
+                  <Td>{dayjs(project.last_specs).format("D MMMM YYYY")}</Td>
+                  <Td>
+                    <IconButton aria-label="modifier" icon={<EditIcon />} />
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </Wrap>
+      </Box>
+    </Container>
   );
 }
+
+export const getServerSideProps = requireAuth;

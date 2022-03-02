@@ -24,6 +24,7 @@ class InputManager():
     def close(self):
         self.json_handler.close()
         self.files_manager.close()
+        self.render_page.close()
 
     def add_new_input(self, socket, msg):
         self.inputs.append(Input(socket, msg))

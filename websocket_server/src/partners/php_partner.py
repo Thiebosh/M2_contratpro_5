@@ -14,58 +14,28 @@ class PhpPartner():
         return PhpPartner(base_url=self.base_url, state=self.state)
 
 
-    def _get(self, endpoint, print_=False):
+    def _call(self, method_callback, endpoint, print_=False, get_code=False):
         print("php - call", endpoint)
         try:
-            result = requests.get(url=f"{self.base_url}?action={endpoint}")
+            result = method_callback()
         except RequestException:
-            print("big exception") # serveur not started or bad url
-            return False, ""
+            raise Exception("php - server not started")
 
         if print_:
-            print("status_code", result.status_code)
-            print("content\n________\n", result.content.decode("utf-8"))
-            print("________\nfinish")
+            print(f"php - status_code {result.status_code}")
+            print("php - content")
+            print(result.content.decode("utf-8"))
+            print("php - finish")
 
-        return result.status_code == 200, result.content.decode("utf-8")
-
-
-    def _post(self, endpoint, data, print_=False):
-        print("php - call to ",endpoint)
-        try:
-            result = requests.post(url=f"{self.base_url}?action={endpoint}", data=data)
-        except RequestException:
-            print("big exception") # serveur not started or bad url
-            return False, ""
-
-        if print_:
-            print("status_code", result.status_code)
-            if result.status_code != 200:
-                print("data : ", data)
-
-            print("content\n________\n", result.content.decode("utf-8"))
-            print("________\nfinish")
-
-        return result.status_code == 200, result.content.decode("utf-8")
+        return result.status_code if get_code else result.status_code == 200, result.content.decode("utf-8")
 
 
-    def _postWithCode(self, endpoint, data, print_=False):
-        print("php - call to ",endpoint)
-        try:
-            result = requests.post(url=f"{self.base_url}?action={endpoint}", data=data)
-        except RequestException:
-            print("big exception") # serveur not started or bad url
-            return False, ""
+    def _get(self, endpoint, print_=False, get_code=False):
+        return self._call(lambda: requests.get(url=f"{self.base_url}?action={endpoint}"), endpoint, print_, get_code)
 
-        if print_:
-            print("status_code", result.status_code)
-            if result.status_code != 200:
-                print("data : ", data)
 
-            print("content\n________\n", result.content.decode("utf-8"))
-            print("________\nfinish")
-
-        return result.status_code, result.content.decode("utf-8")
+    def _post(self, endpoint, data, print_=False, get_code=False):
+        return self._call(lambda: requests.post(url=f"{self.base_url}?action={endpoint}", data=data), endpoint, print_, get_code)
 
 
     def set_project_folder(self, project_name):
@@ -109,6 +79,24 @@ class PhpPartner():
         return self._post("remove_folder", { "project_name": project_name })[0]
 
 
+    def set_session(self, session):
+        if not self.state:
+            return False
+
+        print(self._post("set_session", { "session": session}, get_code=True, print_=True))
+
+        return True
+
+
+    def get_session(self):
+        if not self.state:
+            return False
+
+        print(self._get("get_session", get_code=True, print_=True))
+
+        return "{}"
+
+
     def get_project_page(self, project_name, page):
         if not self.state:
             return False
@@ -117,4 +105,4 @@ class PhpPartner():
             "project_name": project_name,
             "page": page
         }
-        return self._postWithCode("execute", data)
+        return self._post("execute", data, get_code=True)

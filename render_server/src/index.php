@@ -24,7 +24,7 @@ if (isset($_GET['action'])) {
                 exit();
             }
 
-            $result = $directoryManager->include_file($post['project_name'], "routeur.php");
+            $result = $directoryManager->include_file($post['project_name'], "routeur.php", $post['page']);
             http_response_code($result ? $SUCCESS : $ERROR);
             exit();
 

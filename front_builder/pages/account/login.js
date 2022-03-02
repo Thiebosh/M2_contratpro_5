@@ -1,103 +1,97 @@
-import {LockClosedIcon} from "@heroicons/react/solid";
-import {useState} from "react";
-import {useRouter} from "next/router";
+import {
+  Box,
+  Button,
+  Checkbox,
+  Flex,
+  FormControl,
+  FormLabel,
+  Heading,
+  Input,
+  Link,
+  Stack,
+  useColorModeValue,
+} from "@chakra-ui/react";
+import { useRouter } from "next/router";
+import { withSessionSsr } from "../../lib/withSession";
+import axios from "axios";
+import { useRef } from "react";
 
 export default function Login() {
   const router = useRouter();
-  const {login} = () => {
-  };
+  const usernameInput = useRef();
+  const passwordInput = useRef();
 
-  const [username, setUsername] = useState(null);
-  const [password, setPassword] = useState(null);
-
-  const handleLogin = (e) => {
-    e.preventDefault();
-
-    login(username, password)
-      .then(() => router.push(router.query.returnUrl || "/dashboard"))
-      .catch(err => console.log(err))
+  const handleClick = () => {
+    axios
+      .post("/api/auth/login", {
+        username: usernameInput.current.value,
+        password: passwordInput.current.value,
+      })
+      .then(() => router.push("/dashboard"))
+      .catch((err) => console.log(err));
   };
 
   return (
-    <>
-      <div className="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
-          <div>
-            <img
-              className="mx-auto h-12 w-auto"
-              src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
-              alt="Workflow"
-            />
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
-          </div>
-          <form className="mt-8 space-y-6" method="POST">
-            <input type="hidden" name="remember" defaultValue="true"/>
-            <div className="rounded-md shadow-sm -space-y-px">
-              <div>
-                <label htmlFor="email-address" className="sr-only">
-                  Email address
-                </label>
-                <input
-                  onChange={(e) => setUsername(e.target.value)}
-                  id="email-address"
-                  name="username"
-                  type="text"
-                  required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                  placeholder="Username"
-                />
-              </div>
-              <div>
-                <label htmlFor="password" className="sr-only">
-                  Password
-                </label>
-                <input
-                  onChange={(e) => setPassword(e.target.value)}
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                  placeholder="Password"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                  Remember me
-                </label>
-              </div>
-
-              <div className="text-sm">
-                <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
-                  Forgot your password?
-                </a>
-              </div>
-            </div>
-
-            <div>
-              <button
-                onClick={handleLogin}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+    <Flex
+      minH={"80vh"}
+      align={"center"}
+      justify={"center"}
+      bg={useColorModeValue("gray.50", "gray.800")}
+    >
+      <Stack spacing={6} mx={"auto"} maxW={"lg"} py={6} px={6}>
+        <Stack align={"center"}>
+          <Heading fontSize={"4xl"}>Login</Heading>
+        </Stack>
+        <Box
+          rounded={"lg"}
+          bg={useColorModeValue("white", "gray.700")}
+          boxShadow={"lg"}
+          p={8}
+        >
+          <Stack spacing={4}>
+            <FormControl id="email">
+              <FormLabel>Username</FormLabel>
+              <Input type="text" name={"username"} ref={usernameInput} />
+            </FormControl>
+            <FormControl id="password">
+              <FormLabel>Password</FormLabel>
+              <Input type="password" name={"password"} ref={passwordInput} />
+            </FormControl>
+            <Stack spacing={10}>
+              <Button
+                mt={4}
+                bg={"blue.400"}
+                color={"white"}
+                _hover={{
+                  bg: "blue.500",
+                }}
+                onClick={handleClick}
               >
-                <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                  <LockClosedIcon className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400" aria-hidden="true"/>
-                </span>
                 Sign in
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </>
-  )
-};
+              </Button>
+            </Stack>
+          </Stack>
+        </Box>
+      </Stack>
+    </Flex>
+  );
+}
+
+export const getServerSideProps = withSessionSsr(
+  async function getServerSideProps({ req, res }) {
+    const { user } = req.session;
+
+    if (user) {
+      return {
+        redirect: {
+          destination: "/dashboard",
+          permanent: false,
+        },
+      };
+    }
+
+    return {
+      props: {},
+    };
+  }
+);

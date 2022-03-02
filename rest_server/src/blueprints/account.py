@@ -12,9 +12,9 @@ def hash_password(password):
     return current_app.config["partners"]["crypt"].generate_password_hash(password).decode('utf-8')
 
 
-@bp_account.route("/create", methods=['GET', 'POST'])
+@bp_account.route("/create", methods=['POST'])
 async def create():
-    post = await request.form # request.args
+    post = await request.form
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -49,14 +49,14 @@ async def create():
     }, status.HTTP_200_OK
 
 
-@bp_account.route("/connect", methods=['GET', 'POST'])
+@bp_account.route("/connect", methods=['POST'])
 async def connect():
-    post = await request.form # request.args
+    post = await request.form
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
     username = post.get("name", type=str, default=None)
-    password = post.get("password", type=str, default=None) # should have been hashed
+    password = post.get("password", type=str, default=None) # should have not been hashed
 
     if not (username and password):
         return "", status.HTTP_400_BAD_REQUEST
@@ -83,10 +83,10 @@ async def connect():
     }, status.HTTP_200_OK
 
 
-@bp_account.route("/update", methods=['GET', 'POST'])
+@bp_account.route("/update", methods=['POST'])
 async def update():
-    post = await request.form # request.args
-    if len(post) != 3:
+    post = await request.form
+    if not (2 <= len(post) <= 3):
         return "", status.HTTP_400_BAD_REQUEST
 
     user_id = post.get("id", type=str, default=None)
@@ -120,22 +120,20 @@ async def update():
     filter_q = {
         "_id": user_id
     }
-    update_q = {
-        "$set": {
-            "name": username
-        } if username else {
-            "password": hash_password(password)
-        }
-    }
+    update_q = {"$set": {}}
+    if username:
+        update_q["$set"]["name"] = username
+    if password:
+        update_q["$set"]["password"] = hash_password(password)
 
     return {
         "success": await current_app.config["partners"]["db"].update_one(COLLECTION_ACCOUNTS, filter_q, update_q)
     }, status.HTTP_200_OK
 
 
-@bp_account.route("/search", methods=['GET', 'POST'])
+@bp_account.route("/search", methods=['POST'])
 async def search():
-    post = await request.form # request.args
+    post = await request.form
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -163,9 +161,9 @@ async def search():
     }, status.HTTP_200_OK
 
 
-@bp_account.route("/delete", methods=['GET', 'POST'])
+@bp_account.route("/delete", methods=['POST'])
 async def delete():
-    post = await request.form # request.args
+    post = await request.form
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
