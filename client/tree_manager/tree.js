@@ -9,6 +9,10 @@ $(function () {
     root;
 
     tree = d3.layout.tree()
+    .nodeSize([30,])
+    .separation(function separation(a, b) { 
+        return a.parent == b.parent ? 5 : 1;
+    })
     .size([height, width]);
 
     diagonal = d3.svg.diagonal()
@@ -48,7 +52,7 @@ $(function () {
             if (Array.isArray(node[key])){ //On rencontre un JSON Array
                 let arrayNode = parentNode.addArrayChild(key);
                 for (let i = 0; i < node[key].length; i++){
-                    let arrayChildNode = arrayNode.addObjectChild()
+                    let arrayChildNode = arrayNode.addObjectChild(arrayNode.children.length)
                     rec(syntax, node[key][i], arrayChildNode)
 
                 }
@@ -56,7 +60,7 @@ $(function () {
                 let objectNode = parentNode.addObjectChild(key);
                 rec(syntax, node[key], objectNode);
 
-            } else{ //On rencontre une string (on arrive au bout de la branche de l'arbre)
+            } else { //On rencontre une string (on arrive au bout de la branche de l'arbre)
             }
         }
     }
