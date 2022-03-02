@@ -43,32 +43,40 @@ $(function () {
 
     // update(root);
 
-    function rec(syntax, node){
+    function nodeType(elem){
+        console.log(elem);
+    }
+
+    function rec(syntax, node, parentNode){
         for (const key in node){
             // console.log("KEY " + key)
-                if (Array.isArray(node[key])){
+            // console.log(node)
+                if (Array.isArray(node[key])){ //On rencontre un JSON Array
+                    let arrayNode = parentNode.addArrayChild(key);
+                    // console.log(arrayNode)
                     for (let i = 0; i < node[key].length; i++){
-                        console.log(node[key][i]);
-                        rec(syntax, node[key][i])
+                        // nodeType(node[key][i]);
+                        rec(syntax, node[key][i], arrayNode)
                     }
-                } else if (typeof node[key] === "object"){
-                    console.log(node[key])
-                    rec(syntax, node[key]);
-                } else{
-                    console.log(node[key])
+                } else if (typeof node[key] === "object"){ //On rencontre un JSON Object
+                    let objectNode = parentNode.addObjectChild(key);
+                    // nodeType(node[key])
+                    rec(syntax, node[key], objectNode);
+                } else{ //On rencontre une string (on arrive au bout de la branche de l'arbre)
+                    nodeType(node[key])
                 }
         }
     }
 
     function createTreeFromJson(json){
-    	let test  = $.getJSON("../syntax/syntax.json", function(syntax){
+    	$.getJSON("../syntax/syntax.json", function(syntax){
     		// console.log(data)
             $.getJSON("json/example.json",function(json){
                 // console.log(syntax);
                 // console.log(json);
                 root = new MainNode();
                 // console.log(Object.keys(json["root"]))
-                rec(syntax, json["root"])
+                rec(syntax, json["root"], root)
             });
     	});
     	// $.getJSON("json/example.json",function(json){
@@ -79,6 +87,6 @@ $(function () {
 
     }
     createTreeFromJson("");
-    test = new MainNode();
-    screens = test.addArrayChild("Screen");
+    // test = new MainNode();
+    // screens = test.addArrayChild("Screen");
 });
