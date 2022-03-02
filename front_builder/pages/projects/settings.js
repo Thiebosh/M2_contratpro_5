@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Center,
   Flex,
   FormControl,
   FormLabel,
@@ -17,18 +18,20 @@ import requireAuth from "../../components/utils/requireAuth";
 export default function Settings({ user }) {
   const toast = useToast();
   const renameInput = useRef();
+  const projectID = "621f800a3be54c21de916f1e";
 
   const handleSubmit = (e) => {
     e.preventDefault();
     $.ajax({
-      url: "http://localhost:8001/project/delete",
+      url: "http://localhost:8001/project/update",
       type: "POST",
       data: {
         id: projectID,
+        name: renameInput.current.value,
       },
       success: function (resp) {
         toast({
-          title: "Project created",
+          title: "Project renamed",
           description: "Name : " + renameInput.current.value,
           status: "success",
           duration: 9000,
@@ -39,7 +42,7 @@ export default function Settings({ user }) {
       error: function () {
         toast({
           title: "Error",
-          description: "Name : " + renameInput.current.value,
+          description: "Name : " + renameInput.current.value + "invalid",
           status: "error",
           duration: 9000,
           isClosable: true,
@@ -74,17 +77,19 @@ export default function Settings({ user }) {
               <FormLabel htmlFor="rename">Rename</FormLabel>
               <Input id="name" type="text" ref={renameInput} />
             </FormControl>
-            <Button
-              mt={6}
-              bg={"blue.400"}
-              color={"white"}
-              _hover={{
-                bg: "blue.500",
-              }}
-              type={"submit"}
-            >
-              Save
-            </Button>
+            <Center>
+              <Button
+                mt={6}
+                bg={"blue.400"}
+                color={"white"}
+                _hover={{
+                  bg: "blue.500",
+                }}
+                type={"submit"}
+              >
+                Save
+              </Button>
+            </Center>
           </form>
         </Stack>
       </Box>

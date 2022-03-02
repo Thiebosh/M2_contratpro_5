@@ -27,7 +27,7 @@ import Link from "next/link";
 import $ from "jquery";
 import requireAuth from "../../components/utils/requireAuth";
 
-const idUser = "bentest";
+const idUser = "61e131ce9c11b699edc38a1e";
 
 export default function Projects() {
   const [projects, setProjects] = useState([]);
@@ -98,16 +98,17 @@ export default function Projects() {
                         icon={<EditIcon />}
                       />
                     </Link>
-                    <IconButton
-                      aria-label="settings"
-                      mx={1}
-                      icon={<SettingsIcon />}
-                    />
+                    <Link href="/projects/settings">
+                      <IconButton
+                        aria-label="settings"
+                        mx={1}
+                        icon={<SettingsIcon />}
+                      />
+                    </Link>
                     <IconButton
                       aria-label="delete"
                       mx={1}
                       icon={<DeleteIcon />}
-                      //onClick={this.handleClick(console.log("ffff"))}
                     />
                   </Td>
                 </Tr>
