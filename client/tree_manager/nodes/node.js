@@ -14,7 +14,7 @@ class Node {
         if (!this.children) {
             this.children = [];
         }
-        this.children.push(child);
+        this.children.splice(-1, 0, child);
     }
 
     addArrayChild(name){
