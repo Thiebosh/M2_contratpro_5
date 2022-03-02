@@ -23,6 +23,7 @@ $(function () {
 
     socket.onerror = function(error) {
         console.log(`[error] ${error.message}`);
+        
     };
 
     socket.onmessage = function(event) {
