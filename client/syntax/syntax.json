@@ -80,7 +80,7 @@
     },
     "inputText": {
         "type": "input",
-        "nature": "textarea"
+        "nature": "text"
     },
     "inputNumber": {
         "type": "input",
