@@ -6,7 +6,7 @@ const requireAuth = async function getServerSideProps({ req }) {
   if (!user) {
     return {
       redirect: {
-        destination: "/account/login",
+        destination: "/auth/login",
         permanent: false,
       },
     };
