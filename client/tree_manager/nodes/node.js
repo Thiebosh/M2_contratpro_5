@@ -41,13 +41,13 @@ class Node {
     }
 
     editNode(node){
-        $("#nodeName").val("");
-        $("#nodeName").attr("placeholder", node.name);
-        $("#nodeName").on("keypress", function(e){
+        $("#nodeNameInput").val("");
+        $("#nodeNameInput").attr("placeholder", node.name);
+        $("#nodeNameInput").on("keypress", function(e){
             if(e.keyCode == 13){
-                $("#nodeName").blur();
+                $("#nodeNameInput").blur();
                 this.saveNodeName(node);
-                $("#nodeName").off("keypress");
+                $("#nodeNameInput").off("keypress");
             }
         }.bind(this));
         $("#nodeSettings").attr("nodeId", node.path);
@@ -55,7 +55,7 @@ class Node {
     }
 
     saveNodeName(node){
-        node.name = $("#nodeName").val();
+        node.name = $("#nodeNameInput").val();
         d3.select("#" + node.path).select("text").text(node.name);
         $("#nodeSettings").modal("hide");
     }
