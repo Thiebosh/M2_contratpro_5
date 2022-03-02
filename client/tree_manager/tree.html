@@ -70,52 +70,28 @@ var svg = d3.select("body").append("svg")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
-// treeData = [
-// 	{
-// 		"name" : "Root",
-// 		"parent" : "null",
-// 		"path":"root",
-// 		"children" : [
-// 			{
-// 			"name":"Screens",
-// 			"parent":"Root",
-// 			"path":"root_screens",
-// 			"children": [
-// 				{
-// 					"name":"+",
-// 					"parent":"Screens",
-// 					"type" : "add",
-// 				}
-// 			]
-// 			}
-// 		]
-// 	}
-// ]
+treeData = [
+	{
+		"name" : "Root",
+		"parent" : "null",
+		"path":"root",
+		"children" : [
+			{
+			"name":"Screens",
+			"parent":"Root",
+			"path":"root_screens",
+			"children": []
+			}
+		]
+	}
+]
 // root = treeData[0];
 // root.x0 = height/2;
 // root.y0 = 0;
   
 // update(root);
 
-// d3.select(self.frameElement).style("height", "500px");
 
-
-
-
-
-
-
-
-// root = new MainNode()
-// root = new MainNode()
-// test = root.addChild("test");
-// test2 = root.addChild("test2");
-// test3 = root.addChild("test3");
-// test2.addChild("bébé")
-
-
-// dat = root.toJson()
-// update(dat)
 
 
 
@@ -126,34 +102,41 @@ var svg = d3.select("body").append("svg")
 
 
 class Node {
-	constructor(name, parent= null, root= null){
+	constructor(name, parent= null){
 		this.name = name;
 		this.children = [];
 		this.parent = parent;
 		this.path = parent == null ? "root" : parent.path + "_" + name;
-		this.root = root;
+		this.root = parent == null ? this : parent.root;
 		this.depth = parent == null ? 0 : this.parent.depth + 1 ;
 		this.element = null;
 
 	}
 
-	addChild(name){
-		let child = new Node(name, this, this.root);
+	addChildToChildren(child){
 		if (!this.children) {
 			this.children = [];
 		}
 		this.children.push(child);
+	}
+
+	addArrayChild(name){
+		let child = new ArrayNode(name, this);
+		this.addChildToChildren(child);
+		this.update(child.parent);
+		return child;
+	}
+
+	addObjectChild(name){
+		let child = new ObjectNode(name, this);
+		this.addChildToChildren(child);
 		this.update(child.parent);
 		return child;
 	}
 
 	addAddingChild(){
 		let child = new AddingNode(this);
-		if (!this.children) {
-			this.children = [];
-		}
-		this.children.push(child);
-		this.update(this);
+		this.addChildToChildren(child);
 		return child;
 	}
 
@@ -191,7 +174,6 @@ class Node {
 			.data(nodes, function(d) { return d.id || (d.id = ++i); });
 
 		// Enter any new nodes at the parent's previous position.
-		// console.log(source)
 		var nodeEnter = node.enter().append("g")
 		.attr("class", function(d){return d.type ? "node " + d.type : "node"})
 		.attr("id", function(d){return d.path})
@@ -280,11 +262,11 @@ class MainNode extends Node {
 
 class AddingNode extends Node {
 	constructor(parent){
-		super("+", parent, parent.root);
+		super("+", parent);
 	}
 	
 	click() {
-		let screenNode = new ScreenNode("Screen " + (this.parent.children.length), this.parent)
+		let screenNode = new ObjectNode("Screen " + (this.parent.children.length), this.parent)
 		screenNode.path = this.parent.path + "_" + String(this.parent.children.length - 1);
 		this.parent.children.splice(-1, 0, screenNode);
 		this.update(this.parent)
@@ -298,17 +280,26 @@ class AddingNode extends Node {
 	}
 }
 
-class ScreenNode extends Node {
+class ArrayNode extends Node {
 	constructor(name, parent){
 		super(name, parent);
+		this.addAddingChild();
 	}
 }
 
+class ObjectNode extends Node {
+	constructor(name, parent){
+		super(name, parent);
+		this.addAddingChild();
+	}
+}
+
+function createTreeFromJson(json){
+
+}
 
 test = new MainNode();
-screens = test.addChild("Screens")
-// screens.addAddingChild();
-screens.addAddingChild()
+screens = test.addArrayChild("Screen")
 </script>
 	
   </body>
