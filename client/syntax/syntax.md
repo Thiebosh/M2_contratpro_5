@@ -14,10 +14,6 @@
 - La sélection d'un array insère un nouvel objet dans une liste dans le json
 - Les autres règles sont héritées de Object
 
-## Chunk_array
-- Les values de chaque objet sont regroupés dans un enfant intermédaire (règle affichage seulement)
-- Les autres règles sont héritées de Array
-
 ## Field
 - La sélection d'un field crée une entrée utilisateur suivant les règles décrites dans l'objet désigné par le champ field
 

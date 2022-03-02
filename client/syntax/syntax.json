@@ -31,7 +31,7 @@
     },
 
     "screen": {
-        "type": "chunk_array",
+        "type": "array",
         "values": [
             "name",
             "?inputHome",
