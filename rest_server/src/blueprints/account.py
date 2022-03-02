@@ -120,13 +120,11 @@ async def update():
     filter_q = {
         "_id": user_id
     }
-    update_q = {
-        "$set": {
-            "name": username
-        } if username else {
-            "password": hash_password(password)
-        }
-    }
+    update_q = {"$set": {}}
+    if username:
+        update_q["$set"]["name"] = username
+    if password:
+        update_q["$set"]["password"] = hash_password(password)
 
     return {
         "success": await current_app.config["partners"]["db"].update_one(COLLECTION_ACCOUNTS, filter_q, update_q)
