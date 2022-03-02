@@ -122,11 +122,6 @@ var svg = d3.select("body").append("svg")
 
 
 
-function saveNodeName(node){
-	node.name = $("#nodeName").val();
-	d3.select("#" + node.path).select("text").text(node.name);
-	$("#nodeSettings").modal("hide");
-}
 
 
 
@@ -170,13 +165,19 @@ class Node {
 		$("#nodeName").attr("placeholder", node.name);
 		$("#nodeName").on("keypress", function(e){
 			if(e.keyCode == 13){
-				this.blur();
-				saveNodeName(node);
+				$("#nodeName").blur();
+				this.saveNodeName(node);
 				$("#nodeName").off("keypress");
 			}
-		});
+		}.bind(this));
 		$("#nodeSettings").attr("nodeId", node.path);
 		$("#nodeSettings").modal("show");
+	}
+
+	saveNodeName(node){
+		node.name = $("#nodeName").val();
+		d3.select("#" + node.path).select("text").text(node.name);
+		$("#nodeSettings").modal("hide");
 	}
 
 	update(source) {
@@ -265,13 +266,6 @@ class Node {
 		});
 		}
 
-	toJson(){
-		let data = {"name" : this.name,
-		"parent" : this.parent,
-		"children": this.children
-		}
-		return data;
-	}
 
 }
 
