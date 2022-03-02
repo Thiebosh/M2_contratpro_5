@@ -43,11 +43,34 @@ $(function () {
 
     // update(root);
 
+    function rec(syntax, node){
+        for (const key in node){
+            // console.log("KEY " + key)
+                if (Array.isArray(node[key])){
+                    for (let i = 0; i < node[key].length; i++){
+                        console.log(node[key][i]);
+                        rec(syntax, node[key][i])
+                    }
+                } else if (typeof node[key] === "object"){
+                    console.log(node[key])
+                    rec(syntax, node[key]);
+                } else{
+                    console.log(node[key])
+                }
+        }
+    }
+
     function createTreeFromJson(json){
-    	let test  = $.getJSON("../syntax/syntax.json", function(data){
-    		console.log(JSON.stringify(data))
+    	let test  = $.getJSON("../syntax/syntax.json", function(syntax){
+    		// console.log(data)
+            $.getJSON("json/example.json",function(json){
+                // console.log(syntax);
+                // console.log(json);
+                root = new MainNode();
+                // console.log(Object.keys(json["root"]))
+                rec(syntax, json["root"])
+            });
     	});
-    	// console.log(test);
     	// $.getJSON("json/example.json",function(json){
     	// 	root = new MainNode();
 
