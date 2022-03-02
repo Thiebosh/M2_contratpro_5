@@ -4,6 +4,7 @@ import {
   Center,
   Container,
   IconButton,
+  Link,
   Table,
   TableCaption,
   Tbody,
@@ -17,7 +18,7 @@ import {
 } from "@chakra-ui/react";
 import dayjs from "dayjs";
 
-import { EditIcon } from "@chakra-ui/icons";
+import { DeleteIcon, EditIcon, SettingsIcon } from "@chakra-ui/icons";
 import { useEffect, useState } from "react";
 import $ from "jquery";
 import requireAuth from "../../components/utils/requireAuth";
@@ -64,13 +65,12 @@ export default function Projets() {
         <Wrap direction="column">
           <Table variant="simple">
             <TableCaption>Liste des projets en cours</TableCaption>
-            <div className="numberProjects"></div>
             <Thead>
               <Tr>
                 <Th>Nom</Th>
                 <Th>Date de création</Th>
                 <Th>Dernière modification au</Th>
-                <Th>Action</Th>
+                <Th>Actions</Th>
               </Tr>
             </Thead>
             <Tbody>
@@ -80,7 +80,23 @@ export default function Projets() {
                   <Td>{dayjs(project.creation).format("D MMMM YYYY")}</Td>
                   <Td>{dayjs(project.last_specs).format("D MMMM YYYY")}</Td>
                   <Td>
-                    <IconButton aria-label="modifier" icon={<EditIcon />} />
+                    <Link href="/dashboard">
+                      <IconButton
+                        aria-label="modifier"
+                        mx={1}
+                        icon={<EditIcon />}
+                      />
+                    </Link>
+                    <IconButton
+                      aria-label="settings"
+                      mx={1}
+                      icon={<SettingsIcon />}
+                    />
+                    <IconButton
+                      aria-label="delete"
+                      mx={1}
+                      icon={<DeleteIcon />}
+                    />
                   </Td>
                 </Tr>
               ))}
