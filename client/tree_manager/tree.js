@@ -43,19 +43,19 @@ $(function () {
 
     // update(root);
 
-    // function createTreeFromJson(json){
-    // 	let test  = $.getJSON("syntax/syntax.json", function(data){
-    // 		console.log(JSON.stringify(data))
-    // 	});
-    // 	console.log(test);
-    // 	$.getJSON("example.json",function(json){
-    // 		root = new MainNode();
+    function createTreeFromJson(json){
+    	let test  = $.getJSON("../syntax/syntax.json", function(data){
+    		console.log(JSON.stringify(data))
+    	});
+    	// console.log(test);
+    	// $.getJSON("json/example.json",function(json){
+    	// 	root = new MainNode();
 
-    // 		console.log(json[Object.keys(json)[0]]);
-    // 	})
+    	// 	console.log(json[Object.keys(json)[0]]);
+    	// })
 
-    // }
-    // createTreeFromJson("");
+    }
+    createTreeFromJson("");
     test = new MainNode();
     screens = test.addArrayChild("Screen");
 });
