@@ -79,6 +79,24 @@ class PhpPartner():
         return self._post("remove_folder", { "project_name": project_name })[0]
 
 
+    def set_session(self, session):
+        if not self.state:
+            return False
+
+        print(self._post("set_session", { "session": session}, get_code=True, print_=True))
+
+        return True
+
+
+    def get_session(self):
+        if not self.state:
+            return False
+
+        print(self._get("get_session", get_code=True, print_=True))
+
+        return "{}"
+
+
     def get_project_page(self, project_name, page):
         if not self.state:
             return False

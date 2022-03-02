@@ -94,7 +94,7 @@ class MongoPartner:
         return list(self.collections[collection].find(filter_q, fields))
 
 
-    def aggregate(self, collection, aggregation):
+    def aggregate_list(self, collection, aggregation):
         if collection not in self.collections:
             return False
 
