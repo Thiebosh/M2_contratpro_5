@@ -98,7 +98,7 @@ export default function NavBar() {
                 </Link>
               ))}
               <MenuDivider />
-              <Link href="/account/logout">
+              <Link href="/auth/logout">
                 <a>
                   <MenuItem>Logout</MenuItem>
                 </a>

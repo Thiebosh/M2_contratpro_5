@@ -13,12 +13,14 @@ import {
 } from "@chakra-ui/react";
 import { useRef } from "react";
 import $ from "jquery";
-import requireAuth from "../../components/utils/requireAuth";
+import requireAuth from "../../../components/utils/requireAuth";
+import { useRouter } from "next/router";
 
 export default function Settings({ user }) {
   const toast = useToast();
   const renameInput = useRef();
-  const projectID = "621f800a3be54c21de916f1e";
+  const router = useRouter();
+  const { projectId } = router.query;
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -39,22 +41,22 @@ export default function Settings({ user }) {
         });
         console.log(resp);
       },
-      error: function () {
+      error: function (error) {
         toast({
           title: "Error",
-          description: "Name : " + renameInput.current.value + "invalid",
+          description: error,
           status: "error",
           duration: 9000,
           isClosable: true,
         });
-        console.log("failure");
+        console.log(error);
       },
     });
   };
 
   return (
     <Flex
-      minH={"80vh"}
+      minH={"90vh"}
       align={"center"}
       justify={"center"}
       bg={useColorModeValue("gray.50", "gray.800")}
