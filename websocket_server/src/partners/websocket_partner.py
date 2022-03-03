@@ -60,7 +60,8 @@ class WebSocketPartner():
         return ret.encode("latin-1").decode(encoding) # raw str to latin-1 bytes + bytes to utf-8 str
 
     @staticmethod
-    def send(conn, data, encoding):
+    def send(conn, data:str, encoding):
+        data = data.encode(encoding).decode("latin-1")
         head = b'\x81'
         if len(data) < 126:
             head += struct.pack('B', len(data))
