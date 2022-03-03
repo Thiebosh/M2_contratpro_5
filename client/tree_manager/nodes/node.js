@@ -14,7 +14,7 @@ class Node {
         if (!this.children) {
             this.children = [];
         }
-        this.children.push(child);
+        this.children.splice(-1, 0, child);
     }
 
     addArrayChild(name){
@@ -72,12 +72,19 @@ class Node {
 
         // Enter any new nodes at the parent's previous position.
         var nodeEnter = node.enter().append("g")
-        .attr("class", function(d){return d.type ? "node " + d.type : "node"})
+        .attr("class", function(d){
+            let objectName = d.constructor.name;
+            return "node " + objectName.charAt(0).toLowerCase() + objectName.slice(1);
+        })
         .attr("id", function(d){return d.path})
         .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
         .on("click", function(d){d.click();});
         
+        // console.log(nodeEnter)
         nodeEnter.append("circle")
+        // .attr("r", function(d){
+        //     return d.constructor.name == "AddingNode" ? 10 : 30;
+        // })
         .attr("r", 30)
         .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
 
@@ -93,8 +100,11 @@ class Node {
             .attr("transform", function(d) {return "translate(" + d.y + "," + d.x + ")"; });
 
         nodeUpdate.select("circle")
-            .attr("r", 30)
-            .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+        .attr("r", 30)
+        // .attr("r", function(d){
+        //     return d.constructor.name == "AddingNode" ? 10 : 30;
+        // })
+        .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
 
         nodeUpdate.select("text")
             .style("fill-opacity", 1);

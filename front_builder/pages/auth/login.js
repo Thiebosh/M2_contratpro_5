@@ -33,7 +33,7 @@ export default function Login() {
 
   return (
     <Flex
-      minH={"80vh"}
+      minH={"90vh"}
       align={"center"}
       justify={"center"}
       bg={useColorModeValue("gray.50", "gray.800")}
