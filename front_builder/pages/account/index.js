@@ -23,9 +23,9 @@ const idUser = "61e131ce9c11b699edc38a1e";
 import requireAuth from "../../components/utils/requireAuth";
 
 export default function Account() {
-  const toast = useToast();
   const newUserNameInput = useRef();
   const newPasswordInput = useRef();
+  const toast = useToast();
 
   function changeDataAccount() {
     const data = {
@@ -33,15 +33,27 @@ export default function Account() {
       name: newUserNameInput.current.value,
       password: newPasswordInput.current.value,
     };
-    console.log(data);
     $.ajax({
       url: "http://localhost:8001/account/update",
       type: "POST",
       data: data,
       success: function (resp) {
+        toast({
+          title: "Données sauvegardées",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
         console.log(resp);
       },
       error: function () {
+        toast({
+          title: "Error",
+          description: "erreur rrjsncs",
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
         console.log("failure");
       },
     });
@@ -135,7 +147,6 @@ export default function Account() {
                 bg: "blue.500",
               }}
               onClick={changeDataAccount}
-              // onClick={popUpDataSaved}
             >
               Submit
             </Button>
