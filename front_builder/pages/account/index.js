@@ -1,26 +1,149 @@
-import { Input, Avatar, Flex, Stack, Wrap, WrapItem } from "@chakra-ui/react";
+import {
+  Avatar,
+  AvatarBadge,
+  Button,
+  Center,
+  Container,
+  Flex,
+  FormControl,
+  FormLabel,
+  Heading,
+  IconButton,
+  Input,
+  Stack,
+  useColorModeValue,
+  useToast,
+} from "@chakra-ui/react";
+import { SmallCloseIcon } from "@chakra-ui/icons";
+import $ from "jquery";
+import { withSessionSsr } from "../../lib/withSession";
+import { useRef } from "react";
+
+const idUser = "61e131ce9c11b699edc38a1e";
+import requireAuth from "../../components/utils/requireAuth";
 
 export default function Account() {
-  const name = "Benjamin";
-  const password = "ben";
+  const toast = useToast();
+  const newUserNameInput = useRef();
+  const newPasswordInput = useRef();
+
+  function changeDataAccount() {
+    const data = {
+      id: idUser,
+      name: newUserNameInput.current.value,
+      password: newPasswordInput.current.value,
+    };
+    console.log(data);
+    $.ajax({
+      url: "http://localhost:8001/account/update",
+      type: "POST",
+      data: data,
+      success: function (resp) {
+        console.log(resp);
+      },
+      error: function () {
+        console.log("failure");
+      },
+    });
+  }
+
+  function popUpDataSaved() {
+    toast({
+      title: "Données sauvegardées",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+    });
+  }
 
   return (
-    <div className="profilePage">
-      <Flex>
-        <div className="avatar">
-          <Wrap>
-            <WrapItem>
-              <Avatar size="xl" src="https://bit.ly/code-beast" />
-            </WrapItem>
-          </Wrap>
-        </div>
-        <div className="infos">
-          <Stack spacing={3}>
-            <Input variant="flushed" placeholder="Name" />
-            <Input variant="flushed" placeholder="Password" />
+    <Container maxW={"container.xl"}>
+      <Flex
+        minH={"50vh"}
+        align={"center"}
+        justify={"center"}
+        bg={useColorModeValue("gray.50", "gray.800")}
+      >
+        <Stack
+          spacing={4}
+          w={"full"}
+          maxW={"md"}
+          bg={useColorModeValue("white", "gray.700")}
+          rounded={"xl"}
+          boxShadow={"lg"}
+          p={6}
+          my={12}
+        >
+          <Heading lineHeight={1.1} fontSize={{ base: "xl", sm: "3xl" }}>
+            User Profile Edit
+          </Heading>
+          <FormControl id="userName">
+            <FormLabel>User Icon</FormLabel>
+            <Stack direction={["column", "row"]} spacing={6}>
+              <Center>
+                <Avatar size="xl" src="https://bit.ly/code-beast">
+                  <AvatarBadge
+                    as={IconButton}
+                    size="sm"
+                    rounded="full"
+                    top="-10px"
+                    colorScheme="red"
+                    aria-label="remove Image"
+                    icon={<SmallCloseIcon />}
+                  />
+                </Avatar>
+              </Center>
+              <Center w="full">
+                <Button w="full">Change Icon</Button>
+              </Center>
+            </Stack>
+          </FormControl>
+          <FormControl id="newUserNameInput">
+            <FormLabel>Change your user name</FormLabel>
+            <Input
+              placeholder="New UserName"
+              _placeholder={{ color: "gray.500" }}
+              type="text"
+              ref={newUserNameInput}
+            />
+          </FormControl>
+          <FormControl id="newPasswordInput ">
+            <FormLabel>Change your password</FormLabel>
+            <Input
+              placeholder="New password"
+              _placeholder={{ color: "gray.500" }}
+              type="password"
+              ref={newPasswordInput}
+            />
+          </FormControl>
+          <Stack spacing={6} direction={["column", "row"]}>
+            <Button
+              bg={"red.400"}
+              color={"white"}
+              w="full"
+              _hover={{
+                bg: "red.500",
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              bg={"blue.400"}
+              color={"white"}
+              w="full"
+              _hover={{
+                bg: "blue.500",
+              }}
+              onClick={changeDataAccount}
+              // onClick={popUpDataSaved}
+            >
+              Submit
+            </Button>
           </Stack>
-        </div>
+        </Stack>
       </Flex>
-    </div>
+    </Container>
   );
 }
+
+export const getServerSideProps = requireAuth;

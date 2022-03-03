@@ -24,7 +24,7 @@ class MongoPartnerMock:
     async def find_list(self, *_):
         return DOC_LIST
 
-    async def aggregate(self, *_):
+    async def aggregate_list(self, *_):
         return DOC_LIST
 
     async def delete_one(self, *_):

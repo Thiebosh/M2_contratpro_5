@@ -31,7 +31,7 @@
     },
 
     "screen": {
-        "type": "array",
+        "type": "chunk_array",
         "values": [
             "name",
             "?inputHome",
@@ -80,7 +80,7 @@
     },
     "inputText": {
         "type": "input",
-        "nature": "textarea"
+        "nature": "text"
     },
     "inputNumber": {
         "type": "input",

@@ -1,9 +1,7 @@
-import { Fragment } from "react";
-import Link from "next/link";
-import { Disclosure, Menu, Transition } from "@headlessui/react";
-import { BellIcon, MenuIcon, XIcon } from "@heroicons/react/outline";
-import { Box, Image } from "@chakra-ui/react";
-import NavBar from "./NavBar";
+import { Box } from "@chakra-ui/react";
+import NavBar from "../navigation/NavBar";
+import Header from "./Header";
+import Footer from "./Footer";
 
 const user = {
   name: "Tom Cook",
@@ -31,8 +29,10 @@ export default function Layout({ children }) {
 
   return (
     <>
+      <Header />
       <NavBar />
       <Box>{children}</Box>
+      <Footer />
     </>
   );
 }
