@@ -1,14 +1,18 @@
 $(function () {
     // ************** Generate the tree diagram	 *****************
     margin = {top: 20, right: 120, bottom: 20, left: 120};
-    width = 960 - margin.right - margin.left;
-    height = 500 - margin.top - margin.bottom;
+    width = 1500;
+    height = 1000;
 
     i = 0;
     duration = 500;
     root;
 
     tree = d3.layout.tree()
+    .nodeSize([30,])
+    .separation(function separation(a, b) { 
+        return a.parent == b.parent ? 5 : 1;
+    })
     .size([height, width]);
 
     diagonal = d3.svg.diagonal()
@@ -43,42 +47,32 @@ $(function () {
 
     // update(root);
 
-    function rec(syntax, node){
+    function rec(syntax, node, parentNode){
         for (const key in node){
-            // console.log("KEY " + key)
-                if (Array.isArray(node[key])){
-                    for (let i = 0; i < node[key].length; i++){
-                        console.log(node[key][i]);
-                        rec(syntax, node[key][i])
-                    }
-                } else if (typeof node[key] === "object"){
-                    console.log(node[key])
-                    rec(syntax, node[key]);
-                } else{
-                    console.log(node[key])
+            if (Array.isArray(node[key])){ //On rencontre un JSON Array
+                let arrayNode = parentNode.addArrayChild(key);
+                for (let i = 0; i < node[key].length; i++){
+                    let arrayChildNode = arrayNode.addObjectChild(arrayNode.children.length)
+                    rec(syntax, node[key][i], arrayChildNode)
+
                 }
+            } else if (typeof node[key] === "object"){ //On rencontre un JSON Object
+                let objectNode = parentNode.addObjectChild(key);
+                rec(syntax, node[key], objectNode);
+
+            } else { //On rencontre une string (on arrive au bout de la branche de l'arbre)
+            }
         }
     }
 
     function createTreeFromJson(json){
-    	let test  = $.getJSON("../syntax/syntax.json", function(syntax){
-    		// console.log(data)
+    	$.getJSON("../syntax/syntax.json", function(syntax){
             $.getJSON("json/example.json",function(json){
-                // console.log(syntax);
-                // console.log(json);
                 root = new MainNode();
-                // console.log(Object.keys(json["root"]))
-                rec(syntax, json["root"])
+                rec(syntax, json["root"], root)
             });
     	});
-    	// $.getJSON("json/example.json",function(json){
-    	// 	root = new MainNode();
-
-    	// 	console.log(json[Object.keys(json)[0]]);
-    	// })
 
     }
     createTreeFromJson("");
-    test = new MainNode();
-    screens = test.addArrayChild("Screen");
 });

@@ -12,7 +12,9 @@ import {
   MenuItem,
   MenuList,
   Stack,
+  Text,
   useColorMode,
+  useColorModeValue,
   useDisclosure,
 } from "@chakra-ui/react";
 import { CloseIcon, HamburgerIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
@@ -22,7 +24,7 @@ import Link from "next/link";
 const NavLink = ({ link }) => (
   <Link href={link.href}>
     <a>
-      <Button colorScheme="blue" variant="ghost">
+      <Button colorScheme="gray.200" variant="ghost">
         {link.label}
       </Button>
     </a>
@@ -46,7 +48,12 @@ export default function NavBar() {
   ];
 
   return (
-    <Box boxShadow="base" px={4}>
+    <Box
+      boxShadow="md"
+      px={4}
+      bgColor={useColorModeValue("blue.600", "gray.900")}
+      color={"white"}
+    >
       <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
         <IconButton
           size={"md"}
@@ -57,7 +64,7 @@ export default function NavBar() {
         />
 
         <HStack spacing={8} alignItems={"center"}>
-          <Box>LOGO</Box>
+          <Text fontWeight={"bold"}>&lt;SpecTry/&gt;</Text>
           <HStack as={"nav"} spacing={4} display={{ base: "none", md: "flex" }}>
             {links.map((link) => (
               <NavLink key={link.label} link={link} />
@@ -70,7 +77,7 @@ export default function NavBar() {
             mr={2}
             onClick={toggleColorMode}
             icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
-            aria-label={"Toggle dark mode"}
+            variant={""}
           />
           <Menu>
             <MenuButton
@@ -80,9 +87,9 @@ export default function NavBar() {
               cursor={"pointer"}
               minW={0}
             >
-              <Avatar size={"sm"} bg={"blue.500"} />
+              <Avatar size={"sm"} />
             </MenuButton>
-            <MenuList>
+            <MenuList color={"gray.800"}>
               {accountLinks.map((link) => (
                 <Link href={link.href} key={link.href}>
                   <a>
@@ -91,7 +98,7 @@ export default function NavBar() {
                 </Link>
               ))}
               <MenuDivider />
-              <Link href="/account/logout">
+              <Link href="/auth/logout">
                 <a>
                   <MenuItem>Logout</MenuItem>
                 </a>
