@@ -25,14 +25,20 @@ class RenderPage():
                 }
             }
         ]
-        session = self.partners["db"].aggregate_list(COLLECTION_PROJECTS, aggregation)[0]
+        # session = self.partners["db"].aggregate_list(COLLECTION_PROJECTS, aggregation)[0]
+        session = {
+            "test": "un test"
+        }
         print(session)
         if not self.partners["renderer"].set_session(json.dumps(session)):
             raise Exception("RenderPage - PHP - session not setted")
 
 
     def close(self):
-        session = self.partners["renderer"].get_session()
+        success, session = self.partners["renderer"].get_session()
+        print(success)
+        print(session)
+        return
 
         filter_q = {
             "name": self.project_name
