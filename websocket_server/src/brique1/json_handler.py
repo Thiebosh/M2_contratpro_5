@@ -34,6 +34,7 @@ class JsonHandler():
         ]
         self.data = self.partners["db"].aggregate_list(COLLECTION_PROJECTS, aggregation)[0]
 
+
     def close(self):
         result = self.update_storage()
         print(f"{self.project_name} - Mongo - Project {'well' if result else 'not'} updated")
