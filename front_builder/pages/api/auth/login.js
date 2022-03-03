@@ -1,6 +1,7 @@
-import { withSessionRoute, withSessionSsr } from "../../../lib/withSession";
-
-export default withSessionRoute(loginRoute);
+import { withSessionRoute } from "../../../lib/withSession";
+import connectDB from "../../../middleware/mongodb";
+import User from "../../../models/user";
+import bcrypt from "bcryptjs";
 
 async function loginRoute(req, res) {
   // get user from database then:
@@ -11,35 +12,26 @@ async function loginRoute(req, res) {
 
   const { username, password } = req.body;
 
-  if (username === "test" && password === "test") {
-    req.session.user = {
-      id: "61e131ce9c11b699edc38a1e",
-      admin: true,
-    };
-    await req.session.save();
-    res.status(200).json({ message: "logged in" });
-  } else {
-    res.status(403).json({ message: "Wrong credentials" });
-  }
+  User.findOne({ name: username })
+    .then(async (user) => {
+      if (user) {
+        if (bcrypt.compareSync(password, user.password)) {
+          // id: 61e131ce9c11b699edc38a1e
+          req.session.user = {
+            id: user.id,
+          };
+          await req.session.save();
+          res.status(200).json({ message: "logged in" });
+          return;
+        }
+      }
+
+      res.status(403).json({ message: "Wrong credentials" });
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status(400).json({ message: error });
+    });
 }
 
-export const getServerSideProps = withSessionSsr(
-  async function getServerSideProps({ req, res }) {
-    const { user } = req.session;
-    console.log("user", user);
-    console.log("session", req.session);
-
-    if (!user) {
-      return {
-        redirect: {
-          destination: "/auth/login",
-          permanent: false,
-        },
-      };
-    }
-
-    return {
-      props: { user },
-    };
-  }
-);
+export default connectDB(withSessionRoute(loginRoute));

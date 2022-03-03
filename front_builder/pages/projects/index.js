@@ -5,27 +5,17 @@ import {
   Center,
   Container,
   Flex,
-  FormControl,
-  FormLabel,
   Heading,
   Icon,
   IconButton,
-  Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Select,
   Table,
-  TableCaption,
   Tbody,
   Td,
-  Text,
   Th,
   Thead,
   Tr,
+  useColorModeValue,
+  useToast,
   Wrap,
   WrapItem,
 } from "@chakra-ui/react";
@@ -35,34 +25,37 @@ import { AddIcon, DeleteIcon, EditIcon, SettingsIcon } from "@chakra-ui/icons";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import $ from "jquery";
-import requireAuth from "../../components/utils/requireAuth";
+import requireAuth from "../../middleware/requireAuth";
 import ProjectCreateModal from "../../components/modals/ProjectCreateModal";
 import ProjectRenameModal from "../../components/modals/ProjectRenameModal";
 import { UserIcon } from "@heroicons/react/outline";
-
-//const idUser = "61e131ce9c11b699edc38a1e";
+import ConfirmDeleteDialog from "../../components/dialogs/ConfirmDeleteDialog";
 
 export default function Projects({ user }) {
   const [projects, setProjects] = useState([]);
   const [openCreate, setOpenCreate] = useState(false);
-  const [renameProject, setRenameProject] = useState(0);
+  const [renameProjectId, setRenameProjectId] = useState(0);
+  const [deleteProjectId, setDeleteProjectId] = useState(0);
+  const toast = useToast();
 
-  useEffect(() => {
-    const dataProjects = {
-      id: user.id,
-    };
+  function getProjectsByUser() {
     $.ajax({
       url: "http://localhost:8001/project/search_by_user",
       type: "POST",
-      data: dataProjects,
+      data: {
+        id: user.id,
+      },
       success: function (resp) {
         setProjects(resp.result);
-        console.log(resp);
       },
-      error: function () {
-        console.log("failure");
+      error: function (error) {
+        console.log(error);
       },
     });
+  }
+
+  useEffect(() => {
+    getProjectsByUser();
   }, []);
 
   /* HANDLE FUNCTIONS */
@@ -74,18 +67,34 @@ export default function Projects({ user }) {
         id: projectID,
       },
       success: function (resp) {
-        console.log(resp);
+        getProjectsByUser();
+        toast({
+          title: "Project deleted",
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
       },
-      error: function () {
-        console.log("failure");
+      error: function (error) {
+        toast({
+          title: "Delete failed",
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
+        console.log(error);
       },
     });
   }
 
   return (
     <>
-      <Container maxW={"container.xl"} py={8}>
-        <Flex m={5} justifyContent={"space-between"}>
+      <Container
+        maxW={"container.xls"}
+        bg={useColorModeValue("gray.50", "gray.800")}
+        py={4}
+      >
+        <Flex mb={4} justifyContent={"space-between"}>
           <Wrap>
             <WrapItem>
               <Avatar size="xl" src="https://bit.ly/code-beast" />
@@ -96,7 +105,7 @@ export default function Projects({ user }) {
               </Center>
             </WrapItem>
           </Wrap>
-          <Box>
+          <Center w="200px" h="100px">
             <Button
               leftIcon={<AddIcon />}
               colorScheme={"blue"}
@@ -104,10 +113,15 @@ export default function Projects({ user }) {
             >
               New project
             </Button>
-          </Box>
+          </Center>
         </Flex>
 
-        <Box className="container">
+        <Box
+          rounded={"lg"}
+          bg={useColorModeValue("white", "gray.700")}
+          boxShadow={"lg"}
+          p={8}
+        >
           <Wrap direction="column">
             <Table variant="simple">
               <Thead>
@@ -129,7 +143,7 @@ export default function Projects({ user }) {
                         aria-label="modifier"
                         mx={1}
                         icon={<EditIcon />}
-                        onClick={() => setRenameProject(project.id)}
+                        onClick={() => setRenameProjectId(project.id)}
                       />
                       <Link href={`/projects/${project.id}/settings`}>
                         <IconButton
@@ -142,6 +156,7 @@ export default function Projects({ user }) {
                         aria-label="delete"
                         mx={1}
                         icon={<DeleteIcon />}
+                        onClick={() => setDeleteProjectId(project.id)}
                       />
                     </Td>
                   </Tr>
@@ -157,8 +172,15 @@ export default function Projects({ user }) {
         user={user}
       />
       <ProjectRenameModal
-        projectId={renameProject}
-        setProjectId={setRenameProject}
+        projectId={renameProjectId}
+        setProjectId={setRenameProjectId}
+      />
+      <ConfirmDeleteDialog
+        title={"Delete project"}
+        text={"Do you really want to delete this project ?"}
+        deleteAction={deleteProject}
+        cancelAction={() => setDeleteProjectId(0)}
+        objectId={deleteProjectId}
       />
     </>
   );

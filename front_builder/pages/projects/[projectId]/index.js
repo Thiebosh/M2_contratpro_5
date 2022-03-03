@@ -1,4 +1,4 @@
-import requireAuth from "../../../components/utils/requireAuth";
+import requireAuth from "../../../middleware/requireAuth";
 import { Container, Heading, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 

@@ -20,7 +20,7 @@ import { withSessionSsr } from "../../lib/withSession";
 import { useRef } from "react";
 
 const idUser = "61e131ce9c11b699edc38a1e";
-import requireAuth from "../../components/utils/requireAuth";
+import requireAuth from "../../middleware/requireAuth";
 
 export default function Account() {
   const newUserNameInput = useRef();
@@ -56,15 +56,6 @@ export default function Account() {
         });
         console.log("failure");
       },
-    });
-  }
-
-  function popUpDataSaved() {
-    toast({
-      title: "Données sauvegardées",
-      status: "success",
-      duration: 5000,
-      isClosable: true,
     });
   }
 

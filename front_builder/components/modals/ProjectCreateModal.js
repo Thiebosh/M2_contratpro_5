@@ -20,13 +20,12 @@ export default function ProjectCreateModal({ isOpen, setIsOpen, user }) {
   const nameInput = useRef();
 
   const handleSave = () => {
-    console.log(user);
     $.ajax({
       url: "http://localhost:8001/project/create",
       type: "POST",
       data: {
         name: nameInput.current.value,
-        user_id: user.id,
+        users_id: JSON.stringify([user.id]),
       },
       success: function (resp) {
         toast({
@@ -60,7 +59,7 @@ export default function ProjectCreateModal({ isOpen, setIsOpen, user }) {
     <Modal isOpen={isOpen} onClose={handleClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Create a new project</ModalHeader>
+        <ModalHeader>Create new project</ModalHeader>
         <ModalCloseButton />
         <ModalBody pb={6}>
           <FormControl isRequired>

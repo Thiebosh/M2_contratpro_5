@@ -1,57 +1,48 @@
 import {
   Box,
   Button,
-  Center,
   Container,
   Flex,
-  FormControl,
-  FormLabel,
   Heading,
-  Icon,
   IconButton,
   Input,
-  Stack,
-  Td,
-  Textarea,
-  Tr,
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import $ from "jquery";
-import requireAuth from "../../../components/utils/requireAuth";
+import requireAuth from "../../../middleware/requireAuth";
 import { useRouter } from "next/router";
-import ProjectUsersModal from "../../../components/modals/ProjectUsersModal";
-import { AddIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import dayjs from "dayjs";
-import Link from "next/link";
-import { UserIcon } from "@heroicons/react/outline";
+import ProjectAddUsersModal from "../../../components/modals/ProjectAddUsersModal";
+import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 
 export default function Settings({ user }) {
-  const toast = useToast();
-  const renameInput = useRef();
   const router = useRouter();
-  const { projectId } = router.query;
-  const [usersProject, setUsersProject] = useState(0);
-  const [projects, setProjects] = useState([]);
 
-  // useEffect(() => {
-  //   const dataProjects = {
-  //     id: user.id,
-  //   };
-  //   $.ajax({
-  //     url: "http://localhost:8001/project/search_by_user",
-  //     type: "POST",
-  //     data: dataProjects,
-  //     success: function (resp) {
-  //       setProjects(resp.result);
-  //       console.log(resp);
-  //     },
-  //     error: function () {
-  //       console.log("failure");
-  //     },
-  //   });
-  // }, []);
+  const { projectId } = router.query;
+  const [dataProject, setDataProject] = useState({ name: "", users: [] });
+  const [addUserIsOpen, setAddUserIsOpen] = useState(false);
+
+  function getProject() {
+    $.ajax({
+      url: "http://localhost:8001/project/search",
+      type: "POST",
+      data: {
+        id: projectId,
+      },
+      success: function (resp) {
+        setDataProject(resp.result[0]);
+        console.log(resp.result[0]);
+      },
+      error: function () {
+        console.log("failure");
+      },
+    });
+  }
+
+  useEffect(() => {
+    getProject();
+  }, []);
 
   return (
     <>
@@ -60,7 +51,7 @@ export default function Settings({ user }) {
         bg={useColorModeValue("gray.50", "gray.800")}
       >
         <Heading fontSize={"4xl"} my={4}>
-          Settings
+          Settings {dataProject.name} project
         </Heading>
         <Box
           mx={"auto"}
@@ -74,11 +65,23 @@ export default function Settings({ user }) {
             Manage users
           </Heading>
           <Box maxW={"45%"}>
-            <Input variant="filled" isDisabled placeholder="projects" />
-            {projects.map((project) => (
-              <Tr key={project.id}>
-                <Input variant="filled" isDisabled placeholder="projects" />
-              </Tr>
+            {dataProject.users.map((user) => (
+              <Flex key={user.id} direction={"row"}>
+                <Input
+                  variant="filled"
+                  mb={2}
+                  isDisabled
+                  placeholder={user.name}
+                />
+                {dataProject.users[0].id !== user.id && (
+                  <IconButton
+                    aria-label="delete"
+                    ml={3}
+                    icon={<DeleteIcon />}
+                    onClick={() => deleteUserFromProject(projectId, user.id)}
+                  />
+                )}
+              </Flex>
             ))}
           </Box>
           <Button
@@ -86,18 +89,38 @@ export default function Settings({ user }) {
             colorScheme={"blue"}
             px={3}
             mt={5}
-            onClick={() => setUsersProject(projectId)}
+            onClick={() => setAddUserIsOpen(true)}
           >
             Add users
           </Button>
         </Box>
       </Container>
-      <ProjectUsersModal
-        projectId={usersProject}
-        setProjectId={setUsersProject}
+      <ProjectAddUsersModal
+        isOpen={addUserIsOpen}
+        setIsOpen={setAddUserIsOpen}
+        projectId={projectId}
       />
     </>
   );
+
+  function deleteUserFromProject(projectId, userIdToDelete) {
+    console.log(userIdToDelete);
+    $.ajax({
+      url: "http://localhost:8001/project/remove_user",
+      type: "POST",
+      data: {
+        id: projectId,
+        user_id: userIdToDelete,
+      },
+      success: function (resp) {
+        getProject();
+        console.log(resp);
+      },
+      error: function () {
+        console.log("failure");
+      },
+    });
+  }
 }
 
 export const getServerSideProps = requireAuth;
