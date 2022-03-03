@@ -8,15 +8,15 @@ $(function () {
     duration = 500;
     root;
 
-    tree = d3.layout.tree()
-    .nodeSize([30,])
-    .separation(function separation(a, b) { 
-        return a.parent == b.parent ? 5 : 1;
-    })
+    tree = d3.tree()
+    // .nodeSize([30,])
+    // .separation(function separation(a, b) { 
+    //     return a.parent == b.parent ? 5 : 1;
+    // })
     .size([height, width]);
 
-    diagonal = d3.svg.diagonal()
-    .projection(function(d) { return [d.y, d.x]; });
+    // diagonal = d3.svg.diagonal()
+    // .projection(function(d) { return [d.y, d.x]; });
 
     svg = d3.select("body")
         .append("svg")
@@ -69,7 +69,10 @@ $(function () {
     	$.getJSON("../syntax/syntax.json", function(syntax){
             $.getJSON("json/example.json",function(json){
                 root = new MainNode();
+                // root.addArrayChild("Screen");
+                // root.addObjectChild("test").addArrayChild("fds")
                 rec(syntax, json["root"], root)
+                root.update(root)
             });
     	});
 
