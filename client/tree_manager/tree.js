@@ -72,6 +72,7 @@ $(function () {
                 // root.addArrayChild("Screen");
                 // root.addObjectChild("test").addArrayChild("fds")
                 rec(syntax, json["root"], root)
+                root.hierarchy = d3.hierarchy(root, function(d){return d.children;});
                 root.update(root)
             });
     	});

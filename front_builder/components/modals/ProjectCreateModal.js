@@ -20,13 +20,12 @@ export default function ProjectCreateModal({ isOpen, setIsOpen, user }) {
   const nameInput = useRef();
 
   const handleSave = () => {
-    console.log(user);
     $.ajax({
       url: "http://localhost:8001/project/create",
       type: "POST",
       data: {
         name: nameInput.current.value,
-        users_id: [user.id],
+        users_id: JSON.stringify([user.id]),
       },
       success: function (resp) {
         toast({
