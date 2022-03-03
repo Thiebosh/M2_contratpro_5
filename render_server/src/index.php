@@ -1,4 +1,10 @@
 <?php
+header('Access-Control-Allow-Origin: *');
+
+header('Access-Control-Allow-Methods: GET, POST');
+
+header("Access-Control-Allow-Headers: X-Requested-With");
+
 session_start();
 
 
@@ -98,9 +104,9 @@ if (isset($_GET['action'])) {
             exit();
 
         case 'get_session':
-
+            echo($_SESSION["data"]);
             if(!isset($_SESSION["data"])) {
-                echo("{}");
+                echo("ma variable est vide");
                 exit();
             }
             echo (json_encode($_SESSION["data"]));
@@ -111,7 +117,7 @@ if (isset($_GET['action'])) {
                 http_response_code($RESP_CODE["bad_request"]);
                 exit();
             }
-            $post['session'] = filter_input(INPUT_POST, 'session', FILTER_SANITIZE_STRING);
+            $post['session'] = $_POST['session'];
             if (in_array(false, $post, true)) {
                 http_response_code($RESP_CODE["bad_request"]);
                 exit();
