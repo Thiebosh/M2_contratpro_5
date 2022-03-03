@@ -18,7 +18,7 @@ async function loginRoute(req, res) {
         if (bcrypt.compareSync(password, user.password)) {
           // id: 61e131ce9c11b699edc38a1e
           req.session.user = {
-            id: res.id,
+            id: user.id,
           };
           await req.session.save();
           res.status(200).json({ message: "logged in" });

@@ -14,6 +14,8 @@ import {
   Th,
   Thead,
   Tr,
+  useColorModeValue,
+  useToast,
   Wrap,
   WrapItem,
 } from "@chakra-ui/react";
@@ -34,21 +36,21 @@ export default function Projects({ user }) {
   const [projects, setProjects] = useState([]);
   const [openCreate, setOpenCreate] = useState(false);
   const [renameProject, setRenameProject] = useState(0);
+  const toast = useToast();
 
   useEffect(() => {
-    const dataProjects = {
-      id: user.id,
-    };
+    console.log(user);
     $.ajax({
       url: "http://localhost:8001/project/search_by_user",
       type: "POST",
-      data: dataProjects,
+      data: {
+        id: user.id,
+      },
       success: function (resp) {
         setProjects(resp.result);
-        console.log(resp);
       },
-      error: function () {
-        console.log("failure");
+      error: function (error) {
+        console.log(error);
       },
     });
   }, []);
@@ -62,17 +64,32 @@ export default function Projects({ user }) {
         id: projectID,
       },
       success: function (resp) {
-        console.log(resp);
+        toast({
+          title: "Project deleted",
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
       },
-      error: function () {
-        console.log("failure");
+      error: function (error) {
+        toast({
+          title: "Delete failed",
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
+        console.log(error);
       },
     });
   }
 
   return (
     <>
-      <Container maxW={"container.xl"} py={8}>
+      <Container
+        maxW={"container.xls"}
+        bg={useColorModeValue("gray.50", "gray.800")}
+        py={8}
+      >
         <Flex m={5} justifyContent={"space-between"}>
           <Wrap>
             <WrapItem>
