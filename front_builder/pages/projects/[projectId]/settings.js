@@ -75,12 +75,14 @@ export default function Settings({ user }) {
                   isDisabled
                   placeholder={user.name}
                 />
-                <IconButton
-                  aria-label="delete"
-                  ml={3}
-                  icon={<DeleteIcon />}
-                  onClick={() => deleteUserFromProject(projectId, user.id)}
-                />
+                {dataProject.users[0].id !== user.id && (
+                  <IconButton
+                    aria-label="delete"
+                    ml={3}
+                    icon={<DeleteIcon />}
+                    onClick={() => deleteUserFromProject(projectId, user.id)}
+                  />
+                )}
               </Flex>
             ))}
           </Box>
