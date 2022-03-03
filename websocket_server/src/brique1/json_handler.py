@@ -105,6 +105,7 @@ class JsonHandler():
             return False
 
         self.json_currently_stored = False
+        self.current_version_generated = False
         return True
 
 
@@ -125,6 +126,7 @@ class JsonHandler():
 
             del container[int(target)]
             self.json_currently_stored = False
+            self.current_version_generated = False
             return True
 
         return False
@@ -142,4 +144,5 @@ class JsonHandler():
         container[path[-1]] = content
 
         self.json_currently_stored = False
+        self.current_version_generated = False
         return True

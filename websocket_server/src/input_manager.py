@@ -1,4 +1,4 @@
-import pathlib
+# import pathlib
 from input import Input
 from brique1.json_handler import JsonHandler
 from brique2.files_manager import FilesManager
@@ -18,8 +18,8 @@ class InputManager():
         self.render_page = RenderPage(partners, room_name)
 
         # tmp test
-        with open(f"{pathlib.Path(__file__).parent.absolute()}/brique2/needs.json", 'r') as file:
-            self.json_handler.data = json.loads(file.read().replace('\n', '').replace('\n', ''))
+        # with open(f"{pathlib.Path(__file__).parent.absolute()}/brique2/needs.json", 'r') as file:
+        #     self.json_handler.data = json.loads(file.read().replace('\n', '').replace('\n', ''))
 
     def close(self):
         self.json_handler.close()
