@@ -7,6 +7,7 @@ $(function () {
     },
     success: function (resp) {
       $("pre").text(JSON.stringify(resp, null, 2));
+      //$("body").html(resp); // => interpreter le contenu html recu
     },
     error: function () {
       $("pre").text("failure");

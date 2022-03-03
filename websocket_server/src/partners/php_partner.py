@@ -21,13 +21,15 @@ class PhpPartner():
         except RequestException:
             raise Exception("php - server not started")
 
+        content = result.content.decode("utf-8").encode("utf-8").decode('utf-8') # bytes to str + str without to with accents
+
         if print_:
             print(f"php - status_code {result.status_code}")
             print("php - content")
-            print(result.content.decode("utf-8"))
+            print(content)
             print("php - finish")
 
-        return result.status_code if get_code else result.status_code == 200, result.content.decode("utf-8")
+        return result.status_code if get_code else result.status_code == 200, content
 
 
     def _get(self, endpoint, print_=False, get_code=False):

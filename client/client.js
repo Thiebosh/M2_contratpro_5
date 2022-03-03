@@ -28,6 +28,7 @@ $(function () {
   };
 
   socket.onerror = function(error) {
+    socket.close();
     console.log(`[error] ${error.message}`);
   };
 

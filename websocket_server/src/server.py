@@ -89,7 +89,12 @@ class Server():
                     self.close_client_connection(input_socket)
                     continue
 
-                target = json.loads(target)
+                try:
+                    target = json.loads(target)
+                except json.JSONDecodeError:
+                    print(f"malformed json : {target}")
+                    self.close_client_connection(input_socket)
+                    continue
 
                 if "action" in target and target["action"] == "connectRoom" and "author" in target:
                     # plus tard : recupere name dans la db ici plutot que dans target
