@@ -44,10 +44,7 @@ class DirectoryManager {
 
         if (!(is_dir($dir_path) && file_exists($file_path))) return false;
 
-        $SUCCESS = "200";
-        $BAD_REQUEST = "400";
-        $NOT_FOUND = "404";
-        $ERROR = "500";
+        global $RESP_CODE;
 
         include_once($file_path);
         return true;
