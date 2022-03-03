@@ -8,6 +8,7 @@ import {
   FormControl,
   FormLabel,
   Heading,
+  Icon,
   IconButton,
   Input,
   Modal,
@@ -37,8 +38,9 @@ import $ from "jquery";
 import requireAuth from "../../components/utils/requireAuth";
 import ProjectCreateModal from "../../components/modals/ProjectCreateModal";
 import ProjectRenameModal from "../../components/modals/ProjectRenameModal";
+import { UserIcon } from "@heroicons/react/outline";
 
-const idUser = "61e131ce9c11b699edc38a1e";
+//const idUser = "61e131ce9c11b699edc38a1e";
 
 export default function Projects({ user }) {
   const [projects, setProjects] = useState([]);
@@ -47,7 +49,7 @@ export default function Projects({ user }) {
 
   useEffect(() => {
     const dataProjects = {
-      id: idUser,
+      id: user.id,
     };
     $.ajax({
       url: "http://localhost:8001/project/search_by_user",
@@ -133,7 +135,7 @@ export default function Projects({ user }) {
                         <IconButton
                           aria-label="settings"
                           mx={1}
-                          icon={<SettingsIcon />}
+                          icon={<Icon as={UserIcon} boxSize={5} />}
                         />
                       </Link>
                       <IconButton
