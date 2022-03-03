@@ -117,7 +117,12 @@ class Room():
                     self.close_client_connection_to_room(socket)
                     continue
 
-                msg = json.loads(msg)
+                try:
+                    msg = json.loads(msg)
+                except json.JSONDecodeError:
+                    print(f"{self.room_name} - malformed json : {msg}")
+                    # self.close_client_connection_to_room(socket)
+                    continue
 
                 if msg["action"] == "exitRoom":
                     self.close_client_connection_to_room(socket)
