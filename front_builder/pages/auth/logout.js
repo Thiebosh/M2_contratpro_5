@@ -25,7 +25,7 @@ export default function Login() {
 
   return (
     <Flex
-      minH={"80vh"}
+      minH={"90vh"}
       align={"center"}
       justify={"center"}
       bg={useColorModeValue("gray.50", "gray.800")}
@@ -56,7 +56,7 @@ export const getServerSideProps = withSessionSsr(
     await req.session.destroy();
     return {
       redirect: {
-        destination: "/account/login",
+        destination: "/auth/login",
         permanent: false,
       },
     };

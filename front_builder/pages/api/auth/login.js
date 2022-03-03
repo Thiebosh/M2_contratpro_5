@@ -32,7 +32,7 @@ export const getServerSideProps = withSessionSsr(
     if (!user) {
       return {
         redirect: {
-          destination: "/account/login",
+          destination: "/auth/login",
           permanent: false,
         },
       };
