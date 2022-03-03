@@ -17,10 +17,8 @@ import ProjectAddUsersModal from "../../../components/modals/ProjectAddUsersModa
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 
 export default function Settings({ user }) {
-  const toast = useToast();
-  const renameInput = useRef();
   const router = useRouter();
-  const projectName = "";
+
   const { projectId } = router.query;
   const [dataProject, setDataProject] = useState({ name: "", users: [] });
   const [addUserIsOpen, setAddUserIsOpen] = useState(false);
