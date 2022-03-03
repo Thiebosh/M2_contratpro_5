@@ -7,9 +7,9 @@ bp_project = Blueprint("project", __name__)
 
 COLLECTION = "projects"
 
-@bp_project.route("/create", methods=['GET', 'POST'])
+@bp_project.route("/create", methods=['POST'])
 async def create():
-    post = await request.form # request.args
+    post = await request.form
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -49,9 +49,55 @@ async def create():
     }, status.HTTP_200_OK
 
 
-@bp_project.route("/search_by_user", methods=['GET', 'POST'])
+@bp_project.route("/update", methods=['POST'])
+async def update():
+    post = await request.form
+    if len(post) != 2:
+        return "", status.HTTP_400_BAD_REQUEST
+
+    project_id = post.get("id", type=str, default=None)
+    project_name = post.get("name", type=str, default=None)
+
+    if not (project_id and project_name):
+        return "", status.HTTP_400_BAD_REQUEST
+
+    project_id = ObjectId(project_id)
+
+    # verify if name does not exist for other than id
+    filter_q = {
+        "_id": {
+            "$ne": project_id
+        },
+        "name": project_name
+    }
+    fields = {
+        "_id": 0,
+        "name": 1
+    }
+
+    if await current_app.config["partners"]["db"].find_one(COLLECTION, filter_q, fields):
+        return {
+            "success": "already exist"
+        }, status.HTTP_200_OK
+
+    # update fields
+    filter_q = {
+        "_id": project_id
+    }
+    update_q = {
+        "$set": {
+            "name": project_name
+        }
+    }
+
+    return {
+        "success": await current_app.config["partners"]["db"].update_one(COLLECTION, filter_q, update_q)
+    }, status.HTTP_200_OK
+
+
+@bp_project.route("/search_by_user", methods=['POST'])
 async def search_by_user():
-    post = await request.form # request.args
+    post = await request.form
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -60,29 +106,63 @@ async def search_by_user():
     if not user_id:
         return "", status.HTTP_400_BAD_REQUEST
 
-    filter_q = {
-        "users": user_id
-    }
-    fields = {
-        "_id": 0,
-        "id": {
-            "$toString": "$_id"
+    aggregation = [
+        {
+            "$match": {
+                "users": user_id
+            }
         },
-        "name": 1,
-        "users": 1,
-        "creation": 1,
-        "last_specs": 1,
-        "last_proto": 1
-    }
+        {
+            "$project": {
+                "_id": 0,
+                "id": {
+                    "$toString": "$_id"
+                },
+                "name": 1,
+                "users": {
+                    "$map": {
+                        "input": "$users",
+                        "in": { "$toObjectId": "$$this" }
+                    }
+                },
+                "creation": 1,
+                "last_specs": 1,
+                "last_proto": 1
+            }
+        },
+        {
+            "$lookup": {
+                "from": "accounts",
+                "localField": "users",
+                "foreignField": "_id",
+                "as": "users"
+            }
+        },
+        {
+            "$addFields": {
+                "users": {
+                    "$map": {
+                        "input": "$users",
+                        "in": { 
+                            "id": {
+                                "$toString": "$$this._id"
+                            },
+                            "name": "$$this.name"
+                        }
+                    }
+                }
+            }
+        },
+    ]
 
     return {
-        "result": await current_app.config["partners"]["db"].find_list(COLLECTION, filter_q, fields)
+        "result": await current_app.config["partners"]["db"].aggregate_list(COLLECTION, aggregation)
     }, status.HTTP_200_OK
 
 
-@bp_project.route("/add_user", methods=['GET', 'POST'])
+@bp_project.route("/add_user", methods=['POST'])
 async def add_user():
-    post = await request.form # request.args
+    post = await request.form
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -109,9 +189,9 @@ async def add_user():
     }, status.HTTP_200_OK
 
 
-@bp_project.route("/remove_user", methods=['GET', 'POST'])
+@bp_project.route("/remove_user", methods=['POST'])
 async def remove_user():
-    post = await request.form # request.args
+    post = await request.form 
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -136,9 +216,9 @@ async def remove_user():
     }, status.HTTP_200_OK
 
 
-@bp_project.route("/delete", methods=['GET', 'POST'])
+@bp_project.route("/delete", methods=['POST'])
 async def delete():
-    post = await request.form # request.args
+    post = await request.form
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 

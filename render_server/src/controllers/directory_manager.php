@@ -1,69 +1,55 @@
 <?php
 class DirectoryManager {
-    private static string $emplacement = "projects";
+    private string $root_path;
 
-    public static function folder_exist($path) : bool {
-        return true ? true : false; // test existence
+    public function __construct($root_path){
+        if (!is_dir($root_path)) mkdir($root_path, 0777, true);
+        $this->root_path= $root_path;
     }
 
-    public static function file_exist($path) : bool {
-        return file_exists("{DirectoryManager::emplacement}/{$path}") ? true : false; // test existence
+    public function create_folder($path) : bool {
+        $path = "{$this->root_path}/{$path}";
+        return (is_dir($path)) ? true : mkdir($path, 0777, true);
     }
 
-    public function create_folder() : string {
-        if (!isset($_GET['project_name'])) return $BAD_REQUEST; # $_POST
-
-        $post['project_name'] = filter_input(INPUT_GET, 'project_name', FILTER_SANITIZE_STRING); # INPUT_POST
-        if (in_array(false, $post, true)) return $BAD_REQUEST;
-
-        $path = "{DirectoryManager::emplacement}/{$post['project_name']}";
-
-        if (self::folder_exist($path)) return $SUCCESS;
-
-        $result = mkdir($path, 0777, true);
-
-        return $result ? $SUCCESS : $ERROR;
+    public function create_file($path, $content) : bool {
+        $path = "{$this->root_path}/{$path}";
+        if (!is_dir(implode("/", array_slice(explode("/", $path), 0, -1))) || file_exists($path)) return false;
+        return file_put_contents($path, $content) !== false;
     }
 
-    public function create_file() : string {
-        if (!isset($_GET['project_name'], $_GET['file_name'], $_GET['file_content'])) return $BAD_REQUEST; # $_POST
+    public function remove_files($path) : bool {
+        $path = "{$this->root_path}/{$path}";
+        if (!file_exists($path)) return true;
+        if (!is_dir($path)) return false;
 
-        $post['project_name'] = filter_input(INPUT_GET, 'project_name', FILTER_SANITIZE_STRING); # INPUT_POST
-        $post['file_name'] = filter_input(INPUT_GET, 'file_name', FILTER_SANITIZE_STRING); # INPUT_POST
-        $post['file_content'] = filter_input(INPUT_GET, 'file_content', FILTER_SANITIZE_STRING); # INPUT_POST
-        if (in_array(false, $post, true)) return $BAD_REQUEST;
+        foreach(glob($path . "/*") as $element){
+            if(!unlink($element)) return false;
+        }
 
-        if (!self::folder_exist($path)) return $ERROR;
-
-        $result = file_put_contents("{DirectoryManager::emplacement}/{$post['project_name']}/{$post['file_name']}", $post['file_content']);
-
-        return $result !== false ? $SUCCESS : $ERROR;
+        return true;
     }
 
-    public function remove_files() : string {
-        if (!isset($_GET['project_name'])) return $BAD_REQUEST; # $_POST
+    public function remove_folder($path) : bool {
+        $path = "{$this->root_path}/{$path}";
+        if (!file_exists($path)) return true;
+        if (!is_dir($path)) return false;
 
-        $post['project_name'] = filter_input(INPUT_GET, 'project_name', FILTER_SANITIZE_STRING); # INPUT_POST
-        if (in_array(false, $post, true)) return $BAD_REQUEST;
-
-        if (!self::folder_exist($path)) return $ERROR;
-
-        // remove all files in folder
-
-        return $result ? $SUCCESS : $ERROR;
+        return rmdir($path);
     }
 
-    public function remove_folder() : string {
-        if (!isset($_GET['project_name'])) return $BAD_REQUEST; # $_POST
+    public function include_file($path, $filename, $page_call) {
+        $dir_path = "{$this->root_path}/{$path}";
+        $file_path = "{$dir_path}/{$filename}";
 
-        $post['project_name'] = filter_input(INPUT_GET, 'project_name', FILTER_SANITIZE_STRING); # INPUT_POST
-        if (in_array(false, $post, true)) return $BAD_REQUEST;
+        if (!(is_dir($dir_path) && file_exists($file_path))) return false;
 
-        if (self::folder_exist($path)) return $SUCCESS;
+        $SUCCESS = "200";
+        $BAD_REQUEST = "400";
+        $NOT_FOUND = "404";
+        $ERROR = "500";
 
-        // remove all files in folder (or folder deletion recursive ?)
-        // remove folder
-
-        return $result ? $SUCCESS : $ERROR;
+        include_once($file_path);
+        return true;
     }
 }

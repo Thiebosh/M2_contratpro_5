@@ -55,8 +55,8 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 - "id" (str) : l'identifiant du compte à modifier.
 
 **Arguments optionnels : un des deux**
-- "name" (str) : le nom (actuel ou nouveau) que l'utilisateur souhaite associer au compte.
-- "password" (str) : le mot de passe en clair (actuel ou nouveau) que l'utilisateur souhaite associer au compte.
+- "name" (str) : le nouveau nom que l'utilisateur souhaite associer au compte.
+- "password" (str) : le nouveau mot de passe (en clair) que l'utilisateur souhaite associer au compte.
 
 **Retours :**
 - { "success": "already exist" } : le nom de compte est déjà utilisé.
@@ -71,7 +71,7 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 - "name" (str) : une partie du nom de l'utilisateur recherché.
 
 **Retours :**
-- { "result": [{"id": "str", "name"}, ...] } : la liste des utilisateurs dont le nom contient le motif recherché et l'identifiant de compte associé.
+- { "result": [{"id": "str", "name": "str"}, ...] } : la liste des utilisateurs dont le nom contient le motif recherché et l'identifiant de compte associé.
 
 
 # /account/delete
@@ -102,6 +102,19 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 - { "success": True } : le nom de projet est disponible et l'intégration en base de données a réussi.
 
 
+# /project/update
+**Utilisation :** mettre à jour les informations d'un projet.
+
+**Arguments requis :**
+- "id" (str) : l'identifiant du compte à modifier.
+- "name" (str) : le nouveau nom que l'utilisateur souhaite associer au projet.
+
+**Retours :**
+- { "success": "already exist" } : le nom de projet est déjà utilisé.
+- { "success": False } : l'intégration en base de données a échoué.
+- { "success": True } : l'intégration en base de données a réussi.
+
+
 # /project/search_by_user
 **Utilisation :** lister les projets accessibles pour un compte.
 
@@ -109,10 +122,10 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 - "user_id" (str) : l'identifiant du compte voulant consulter ses projets.
 
 **Retours :**
-- { "result": [{"id": "str", "name": "str", "users": ["str", ...], "creation": "date", "last_specs": "date", "last_proto": "date" }, ...] } :
+- { "result": [{"id": "str", "name": "str", "users": [{"str", "str"}, ...], "creation": "date", "last_specs": "date", "last_proto": "date" }, ...] } :
     - id : l'identifiant du projet.
     - name : le nom du projet.
-    - users : la liste des identifiants de comptes associés au projet.
+    - users : la liste des couples noms - identifiants de comptes associés au projet.
     - creation : la date de création du projet.
     - last_specs : la date de dernière modification des spécifications du projet.
     - last_proto : la date de dernière génération des fichiers du projet.

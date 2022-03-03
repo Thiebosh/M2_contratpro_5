@@ -1,5 +1,6 @@
 **/.vscode/
 **/_creds.bat
+**/.idea/
 
 .env
 !*/**/.env

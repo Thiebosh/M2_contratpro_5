@@ -1,0 +1,112 @@
+{
+    "root": {
+        "type": "object",
+        "values": [
+            "screen"
+        ]
+    },
+    "style": {
+        "type": "object",
+        "values": [
+            "?name",
+            "?color",
+            "?align",
+            "?decoration"
+        ]
+    },
+    "block": {
+        "type": "object",
+        "values": [
+            "?name",
+            "?style",
+            "?content"
+        ]
+    },
+    "text": {
+        "type": "object",
+        "values": [
+            "?style",
+            "textValue"
+        ]
+    },
+
+    "screen": {
+        "type": "chunk_array",
+        "values": [
+            "name",
+            "?inputHome",
+            "?style",
+            "?content"
+        ]
+    },
+    "content": {
+        "type": "array",
+        "values": [
+            "?block",
+            "?text",
+            "?inputNumber"
+        ]
+    },
+
+    "name": {
+        "type": "field",
+        "field": "inputText"
+    },
+    "textValue": {
+        "type": "field",
+        "field": "inputText"
+    },
+    "numberValue": {
+        "type": "field",
+        "field": "inputNumber"
+    },
+    "color": {
+        "type": "field",
+        "field": "inputColor"
+    },
+    "align": {
+        "type": "field",
+        "field": "selectAlign"
+    },
+    "decoration": {
+        "type": "field",
+        "field": "selectDecoration"
+    },
+
+    "inputHome": {
+        "type": "input",
+        "nature": "radio",
+        "global": "true"
+    },
+    "inputText": {
+        "type": "input",
+        "nature": "text"
+    },
+    "inputNumber": {
+        "type": "input",
+        "nature": "number"
+    },
+    "inputColor": {
+        "type": "input",
+        "nature": "color"
+    },
+
+    "selectAlign": {
+        "type": "select",
+        "values": [
+            "center",
+            "right",
+            "left",
+            "top",
+            "bottom"
+        ]
+    },
+    "selectDecoration": {
+        "type": "select",
+        "values": [
+            "none",
+            "underline",
+            "italic"
+        ]
+    }
+}

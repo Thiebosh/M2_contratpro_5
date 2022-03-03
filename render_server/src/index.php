@@ -3,48 +3,95 @@ session_start();
 
 require_once("controllers/directory_manager.php");
 
-// a mettre dans un fichier "return_codes.php" et a inclure ici et dans les controleurs
 $SUCCESS = "200";
 $BAD_REQUEST = "400";
+$NOT_FOUND = "404";
 $ERROR = "500";
 
-function generate() {
-    echo("call generate<br>");
-    if (!isset($_GET['project_name'], $_GET['page'])) return $BAD_REQUEST; # $_POST
-
-    $post['project_name'] = filter_input(INPUT_GET, 'project_name', FILTER_SANITIZE_STRING); # INPUT_POST
-    $post['page'] = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_STRING); # INPUT_POST
-    if (in_array(false, $post, true)) return $BAD_REQUEST;
-
-    echo("args ok<br>");
-    $path = "{$post['project_name']}/routeur.php";
-    if (!DirectoryManager::file_exist($path)) return $ERROR;
-
-    echo("file exists<br>");
-    require_once($path);
-    return $SUCCESS;
-}
-
+$directoryManager = new DirectoryManager(__DIR__."/projects");
 if (isset($_GET['action'])) {
     switch ($action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING)) {
-        case 'generate':
-            http_response_code(generate());
+        case 'execute':
+            if (!isset($_POST['project_name'], $_POST['page'])) {
+                http_response_code($BAD_REQUEST);
+                exit();
+            }
+
+            $post['project_name'] = filter_input(INPUT_POST, 'project_name', FILTER_SANITIZE_STRING);
+            $post['page'] = filter_input(INPUT_POST, 'page', FILTER_SANITIZE_STRING);
+            if (in_array(false, $post, true)) {
+                http_response_code($BAD_REQUEST);
+                exit();
+            }
+
+            $result = $directoryManager->include_file($post['project_name'], "routeur.php", $post['page']);
+            http_response_code($result ? $SUCCESS : $ERROR);
             exit();
 
-        case 'create_folder': //localhost:80/index.php?action=create_folder&project_name=test
-            http_response_code((new DirectoryManager)->create_folder());
+        case 'create_folder':
+            if (!isset($_POST['project_name'])) {
+                http_response_code($BAD_REQUEST);
+                exit();
+            }
+
+            $post['project_name'] = filter_input(INPUT_POST, 'project_name', FILTER_SANITIZE_STRING);
+            if (in_array(false, $post, true)) {
+                http_response_code($BAD_REQUEST);
+                exit();
+            }
+
+            $result = $directoryManager->create_folder($post['project_name']);
+            http_response_code($result ? $SUCCESS : $ERROR);
             exit();
 
-        case 'create_file': //localhost:80/index.php?action=create_file&project_name=test&file_name=exemple.html&file_content="un peu de texte"
-            http_response_code((new DirectoryManager)->create_folder());
+        case 'create_file':
+            if (!isset($_POST['project_name'], $_POST['file_name'], $_POST['file_content'])) {
+                http_response_code($BAD_REQUEST);
+                exit();
+            }
+
+            $post['project_name'] = filter_input(INPUT_POST, 'project_name', FILTER_SANITIZE_STRING);
+            $post['file_name'] = filter_input(INPUT_POST, 'file_name', FILTER_SANITIZE_STRING);
+            $post['file_content'] = $_POST["file_content"];
+            if (in_array(false, $post, true)) {
+                http_response_code($BAD_REQUEST);
+                exit();
+            }
+
+            $result = $directoryManager->create_file("{$post['project_name']}/{$post['file_name']}", $post['file_content']);
+            http_response_code($result ? $SUCCESS : $ERROR);
             exit();
 
-        case 'remove_files': //localhost:80/index.php?action=remove_files&project_name=test
-            http_response_code((new DirectoryManager)->remove_files());
+        case 'remove_files':
+            if (!isset($_POST['project_name'])) {
+                http_response_code($BAD_REQUEST);
+                exit();
+            }
+
+            $post['project_name'] = filter_input(INPUT_POST, 'project_name', FILTER_SANITIZE_STRING);
+            if (in_array(false, $post, true)) {
+                http_response_code($BAD_REQUEST);
+                exit();
+            }
+
+            $result = $directoryManager->remove_files($post['project_name']);
+            http_response_code($result ? $SUCCESS : $ERROR);
             exit();
 
-        case 'remove_folder': //localhost:80/index.php?action=remove_folder&project_name=test
-            http_response_code((new DirectoryManager)->remove_folder());
+        case 'remove_folder':
+            if (!isset($_POST['project_name'])) {
+                http_response_code($BAD_REQUEST);
+                exit();
+            }
+
+            $post['project_name'] = filter_input(INPUT_POST, 'project_name', FILTER_SANITIZE_STRING);
+            if (in_array(false, $post, true)) {
+                http_response_code($BAD_REQUEST);
+                exit();
+            }
+
+            $result = $directoryManager->remove_folder($post['project_name']);
+            http_response_code($result ? $SUCCESS : $ERROR);
             exit();
 
         case "probe":

@@ -7,42 +7,60 @@ class PhpPartner():
         self.state = state or False
 
         if state == None:
-            try:
-                result = requests.get(url=f"{self.base_url}?action=probe")
-            except RequestException:
-                print("big exception") # serveur not started or bad url
-            else:
-                # print("status_code", result.status_code)
-                self.state = result.status_code == 200
+            self.state = self._get("probe")[0]
 
 
     def copy_partner(self):
         return PhpPartner(base_url=self.base_url, state=self.state)
 
-    
+
+    def _call(self, method_callback, endpoint, print_=False, get_code=False):
+        print("php - call", endpoint)
+        try:
+            result = method_callback()
+        except RequestException:
+            raise Exception("php - server not started")
+
+        if print_:
+            print(f"php - status_code {result.status_code}")
+            print("php - content")
+            print(result.content.decode("utf-8"))
+            print("php - finish")
+
+        return result.status_code if get_code else result.status_code == 200, result.content.decode("utf-8")
+
+
+    def _get(self, endpoint, print_=False, get_code=False):
+        return self._call(lambda: requests.get(url=f"{self.base_url}?action={endpoint}"), endpoint, print_, get_code)
+
+
+    def _post(self, endpoint, data, print_=False, get_code=False):
+        return self._call(lambda: requests.post(url=f"{self.base_url}?action={endpoint}", data=data), endpoint, print_, get_code)
+
+
     def set_project_folder(self, project_name):
         if not self.state:
             return False
 
-        # try:
-        #     result = requests.get(url=f"{self.base_url}?action=...")
-        # except RequestException:
-        #     print("big exception")
-        #     return False
+        return self._post("create_folder", { "project_name": project_name })[0]
 
-        return True
 
-    
     def set_project_files(self, project_name, files):
         if not self.state:
             return False
 
-        # for file in files:
-        #     try:
-        #         result = requests.get(url=f"{self.base_url}?action=...")
-        #     except RequestException:
-        #         print("big exception")
-        #         return False
+        print("upload all files")
+
+        for file in files:
+            data = { 
+                "project_name": project_name,
+                "file_name": file['name'],
+                "file_content": file['content']
+            }
+            if not self._post("create_file", data)[0]:
+                return False
+
+        print("finish all files")
 
         return True
 
@@ -51,40 +69,40 @@ class PhpPartner():
         if not self.state:
             return False
 
-        # try:
-        #     result = requests.get(url=f"{self.base_url}?action=...")
-        # except RequestException:
-        #     print("big exception")
-        #     return False
-
-        return True
+        return self._post("remove_files", { "project_name": project_name })[0]
 
 
     def unset_project_folder(self, project_name):
         if not self.state:
             return False
 
-        # try:
-        #     result = requests.get(url=f"{self.base_url}?action=...")
-        # except RequestException:
-        #     print("big exception")
-        #     return False
+        return self._post("remove_folder", { "project_name": project_name })[0]
+
+
+    def set_session(self, session):
+        if not self.state:
+            return False
+
+        print(self._post("set_session", { "session": session}, get_code=True, print_=True))
 
         return True
+
+
+    def get_session(self):
+        if not self.state:
+            return False
+
+        print(self._get("get_session", get_code=True, print_=True))
+
+        return "{}"
 
 
     def get_project_page(self, project_name, page):
         if not self.state:
             return False
 
-        print("call to ", f"{self.base_url}?action=generate&project_name={project_name}&page={page}")
-        try:
-            result = requests.get(url=f"{self.base_url}?action=generate&project_name={project_name}&page={page}")
-        except RequestException:
-            print("big exception") # serveur not started or bad url
-            return False
-
-        print("status_code", result.status_code)
-        print("content", result.content.decode("utf-8"))
-
-        return True
+        data = {
+            "project_name": project_name,
+            "page": page
+        }
+        return self._post("execute", data, get_code=True)
