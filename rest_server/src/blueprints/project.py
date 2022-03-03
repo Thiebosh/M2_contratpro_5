@@ -95,6 +95,65 @@ async def update():
     }, status.HTTP_200_OK
 
 
+@bp_project.route("/search", methods=['POST'])
+async def search():
+    post = await request.form
+    if len(post) != 1:
+        return "", status.HTTP_400_BAD_REQUEST
+
+    project_id = post.get("id", type=str, default=None)
+
+    if not project_id:
+        return "", status.HTTP_400_BAD_REQUEST
+
+    aggregation = [
+        {
+            "$match": {
+                "_id": ObjectId(project_id)
+            }
+        },
+        {
+            "$project": {
+                "_id": 0,
+                "name": 1,
+                "users": {
+                    "$map": {
+                        "input": "$users",
+                        "in": { "$toObjectId": "$$this" }
+                    }
+                }
+            }
+        },
+        {
+            "$lookup": {
+                "from": "accounts",
+                "localField": "users",
+                "foreignField": "_id",
+                "as": "users"
+            }
+        },
+        {
+            "$addFields": {
+                "users": {
+                    "$map": {
+                        "input": "$users",
+                        "in": { 
+                            "id": {
+                                "$toString": "$$this._id"
+                            },
+                            "name": "$$this.name"
+                        }
+                    }
+                }
+            }
+        },
+    ]
+
+    return {
+        "result": await current_app.config["partners"]["db"].aggregate_list(COLLECTION, aggregation)
+    }, status.HTTP_200_OK
+
+
 @bp_project.route("/search_by_user", methods=['POST'])
 async def search_by_user():
     post = await request.form
