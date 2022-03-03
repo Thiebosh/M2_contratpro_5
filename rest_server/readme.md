@@ -115,6 +115,16 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 - { "success": True } : l'intégration en base de données a réussi.
 
 
+# /project/search
+**Utilisation :** chercher des projets.
+
+**Arguments requis :**
+- "id" (str) : l'identifiant du projet recherché.
+
+**Retours :**
+- { "result": [{"name": "str", "users": [{"id": "str", "name": "str"}, ...]}, ...] } : le nom du projet et les utilisateurs associés.
+
+
 # /project/search_by_user
 **Utilisation :** lister les projets accessibles pour un compte.
 
@@ -122,7 +132,7 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 - "user_id" (str) : l'identifiant du compte voulant consulter ses projets.
 
 **Retours :**
-- { "result": [{"id": "str", "name": "str", "users": [{"str", "str"}, ...], "creation": "date", "last_specs": "date", "last_proto": "date" }, ...] } :
+- { "result": [{"id": "str", "name": "str", "users": [{"id": "str", "name": "str"}, ...], "creation": "date", "last_specs": "date", "last_proto": "date" }, ...] } :
     - id : l'identifiant du projet.
     - name : le nom du projet.
     - users : la liste des couples noms - identifiants de comptes associés au projet.
