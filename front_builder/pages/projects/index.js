@@ -30,16 +30,13 @@ import ProjectCreateModal from "../../components/modals/ProjectCreateModal";
 import ProjectRenameModal from "../../components/modals/ProjectRenameModal";
 import { UserIcon } from "@heroicons/react/outline";
 
-//const idUser = "61e131ce9c11b699edc38a1e";
-
 export default function Projects({ user }) {
   const [projects, setProjects] = useState([]);
   const [openCreate, setOpenCreate] = useState(false);
   const [renameProject, setRenameProject] = useState(0);
   const toast = useToast();
 
-  useEffect(() => {
-    console.log(user);
+  function getProjectsByUser() {
     $.ajax({
       url: "http://localhost:8001/project/search_by_user",
       type: "POST",
@@ -53,6 +50,10 @@ export default function Projects({ user }) {
         console.log(error);
       },
     });
+  }
+
+  useEffect(() => {
+    getProjectsByUser();
   }, []);
 
   /* HANDLE FUNCTIONS */
@@ -64,6 +65,7 @@ export default function Projects({ user }) {
         id: projectID,
       },
       success: function (resp) {
+        getProjectsByUser();
         toast({
           title: "Project deleted",
           status: "error",
@@ -147,6 +149,7 @@ export default function Projects({ user }) {
                         aria-label="delete"
                         mx={1}
                         icon={<DeleteIcon />}
+                        onClick={() => deleteProject(project.id)}
                       />
                     </Td>
                   </Tr>
