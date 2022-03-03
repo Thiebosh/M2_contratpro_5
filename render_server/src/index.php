@@ -100,6 +100,7 @@ if (isset($_GET['action'])) {
 
             if(!isset($_SESSION["data"])) {
                 echo("{}");
+                exit();
             }
             echo (json_encode($_SESSION["data"]));
             exit();
