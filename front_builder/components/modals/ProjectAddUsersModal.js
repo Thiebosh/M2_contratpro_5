@@ -23,37 +23,21 @@ export default function ProjectAddUsersModal({ projectId, isOpen, setIsOpen }) {
     $.ajax({
       url: "http://localhost:8001/project/add_user",
       type: "POST",
-      data: {},
+      data: {
+        id: projectId,
+        user_id: nameInput.current.value,
+      },
       success: function (resp) {
-        toast({
-          title: "Project renamed",
-          description: "Name : ",
-          status: "success",
-          duration: 9000,
-          isClosable: true,
-        });
-        handleClose();
+        console.log(resp);
       },
       error: function (error) {
-        toast({
-          title: "Error",
-          description: error,
-          status: "error",
-          duration: 9000,
-          isClosable: true,
-        });
         console.log(error);
       },
     });
   };
 
-  function handleClose() {
-    nameInput.current.value = "";
-    setIsOpen(0);
-  }
-
   return (
-    <Modal isOpen={isOpen} onClose={handleClose}>
+    <Modal isOpen={isOpen} onClose={() => setIsOpen(0)}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Add Users</ModalHeader>
@@ -67,9 +51,9 @@ export default function ProjectAddUsersModal({ projectId, isOpen, setIsOpen }) {
 
         <ModalFooter>
           <Button colorScheme="blue" mr={3} onClick={handleSave}>
-            Save
+            Add
           </Button>
-          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={() => setIsOpen(0)}>Cancel</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

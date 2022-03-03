@@ -1,31 +1,20 @@
 import {
   Box,
   Button,
-  Center,
   Container,
   Flex,
-  FormControl,
-  FormLabel,
   Heading,
-  Icon,
   IconButton,
   Input,
-  Stack,
-  Td,
-  Textarea,
-  Tr,
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import $ from "jquery";
-import requireAuth from "../../../components/utils/requireAuth";
+import requireAuth from "../../../middleware/requireAuth";
 import { useRouter } from "next/router";
 import ProjectAddUsersModal from "../../../components/modals/ProjectAddUsersModal";
-import { AddIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import dayjs from "dayjs";
-import Link from "next/link";
-import { UserIcon } from "@heroicons/react/outline";
+import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 
 export default function Settings({ user }) {
   const toast = useToast();
@@ -36,7 +25,7 @@ export default function Settings({ user }) {
   const [dataProject, setDataProject] = useState({ name: "", users: [] });
   const [addUserIsOpen, setAddUserIsOpen] = useState(false);
 
-  useEffect(() => {
+  function getProject() {
     $.ajax({
       url: "http://localhost:8001/project/search",
       type: "POST",
@@ -45,12 +34,16 @@ export default function Settings({ user }) {
       },
       success: function (resp) {
         setDataProject(resp.result[0]);
-        console.log(resp);
+        console.log(resp.result[0]);
       },
       error: function () {
         console.log("failure");
       },
     });
+  }
+
+  useEffect(() => {
+    getProject();
   }, []);
 
   return (
@@ -60,7 +53,7 @@ export default function Settings({ user }) {
         bg={useColorModeValue("gray.50", "gray.800")}
       >
         <Heading fontSize={"4xl"} my={4}>
-          Settings {dataProject.name}
+          Settings {dataProject.name} project
         </Heading>
         <Box
           mx={"auto"}
@@ -75,12 +68,20 @@ export default function Settings({ user }) {
           </Heading>
           <Box maxW={"45%"}>
             {dataProject.users.map((user) => (
-              <Input
-                variant="filled"
-                mb={2}
-                isDisabled
-                placeholder={user.name}
-              />
+              <Flex key={user.id} direction={"row"}>
+                <Input
+                  variant="filled"
+                  mb={2}
+                  isDisabled
+                  placeholder={user.name}
+                />
+                <IconButton
+                  aria-label="delete"
+                  ml={3}
+                  icon={<DeleteIcon />}
+                  onClick={() => deleteUserFromProject(projectId, user.id)}
+                />
+              </Flex>
             ))}
           </Box>
           <Button
@@ -101,6 +102,25 @@ export default function Settings({ user }) {
       />
     </>
   );
+
+  function deleteUserFromProject(projectId, userIdToDelete) {
+    console.log(userIdToDelete);
+    $.ajax({
+      url: "http://localhost:8001/project/remove_user",
+      type: "POST",
+      data: {
+        id: projectId,
+        user_id: userIdToDelete,
+      },
+      success: function (resp) {
+        getProject();
+        console.log(resp);
+      },
+      error: function () {
+        console.log("failure");
+      },
+    });
+  }
 }
 
 export const getServerSideProps = requireAuth;
