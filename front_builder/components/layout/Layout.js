@@ -1,4 +1,4 @@
-import { Box } from "@chakra-ui/react";
+import { Box, useColorModeValue } from "@chakra-ui/react";
 import NavBar from "../navigation/NavBar";
 import Header from "./Header";
 import Footer from "./Footer";
@@ -31,7 +31,7 @@ export default function Layout({ children }) {
     <>
       <Header />
       <NavBar />
-      <Box>{children}</Box>
+      <Box minH={"calc(100vh - 120px)"}>{children}</Box>
       <Footer />
     </>
   );

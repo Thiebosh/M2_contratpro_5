@@ -38,11 +38,13 @@ class DirectoryManager {
         return rmdir($path);
     }
 
-    public function include_file($path, $filename) {
+    public function include_file($path, $filename, $page_call) {
         $dir_path = "{$this->root_path}/{$path}";
         $file_path = "{$dir_path}/{$filename}";
 
         if (!(is_dir($dir_path) && file_exists($file_path))) return false;
+
+        global $RESP_CODE;
 
         include_once($file_path);
         return true;
