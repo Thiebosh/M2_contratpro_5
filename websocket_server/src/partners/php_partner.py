@@ -70,13 +70,11 @@ class PhpPartner():
 
 
     def set_session(self, session):
-        print(self._post("set_session", { "session": session}, get_code=True, print_=True))
-        return True
+        return self._post("set_session", { "session": session}, print_=True)[0]
 
 
     def get_session(self):
-        print(self._get("get_session", get_code=True, print_=True))
-        return "{}"
+        return self._get("get_session", print_=True)
 
 
     def get_project_page(self, project_name, page):
