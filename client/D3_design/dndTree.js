@@ -559,6 +559,26 @@ treeJSON = d3.json("flare.json", function (error, treeData) {
         });
     }
 
+    function delete_node(node) {
+        visit(
+            treeData,
+            function (d) {
+                if (d.children) {
+                    for (var child of d.children) {
+                        if (child == node) {
+                            d.children = _.without(d.children, child);
+                            update(root);
+                            break;
+                        }
+                    }
+                }
+            },
+            function (d) {
+                return d.children && d.children.length > 0 ? d.children : null;
+            }
+        );
+    }
+
     // Append a group which holds all nodes and which the zoom Listener can act upon.
     var svgGroup = baseSvg.append("g");
 
