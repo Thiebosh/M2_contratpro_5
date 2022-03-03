@@ -15,23 +15,24 @@ import {
 import { useRef } from "react";
 import $ from "jquery";
 
-export default function ProjectCreateModal({ isOpen, setIsOpen, user }) {
+export default function AccountCreateModal({ isOpen, setIsOpen, user }) {
   const toast = useToast();
-  const nameInput = useRef();
+  const usernameInput = useRef();
+  const passwordInput = useRef();
 
   const handleSave = () => {
     console.log(user);
     $.ajax({
-      url: "http://localhost:8001/project/create",
+      url: "http://localhost:8001/account/create",
       type: "POST",
       data: {
-        name: nameInput.current.value,
-        users_id: [user.id],
+        name: usernameInput.current.value,
+        password: passwordInput.current.value,
       },
-      success: function (resp) {
+      success: function () {
         toast({
-          title: "Project created",
-          description: "Name : " + nameInput.current.value,
+          title: "Account created",
+          description: "Name : " + usernameInput.current.value,
           status: "success",
           duration: 9000,
           isClosable: true,
@@ -60,12 +61,16 @@ export default function ProjectCreateModal({ isOpen, setIsOpen, user }) {
     <Modal isOpen={isOpen} onClose={handleClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Create new project</ModalHeader>
+        <ModalHeader>Create new account</ModalHeader>
         <ModalCloseButton />
         <ModalBody pb={6}>
           <FormControl isRequired>
-            <FormLabel htmlFor="name">Name</FormLabel>
-            <Input id="name" type="text" ref={nameInput} />
+            <FormLabel htmlFor="username">Username</FormLabel>
+            <Input id="username" type="text" ref={usernameInput} />
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel htmlFor="password">password</FormLabel>
+            <Input id="password" type="password" ref={passwordInput} />
           </FormControl>
         </ModalBody>
 

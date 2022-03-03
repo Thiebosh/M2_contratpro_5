@@ -1,15 +1,14 @@
 import {
   Box,
   Button,
-  Checkbox,
   Flex,
   FormControl,
   FormLabel,
   Heading,
   Input,
-  Link,
   Stack,
   useColorModeValue,
+  useToast,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { withSessionSsr } from "../../lib/withSession";
@@ -20,6 +19,7 @@ export default function Login() {
   const router = useRouter();
   const usernameInput = useRef();
   const passwordInput = useRef();
+  const toast = useToast();
 
   const handleClick = () => {
     axios
@@ -27,8 +27,26 @@ export default function Login() {
         username: usernameInput.current.value,
         password: passwordInput.current.value,
       })
-      .then(() => router.push("/dashboard"))
-      .catch((err) => console.log(err));
+      .then(() => {
+        toast({
+          title: "Loged in",
+          description: "Redirecting...",
+          status: "success",
+          duration: 9000,
+          isClosable: true,
+        });
+        router.push("/dashboard");
+      })
+      .catch((err) => {
+        toast({
+          title: "Login failed",
+          description: "Wrong credentials",
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
+        console.log(err);
+      });
   };
 
   return (

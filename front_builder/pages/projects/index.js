@@ -5,23 +5,11 @@ import {
   Center,
   Container,
   Flex,
-  FormControl,
-  FormLabel,
   Heading,
   IconButton,
-  Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Select,
   Table,
-  TableCaption,
   Tbody,
   Td,
-  Text,
   Th,
   Thead,
   Tr,
@@ -34,7 +22,7 @@ import { AddIcon, DeleteIcon, EditIcon, SettingsIcon } from "@chakra-ui/icons";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import $ from "jquery";
-import requireAuth from "../../components/utils/requireAuth";
+import requireAuth from "../../middleware/requireAuth";
 import ProjectCreateModal from "../../components/modals/ProjectCreateModal";
 import ProjectRenameModal from "../../components/modals/ProjectRenameModal";
 
