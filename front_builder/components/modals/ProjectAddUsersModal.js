@@ -15,22 +15,19 @@ import {
 import { useRef } from "react";
 import $ from "jquery";
 
-export default function ProjectUsersModal({ projectId, setProjectId }) {
+export default function ProjectAddUsersModal({ projectId, isOpen, setIsOpen }) {
   const toast = useToast();
   const nameInput = useRef();
 
   const handleSave = () => {
     $.ajax({
-      url: "http://localhost:8001/project/update",
+      url: "http://localhost:8001/project/add_user",
       type: "POST",
-      data: {
-        id: projectId,
-        name: nameInput.current.value,
-      },
+      data: {},
       success: function (resp) {
         toast({
           title: "Project renamed",
-          description: "Name : " + nameInput.current.value,
+          description: "Name : ",
           status: "success",
           duration: 9000,
           isClosable: true,
@@ -52,11 +49,11 @@ export default function ProjectUsersModal({ projectId, setProjectId }) {
 
   function handleClose() {
     nameInput.current.value = "";
-    setProjectId(0);
+    setIsOpen(0);
   }
 
   return (
-    <Modal isOpen={projectId} onClose={handleClose}>
+    <Modal isOpen={isOpen} onClose={handleClose}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Add Users</ModalHeader>
