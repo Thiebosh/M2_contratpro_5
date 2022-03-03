@@ -59,15 +59,6 @@ export default function Account() {
     });
   }
 
-  function popUpDataSaved() {
-    toast({
-      title: "Données sauvegardées",
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-    });
-  }
-
   return (
     <Container maxW={"container.xl"}>
       <Flex
