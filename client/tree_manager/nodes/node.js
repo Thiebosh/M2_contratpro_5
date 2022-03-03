@@ -7,6 +7,7 @@ class Node {
         this.path = parent == null ? "root" : parent.path + "_" + name;
         this.root = parent == null ? this : parent.root;
         this.depth = parent == null ? 0 : this.parent.depth + 1 ;
+        this.pd = null;
 
     }
 
@@ -60,18 +61,15 @@ class Node {
 
     update(source) {
         // Compute the new tree layout. 
-        var root = d3.hierarchy(this.root, function(d) {return d.children; });
-        var treeData = tree(root);
+        var treeData = tree(this.root.hierarchy);
         var nodes = treeData.descendants(),
             links = treeData.descendants().slice(1);
-
         // Normalize for fixed-depth.
-        nodes.forEach(function(d) {d.y = d.depth * 180; });
+        nodes.forEach(function(d) {d.data.pd = d;d.y = d.depth * 180; });
         // Update the nodes…
         var node = svg.selectAll("g.node")
             .data(nodes, function(d) { return d.id || (d.id = ++i); });
-
-        // Enter any new nodes at the parent's previous position.
+            // Enter any new nodes at the parent's previous position.
         var nodeEnter = node.enter().append("g")
         .attr("class", function(d){
             let objectName = d.data.constructor.name;
@@ -79,9 +77,8 @@ class Node {
         })
         .attr("id", function(d){return d.data.path})
         .attr("transform", function(d) {return "translate(" + source.y0 + "," + source.x0 + ")"; })
-        .on("click", function(e,d){d.data.click();});
+        .on("click", function(e,d){d.data.click(d.parent);});
         
-        // console.log(nodeEnter)
         nodeEnter.append("circle")
         .attr("class", "node")
         // .attr("r", function(d){
