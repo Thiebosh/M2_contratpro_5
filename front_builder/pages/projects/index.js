@@ -68,7 +68,7 @@ export default function Projects({ user }) {
       success: function (res) {
         toast({
           title: "Project deleted",
-          status: "error",
+          status: "success",
           duration: 9000,
           isClosable: true,
         });

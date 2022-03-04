@@ -24,13 +24,17 @@ export default function Account({ user }) {
 
   const [account, setAccount] = useState();
 
-  useEffect(() => {
+  function getAccount() {
     axios
       .get("/api/accounts/" + user.id)
       .then((res) => setAccount(res.data))
       .catch((error) => {
         console.error(error);
       });
+  }
+
+  useEffect(() => {
+    getAccount();
   }, []);
 
   /* HANDLE FUNCTIONS */
