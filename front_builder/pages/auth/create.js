@@ -1,15 +1,12 @@
 import {
   Box,
   Button,
-  Center,
   Flex,
   FormControl,
   FormLabel,
   Heading,
   Input,
-  Link,
   Stack,
-  Text,
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
@@ -17,40 +14,61 @@ import { useRouter } from "next/router";
 import { withSessionSsr } from "../../lib/withSession";
 import axios from "axios";
 import { useRef } from "react";
-import NextLink from "next/link";
+import Link from "next/link";
+import $ from "jquery";
 
-export default function Login() {
+export default function Create() {
   const router = useRouter();
-  const usernameInput = useRef();
-  const passwordInput = useRef();
+  const createUsernameInput = useRef();
+  const createPasswordInput = useRef();
   const toast = useToast();
 
   const handleClick = () => {
-    axios
-      .post("/api/auth/login", {
-        username: usernameInput.current.value,
-        password: passwordInput.current.value,
-      })
-      .then(() => {
+    const dataCreateAccount = {
+      name: createUsernameInput.current.value,
+      password: createPasswordInput.current.value,
+    };
+    $.ajax({
+      url: "http://localhost:8001/account/create",
+      type: "POST",
+      data: dataCreateAccount,
+      success: function (resp) {
+        if (resp.success === "already exist") {
+          toast({
+            title: "Account already exist",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        } else if (resp.success === true) {
+          toast({
+            title: "Account created",
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+          });
+          router.push("/auth/login");
+        } else if (resp.success === false) {
+          toast({
+            title: "Error",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        }
+        console.log(resp);
+      },
+      error: function () {
         toast({
-          title: "Loged in",
-          description: "Redirecting...",
-          status: "success",
-          duration: 9000,
-          isClosable: true,
-        });
-        router.push("/dashboard");
-      })
-      .catch((err) => {
-        toast({
-          title: "Login failed",
-          description: "Wrong credentials",
+          title: "Error",
+          description: "erreur",
           status: "error",
-          duration: 9000,
+          duration: 3000,
           isClosable: true,
         });
-        console.log(err);
-      });
+        console.log("failure");
+      },
+    });
   };
 
   return (
@@ -62,7 +80,7 @@ export default function Login() {
     >
       <Stack spacing={6} mx={"auto"} maxW={"lg"} py={6} px={6}>
         <Stack align={"center"}>
-          <Heading fontSize={"4xl"}>Login</Heading>
+          <Heading fontSize={"4xl"}>Create account</Heading>
         </Stack>
         <Box
           rounded={"lg"}
@@ -73,13 +91,17 @@ export default function Login() {
           <Stack spacing={4}>
             <FormControl id="email">
               <FormLabel>Username</FormLabel>
-              <Input type="text" name={"username"} ref={usernameInput} />
+              <Input type="text" name={"username"} ref={createUsernameInput} />
             </FormControl>
             <FormControl id="password">
               <FormLabel>Password</FormLabel>
-              <Input type="password" name={"password"} ref={passwordInput} />
+              <Input
+                type="password"
+                name={"password"}
+                ref={createPasswordInput}
+              />
             </FormControl>
-            <Stack>
+            <Stack spacing={10}>
               <Button
                 mt={4}
                 bg={"blue.400"}
@@ -89,15 +111,8 @@ export default function Login() {
                 }}
                 onClick={handleClick}
               >
-                Sign in
+                Create
               </Button>
-              <Center>
-                <NextLink href="/auth/create">
-                  <Link as="i" fontSize="sm" color="gray.500" mt={2}>
-                    Create account
-                  </Link>
-                </NextLink>
-              </Center>
             </Stack>
           </Stack>
         </Box>
