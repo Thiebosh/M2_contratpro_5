@@ -57,11 +57,14 @@ $(function () {
                 for (let i = 0; i < node[key].length; i++){
                     let arrayChildNode = arrayNode.addObjectChild(arrayNode.children.length)
                     rec(syntax, node[key][i], arrayChildNode)
-
+                    arrayChildNode.children.push(arrayChildNode.children.splice(0,1)[0]) //On place le "+" en dernier enfant
+                    
                 }
+                arrayNode.children.push(arrayNode.children.splice(0,1)[0]) //On place le "+" en dernier enfant
             } else if (typeof node[key] === "object"){ //On rencontre un JSON Object
                 let objectNode = parentNode.addObjectChild(key);
                 rec(syntax, node[key], objectNode);
+                objectNode.children.push(objectNode.children.splice(0,1)[0]) //On place le "+" en dernier enfant
 
             } else { //On rencontre une string (on arrive au bout de la branche de l'arbre)
             }
