@@ -4,7 +4,6 @@ import User from "../../../models/user";
 import bcrypt from "bcryptjs";
 
 async function loginRoute(req, res) {
-  // get user from database then:
   if (req.method !== "POST") {
     res.status(404).json({ message: "Not found" });
     return;

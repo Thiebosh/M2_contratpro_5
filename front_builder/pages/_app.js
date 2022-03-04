@@ -1,12 +1,17 @@
 import { ChakraProvider } from "@chakra-ui/react";
 
 import "../styles/globals.css";
-import Layout from "../components/layout/Layout";
+import DefaultLayout from "../components/layout/DefaultLayout";
 
 function MyApp({ Component, pageProps: { session, ...pageProps } }) {
-  const getLayout = Component.getLayout || ((page) => page);
+  const Layout =
+    Component.layout === undefined
+      ? DefaultLayout
+      : Component.layout
+      ? Component.layout
+      : ({ children }) => children;
 
-  return getLayout(
+  return (
     <ChakraProvider>
       <Layout>
         <Component {...pageProps} />

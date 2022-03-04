@@ -58,9 +58,9 @@ export default function NavBar() {
         <IconButton
           size={"md"}
           icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
-          aria-label={"Open Menu"}
           display={{ md: "none" }}
           onClick={isOpen ? onClose : onOpen}
+          variant={""}
         />
 
         <HStack spacing={8} alignItems={"center"}>
@@ -89,7 +89,7 @@ export default function NavBar() {
             >
               <Avatar size={"sm"} />
             </MenuButton>
-            <MenuList color={"gray.800"}>
+            <MenuList color={useColorModeValue("gray.800", "white.300")}>
               {accountLinks.map((link) => (
                 <Link href={link.href} key={link.href}>
                   <a>

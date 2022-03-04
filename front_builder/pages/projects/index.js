@@ -5,14 +5,15 @@ import {
   Center,
   Container,
   Flex,
+  forwardRef,
   Heading,
-  Icon,
   IconButton,
   Table,
   Tbody,
   Td,
   Th,
   Thead,
+  Tooltip,
   Tr,
   useColorModeValue,
   useToast,
@@ -21,12 +22,11 @@ import {
 } from "@chakra-ui/react";
 import dayjs from "dayjs";
 
-import { AddIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons";
+import { AddIcon, DeleteIcon, EditIcon, SettingsIcon } from "@chakra-ui/icons";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import $ from "jquery";
 import requireAuth from "../../middleware/requireAuth";
-import { UserIcon } from "@heroicons/react/outline";
 import ConfirmDeleteDialog from "../../components/dialogs/ConfirmDeleteDialog";
 import NameModal from "../../components/modals/NameModal";
 
@@ -68,7 +68,7 @@ export default function Projects({ user }) {
       success: function (res) {
         toast({
           title: "Project deleted",
-          status: "error",
+          status: "success",
           duration: 9000,
           isClosable: true,
         });
@@ -203,25 +203,23 @@ export default function Projects({ user }) {
                     <Td>{dayjs(project.creation).format("D MMMM YYYY")}</Td>
                     <Td>{dayjs(project.last_specs).format("D MMMM YYYY")}</Td>
                     <Td>
-                      <IconButton
-                        aria-label="modifier"
-                        mx={1}
-                        icon={<EditIcon />}
-                        onClick={() => setRenameProjectId(project.id)}
-                      />
-                      <Link href={`/projects/${project.id}/settings`}>
+                      <Tooltip label={"Rename"}>
                         <IconButton
-                          aria-label="settings"
                           mx={1}
-                          icon={<Icon as={UserIcon} boxSize={5} />}
+                          icon={<EditIcon />}
+                          onClick={() => setRenameProjectId(project.id)}
                         />
+                      </Tooltip>
+                      <Link href={`/projects/${project.id}/settings`}>
+                        <IconButton mx={1} icon={<SettingsIcon />} />
                       </Link>
-                      <IconButton
-                        aria-label="delete"
-                        mx={1}
-                        icon={<DeleteIcon />}
-                        onClick={() => setDeleteProjectId(project.id)}
-                      />
+                      <Tooltip label={"Delete"}>
+                        <IconButton
+                          mx={1}
+                          icon={<DeleteIcon />}
+                          onClick={() => setDeleteProjectId(project.id)}
+                        />
+                      </Tooltip>
                     </Td>
                   </Tr>
                 ))}
