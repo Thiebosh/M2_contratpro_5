@@ -18,18 +18,21 @@ import {
   useColorModeValue,
   useToast,
   Wrap,
+  Link,
   WrapItem,
 } from "@chakra-ui/react";
 import dayjs from "dayjs";
 
 import { AddIcon, DeleteIcon, EditIcon, SettingsIcon } from "@chakra-ui/icons";
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import $ from "jquery";
 import requireAuth from "../../middleware/requireAuth";
 import ConfirmDeleteDialog from "../../components/dialogs/ConfirmDeleteDialog";
 import NameModal from "../../components/modals/NameModal";
+import * as PropTypes from "prop-types";
+import NextLink from "next/link";
 
+NextLink.propTypes = { children: PropTypes.node };
 export default function Projects({ user }) {
   const [projects, setProjects] = useState([]);
   const [openCreate, setOpenCreate] = useState(false);
@@ -199,7 +202,11 @@ export default function Projects({ user }) {
               <Tbody>
                 {projects.map((project) => (
                   <Tr key={project.id}>
-                    <Td>{project.name}</Td>
+                    <Td>
+                      <NextLink href={`/projects/${project.id}`}>
+                        <Link color="teal.500">{project.name}</Link>
+                      </NextLink>
+                    </Td>
                     <Td>{dayjs(project.creation).format("D MMMM YYYY")}</Td>
                     <Td>{dayjs(project.last_specs).format("D MMMM YYYY")}</Td>
                     <Td>
@@ -210,9 +217,9 @@ export default function Projects({ user }) {
                           onClick={() => setRenameProjectId(project.id)}
                         />
                       </Tooltip>
-                      <Link href={`/projects/${project.id}/settings`}>
+                      <NextLink href={`/projects/${project.id}/settings`}>
                         <IconButton mx={1} icon={<SettingsIcon />} />
-                      </Link>
+                      </NextLink>
                       <Tooltip label={"Delete"}>
                         <IconButton
                           mx={1}
