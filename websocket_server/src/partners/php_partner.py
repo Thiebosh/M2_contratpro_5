@@ -4,6 +4,7 @@ from requests.exceptions import RequestException
 class PhpPartner():
     def __init__(self, base_url, state=None) -> None:
         self.base_url = base_url
+        self.session = requests.session()
         self.state = state or self._get("probe")[0]
 
 
@@ -17,7 +18,7 @@ class PhpPartner():
 
         print("php - call", endpoint)
         try:
-            result = method_callback()
+            result:requests.Response = method_callback()
         except RequestException:
             raise Exception("php - server not started")
 
@@ -33,11 +34,11 @@ class PhpPartner():
 
 
     def _get(self, endpoint, print_=False, get_code=False):
-        return self._call(lambda: requests.get(url=f"{self.base_url}?action={endpoint}"), endpoint, print_, get_code)
+        return self._call(lambda: self.session.get(url=f"{self.base_url}?action={endpoint}"), endpoint, print_, get_code)
 
 
     def _post(self, endpoint, data, print_=False, get_code=False):
-        return self._call(lambda: requests.post(url=f"{self.base_url}?action={endpoint}", data=data), endpoint, print_, get_code)
+        return self._call(lambda: self.session.post(url=f"{self.base_url}?action={endpoint}", data=data), endpoint, print_, get_code)
 
 
     def set_project_folder(self, project_name):
@@ -70,11 +71,11 @@ class PhpPartner():
 
 
     def set_session(self, session):
-        return self._post("set_session", { "session": session}, print_=True)[0]
+        return self._post("set_session", { "session": session})[0]
 
 
     def get_session(self):
-        return self._get("get_session", print_=True)
+        return self._get("get_session")
 
 
     def get_project_page(self, project_name, page):
