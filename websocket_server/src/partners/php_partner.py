@@ -18,7 +18,7 @@ class PhpPartner():
 
         print("php - call", endpoint)
         try:
-            result = method_callback()
+            result:requests.Response = method_callback()
         except RequestException:
             raise Exception("php - server not started")
 
