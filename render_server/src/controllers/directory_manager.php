@@ -46,7 +46,14 @@ class DirectoryManager {
 
         global $RESP_CODE;
 
-        include_once($file_path);
+        try {
+            include_once($file_path); // set content in ob temp and echo it only if well passed
+        }
+        catch(Exception $e) {
+            echo($RESP_CODE["error"]);
+            return false;
+        }
+
         return true;
     }
 }
