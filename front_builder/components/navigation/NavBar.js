@@ -58,9 +58,9 @@ export default function NavBar() {
         <IconButton
           size={"md"}
           icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
-          aria-label={"Open Menu"}
           display={{ md: "none" }}
           onClick={isOpen ? onClose : onOpen}
+          variant={""}
         />
 
         <HStack spacing={8} alignItems={"center"}>

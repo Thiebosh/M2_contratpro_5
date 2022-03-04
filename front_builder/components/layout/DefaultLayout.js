@@ -3,7 +3,7 @@ import NavBar from "../navigation/NavBar";
 import Header from "./Header";
 import Footer from "./Footer";
 
-export default function Layout({ children }) {
+export default function DefaultLayout({ children }) {
   return (
     <>
       <Header />

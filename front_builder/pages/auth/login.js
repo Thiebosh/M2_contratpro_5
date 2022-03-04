@@ -55,7 +55,7 @@ export default function Login() {
 
   return (
     <Flex
-      minH={"90vh"}
+      minH={"100vh"}
       align={"center"}
       justify={"center"}
       bg={useColorModeValue("gray.50", "gray.800")}
@@ -124,3 +124,5 @@ export const getServerSideProps = withSessionSsr(
     };
   }
 );
+
+Login.layout = false;
