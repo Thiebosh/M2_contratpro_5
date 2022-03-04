@@ -102,12 +102,7 @@ if (isset($_GET['action'])) {
             exit();
 
         case 'get_session':
-            echo($_SESSION["data"]);
-            if(!isset($_SESSION["data"])) {
-                echo("{}");
-                exit();
-            }
-            echo (json_encode($_SESSION["data"]));
+            echo((!isset($_SESSION["data"]) || empty($_SESSION["data"])) ? "{}" : (!isset($_SESSION["data"]) || empty($_SESSION["data"])));
             exit();
 
         case 'set_session':
@@ -115,13 +110,14 @@ if (isset($_GET['action'])) {
                 http_response_code($RESP_CODE["bad_request"]);
                 exit();
             }
+
             $post['session'] = $_POST['session'];
             if (in_array(false, $post, true)) {
                 http_response_code($RESP_CODE["bad_request"]);
                 exit();
             }
-            $_SESSION["data"] = json_decode($post['session'],true);
-            echo($_SESSION["data"]["test"]);
+
+            $_SESSION["data"] = json_decode($post['session'], true);
             http_response_code($RESP_CODE["success"]);
             exit();
 
