@@ -60,13 +60,8 @@ export default function Account() {
   }
 
   return (
-    <Container maxW={"container.xl"}>
-      <Flex
-        minH={"50vh"}
-        align={"center"}
-        justify={"center"}
-        bg={useColorModeValue("gray.50", "gray.800")}
-      >
+    <Container>
+      <Flex minH={"50vh"} align={"center"} justify={"center"}>
         <Stack
           spacing={4}
           w={"full"}
@@ -80,27 +75,9 @@ export default function Account() {
           <Heading lineHeight={1.1} fontSize={{ base: "xl", sm: "3xl" }}>
             User Profile Edit
           </Heading>
-          <FormControl id="userName">
-            <FormLabel>User Icon</FormLabel>
-            <Stack direction={["column", "row"]} spacing={6}>
-              <Center>
-                <Avatar size="xl" src="https://bit.ly/code-beast">
-                  <AvatarBadge
-                    as={IconButton}
-                    size="sm"
-                    rounded="full"
-                    top="-10px"
-                    colorScheme="red"
-                    aria-label="remove Image"
-                    icon={<SmallCloseIcon />}
-                  />
-                </Avatar>
-              </Center>
-              <Center w="full">
-                <Button w="full">Change Icon</Button>
-              </Center>
-            </Stack>
-          </FormControl>
+
+          <Avatar size="xl" src="https://bit.ly/code-beast" />
+
           <FormControl id="newUserNameInput">
             <FormLabel>Change your user name</FormLabel>
             <Input
@@ -120,16 +97,6 @@ export default function Account() {
             />
           </FormControl>
           <Stack spacing={6} direction={["column", "row"]}>
-            <Button
-              bg={"red.400"}
-              color={"white"}
-              w="full"
-              _hover={{
-                bg: "red.500",
-              }}
-            >
-              Cancel
-            </Button>
             <Button
               bg={"blue.400"}
               color={"white"}

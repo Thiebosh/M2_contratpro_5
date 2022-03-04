@@ -18,10 +18,13 @@ $(function () {
     // diagonal = d3.svg.diagonal()
     // .projection(function(d) { return [d.y, d.x]; });
 
-    svg = d3.select("body")
+    svg = d3.select("#treeContent")
         .append("svg")
         .attr("width", width + margin.right + margin.left)
         .attr("height", height + margin.top + margin.bottom)
+        .call(d3.zoom().on("zoom", function (event) {
+            svg.attr("transform", event.transform)
+         }))
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -72,6 +75,7 @@ $(function () {
                 // root.addArrayChild("Screen");
                 // root.addObjectChild("test").addArrayChild("fds")
                 rec(syntax, json["root"], root)
+                root.hierarchy = d3.hierarchy(root, function(d){return d.children;});
                 root.update(root)
             });
     	});
