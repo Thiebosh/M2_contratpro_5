@@ -1,35 +1,28 @@
 import {
   Avatar,
-  AvatarBadge,
   Button,
-  Center,
   Container,
   Flex,
   FormControl,
   FormLabel,
   Heading,
-  IconButton,
   Input,
   Stack,
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
-import { SmallCloseIcon } from "@chakra-ui/icons";
 import $ from "jquery";
-import { withSessionSsr } from "../../lib/withSession";
 import { useRef } from "react";
-
-const idUser = "61e131ce9c11b699edc38a1e";
 import requireAuth from "../../middleware/requireAuth";
 
-export default function Account() {
+export default function Account({ user }) {
   const newUserNameInput = useRef();
   const newPasswordInput = useRef();
   const toast = useToast();
 
   function changeDataAccount() {
     const data = {
-      id: idUser,
+      id: user.id,
       name: newUserNameInput.current.value,
       password: newPasswordInput.current.value,
     };
