@@ -65,14 +65,15 @@ export default function Projects({ user }) {
       data: {
         id: projectID,
       },
-      success: function (resp) {
-        getProjectsByUser();
+      success: function (res) {
         toast({
           title: "Project deleted",
           status: "error",
           duration: 9000,
           isClosable: true,
         });
+        getProjectsByUser();
+        setDeleteProjectId(0);
       },
       error: function (error) {
         toast({
