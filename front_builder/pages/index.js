@@ -1,13 +1,4 @@
-import {
-  Box,
-  Button,
-  Container,
-  Heading,
-  Icon,
-  Stack,
-  Text,
-  useColorModeValue,
-} from "@chakra-ui/react";
+import { Box, Button, Container, Heading, Stack, Text } from "@chakra-ui/react";
 import Link from "next/link";
 import requireAuth from "../middleware/requireAuth";
 

@@ -6,19 +6,11 @@ import {
   GridItem,
   Heading,
   Link,
-  Table,
-  Tbody,
-  Td,
   Text,
-  Th,
-  Thead,
-  Tr,
   useColorModeValue,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import $ from "jquery";
-import dayjs from "dayjs";
-import { ChevronRightIcon } from "@chakra-ui/icons";
 
 export default function Dashboard({ user }) {
   const [projects, setProjects] = useState([]);
@@ -80,7 +72,7 @@ export default function Dashboard({ user }) {
             Username : {projects.length && projects[0].users[0].name}
           </Text>
           <Link href={"/projects"}>
-            <Button colorScheme={"blue"}>All accounts &rarr;</Button>
+            <Button colorScheme={"blue"}>My account &rarr;</Button>
           </Link>
         </GridItem>
       </Grid>

@@ -9,19 +9,23 @@ import {
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import $ from "jquery";
 import requireAuth from "../../../middleware/requireAuth";
 import { useRouter } from "next/router";
 import ProjectAddUsersModal from "../../../components/modals/ProjectAddUsersModal";
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
+import axios from "axios";
 
 export default function Settings({ user }) {
+  const toast = useToast();
   const router = useRouter();
 
   const { projectId } = router.query;
+
   const [dataProject, setDataProject] = useState({ name: "", users: [] });
   const [addUserIsOpen, setAddUserIsOpen] = useState(false);
+  const [options, setOptions] = useState([]);
 
   function getProject() {
     $.ajax({
@@ -40,18 +44,90 @@ export default function Settings({ user }) {
     });
   }
 
+  function getOptions() {
+    axios
+      .get("/api/accounts")
+      .then((res) => {
+        // build options
+        const optns = [];
+        res.data.forEach((acc) => {
+          if (!dataProject.users.find((user) => user.id === acc._id)) {
+            optns.push({
+              value: acc._id,
+              label: acc.name,
+            });
+          }
+        });
+        setOptions(optns);
+      })
+      .catch((error) => {
+        console.error(error);
+        toast({
+          title: "Error",
+          description: "Cannot fetch accounts",
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
+      });
+  }
+
   useEffect(() => {
     getProject();
   }, []);
+
+  useEffect(() => {
+    getOptions();
+  }, [dataProject]);
+
+  /* HANDLE FUNCTIONS */
+  function deleteUserFromProject(projectId, userIdToDelete) {
+    console.log(userIdToDelete);
+    $.ajax({
+      url: "http://localhost:8001/project/remove_user",
+      type: "POST",
+      data: {
+        id: projectId,
+        user_id: userIdToDelete,
+      },
+      success: function (resp) {
+        getProject();
+      },
+      error: function () {
+        console.log("failure");
+      },
+    });
+  }
+
+  function addUsers(results) {
+    const errors = [];
+    results.forEach(async (result) => {
+      await $.ajax({
+        url: "http://localhost:8001/project/add_user",
+        type: "POST",
+        data: {
+          id: projectId,
+          user_id: result.value,
+        },
+        error: function (error) {
+          console.error(error);
+          errors.push(result);
+        },
+      });
+    });
+    setAddUserIsOpen(false);
+    getProject();
+  }
 
   return (
     <>
       <Container
         maxW={"container.xls"}
         bg={useColorModeValue("gray.50", "gray.800")}
+        py={8}
       >
-        <Heading fontSize={"4xl"} my={4}>
-          Settings {dataProject.name} project
+        <Heading fontSize={"4xl"} mb={4}>
+          Settings - {dataProject.name}
         </Heading>
         <Box
           mx={"auto"}
@@ -61,7 +137,7 @@ export default function Settings({ user }) {
           boxShadow={"lg"}
           p={8}
         >
-          <Heading size={"md"} mb={3}>
+          <Heading size={"md"} mb={4}>
             Manage users
           </Heading>
           <Box maxW={"45%"}>
@@ -97,30 +173,12 @@ export default function Settings({ user }) {
       </Container>
       <ProjectAddUsersModal
         isOpen={addUserIsOpen}
-        setIsOpen={setAddUserIsOpen}
-        projectId={projectId}
+        options={options}
+        cancelAdd={() => setAddUserIsOpen(false)}
+        saveAdd={addUsers}
       />
     </>
   );
-
-  function deleteUserFromProject(projectId, userIdToDelete) {
-    console.log(userIdToDelete);
-    $.ajax({
-      url: "http://localhost:8001/project/remove_user",
-      type: "POST",
-      data: {
-        id: projectId,
-        user_id: userIdToDelete,
-      },
-      success: function (resp) {
-        getProject();
-        console.log(resp);
-      },
-      error: function () {
-        console.log("failure");
-      },
-    });
-  }
 }
 
 export const getServerSideProps = requireAuth;

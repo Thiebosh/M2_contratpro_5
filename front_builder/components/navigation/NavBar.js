@@ -89,7 +89,7 @@ export default function NavBar() {
             >
               <Avatar size={"sm"} />
             </MenuButton>
-            <MenuList color={"gray.800"}>
+            <MenuList color={useColorModeValue("gray.800", "white.300")}>
               {accountLinks.map((link) => (
                 <Link href={link.href} key={link.href}>
                   <a>
