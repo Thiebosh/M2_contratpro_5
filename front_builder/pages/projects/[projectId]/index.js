@@ -14,27 +14,60 @@ import {
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import Head from "next/head";
-import { CloseIcon, HamburgerIcon, Icon } from "@chakra-ui/icons";
-import { SaveIcon } from "@heroicons/react/outline";
-
-const links = [
-  {
-    label: "Close",
-    href: "/projects",
-    icon: <CloseIcon />,
-  },
-  {
-    label: "Save",
-    onClick: "/projects",
-    icon: <Icon as={SaveIcon} boxSize={5} />,
-  },
-];
+import {
+  CloseIcon,
+  HamburgerIcon,
+  Icon,
+  SmallCloseIcon,
+} from "@chakra-ui/icons";
+import { BeakerIcon, CogIcon, SaveIcon } from "@heroicons/react/outline";
 
 export default function ProjectDetails() {
   const router = useRouter();
   const { projectId } = router.query;
 
   useEffect(() => {}, []);
+
+  const links = [
+    {
+      label: "Close",
+      onClick: handleClose,
+      icon: <CloseIcon />,
+    },
+    {
+      label: "Save",
+      onClick: handleSave,
+      icon: <Icon as={SaveIcon} boxSize={5} />,
+    },
+    {
+      label: "Generate",
+      onClick: handleGenerate,
+      icon: <Icon as={CogIcon} boxSize={5} />,
+    },
+    {
+      label: "Test",
+      onClick: handleTest,
+      icon: <Icon as={BeakerIcon} boxSize={5} />,
+    },
+  ];
+
+  /* HANDLE FUNCTIONS */
+  function handleClose() {
+    // ConfirmDialog
+    router.push("/projects");
+  }
+
+  function handleSave() {
+    console.log("nothing saved");
+  }
+
+  function handleGenerate() {
+    console.log("nothing generated");
+  }
+
+  function handleTest() {
+    console.log("nothing tested");
+  }
 
   return (
     <>
@@ -49,7 +82,7 @@ export default function ProjectDetails() {
           w={"100vw"}
           zIndex={100}
           p={2}
-          bg={"whiteAlpha.700"}
+          bg={"whiteAlpha.800"}
           borderBottom={"1px"}
           borderColor={"gray.100"}
         >
@@ -60,11 +93,21 @@ export default function ProjectDetails() {
                 border={"solid 1px gray.800"}
                 as={IconButton}
                 icon={<HamburgerIcon />}
-                bgColor={"white"}
+                bgColor={"whiteAlpha.800"}
+                _hover={{
+                  bg: "white",
+                }}
+                _active={{
+                  bg: "white",
+                }}
               />
               <MenuList>
                 {links.map((link) => (
-                  <MenuItem key={link.label} icon={link.icon}>
+                  <MenuItem
+                    key={link.label}
+                    icon={link.icon}
+                    onClick={link.onClick}
+                  >
                     {link.label}
                   </MenuItem>
                 ))}
@@ -78,12 +121,15 @@ export default function ProjectDetails() {
             <Text color={"gray.500"}>Id: {projectId}</Text>
           </Flex>
         </Flex>
+
         <Box bg={useColorModeValue("gray.50", "gray.800")} minH={"100vh"} p={1}>
           {/* REPLACE CODE BELLOW WITH GRAPH */}
           {/* --- START --- */}
+
           <Box h={"200px"} w={"200px"} bgColor={"red"} px={4} py={14}>
-            REPLACE THIS CODE WITH GRAPH CONTENT
+            Replace this box with GRAPH CONTENT
           </Box>
+
           {/* --- END --- */}
         </Box>
       </Box>
