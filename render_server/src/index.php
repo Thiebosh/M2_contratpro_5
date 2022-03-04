@@ -102,7 +102,7 @@ if (isset($_GET['action'])) {
             exit();
 
         case 'get_session':
-            echo((!isset($_SESSION["data"]) || empty($_SESSION["data"])) ? "{}" : (!isset($_SESSION["data"]) || empty($_SESSION["data"])));
+            echo((!isset($_SESSION["data"]) || empty($_SESSION["data"])) ? "{}" : json_encode($_SESSION["data"]));
             exit();
 
         case 'set_session':
