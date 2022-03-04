@@ -21,15 +21,14 @@ import {
 } from "@chakra-ui/react";
 import dayjs from "dayjs";
 
-import { AddIcon, DeleteIcon, EditIcon, SettingsIcon } from "@chakra-ui/icons";
+import { AddIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import $ from "jquery";
 import requireAuth from "../../middleware/requireAuth";
-import ProjectCreateModal from "../../components/modals/ProjectCreateModal";
-import ProjectRenameModal from "../../components/modals/ProjectRenameModal";
 import { UserIcon } from "@heroicons/react/outline";
 import ConfirmDeleteDialog from "../../components/dialogs/ConfirmDeleteDialog";
+import NameModal from "../../components/modals/NameModal";
 
 export default function Projects({ user }) {
   const [projects, setProjects] = useState([]);
@@ -86,6 +85,70 @@ export default function Projects({ user }) {
       },
     });
   }
+
+  const createProject = (name) => {
+    $.ajax({
+      url: "http://localhost:8001/project/create",
+      type: "POST",
+      data: {
+        name: name,
+        users_id: JSON.stringify([user.id]),
+      },
+      success: function (resp) {
+        toast({
+          title: "Project created",
+          description: "Name : " + name,
+          status: "success",
+          duration: 9000,
+          isClosable: true,
+        });
+        setOpenCreate(false);
+        getProjectsByUser();
+      },
+      error: function (error) {
+        toast({
+          title: "Error",
+          description: error,
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
+        console.log(error);
+      },
+    });
+  };
+
+  const renameProject = (projectId, name) => {
+    $.ajax({
+      url: "http://localhost:8001/project/update",
+      type: "POST",
+      data: {
+        id: projectId,
+        name: name,
+      },
+      success: function (resp) {
+        toast({
+          title: "Project renamed",
+          description: "Name : " + name,
+          status: "success",
+          duration: 9000,
+          isClosable: true,
+        });
+        setRenameProjectId(0);
+        getProjectsByUser();
+      },
+      error: function (error) {
+        toast({
+          title: "Error",
+          description: error,
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
+        console.log(error);
+      },
+    });
+  };
 
   return (
     <>
@@ -166,14 +229,17 @@ export default function Projects({ user }) {
           </Wrap>
         </Box>
       </Container>
-      <ProjectCreateModal
+      <NameModal
+        title={"Create a project"}
         isOpen={openCreate}
-        setIsOpen={setOpenCreate}
-        user={user}
+        cancelAction={() => setOpenCreate(false)}
+        saveAction={createProject}
       />
-      <ProjectRenameModal
-        projectId={renameProjectId}
-        setProjectId={setRenameProjectId}
+      <NameModal
+        title={"Rename project"}
+        isOpen={renameProjectId}
+        cancelAction={() => setRenameProjectId(0)}
+        saveAction={(name) => renameProject(renameProjectId, name)}
       />
       <ConfirmDeleteDialog
         title={"Delete project"}
