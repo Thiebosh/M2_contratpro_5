@@ -1,9 +1,9 @@
 import {
+  Avatar,
   Box,
   Button,
   FormControl,
   FormLabel,
-  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -11,53 +11,33 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  useToast,
+  Tag,
+  TagCloseButton,
+  TagLabel,
 } from "@chakra-ui/react";
-import { useEffect, useRef, useState } from "react";
-import $ from "jquery";
-import { Autocomplete, Option } from "chakra-ui-simple-autocomplete";
+import { useState } from "react";
+import { Autocomplete } from "chakra-ui-simple-autocomplete";
 
-export default function ProjectAddUsersModal({ projectId, isOpen, setIsOpen }) {
-  const toast = useToast();
-  const nameInput = useRef();
-  const [result, setResult] = useState([]);
-  const [options, setOptions] = useState([]);
+export default function ProjectAddUsersModal({
+  isOpen,
+  options,
+  cancelAdd,
+  saveAdd,
+}) {
+  const [results, setResults] = useState([]);
 
-  function searchUser(partOfTheUserName) {
-    $.ajax({
-      url: "http://localhost:8001/account/search",
-      type: "POST",
-      data: {
-        name: partOfTheUserName,
-      },
-      success: function (resp) {
-        console.log(resp);
-      },
-      error: function (error) {
-        console.log(error);
-      },
-    });
+  function handleSave() {
+    saveAdd(results);
+    setResults([]);
   }
 
-  const handleSave = () => {
-    $.ajax({
-      url: "http://localhost:8001/project/add_user",
-      type: "POST",
-      data: {
-        id: projectId,
-        user_id: nameInput.current.value,
-      },
-      success: function (resp) {
-        console.log(resp);
-      },
-      error: function (error) {
-        console.log(error);
-      },
-    });
-  };
+  function handleCancel() {
+    cancelAdd();
+    setResults([]);
+  }
 
   return (
-    <Modal isOpen={isOpen} onClose={() => setIsOpen(0)}>
+    <Modal isOpen={isOpen} onClose={handleCancel}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Add Users</ModalHeader>
@@ -65,7 +45,30 @@ export default function ProjectAddUsersModal({ projectId, isOpen, setIsOpen }) {
         <ModalBody pb={6}>
           <FormControl isRequired>
             <FormLabel htmlFor="name">Name</FormLabel>
-            <Input id="name" type="text" ref={nameInput} />
+            <Box maxW="md">
+              <Autocomplete
+                autoComplete="off"
+                id="name"
+                options={options}
+                result={results}
+                setResult={(options) => setResults(options)}
+                placeholder="Autocomplete"
+                allowCreation={false}
+                renderBadge={(option) => (
+                  <Tag
+                    size={"lg"}
+                    key={option.value}
+                    borderRadius="full"
+                    mr={1}
+                    mb={1}
+                  >
+                    <Avatar size="xs" ml={-1} mr={2} />
+                    <TagLabel>{option.label}</TagLabel>
+                    <TagCloseButton />
+                  </Tag>
+                )}
+              />
+            </Box>
           </FormControl>
         </ModalBody>
 
@@ -73,17 +76,8 @@ export default function ProjectAddUsersModal({ projectId, isOpen, setIsOpen }) {
           <Button colorScheme="blue" mr={3} onClick={handleSave}>
             Add
           </Button>
-          <Button onClick={() => setIsOpen(0)}>Cancel</Button>
+          <Button onClick={handleCancel}>Cancel</Button>
         </ModalFooter>
-
-        <Box maxW="md">
-          <Autocomplete
-            options={options}
-            result={result}
-            setResult={() => setResult(options)}
-            placeholder="Autocomplete"
-          />
-        </Box>
       </ModalContent>
     </Modal>
   );

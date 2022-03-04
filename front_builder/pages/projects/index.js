@@ -5,8 +5,8 @@ import {
   Center,
   Container,
   Flex,
+  forwardRef,
   Heading,
-  Icon,
   IconButton,
   Table,
   Tbody,
@@ -27,7 +27,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import $ from "jquery";
 import requireAuth from "../../middleware/requireAuth";
-import { UserIcon } from "@heroicons/react/outline";
 import ConfirmDeleteDialog from "../../components/dialogs/ConfirmDeleteDialog";
 import NameModal from "../../components/modals/NameModal";
 
@@ -211,11 +210,9 @@ export default function Projects({ user }) {
                           onClick={() => setRenameProjectId(project.id)}
                         />
                       </Tooltip>
-                      <Tooltip label={"Settings"}>
-                        <Link href={`/projects/${project.id}/settings`}>
-                          <IconButton mx={1} icon={<SettingsIcon />} />
-                        </Link>
-                      </Tooltip>
+                      <Link href={`/projects/${project.id}/settings`}>
+                        <IconButton mx={1} icon={<SettingsIcon />} />
+                      </Link>
                       <Tooltip label={"Delete"}>
                         <IconButton
                           mx={1}
