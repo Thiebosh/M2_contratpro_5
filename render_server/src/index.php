@@ -1,14 +1,9 @@
 <?php
 /*header('Access-Control-Allow-Origin: *');
-
 header('Access-Control-Allow-Methods: GET, POST');
-
 header("Access-Control-Allow-Headers: X-Requested-With");*/
 
 session_start();
-
-
-require_once("controllers/directory_manager.php");
 
 $RESP_CODE = array(
     "success"=>"200",
@@ -17,8 +12,11 @@ $RESP_CODE = array(
     "error"=>"500"
 );
 
-$directoryManager = new DirectoryManager(__DIR__."/projects");
 if (isset($_GET['action'])) {
+    require_once("controllers/directory_manager.php");
+
+    $directoryManager = new DirectoryManager(__DIR__."/projects");
+
     switch ($action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING)) {
         case 'execute':
             if (!isset($_POST['project_name'], $_POST['page'])) {
@@ -106,14 +104,13 @@ if (isset($_GET['action'])) {
         case 'get_session':
             echo($_SESSION["data"]);
             if(!isset($_SESSION["data"])) {
-                echo("ma variable est vide");
+                echo("{}");
                 exit();
             }
             echo (json_encode($_SESSION["data"]));
             exit();
-        
+
         case 'set_session':
-            
             if(!isset($_POST['session'])) {
                 http_response_code($RESP_CODE["bad_request"]);
                 exit();
@@ -127,12 +124,11 @@ if (isset($_GET['action'])) {
             echo($_SESSION["data"]["test"]);
             http_response_code($RESP_CODE["success"]);
             exit();
-        
+
         case "probe":
             echo("alive");
             http_response_code($RESP_CODE["success"]);
             exit();
-
     }
 }
 
