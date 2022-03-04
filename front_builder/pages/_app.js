@@ -4,6 +4,7 @@ import "../styles/globals.css";
 import DefaultLayout from "../components/layout/DefaultLayout";
 
 function MyApp({ Component, pageProps: { session, ...pageProps } }) {
+  console.log(Component.layout);
   const Layout =
     Component.layout === undefined
       ? DefaultLayout

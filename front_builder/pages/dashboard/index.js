@@ -11,9 +11,21 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import $ from "jquery";
+import axios from "axios";
 
 export default function Dashboard({ user }) {
   const [projects, setProjects] = useState([]);
+
+  const [account, setAccount] = useState();
+
+  function getAccount() {
+    axios
+      .get("/api/accounts/" + user.id)
+      .then((res) => setAccount(res.data))
+      .catch((error) => {
+        console.error(error);
+      });
+  }
 
   useEffect(() => {
     $.ajax({
@@ -29,6 +41,7 @@ export default function Dashboard({ user }) {
         console.log(error);
       },
     });
+    getAccount();
   }, []);
 
   return (
@@ -69,7 +82,10 @@ export default function Dashboard({ user }) {
             Account
           </Heading>
           <Text mb={4}>
-            Username : {projects.length && projects[0].users[0].name}
+            Username :{" "}
+            <Text as={"i"} fontStyle={"italic"}>
+              {account && account.name}
+            </Text>
           </Text>
           <Link href={"/projects"}>
             <Button colorScheme={"blue"}>My account &rarr;</Button>
