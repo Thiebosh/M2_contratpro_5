@@ -233,12 +233,14 @@ export default function Projects({ user }) {
         isOpen={openCreate}
         cancelAction={() => setOpenCreate(false)}
         saveAction={createProject}
+        textButton={"Create"}
       />
       <NameModal
         title={"Rename project"}
         isOpen={renameProjectId}
         cancelAction={() => setRenameProjectId(0)}
         saveAction={(name) => renameProject(renameProjectId, name)}
+        textButton={"Save"}
       />
       <ConfirmDeleteDialog
         title={"Delete project"}
