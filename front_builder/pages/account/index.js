@@ -31,13 +31,29 @@ export default function Account({ user }) {
       type: "POST",
       data: data,
       success: function (resp) {
-        toast({
-          title: "Données sauvegardées",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-        });
         console.log(resp);
+        if (resp.success === "already exist") {
+          toast({
+            title: "Already exist",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        } else if (resp.success === true) {
+          toast({
+            title: "Data modified",
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+          });
+        } else if (resp.success === false) {
+          toast({
+            title: "Error !",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        }
       },
       error: function () {
         toast({
