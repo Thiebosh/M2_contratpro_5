@@ -13,7 +13,13 @@ import {
 } from "@chakra-ui/react";
 import { useRef } from "react";
 
-export default function NameModal({ title, isOpen, saveAction, cancelAction }) {
+export default function NameModal({
+  title,
+  textButton,
+  isOpen,
+  saveAction,
+  cancelAction,
+}) {
   const nameInput = useRef();
 
   return (
@@ -34,7 +40,7 @@ export default function NameModal({ title, isOpen, saveAction, cancelAction }) {
             mr={3}
             onClick={() => saveAction(nameInput.current.value)}
           >
-            Save
+            {textButton}
           </Button>
           <Button onClick={cancelAction}>Cancel</Button>
         </ModalFooter>
