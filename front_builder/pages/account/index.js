@@ -8,18 +8,32 @@ import {
   Heading,
   Input,
   Stack,
+  Text,
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
 import $ from "jquery";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import requireAuth from "../../middleware/requireAuth";
+import axios from "axios";
 
 export default function Account({ user }) {
   const newUserNameInput = useRef();
   const newPasswordInput = useRef();
   const toast = useToast();
 
+  const [account, setAccount] = useState();
+
+  useEffect(() => {
+    axios
+      .get("/api/accounts/" + user.id)
+      .then((res) => setAccount(res.data))
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
+
+  /* HANDLE FUNCTIONS */
   function changeDataAccount() {
     const data = {
       id: user.id,
@@ -81,11 +95,13 @@ export default function Account({ user }) {
           p={6}
           my={12}
         >
-          <Heading lineHeight={1.1} fontSize={{ base: "xl", sm: "3xl" }}>
-            User Profile Edit
-          </Heading>
-
-          <Avatar size="xl" src="https://bit.ly/code-beast" />
+          <Heading>User Profile Edit</Heading>
+          <Flex align={"center"} my={6}>
+            <Avatar size="xl" src="https://bit.ly/code-beast" />
+            <Text ml={4} fontSize={"2xl"}>
+              {account && account.name}
+            </Text>
+          </Flex>
 
           <FormControl id="newUserNameInput">
             <FormLabel>Change your user name</FormLabel>

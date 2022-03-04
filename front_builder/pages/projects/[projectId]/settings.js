@@ -109,6 +109,9 @@ export default function Settings({ user }) {
           id: projectId,
           user_id: result.value,
         },
+        success: function () {
+          getProject();
+        },
         error: function (error) {
           console.error(error);
           errors.push(result);
@@ -116,7 +119,6 @@ export default function Settings({ user }) {
       });
     });
     setAddUserIsOpen(false);
-    getProject();
   }
 
   return (
