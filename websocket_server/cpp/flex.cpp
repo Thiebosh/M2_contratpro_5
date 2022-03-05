@@ -1,4 +1,5 @@
 %option noyywrap
+%option yylineno
 %{
     #include <iostream>
     #include "compiled.bison.hpp"

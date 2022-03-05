@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -6,7 +7,8 @@
 
 #include "error.hpp"
 
-#define INDENT true
+#define INDENT false
+#define ONE_LINE true
 
 using namespace std;
 
@@ -66,4 +68,5 @@ void outputResultFiles() {
     //print html files
 	for (auto file : fileContent) cout << file.first << endl << file.second << endl << endl;
     cout << endl;
+    if (ONE_LINE) cout << endl;
 }

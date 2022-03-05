@@ -86,7 +86,7 @@ class Room():
                 continue
 
             result = await self.input_manager.check_and_execute_action_function(input_to_process)
-            self.add_message_in_queue(input_to_process.socket, json.dumps({input_to_process.get_action(): result}))
+            self.add_message_in_queue(input_to_process.socket, json.dumps({input_to_process.get_action(): result}, ensure_ascii=False))
 
             if result is False:
                 continue
@@ -117,7 +117,12 @@ class Room():
                     self.close_client_connection_to_room(socket)
                     continue
 
-                msg = json.loads(msg)
+                try:
+                    msg = json.loads(msg)
+                except json.JSONDecodeError:
+                    print(f"{self.room_name} - malformed json : {msg}")
+                    # self.close_client_connection_to_room(socket)
+                    continue
 
                 if msg["action"] == "exitRoom":
                     self.close_client_connection_to_room(socket)

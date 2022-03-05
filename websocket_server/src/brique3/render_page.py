@@ -26,13 +26,16 @@ class RenderPage():
             }
         ]
         session = self.partners["db"].aggregate_list(COLLECTION_PROJECTS, aggregation)[0]
-        print(session)
         if not self.partners["renderer"].set_session(json.dumps(session)):
             raise Exception("RenderPage - PHP - session not setted")
 
 
     def close(self):
-        session = self.partners["renderer"].get_session()
+        success, session = self.partners["renderer"].get_session()
+
+        if not success:
+            print(f"{self.project_name} - Project session {'well' if result else 'not'} retrieved")
+            return
 
         filter_q = {
             "name": self.project_name
@@ -42,7 +45,6 @@ class RenderPage():
                 "session": json.loads(session)
             }
         }
-
         result = self.partners["db"].update_one(COLLECTION_PROJECTS, filter_q, update_q)
         print(f"{self.project_name} - Mongo - Project session {'well' if result else 'not'} updated")
 

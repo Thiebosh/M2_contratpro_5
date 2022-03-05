@@ -5,64 +5,59 @@ import {
   Center,
   Container,
   Flex,
-  FormControl,
-  FormLabel,
+  forwardRef,
   Heading,
-  Icon,
   IconButton,
-  Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Select,
   Table,
-  TableCaption,
   Tbody,
   Td,
-  Text,
   Th,
   Thead,
+  Tooltip,
   Tr,
+  useColorModeValue,
+  useToast,
   Wrap,
+  Link,
   WrapItem,
 } from "@chakra-ui/react";
 import dayjs from "dayjs";
 
 import { AddIcon, DeleteIcon, EditIcon, SettingsIcon } from "@chakra-ui/icons";
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import $ from "jquery";
-import requireAuth from "../../components/utils/requireAuth";
-import ProjectCreateModal from "../../components/modals/ProjectCreateModal";
-import ProjectRenameModal from "../../components/modals/ProjectRenameModal";
-import { UserIcon } from "@heroicons/react/outline";
+import requireAuth from "../../middleware/requireAuth";
+import ConfirmDeleteDialog from "../../components/dialogs/ConfirmDeleteDialog";
+import NameModal from "../../components/modals/NameModal";
+import * as PropTypes from "prop-types";
+import NextLink from "next/link";
 
-//const idUser = "61e131ce9c11b699edc38a1e";
-
+NextLink.propTypes = { children: PropTypes.node };
 export default function Projects({ user }) {
   const [projects, setProjects] = useState([]);
   const [openCreate, setOpenCreate] = useState(false);
-  const [renameProject, setRenameProject] = useState(0);
+  const [renameProjectId, setRenameProjectId] = useState(0);
+  const [deleteProjectId, setDeleteProjectId] = useState(0);
+  const toast = useToast();
 
-  useEffect(() => {
-    const dataProjects = {
-      id: user.id,
-    };
+  function getProjectsByUser() {
     $.ajax({
       url: "http://localhost:8001/project/search_by_user",
       type: "POST",
-      data: dataProjects,
+      data: {
+        id: user.id,
+      },
       success: function (resp) {
         setProjects(resp.result);
-        console.log(resp);
       },
-      error: function () {
-        console.log("failure");
+      error: function (error) {
+        console.log(error);
       },
     });
+  }
+
+  useEffect(() => {
+    getProjectsByUser();
   }, []);
 
   /* HANDLE FUNCTIONS */
@@ -73,19 +68,100 @@ export default function Projects({ user }) {
       data: {
         id: projectID,
       },
-      success: function (resp) {
-        console.log(resp);
+      success: function (res) {
+        toast({
+          title: "Project deleted",
+          status: "success",
+          duration: 9000,
+          isClosable: true,
+        });
+        getProjectsByUser();
+        setDeleteProjectId(0);
       },
-      error: function () {
-        console.log("failure");
+      error: function (error) {
+        toast({
+          title: "Delete failed",
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
+        console.log(error);
       },
     });
   }
 
+  const createProject = (name) => {
+    $.ajax({
+      url: "http://localhost:8001/project/create",
+      type: "POST",
+      data: {
+        name: name,
+        users_id: JSON.stringify([user.id]),
+      },
+      success: function (resp) {
+        toast({
+          title: "Project created",
+          description: "Name : " + name,
+          status: "success",
+          duration: 9000,
+          isClosable: true,
+        });
+        setOpenCreate(false);
+        getProjectsByUser();
+      },
+      error: function (error) {
+        toast({
+          title: "Error",
+          description: error,
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
+        console.log(error);
+      },
+    });
+  };
+
+  const renameProject = (projectId, name) => {
+    $.ajax({
+      url: "http://localhost:8001/project/update",
+      type: "POST",
+      data: {
+        id: projectId,
+        name: name,
+      },
+      success: function (resp) {
+        toast({
+          title: "Project renamed",
+          description: "Name : " + name,
+          status: "success",
+          duration: 9000,
+          isClosable: true,
+        });
+        setRenameProjectId(0);
+        getProjectsByUser();
+      },
+      error: function (error) {
+        toast({
+          title: "Error",
+          description: error,
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
+        console.log(error);
+      },
+    });
+  };
+
   return (
     <>
-      <Container maxW={"container.xl"} py={8}>
-        <Flex m={5} justifyContent={"space-between"}>
+      <Container
+        maxW={"container.xls"}
+        bg={useColorModeValue("gray.50", "gray.800")}
+        py={4}
+      >
+        <Flex mb={4} justifyContent={"space-between"}>
           <Wrap>
             <WrapItem>
               <Avatar size="xl" src="https://bit.ly/code-beast" />
@@ -96,7 +172,7 @@ export default function Projects({ user }) {
               </Center>
             </WrapItem>
           </Wrap>
-          <Box>
+          <Center w="200px" h="100px">
             <Button
               leftIcon={<AddIcon />}
               colorScheme={"blue"}
@@ -104,10 +180,15 @@ export default function Projects({ user }) {
             >
               New project
             </Button>
-          </Box>
+          </Center>
         </Flex>
 
-        <Box className="container">
+        <Box
+          rounded={"lg"}
+          bg={useColorModeValue("white", "gray.700")}
+          boxShadow={"lg"}
+          p={8}
+        >
           <Wrap direction="column">
             <Table variant="simple">
               <Thead>
@@ -121,28 +202,31 @@ export default function Projects({ user }) {
               <Tbody>
                 {projects.map((project) => (
                   <Tr key={project.id}>
-                    <Td>{project.name}</Td>
+                    <Td>
+                      <NextLink href={`/projects/${project.id}`}>
+                        <Link color="teal.500">{project.name}</Link>
+                      </NextLink>
+                    </Td>
                     <Td>{dayjs(project.creation).format("D MMMM YYYY")}</Td>
                     <Td>{dayjs(project.last_specs).format("D MMMM YYYY")}</Td>
                     <Td>
-                      <IconButton
-                        aria-label="modifier"
-                        mx={1}
-                        icon={<EditIcon />}
-                        onClick={() => setRenameProject(project.id)}
-                      />
-                      <Link href={`/projects/${project.id}/settings`}>
+                      <Tooltip label={"Rename"}>
                         <IconButton
-                          aria-label="settings"
                           mx={1}
-                          icon={<Icon as={UserIcon} boxSize={5} />}
+                          icon={<EditIcon />}
+                          onClick={() => setRenameProjectId(project.id)}
                         />
-                      </Link>
-                      <IconButton
-                        aria-label="delete"
-                        mx={1}
-                        icon={<DeleteIcon />}
-                      />
+                      </Tooltip>
+                      <NextLink href={`/projects/${project.id}/settings`}>
+                        <IconButton mx={1} icon={<SettingsIcon />} />
+                      </NextLink>
+                      <Tooltip label={"Delete"}>
+                        <IconButton
+                          mx={1}
+                          icon={<DeleteIcon />}
+                          onClick={() => setDeleteProjectId(project.id)}
+                        />
+                      </Tooltip>
                     </Td>
                   </Tr>
                 ))}
@@ -151,14 +235,26 @@ export default function Projects({ user }) {
           </Wrap>
         </Box>
       </Container>
-      <ProjectCreateModal
+      <NameModal
+        title={"Create a project"}
         isOpen={openCreate}
-        setIsOpen={setOpenCreate}
-        user={user}
+        cancelAction={() => setOpenCreate(false)}
+        saveAction={createProject}
+        textButton={"Create"}
       />
-      <ProjectRenameModal
-        projectId={renameProject}
-        setProjectId={setRenameProject}
+      <NameModal
+        title={"Rename project"}
+        isOpen={renameProjectId}
+        cancelAction={() => setRenameProjectId(0)}
+        saveAction={(name) => renameProject(renameProjectId, name)}
+        textButton={"Save"}
+      />
+      <ConfirmDeleteDialog
+        title={"Delete project"}
+        text={"Do you really want to delete this project ?"}
+        deleteAction={deleteProject}
+        cancelAction={() => setDeleteProjectId(0)}
+        objectId={deleteProjectId}
       />
     </>
   );
