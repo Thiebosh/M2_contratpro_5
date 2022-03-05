@@ -3,12 +3,17 @@
     #include "../core.hpp"
 
     #define YYDEBUG 1
+    #define YYERROR_VERBOSE 1
 
     using namespace std;
 
     extern FILE *yyin;
     extern int yylex ();
-    int yyerror(char const *s) { fprintf (stderr, "%s\n", s); return 1; }
+    extern int yylineno;
+    int yyerror(char const *s) {
+        cout << endl << "ERROR : line " << yylineno << endl << s << endl;
+        exit(EXIT_FAILURE);
+    }
 %}
 
 %union{//variables
@@ -81,7 +86,8 @@ field
                     currentPage = $2;
                     currentPage.append(".html");
                     htmlPages.push_back(currentPage);
-                    fileContent.insert({currentPage, "<section>\n"});
+                    fileContent.insert({currentPage, "<section>"});
+                    if (!ONE_LINE) fileContent[currentPage] += "\n";
                     indent++;
                     break;
             }
@@ -96,35 +102,36 @@ field
     |   BLOCK
         {
             currentContainer = Container::block;
-            fileContent[currentPage] += (INDENT ? string(indent++, '\t') : "") + "<div>\n";
+            fileContent[currentPage] += (INDENT ? string(indent++, '\t') : "") + "<div>" + (ONE_LINE ? "" : "\n");
         }
         doc
         {
-            fileContent[currentPage] += (INDENT ? string(--indent, '\t') : "") + "</div>\n";
+            fileContent[currentPage] += (INDENT ? string(--indent, '\t') : "") + "</div>" + (ONE_LINE ? "" : "\n");
         }
     |   TEXT
         {
             currentContainer = Container::text;
-            fileContent[currentPage] += (INDENT ? string(indent++, '\t') : "") + "<p>\n";
+            fileContent[currentPage] += (INDENT ? string(indent++, '\t') : "") + "<p>" + (ONE_LINE ? "" : "\n");
         }
         doc
         {
-            fileContent[currentPage] += (INDENT ? string(--indent, '\t') : "") + "</p>\n";
+            fileContent[currentPage] += (INDENT ? string(--indent, '\t') : "") + "</p>" + (ONE_LINE ? "" : "\n");
         }
     |   TEXTVALUE STR_VALUE
         {
-            fileContent[currentPage] += (INDENT ? string(indent, '\t') : "") + $2 + '\n';
+            fileContent[currentPage] += (INDENT ? string(indent, '\t') : "") + $2 + (ONE_LINE ? "" : "\n");
         }
     |   STYLE
         {
-            fileContent[currentPage].pop_back();
+            if (!ONE_LINE) fileContent[currentPage].pop_back();
             fileContent[currentPage].pop_back();
             fileContent[currentPage] += " style=\"";
         }
         doc
         {
             fileContent[currentPage].pop_back();
-            fileContent[currentPage] += "\">\n";
+            fileContent[currentPage] += "\">";
+            if (!ONE_LINE) fileContent[currentPage] += "\n";
         }
     |   COLOR COLOR_VALUE
         {

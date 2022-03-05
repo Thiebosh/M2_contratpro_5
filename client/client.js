@@ -13,7 +13,19 @@ $(function () {
 
   socket.onmessage = function(event) {
     console.log(`[message] Data received from server: ${event.data}`);
-    (event.data.split("\n").map((msg) => $(`<p>- serveur : ${msg}</p>`).appendTo(output_msg)));
+    msg = JSON.parse(event.data);
+    if (!Object.keys(msg).includes("execute")) {
+      event.data.split("\n").map((msg) => $(`<p>- serveur : ${msg}</p>`).appendTo(output_msg));
+    }
+    else {
+      console.log(msg["execute"]["content"]);
+      if (msg["execute"]["success"] == 200) {
+        $("#display").html(msg["execute"]["content"]);
+      }
+      else {
+        $("#display").text(msg["execute"]["success"]);
+      }
+    }
   };
 
   socket.onclose = function(event) {
