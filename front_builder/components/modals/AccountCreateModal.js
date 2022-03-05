@@ -15,22 +15,24 @@ import {
 import { useRef } from "react";
 import $ from "jquery";
 
-export default function ProjectRenameModal({ projectId, setProjectId }) {
+export default function AccountCreateModal({ isOpen, setIsOpen, user }) {
   const toast = useToast();
-  const nameInput = useRef();
+  const usernameInput = useRef();
+  const passwordInput = useRef();
 
   const handleSave = () => {
+    console.log(user);
     $.ajax({
-      url: "http://localhost:8001/project/update",
+      url: "http://localhost:8001/account/create",
       type: "POST",
       data: {
-        id: projectId,
-        name: nameInput.current.value,
+        name: usernameInput.current.value,
+        password: passwordInput.current.value,
       },
-      success: function (resp) {
+      success: function () {
         toast({
-          title: "Project renamed",
-          description: "Name : " + nameInput.current.value,
+          title: "Account created",
+          description: "Name : " + usernameInput.current.value,
           status: "success",
           duration: 9000,
           isClosable: true,
@@ -52,19 +54,23 @@ export default function ProjectRenameModal({ projectId, setProjectId }) {
 
   function handleClose() {
     nameInput.current.value = "";
-    setProjectId(0);
+    setIsOpen(false);
   }
 
   return (
-    <Modal isOpen={projectId} onClose={handleClose}>
+    <Modal isOpen={isOpen} onClose={handleClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Rename project</ModalHeader>
+        <ModalHeader>Create new account</ModalHeader>
         <ModalCloseButton />
         <ModalBody pb={6}>
           <FormControl isRequired>
-            <FormLabel htmlFor="name">Name</FormLabel>
-            <Input id="name" type="text" ref={nameInput} />
+            <FormLabel htmlFor="username">Username</FormLabel>
+            <Input id="username" type="text" ref={usernameInput} />
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel htmlFor="password">password</FormLabel>
+            <Input id="password" type="password" ref={passwordInput} />
           </FormControl>
         </ModalBody>
 

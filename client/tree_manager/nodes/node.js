@@ -7,6 +7,7 @@ class Node {
         this.path = parent == null ? "root" : parent.path + "_" + name;
         this.root = parent == null ? this : parent.root;
         this.depth = parent == null ? 0 : this.parent.depth + 1 ;
+        this.pd = null;
 
     }
 
@@ -14,26 +15,27 @@ class Node {
         if (!this.children) {
             this.children = [];
         }
-        this.children.splice(-1, 0, child);
+        this.children.push(child);
     }
 
     addArrayChild(name){
         let child = new ArrayNode(name, this);
         this.addChildToChildren(child);
-        this.update(child.parent);
         return child;
     }
 
     addObjectChild(name){
         let child = new ObjectNode(name, this);
         this.addChildToChildren(child);
-        this.update(child.parent);
         return child;
     }
 
     addAddingChild(){
         let child = new AddingNode(this);
-        this.addChildToChildren(child);
+        if (!this.children) {
+            this.children = [];
+        }
+        this.children.splice(-1, 0, child);
         return child;
     }
 
@@ -60,98 +62,142 @@ class Node {
         $("#nodeSettings").modal("hide");
     }
 
+    getPreviousOneByDepthAndPos(nodesDict, depth, index){
+        var nodesOnSameDepth = []
+        $(".node[depth='"+depth+"']").each(function(i, n){
+            nodesOnSameDepth.push(n)
+        })
+        return nodesDict[nodesOnSameDepth[index-1].id].pd.x;
+    }
+
     update(source) {
-        // Compute the new tree layout.
-        var nodes = tree.nodes(this.root).reverse(),
-            links = tree.links(nodes);
+        // Compute the new tree layout. 
+        var treeData = tree(this.root.hierarchy);
+        var nodes = treeData.descendants(),
+            links = treeData.descendants().slice(1);
         // Normalize for fixed-depth.
-        nodes.forEach(function(d) {d.y = d.depth * 180; });
+        var nodesDict = {}
+        nodes.forEach(function(d) {
+            nodesDict[d.data.path] = d.data;
+            d.data.pd = d;
+            d.y = d.depth * 180;});
         // Update the nodes…
         var node = svg.selectAll("g.node")
-            .data(nodes, function(d) { return d.id || (d.id = ++i); });
-
+        .data(nodes, function(d) {return d.id || (d.id = ++i); });
         // Enter any new nodes at the parent's previous position.
         var nodeEnter = node.enter().append("g")
         .attr("class", function(d){
-            let objectName = d.constructor.name;
+            let objectName = d.data.constructor.name;
             return "node " + objectName.charAt(0).toLowerCase() + objectName.slice(1);
         })
-        .attr("id", function(d){return d.path})
-        .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
-        .on("click", function(d){d.click();});
+        .attr("id", function(d){return d.data.path})
+        .attr("depth", function(d){return d.depth})
+        .attr("transform", function(d) {return "translate(" + source.y0 + "," + source.x0 + ")"; })
+        .on("click", function(e,d){d.data.click(d.parent);});
         
-        // console.log(nodeEnter)
         nodeEnter.append("circle")
+        .attr("class", "node")
         // .attr("r", function(d){
-        //     return d.constructor.name == "AddingNode" ? 10 : 30;
+        //     return d.data.constructor.name == "AddingNode" ? 10 : 30;
         // })
         .attr("r", 30)
-        .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
-
-
+        .style("fill", function(d) { "#fff"; });
+        
+        
         nodeEnter.append("text")
-        .text(function(d){return d.name;})
+        .text(function(d){return d.data.name;})
         .attr("text-anchor", "middle");
 
-
+        var currentDepth = 0;
+        var currentIndex = 0;
+        var nodeUpdate = nodeEnter.merge(node);
         // Transition nodes to their new position.
-        var nodeUpdate = node.transition()
-            .duration(duration)
-            .attr("transform", function(d) {return "translate(" + d.y + "," + d.x + ")"; });
-
+        nodeUpdate.transition()
+        .duration(duration)
+        .attr("transform", function(d) {
+            if (d.depth != currentDepth){
+                currentDepth += 1;
+                currentIndex = 1;
+            } else{
+                if(currentIndex > 0){
+                    let x = this.getPreviousOneByDepthAndPos(nodesDict, currentDepth, currentIndex);
+                    if (d.x < x+60){
+                        d.x = x + 60;
+                    }
+                }
+                currentIndex += 1;
+            }
+            return "translate(" + d.y + "," + d.x + ")"; }.bind(this));
+        
+        
         nodeUpdate.select("circle")
         .attr("r", 30)
         // .attr("r", function(d){
-        //     return d.constructor.name == "AddingNode" ? 10 : 30;
+        //     return d.data.constructor.name == "AddingNode" ? 10 : 30;
         // })
         .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
-
+        
         nodeUpdate.select("text")
-            .style("fill-opacity", 1);
-
+        .style("fill-opacity", 1);
+        
         // Transition exiting nodes to the parent's new position.
         var nodeExit = node.exit().transition()
-            .duration(duration)
-            .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
-            .remove();
-
+        .duration(duration)
+        .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+        .remove();
+        
         nodeExit.select("circle")
-            .attr("r", 1e-6);
-
+        .attr("r", 1e-6);
+        
         nodeExit.select("text")
-            .style("fill-opacity", 1e-6);
-            
-
+        .style("fill-opacity", 1e-6);
+        
+        
         // Update the links…
         var link = svg.selectAll("path.link")
-            .data(links, function(d) { return d.target.id; });
-
+        .data(links, function(d) { return d.id; });
+        
         // Enter any new links at the parent's previous position.
-        link.enter().insert("path", "g")
-            .attr("class", "link")
-            .attr("d", function(d) {
-                var o = {x: source.x0, y: source.y0};
-                return diagonal({source: o, target: o});
-            });
-
+        var linkEnter = link.enter().insert("path", "g")
+        .attr("class", "link")
+        .attr("d", function(d) {
+            var o = {x: source.x0, y: source.y0};
+            return this.diagonal(o, o);
+        }.bind(this));
+        
+        var linkUpdate = linkEnter.merge(link);
+        
         // Transition links to their new position.
-        link.transition()
-            .duration(duration)
-            .attr("d", diagonal);
-
+        linkUpdate.transition()
+        .duration(duration)
+        .attr("d", function(d){return this.diagonal(d,d.parent)}.bind(this));
+        
         // Transition exiting nodes to the parent's new position.
         link.exit().transition()
-            .duration(duration)
-            .attr("d", function(d) {
-                var o = {x: source.x, y: source.y};
-                return diagonal({source: o, target: o});
-            })
-            .remove();
-
+        .duration(duration)
+        .attr("d", function(d) {
+            var o = {x: source.x, y: source.y};
+            return this.diagonal(o, o);
+        }.bind(this))
+        .remove();
+        
         // Stash the old positions for transition.
         nodes.forEach(function(d) {
             d.x0 = d.x;
             d.y0 = d.y;
+            d.data.x = d.x;
+            d.data.y = d.y;
+            d.data.x0 = d.x;
+            d.data.y0 = d.y;
         });
+    }
+    
+    diagonal(s, d) {
+        let path = `M ${s.y} ${s.x}
+                C ${(s.y + d.y) / 2} ${s.x},
+                    ${(s.y + d.y) / 2} ${d.x},
+                    ${d.y} ${d.x}`
+
+        return path
     }
 }

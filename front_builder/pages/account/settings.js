@@ -1,4 +1,4 @@
-import requireAuth from "../../components/utils/requireAuth";
+import requireAuth from "../../middleware/requireAuth";
 import { Container, Heading } from "@chakra-ui/react";
 
 export default function Settings() {
