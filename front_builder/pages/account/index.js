@@ -1,35 +1,46 @@
 import {
   Avatar,
-  AvatarBadge,
   Button,
-  Center,
   Container,
   Flex,
   FormControl,
   FormLabel,
   Heading,
-  IconButton,
   Input,
   Stack,
+  Text,
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
-import { SmallCloseIcon } from "@chakra-ui/icons";
 import $ from "jquery";
-import { withSessionSsr } from "../../lib/withSession";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import requireAuth from "../../middleware/requireAuth";
+import axios from "axios";
 
-const idUser = "61e131ce9c11b699edc38a1e";
-import requireAuth from "../../components/utils/requireAuth";
-
-export default function Account() {
+export default function Account({ user }) {
   const newUserNameInput = useRef();
   const newPasswordInput = useRef();
   const toast = useToast();
 
+  const [account, setAccount] = useState();
+
+  function getAccount() {
+    axios
+      .get("/api/accounts/" + user.id)
+      .then((res) => setAccount(res.data))
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
+  useEffect(() => {
+    getAccount();
+  }, []);
+
+  /* HANDLE FUNCTIONS */
   function changeDataAccount() {
     const data = {
-      id: idUser,
+      id: user.id,
       name: newUserNameInput.current.value,
       password: newPasswordInput.current.value,
     };
@@ -38,13 +49,29 @@ export default function Account() {
       type: "POST",
       data: data,
       success: function (resp) {
-        toast({
-          title: "Données sauvegardées",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-        });
         console.log(resp);
+        if (resp.success === "already exist") {
+          toast({
+            title: "Already exist",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        } else if (resp.success === true) {
+          toast({
+            title: "Data modified",
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+          });
+        } else if (resp.success === false) {
+          toast({
+            title: "Error !",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        }
       },
       error: function () {
         toast({
@@ -59,23 +86,9 @@ export default function Account() {
     });
   }
 
-  function popUpDataSaved() {
-    toast({
-      title: "Données sauvegardées",
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-    });
-  }
-
   return (
-    <Container maxW={"container.xl"}>
-      <Flex
-        minH={"50vh"}
-        align={"center"}
-        justify={"center"}
-        bg={useColorModeValue("gray.50", "gray.800")}
-      >
+    <Container>
+      <Flex minH={"50vh"} align={"center"} justify={"center"}>
         <Stack
           spacing={4}
           w={"full"}
@@ -86,30 +99,14 @@ export default function Account() {
           p={6}
           my={12}
         >
-          <Heading lineHeight={1.1} fontSize={{ base: "xl", sm: "3xl" }}>
-            User Profile Edit
-          </Heading>
-          <FormControl id="userName">
-            <FormLabel>User Icon</FormLabel>
-            <Stack direction={["column", "row"]} spacing={6}>
-              <Center>
-                <Avatar size="xl" src="https://bit.ly/code-beast">
-                  <AvatarBadge
-                    as={IconButton}
-                    size="sm"
-                    rounded="full"
-                    top="-10px"
-                    colorScheme="red"
-                    aria-label="remove Image"
-                    icon={<SmallCloseIcon />}
-                  />
-                </Avatar>
-              </Center>
-              <Center w="full">
-                <Button w="full">Change Icon</Button>
-              </Center>
-            </Stack>
-          </FormControl>
+          <Heading>User Profile Edit</Heading>
+          <Flex align={"center"} my={6}>
+            <Avatar size="xl" src="https://bit.ly/code-beast" />
+            <Text ml={4} fontSize={"2xl"}>
+              {account && account.name}
+            </Text>
+          </Flex>
+
           <FormControl id="newUserNameInput">
             <FormLabel>Change your user name</FormLabel>
             <Input
@@ -129,16 +126,6 @@ export default function Account() {
             />
           </FormControl>
           <Stack spacing={6} direction={["column", "row"]}>
-            <Button
-              bg={"red.400"}
-              color={"white"}
-              w="full"
-              _hover={{
-                bg: "red.500",
-              }}
-            >
-              Cancel
-            </Button>
             <Button
               bg={"blue.400"}
               color={"white"}

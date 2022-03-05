@@ -1,4 +1,4 @@
-import { withSessionSsr } from "../../lib/withSession";
+import { withSessionSsr } from "../lib/withSession";
 
 const requireAuth = async function getServerSideProps({ req }) {
   const { user } = req.session;
