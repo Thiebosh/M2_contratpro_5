@@ -57,10 +57,22 @@ class WebSocketPartner():
         if ret.encode(encoding) == b'\x03\xc3\xa9':
             return None
 
-        return ret
+        return ret.encode("latin-1").decode(encoding) # raw str to latin-1 bytes + bytes to utf-8 str
 
     @staticmethod
-    def send(conn, data, encoding):
+    def send(conn, data:str, encoding):
+        # tmp remplace : see how to use recv mask method in reverse way
+        data = data.replace("é", "e")\
+                    .replace("è", "e")\
+                    .replace("ê", "e")\
+                    .replace("ç", "c")\
+                    .replace("à", "a")\
+                    .replace("ù", "u")\
+                    .replace("ï", "i")\
+                    .replace("î", "i")\
+                    .replace("ô", "o")\
+                    .replace("ö", "o")
+        data = data.encode(encoding).decode("latin-1")
         head = b'\x81'
         if len(data) < 126:
             head += struct.pack('B', len(data))

@@ -87,7 +87,6 @@ class FilesManager():
 
         self.files = [{"name": line.split("\n")[0], "content": line[line.find("\n")+1:]} for line in chunks][:-1]
         self.files_currently_stored = False
-        print(self.files)
 
         return True
 
