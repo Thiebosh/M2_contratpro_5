@@ -3,12 +3,17 @@
     #include "../core.hpp"
 
     #define YYDEBUG 1
+    #define YYERROR_VERBOSE 1
 
     using namespace std;
 
     extern FILE *yyin;
     extern int yylex ();
-    int yyerror(char const *s) { fprintf (stderr, "%s\n", s); return 1; }
+    extern int yylineno;
+    int yyerror(char const *s) {
+        cout << endl << "ERROR : line " << yylineno << endl << s << endl;
+        exit(EXIT_FAILURE);
+    }
 %}
 
 %union{//variables

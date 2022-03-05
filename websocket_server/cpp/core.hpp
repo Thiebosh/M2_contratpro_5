@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -6,8 +7,8 @@
 
 #include "error.hpp"
 
-#define INDENT true
-#define ONE_LINE false
+#define INDENT false
+#define ONE_LINE true
 
 using namespace std;
 

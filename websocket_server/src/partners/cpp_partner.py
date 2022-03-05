@@ -27,4 +27,5 @@ class CppPartner():
                 break
             await asyncio.sleep(poll_freq)
 
+        print(f"cpp - retcode = {retcode}")
         return process.communicate()[0], retcode

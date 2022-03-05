@@ -6,7 +6,7 @@ build:
 	g++ compilation/compiled.flex.cpp compilation/compiled.bison.cpp -o prototypeur.exe
 
 run:
-	./prototypeur.exe
+	./prototypeur.exe templates/needs.json
 
 all:
 	make build
