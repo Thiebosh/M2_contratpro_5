@@ -25,7 +25,6 @@ import dayjs from "dayjs";
 
 import { AddIcon, DeleteIcon, EditIcon, SettingsIcon } from "@chakra-ui/icons";
 import { useEffect, useState } from "react";
-import $ from "jquery";
 import requireAuth from "../../middleware/requireAuth";
 import ConfirmDeleteDialog from "../../components/dialogs/ConfirmDeleteDialog";
 import NameModal from "../../components/modals/NameModal";
@@ -41,18 +40,22 @@ export default function Projects({ user }) {
   const toast = useToast();
 
   function getProjectsByUser() {
-    $.ajax({
-      url: "http://localhost:8001/project/search_by_user",
-      type: "POST",
-      data: {
+    fetch('http://localhost:8001/project/search_by_user', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
         id: user.id,
-      },
-      success: function (resp) {
-        setProjects(resp.result);
-      },
-      error: function (error) {
+      })
+    })
+    .then(resp => JSON.parse(resp))
+    .then(resp => {
+      setProjects(resp.result);
+    })
+    .catch(error => {
+        console.log("failure");
         console.log(error);
-      },
     });
   }
 
@@ -62,95 +65,107 @@ export default function Projects({ user }) {
 
   /* HANDLE FUNCTIONS */
   function deleteProject(projectID) {
-    $.ajax({
-      url: "http://localhost:8001/project/delete",
-      type: "POST",
-      data: {
+    fetch('http://localhost:8001/project/delete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
         id: projectID,
-      },
-      success: function (res) {
-        toast({
-          title: "Project deleted",
-          status: "success",
-          duration: 9000,
-          isClosable: true,
-        });
-        getProjectsByUser();
-        setDeleteProjectId(0);
-      },
-      error: function (error) {
-        toast({
-          title: "Delete failed",
-          status: "error",
-          duration: 9000,
-          isClosable: true,
-        });
-        console.log(error);
-      },
+      })
+    })
+    .then(resp => JSON.parse(resp))
+    .then(resp => {
+      toast({
+        title: "Project deleted",
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
+      getProjectsByUser();
+      setDeleteProjectId(0);
+    })
+    .catch(error => {
+      toast({
+        title: "Delete failed",
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
+      console.log("failure");
+      console.log(error);
     });
   }
 
   const createProject = (name) => {
-    $.ajax({
-      url: "http://localhost:8001/project/create",
-      type: "POST",
-      data: {
+    fetch('http://localhost:8001/project/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
         name: name,
         users_id: JSON.stringify([user.id]),
-      },
-      success: function (resp) {
-        toast({
-          title: "Project created",
-          description: "Name : " + name,
-          status: "success",
-          duration: 9000,
-          isClosable: true,
-        });
-        setOpenCreate(false);
-        getProjectsByUser();
-      },
-      error: function (error) {
-        toast({
-          title: "Error",
-          description: error,
-          status: "error",
-          duration: 9000,
-          isClosable: true,
-        });
-        console.log(error);
-      },
+      })
+    })
+    .then(resp => JSON.parse(resp))
+    .then(resp => {
+      toast({
+        title: "Project created",
+        description: "Name : " + name,
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
+      setOpenCreate(false);
+      getProjectsByUser();
+    })
+    .catch(error => {
+      toast({
+        title: "Error",
+        description: error,
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
+      console.log("failure");
+      console.log(error);
     });
   };
 
   const renameProject = (projectId, name) => {
-    $.ajax({
-      url: "http://localhost:8001/project/update",
-      type: "POST",
-      data: {
+    fetch('http://localhost:8001/project/update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
         id: projectId,
         name: name,
-      },
-      success: function (resp) {
-        toast({
-          title: "Project renamed",
-          description: "Name : " + name,
-          status: "success",
-          duration: 9000,
-          isClosable: true,
-        });
-        setRenameProjectId(0);
-        getProjectsByUser();
-      },
-      error: function (error) {
-        toast({
-          title: "Error",
-          description: error,
-          status: "error",
-          duration: 9000,
-          isClosable: true,
-        });
-        console.log(error);
-      },
+      })
+    })
+    .then(resp => JSON.parse(resp))
+    .then(resp => {
+      toast({
+        title: "Project renamed",
+        description: "Name : " + name,
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
+      setRenameProjectId(0);
+      getProjectsByUser();
+    })
+    .catch(error => {
+      toast({
+        title: "Error",
+        description: error,
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
+      console.log("failure");
+      console.log(error);
     });
   };
 
