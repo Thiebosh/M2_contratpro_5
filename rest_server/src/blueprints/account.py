@@ -1,6 +1,7 @@
 from quart import Blueprint, request, current_app
 from flask_api import status
 from bson.objectid import ObjectId
+from werkzeug.datastructures import ImmutableDict
 
 bp_account = Blueprint("account", __name__)
 
@@ -14,7 +15,7 @@ def hash_password(password):
 
 @bp_account.route("/create", methods=['POST'])
 async def create():
-    post = await request.form
+    post = ImmutableDict(await request.get_json())
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -33,10 +34,13 @@ async def create():
         "name": 1
     }
 
-    if await current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, filter_q, fields):
-        return {
-            "success": "already exist"
-        }, status.HTTP_200_OK
+    try:
+        if await current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, filter_q, fields):
+            return {
+                "success": "already exist"
+            }, status.HTTP_200_OK
+    except Exception:
+        return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
     # create user
     doc = {
@@ -44,14 +48,17 @@ async def create():
         "password": hash_password(password)
     }
 
-    return {
-        "success": await current_app.config["partners"]["db"].insert_one(COLLECTION_ACCOUNTS, doc)
-    }, status.HTTP_200_OK
+    try:
+        return {
+            "success": await current_app.config["partners"]["db"].insert_one(COLLECTION_ACCOUNTS, doc)
+        }, status.HTTP_200_OK
+    except Exception:
+        return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
 @bp_account.route("/connect", methods=['POST'])
 async def connect():
-    post = await request.form
+    post = ImmutableDict(await request.get_json())
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -73,7 +80,10 @@ async def connect():
         "password": 1
     }
 
-    result = await current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, filter_q, fields)
+    try:
+        result = await current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, filter_q, fields)
+    except Exception:
+        return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
     if not result:
         return {"id": False}, status.HTTP_200_OK
@@ -85,7 +95,7 @@ async def connect():
 
 @bp_account.route("/update", methods=['POST'])
 async def update():
-    post = await request.form
+    post = ImmutableDict(await request.get_json())
     if not (2 <= len(post) <= 3):
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -111,10 +121,13 @@ async def update():
             "name": 1
         }
 
-        if await current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, filter_q, fields):
-            return {
-                "success": "already exist"
-            }, status.HTTP_200_OK
+        try:
+            if await current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, filter_q, fields):
+                return {
+                    "success": "already exist"
+                }, status.HTTP_200_OK
+        except Exception:
+            return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
     # update fields
     filter_q = {
@@ -126,14 +139,17 @@ async def update():
     if password:
         update_q["$set"]["password"] = hash_password(password)
 
-    return {
-        "success": await current_app.config["partners"]["db"].update_one(COLLECTION_ACCOUNTS, filter_q, update_q)
-    }, status.HTTP_200_OK
+    try:
+        return {
+            "success": await current_app.config["partners"]["db"].update_one(COLLECTION_ACCOUNTS, filter_q, update_q)
+        }, status.HTTP_200_OK
+    except Exception:
+        return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
 @bp_account.route("/search", methods=['POST'])
 async def search():
-    post = await request.form
+    post = ImmutableDict(await request.get_json())
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -156,14 +172,17 @@ async def search():
         "name": 1
     }
 
-    return {
-        "result": await current_app.config["partners"]["db"].find_list(COLLECTION_ACCOUNTS, filter_q, fields)
-    }, status.HTTP_200_OK
+    try:
+        return {
+            "result": await current_app.config["partners"]["db"].find_list(COLLECTION_ACCOUNTS, filter_q, fields)
+        }, status.HTTP_200_OK
+    except Exception:
+        return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
 @bp_account.route("/delete", methods=['POST'])
 async def delete():
-    post = await request.form
+    post = ImmutableDict(await request.get_json())
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -191,12 +210,14 @@ async def delete():
             "$toString": "$_id"
         },
     }
-    for project in await current_app.config["partners"]["db"].find_list(COLLECTION_PROJECTS, filter_unique_contrib_projects, fields):
-        print(project)
-        current_app.config["partners"]["nas"].remove_folder(project["id"])
+    try:
+        for project in await current_app.config["partners"]["db"].find_list(COLLECTION_PROJECTS, filter_unique_contrib_projects, fields):
+            current_app.config["partners"]["nas"].remove_folder(project["id"])
 
-    return {
-        "success": await current_app.config["partners"]["db"].delete_one(COLLECTION_ACCOUNTS, filter_user),
-        "deleted_projects": await current_app.config["partners"]["db"].delete_many(COLLECTION_PROJECTS, filter_unique_contrib_projects),
-        "deleted_from_projects": await current_app.config["partners"]["db"].update_many(COLLECTION_PROJECTS, filter_one_contrib_projects, update_one_contrib_projects)
-    }, status.HTTP_200_OK
+        return {
+            "success": await current_app.config["partners"]["db"].delete_one(COLLECTION_ACCOUNTS, filter_user),
+            "deleted_projects": await current_app.config["partners"]["db"].delete_many(COLLECTION_PROJECTS, filter_unique_contrib_projects),
+            "deleted_from_projects": await current_app.config["partners"]["db"].update_many(COLLECTION_PROJECTS, filter_one_contrib_projects, update_one_contrib_projects)
+        }, status.HTTP_200_OK
+    except Exception:
+        return "", status.HTTP_503_SERVICE_UNAVAILABLE

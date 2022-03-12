@@ -2,6 +2,7 @@ from datetime import datetime
 from quart import Blueprint, json, request, current_app
 from flask_api import status
 from bson.objectid import ObjectId
+from werkzeug.datastructures import ImmutableDict
 
 bp_project = Blueprint("project", __name__)
 
@@ -9,7 +10,7 @@ COLLECTION = "projects"
 
 @bp_project.route("/create", methods=['POST'])
 async def create():
-    post = await request.form
+    post = ImmutableDict(await request.get_json())
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -28,10 +29,13 @@ async def create():
         "name": 1
     }
 
-    if await current_app.config["partners"]["db"].find_one(COLLECTION, filter_q, fields):
-        return {
-            "success": "already exist"
-        }, status.HTTP_200_OK
+    try:
+        if await current_app.config["partners"]["db"].find_one(COLLECTION, filter_q, fields):
+            return {
+                "success": "already exist"
+            }, status.HTTP_200_OK
+    except Exception:
+        return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
     # create project
     doc = {
@@ -44,14 +48,17 @@ async def create():
         "session": {}
     }
 
-    return {
-        "success": await current_app.config["partners"]["db"].insert_one(COLLECTION, doc),
-    }, status.HTTP_200_OK
+    try:
+        return {
+            "success": await current_app.config["partners"]["db"].insert_one(COLLECTION, doc),
+        }, status.HTTP_200_OK
+    except Exception:
+        return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
 @bp_project.route("/update", methods=['POST'])
 async def update():
-    post = await request.form
+    post = ImmutableDict(await request.get_json())
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -75,10 +82,13 @@ async def update():
         "name": 1
     }
 
-    if await current_app.config["partners"]["db"].find_one(COLLECTION, filter_q, fields):
-        return {
-            "success": "already exist"
-        }, status.HTTP_200_OK
+    try:
+        if await current_app.config["partners"]["db"].find_one(COLLECTION, filter_q, fields):
+            return {
+                "success": "already exist"
+            }, status.HTTP_200_OK
+    except Exception:
+        return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
     # update fields
     filter_q = {
@@ -90,14 +100,17 @@ async def update():
         }
     }
 
-    return {
-        "success": await current_app.config["partners"]["db"].update_one(COLLECTION, filter_q, update_q)
-    }, status.HTTP_200_OK
+    try:
+        return {
+            "success": await current_app.config["partners"]["db"].update_one(COLLECTION, filter_q, update_q)
+        }, status.HTTP_200_OK
+    except Exception:
+        return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
 @bp_project.route("/search", methods=['POST'])
 async def search():
-    post = await request.form
+    post = ImmutableDict(await request.get_json())
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -149,14 +162,17 @@ async def search():
         },
     ]
 
-    return {
-        "result": await current_app.config["partners"]["db"].aggregate_list(COLLECTION, aggregation)
-    }, status.HTTP_200_OK
+    try:
+        return {
+            "result": await current_app.config["partners"]["db"].aggregate_list(COLLECTION, aggregation)
+        }, status.HTTP_200_OK
+    except Exception:
+        return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
 @bp_project.route("/search_by_user", methods=['POST'])
 async def search_by_user():
-    post = await request.form
+    post = ImmutableDict(await request.get_json())
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -214,14 +230,17 @@ async def search_by_user():
         },
     ]
 
-    return {
-        "result": await current_app.config["partners"]["db"].aggregate_list(COLLECTION, aggregation)
-    }, status.HTTP_200_OK
+    try:
+        return {
+            "result": await current_app.config["partners"]["db"].aggregate_list(COLLECTION, aggregation)
+        }, status.HTTP_200_OK
+    except Exception:
+        return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
 @bp_project.route("/add_user", methods=['POST'])
 async def add_user():
-    post = await request.form
+    post = ImmutableDict(await request.get_json())
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -243,14 +262,17 @@ async def add_user():
         }
     }
 
-    return {
-        "success": await current_app.config["partners"]["db"].update_one(COLLECTION, filter_q, update_q)
-    }, status.HTTP_200_OK
+    try:
+        return {
+            "success": await current_app.config["partners"]["db"].update_one(COLLECTION, filter_q, update_q)
+        }, status.HTTP_200_OK
+    except Exception:
+        return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
 @bp_project.route("/remove_user", methods=['POST'])
 async def remove_user():
-    post = await request.form 
+    post = ImmutableDict(await request.get_json()) 
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -270,14 +292,17 @@ async def remove_user():
         }
     }
 
-    return {
-        "success": await current_app.config["partners"]["db"].update_one(COLLECTION, filter_q, update_q)
-    }, status.HTTP_200_OK
+    try:
+        return {
+            "success": await current_app.config["partners"]["db"].update_one(COLLECTION, filter_q, update_q)
+        }, status.HTTP_200_OK
+    except Exception:
+        return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
 @bp_project.route("/delete", methods=['POST'])
 async def delete():
-    post = await request.form
+    post = ImmutableDict(await request.get_json())
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -290,7 +315,10 @@ async def delete():
         "_id": ObjectId(project_id)
     }
 
-    return {
-        "success": await current_app.config["partners"]["db"].delete_one(COLLECTION, filter_q) \
-                    and current_app.config["partners"]["nas"].remove_folder(project_id)
-    }, status.HTTP_200_OK
+    try:
+        return {
+            "success": await current_app.config["partners"]["db"].delete_one(COLLECTION, filter_q) \
+                        and current_app.config["partners"]["nas"].remove_folder(project_id)
+        }, status.HTTP_200_OK
+    except Exception:
+        return "", status.HTTP_503_SERVICE_UNAVAILABLE
