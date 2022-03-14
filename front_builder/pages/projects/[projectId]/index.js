@@ -21,6 +21,7 @@ import {
   SmallCloseIcon,
 } from "@chakra-ui/icons";
 import { BeakerIcon, CogIcon, SaveIcon } from "@heroicons/react/outline";
+import $ from "jquery"; // for graph lib surcouche
 
 export default function ProjectDetails() {
   const router = useRouter();
