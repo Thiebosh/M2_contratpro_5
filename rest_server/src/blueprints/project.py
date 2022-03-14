@@ -2,7 +2,7 @@ from datetime import datetime
 from quart import Blueprint, json, request, current_app
 from flask_api import status
 from bson.objectid import ObjectId
-from werkzeug.datastructures import ImmutableDict
+from werkzeug.datastructures import ImmutableMultiDict
 
 bp_project = Blueprint("project", __name__)
 
@@ -10,7 +10,7 @@ COLLECTION = "projects"
 
 @bp_project.route("/create", methods=['POST'])
 async def create():
-    post = ImmutableDict(await request.get_json())
+    post = ImmutableMultiDict(await request.get_json())
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -34,7 +34,8 @@ async def create():
             return {
                 "success": "already exist"
             }, status.HTTP_200_OK
-    except Exception:
+    except Exception as e:
+        print(e)
         return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
     # create project
@@ -52,13 +53,14 @@ async def create():
         return {
             "success": await current_app.config["partners"]["db"].insert_one(COLLECTION, doc),
         }, status.HTTP_200_OK
-    except Exception:
+    except Exception as e:
+        print(e)
         return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
 @bp_project.route("/update", methods=['POST'])
 async def update():
-    post = ImmutableDict(await request.get_json())
+    post = ImmutableMultiDict(await request.get_json())
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -87,7 +89,8 @@ async def update():
             return {
                 "success": "already exist"
             }, status.HTTP_200_OK
-    except Exception:
+    except Exception as e:
+        print(e)
         return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
     # update fields
@@ -104,13 +107,14 @@ async def update():
         return {
             "success": await current_app.config["partners"]["db"].update_one(COLLECTION, filter_q, update_q)
         }, status.HTTP_200_OK
-    except Exception:
+    except Exception as e:
+        print(e)
         return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
 @bp_project.route("/search", methods=['POST'])
 async def search():
-    post = ImmutableDict(await request.get_json())
+    post = ImmutableMultiDict(await request.get_json())
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -166,13 +170,14 @@ async def search():
         return {
             "result": await current_app.config["partners"]["db"].aggregate_list(COLLECTION, aggregation)
         }, status.HTTP_200_OK
-    except Exception:
+    except Exception as e:
+        print(e)
         return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
 @bp_project.route("/search_by_user", methods=['POST'])
 async def search_by_user():
-    post = ImmutableDict(await request.get_json())
+    post = ImmutableMultiDict(await request.get_json())
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -234,13 +239,14 @@ async def search_by_user():
         return {
             "result": await current_app.config["partners"]["db"].aggregate_list(COLLECTION, aggregation)
         }, status.HTTP_200_OK
-    except Exception:
+    except Exception as e:
+        print(e)
         return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
 @bp_project.route("/add_user", methods=['POST'])
 async def add_user():
-    post = ImmutableDict(await request.get_json())
+    post = ImmutableMultiDict(await request.get_json())
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -266,13 +272,14 @@ async def add_user():
         return {
             "success": await current_app.config["partners"]["db"].update_one(COLLECTION, filter_q, update_q)
         }, status.HTTP_200_OK
-    except Exception:
+    except Exception as e:
+        print(e)
         return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
 @bp_project.route("/remove_user", methods=['POST'])
 async def remove_user():
-    post = ImmutableDict(await request.get_json()) 
+    post = ImmutableMultiDict(await request.get_json()) 
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -296,13 +303,14 @@ async def remove_user():
         return {
             "success": await current_app.config["partners"]["db"].update_one(COLLECTION, filter_q, update_q)
         }, status.HTTP_200_OK
-    except Exception:
+    except Exception as e:
+        print(e)
         return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
 @bp_project.route("/delete", methods=['POST'])
 async def delete():
-    post = ImmutableDict(await request.get_json())
+    post = ImmutableMultiDict(await request.get_json())
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -320,5 +328,6 @@ async def delete():
             "success": await current_app.config["partners"]["db"].delete_one(COLLECTION, filter_q) \
                         and current_app.config["partners"]["nas"].remove_folder(project_id)
         }, status.HTTP_200_OK
-    except Exception:
+    except Exception as e:
+        print(e)
         return "", status.HTTP_503_SERVICE_UNAVAILABLE

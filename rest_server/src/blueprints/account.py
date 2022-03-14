@@ -1,7 +1,7 @@
 from quart import Blueprint, request, current_app
 from flask_api import status
 from bson.objectid import ObjectId
-from werkzeug.datastructures import ImmutableDict
+from werkzeug.datastructures import ImmutableMultiDict
 
 bp_account = Blueprint("account", __name__)
 
@@ -15,7 +15,7 @@ def hash_password(password):
 
 @bp_account.route("/create", methods=['POST'])
 async def create():
-    post = ImmutableDict(await request.get_json())
+    post = ImmutableMultiDict(await request.get_json())
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -39,7 +39,8 @@ async def create():
             return {
                 "success": "already exist"
             }, status.HTTP_200_OK
-    except Exception:
+    except Exception as e:
+        print(e)
         return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
     # create user
@@ -52,13 +53,14 @@ async def create():
         return {
             "success": await current_app.config["partners"]["db"].insert_one(COLLECTION_ACCOUNTS, doc)
         }, status.HTTP_200_OK
-    except Exception:
+    except Exception as e:
+        print(e)
         return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
 @bp_account.route("/connect", methods=['POST'])
 async def connect():
-    post = ImmutableDict(await request.get_json())
+    post = ImmutableMultiDict(await request.get_json())
     if len(post) != 2:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -82,7 +84,8 @@ async def connect():
 
     try:
         result = await current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, filter_q, fields)
-    except Exception:
+    except Exception as e:
+        print(e)
         return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
     if not result:
@@ -95,7 +98,7 @@ async def connect():
 
 @bp_account.route("/update", methods=['POST'])
 async def update():
-    post = ImmutableDict(await request.get_json())
+    post = ImmutableMultiDict(await request.get_json())
     if not (2 <= len(post) <= 3):
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -126,7 +129,8 @@ async def update():
                 return {
                     "success": "already exist"
                 }, status.HTTP_200_OK
-        except Exception:
+        except Exception as e:
+            print(e)
             return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
     # update fields
@@ -143,13 +147,14 @@ async def update():
         return {
             "success": await current_app.config["partners"]["db"].update_one(COLLECTION_ACCOUNTS, filter_q, update_q)
         }, status.HTTP_200_OK
-    except Exception:
+    except Exception as e:
+        print(e)
         return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
 @bp_account.route("/search", methods=['POST'])
 async def search():
-    post = ImmutableDict(await request.get_json())
+    post = ImmutableMultiDict(await request.get_json())
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -176,13 +181,14 @@ async def search():
         return {
             "result": await current_app.config["partners"]["db"].find_list(COLLECTION_ACCOUNTS, filter_q, fields)
         }, status.HTTP_200_OK
-    except Exception:
+    except Exception as e:
+        print(e)
         return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
 @bp_account.route("/delete", methods=['POST'])
 async def delete():
-    post = ImmutableDict(await request.get_json())
+    post = ImmutableMultiDict(await request.get_json())
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
@@ -219,5 +225,6 @@ async def delete():
             "deleted_projects": await current_app.config["partners"]["db"].delete_many(COLLECTION_PROJECTS, filter_unique_contrib_projects),
             "deleted_from_projects": await current_app.config["partners"]["db"].update_many(COLLECTION_PROJECTS, filter_one_contrib_projects, update_one_contrib_projects)
         }, status.HTTP_200_OK
-    except Exception:
+    except Exception as e:
+        print(e)
         return "", status.HTTP_503_SERVICE_UNAVAILABLE
