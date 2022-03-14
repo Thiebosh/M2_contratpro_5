@@ -10,7 +10,6 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import $ from "jquery";
 import axios from "axios";
 
 export default function Dashboard({ user }) {
@@ -28,18 +27,22 @@ export default function Dashboard({ user }) {
   }
 
   useEffect(() => {
-    $.ajax({
-      url: "http://localhost:8001/project/search_by_user",
-      type: "POST",
-      data: {
+    fetch('http://localhost:8001/project/search_by_user', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
         id: user.id,
-      },
-      success: function (res) {
-        setProjects(res.result);
-      },
-      error: function (error) {
+      })
+    })
+    .then(resp => JSON.parse(resp))
+    .then(resp => {
+      setProjects(resp.result);
+    })
+    .catch(error => {
+        console.log("failure");
         console.log(error);
-      },
     });
     getAccount();
   }, []);
