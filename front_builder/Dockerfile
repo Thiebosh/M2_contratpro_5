@@ -1,6 +1,10 @@
 FROM node:16-alpine
 
+ARG arg_port
+
 COPY . ./
 RUN npm install
 
-CMD ["npm", "start"]
+EXPOSE $arg_port
+
+CMD ["npm", "run", "dev"]
