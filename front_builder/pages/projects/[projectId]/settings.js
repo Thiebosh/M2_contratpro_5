@@ -10,7 +10,6 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import $ from "jquery";
 import requireAuth from "../../../middleware/requireAuth";
 import { useRouter } from "next/router";
 import ProjectAddUsersModal from "../../../components/modals/ProjectAddUsersModal";
@@ -28,19 +27,23 @@ export default function Settings({ user }) {
   const [options, setOptions] = useState([]);
 
   function getProject() {
-    $.ajax({
-      url: "http://localhost:8001/project/search",
-      type: "POST",
-      data: {
+    fetch('http://localhost:8001/project/search', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
         id: projectId,
-      },
-      success: function (resp) {
-        setDataProject(resp.result[0]);
-        console.log(resp.result[0]);
-      },
-      error: function () {
+      })
+    })
+    .then(resp => JSON.parse(resp))
+    .then(resp => {
+      setDataProject(resp.result[0]);
+      console.log(resp.result[0]);
+    })
+    .catch(error => {
         console.log("failure");
-      },
+        console.log(error);
     });
   }
 
@@ -83,39 +86,47 @@ export default function Settings({ user }) {
   /* HANDLE FUNCTIONS */
   function deleteUserFromProject(projectId, userIdToDelete) {
     console.log(userIdToDelete);
-    $.ajax({
-      url: "http://localhost:8001/project/remove_user",
-      type: "POST",
-      data: {
+    fetch('http://localhost:8001/project/remove_user', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
         id: projectId,
         user_id: userIdToDelete,
-      },
-      success: function (resp) {
-        getProject();
-      },
-      error: function () {
+      })
+    })
+    .then(resp => JSON.parse(resp))
+    .then(resp => {
+      getProject();
+    })
+    .catch(error => {
         console.log("failure");
-      },
+        console.log(error);
     });
   }
 
   function addUsers(results) {
     const errors = [];
-    results.forEach(async (result) => {
-      await $.ajax({
-        url: "http://localhost:8001/project/add_user",
-        type: "POST",
-        data: {
+    results.forEach(async (result) => { // could send array here (one call rather than n)
+      await fetch('http://localhost:8001/project/add_user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
           id: projectId,
           user_id: result.value,
-        },
-        success: function () {
-          getProject();
-        },
-        error: function (error) {
-          console.error(error);
+        })
+      })
+      .then(resp => JSON.parse(resp))
+      .then(resp => {
+        getProject();
+      })
+      .catch(error => {
+          console.log("failure");
+          console.log(error);
           errors.push(result);
-        },
       });
     });
     setAddUserIsOpen(false);

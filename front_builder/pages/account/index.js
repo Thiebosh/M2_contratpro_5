@@ -12,7 +12,6 @@ import {
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
-import $ from "jquery";
 import { useEffect, useRef, useState } from "react";
 import requireAuth from "../../middleware/requireAuth";
 import axios from "axios";
@@ -39,50 +38,53 @@ export default function Account({ user }) {
 
   /* HANDLE FUNCTIONS */
   function changeDataAccount() {
-    const data = {
-      id: user.id,
-      name: newUserNameInput.current.value,
-      password: newPasswordInput.current.value,
-    };
-    $.ajax({
-      url: "http://localhost:8001/account/update",
-      type: "POST",
-      data: data,
-      success: function (resp) {
-        console.log(resp);
-        if (resp.success === "already exist") {
-          toast({
-            title: "Already exist",
-            status: "error",
-            duration: 3000,
-            isClosable: true,
-          });
-        } else if (resp.success === true) {
-          toast({
-            title: "Data modified",
-            status: "success",
-            duration: 3000,
-            isClosable: true,
-          });
-        } else if (resp.success === false) {
-          toast({
-            title: "Error !",
-            status: "error",
-            duration: 3000,
-            isClosable: true,
-          });
-        }
+    fetch('http://localhost:8001/account/update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
       },
-      error: function () {
+      body: JSON.stringify({
+        id: user.id,
+        name: newUserNameInput.current.value,
+        password: newPasswordInput.current.value,
+      })
+    })
+    .then(resp => JSON.parse(resp))
+    .then(resp => {
+      console.log(resp);
+      if (resp.success === "already exist") {
         toast({
-          title: "Error",
-          description: "erreur rrjsncs",
+          title: "Already exist",
           status: "error",
-          duration: 9000,
+          duration: 3000,
           isClosable: true,
         });
-        console.log("failure");
-      },
+      } else if (resp.success === true) {
+        toast({
+          title: "Data modified",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      } else if (resp.success === false) {
+        toast({
+          title: "Error !",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    })
+    .catch(error => {
+      toast({
+        title: "Error",
+        description: "erreur rrjsncs",
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
+      console.log("failure");
+      console.log(error);
     });
   }
 

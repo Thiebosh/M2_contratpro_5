@@ -15,7 +15,6 @@ import { withSessionSsr } from "../../lib/withSession";
 import axios from "axios";
 import { useRef } from "react";
 import Link from "next/link";
-import $ from "jquery";
 
 export default function Create() {
   const router = useRouter();
@@ -24,41 +23,44 @@ export default function Create() {
   const toast = useToast();
 
   const handleClick = () => {
-    const dataCreateAccount = {
-      name: createUsernameInput.current.value,
-      password: createPasswordInput.current.value,
-    };
-    $.ajax({
-      url: "http://localhost:8001/account/create",
-      type: "POST",
-      data: dataCreateAccount,
-      success: function (resp) {
-        if (resp.success === "already exist") {
-          toast({
-            title: "Account already exist",
-            status: "error",
-            duration: 3000,
-            isClosable: true,
-          });
-        } else if (resp.success === true) {
-          toast({
-            title: "Account created",
-            status: "success",
-            duration: 3000,
-            isClosable: true,
-          });
-          router.push("/auth/login");
-        } else if (resp.success === false) {
-          toast({
-            title: "Error",
-            status: "error",
-            duration: 3000,
-            isClosable: true,
-          });
-        }
-        console.log(resp);
+    fetch('http://localhost:8001/account/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
       },
-      error: function () {
+      body: JSON.stringify({
+        name: createUsernameInput.current.value,
+        password: createPasswordInput.current.value,
+      })
+    })
+    .then(resp => JSON.parse(resp))
+    .then(resp => {
+      if (resp.success === "already exist") {
+        toast({
+          title: "Account already exist",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      } else if (resp.success === true) {
+        toast({
+          title: "Account created",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        router.push("/auth/login");
+      } else if (resp.success === false) {
+        toast({
+          title: "Error",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+      console.log(resp);
+    })
+    .catch(error => {
         toast({
           title: "Error",
           description: "erreur",
@@ -67,7 +69,7 @@ export default function Create() {
           isClosable: true,
         });
         console.log("failure");
-      },
+        console.log(error);
     });
   };
 
