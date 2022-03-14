@@ -32,7 +32,7 @@ if (isset($_GET['action'])) {
             }
 
             $result = $directoryManager->include_file($post['project_name'], "routeur.php", $post['page']);
-            http_response_code($result ? $RESP_CODE["success"] : $RESP_CODE["error"]);
+            http_response_code($RESP_CODE[$result ? "success" : "error"]);
             exit();
 
         case 'create_folder':
@@ -48,7 +48,7 @@ if (isset($_GET['action'])) {
             }
 
             $result = $directoryManager->create_folder($post['project_name']);
-            http_response_code($result ? $RESP_CODE["success"] : $RESP_CODE["error"]);
+            http_response_code($RESP_CODE[$result ? "success" : "error"]);
             exit();
 
         case 'create_file':
@@ -66,7 +66,7 @@ if (isset($_GET['action'])) {
             }
 
             $result = $directoryManager->create_file("{$post['project_name']}/{$post['file_name']}", $post['file_content']);
-            http_response_code($result ? $RESP_CODE["success"] : $RESP_CODE["error"]);
+            http_response_code($RESP_CODE[$result ? "success" : "error"]);
             exit();
 
         case 'remove_files':
@@ -82,7 +82,7 @@ if (isset($_GET['action'])) {
             }
 
             $result = $directoryManager->remove_files($post['project_name']);
-            http_response_code($result ? $RESP_CODE["success"] : $RESP_CODE["error"]);
+            http_response_code($RESP_CODE[$result ? "success" : "error"]);
             exit();
 
         case 'remove_folder':
@@ -98,7 +98,7 @@ if (isset($_GET['action'])) {
             }
 
             $result = $directoryManager->remove_folder($post['project_name']);
-            http_response_code($result ? $RESP_CODE["success"] : $RESP_CODE["error"]);
+            http_response_code($RESP_CODE[$result ? "success" : "error"]);
             exit();
 
         case 'get_session':
