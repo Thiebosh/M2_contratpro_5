@@ -1,19 +1,5 @@
-# first stage : build cpp exe
-# FROM frolvlad/alpine-gxx:latest as build
-
-# RUN apk add \
-#         make \
-#         flex \
-#         bison
-
-# WORKDIR /src
-# COPY cpp .
-
-# RUN make build
-
-
-# second stage : prepare server environment
-FROM python:3.9-slim-buster
+# first stage : prepare server environment
+FROM python:3.9-slim-buster as server
 
 RUN pip install -U --no-cache-dir \
         pip \
@@ -21,20 +7,13 @@ RUN pip install -U --no-cache-dir \
         google-api-python-client>=2.0.2 \
         google-auth-httplib2>=0.1.0 \
         google-auth-oauthlib>=0.4.3
-# RUN apt update &&\
-#     apt install -y \
-#         g++
+
 RUN apt update &&\
     apt install -y \
-        g++ \
-        make \
-        flex \
-        bison
+        g++
 
 ARG arg_port
 ARG php_url
-
-EXPOSE $arg_port
 
 ENV HOST=0.0.0.0
 ENV PORT=$arg_port
@@ -42,15 +21,34 @@ ENV PHP_URL=$php_url
 ENV CPP_PATH="/src/brique2/cpp/prototypeur.exe"
 ENV DRIVE_PATH="/credentials/service_account.json"
 
+EXPOSE $arg_port
+
+CMD ["python", "."]
+
+
+# second stage : build cpp exe
+FROM python:3.9-slim-buster as builder
+
+RUN apt update &&\
+    apt install -y \
+        g++ \
+        make \
+        flex \
+        bison
+
+WORKDIR /src
+COPY cpp .
+
+RUN make build
+
+
+# third stage : copy all files
+FROM server
+
 WORKDIR /credentials
 COPY credentials .
 
 WORKDIR /src
 COPY src .
-COPY cpp /src/brique2/cpp/
-# COPY --from=build /src/prototypeur.exe /src/brique2/cpp/
 
-# CMD ["python", "."]
-CMD cd brique2/cpp && \
-    make build && \
-    python ../../
+COPY --from=builder /src/prototypeur.exe /src/brique2/cpp/
