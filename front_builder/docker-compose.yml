@@ -9,5 +9,5 @@ services:
         ports:
             - "8000:3000"
         # volumes:
-        #     - "./src/:/app/"
+        #     - "./:./"
         tty: true # bind console
