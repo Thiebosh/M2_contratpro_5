@@ -21,10 +21,10 @@ class InputManager():
         # with open(f"{pathlib.Path(__file__).parent.absolute()}/brique2/needs.json", 'r') as file:
         #     self.json_handler.data = json.loads(file.read().replace('\n', '').replace('\n', ''))
 
-    def close(self):
-        self.json_handler.close()
+    async def close(self):
+        await self.json_handler.close()
         self.files_manager.close()
-        self.render_page.close()
+        await self.render_page.close()
 
     def add_new_input(self, socket, msg):
         self.inputs.append(Input(socket, msg))
@@ -71,7 +71,7 @@ class InputManager():
                                                       input_to_process.get_content())
 
         elif action == "save":
-            result = self.json_handler.update_storage()
+            result = await self.json_handler.update_storage()
             print(f"Project {'well' if result else 'not'} updated")
 
         elif action == "generate":

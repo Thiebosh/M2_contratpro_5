@@ -24,11 +24,11 @@ class Room():
         print(f"{room_name} - Room created")
 
 
-    def close(self):
+    async def close(self):
         print(f"{self.room_name} - Closing room...")
         for socket in self.inputs:
             socket.close()
-        self.input_manager.close()
+        await self.input_manager.close()
         self.callback_remove_room(self.room_name)
         print(f"{self.room_name} - Room closed")
 
@@ -143,4 +143,4 @@ class Room():
             for socket in exception:
                 self.close_client_connection_to_room(socket)
 
-        self.close()
+        await self.close()

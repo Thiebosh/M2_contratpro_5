@@ -30,7 +30,7 @@ class RenderPage():
             raise Exception("RenderPage - PHP - session not setted")
 
 
-    def close(self):
+    async def close(self):
         success, session = self.partners["renderer"].get_session()
 
         if not success:
@@ -45,7 +45,7 @@ class RenderPage():
                 "session": json.loads(session)
             }
         }
-        result = self.partners["db"].update_one(COLLECTION_PROJECTS, filter_q, update_q)
+        result = await self.partners["db"].update_one_async(COLLECTION_PROJECTS, filter_q, update_q)
         print(f"{self.project_name} - Mongo - Project session {'well' if result else 'not'} updated")
 
 
