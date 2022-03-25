@@ -35,17 +35,17 @@ class JsonHandler():
         self.data = self.partners["db"].aggregate_list(COLLECTION_PROJECTS, aggregation)[0]
 
 
-    def close(self):
-        result = self.update_storage()
+    async def close(self):
+        result = await self.update_storage()
         print(f"{self.project_name} - Mongo - Project {'well' if result else 'not'} updated")
 
 
-    def update_storage(self):
+    async def update_storage(self):
         print(f"{self.project_name} - {'' if self.json_currently_stored else 'no '}need of db update")
         if self.json_currently_stored:
             return True
 
-        self.json_currently_stored = self.partners["db"].update_one(
+        self.json_currently_stored = await self.partners["db"].update_one_async(
             COLLECTION_PROJECTS,
             {"name":self.project_name},
             {"$set": {

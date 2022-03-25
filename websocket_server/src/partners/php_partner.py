@@ -1,4 +1,4 @@
-import requests
+import requests # eventuellement requests_async mais à voir car doit garder session
 from requests.exceptions import RequestException
 
 class PhpPartner():
