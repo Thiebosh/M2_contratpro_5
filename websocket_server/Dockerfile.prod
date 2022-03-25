@@ -1,13 +1,6 @@
 # first stage : prepare server environment
 FROM python:3.9-slim-buster as server
 
-RUN pip install -U --no-cache-dir \
-        pip \
-        pymongo[srv]==4.0.1 \
-        google-api-python-client>=2.0.2 \
-        google-auth-httplib2>=0.1.0 \
-        google-auth-oauthlib>=0.4.3
-
 RUN apt update &&\
     apt install -y \
         g++
@@ -24,6 +17,15 @@ ENV DRIVE_PATH="/credentials/service_account.json"
 EXPOSE $arg_port
 
 CMD ["python", "."]
+
+COPY requirements.txt .
+RUN pip install -U -r requirements.txt
+
+WORKDIR /credentials
+COPY credentials .
+
+WORKDIR /src
+COPY src .
 
 
 # second stage : build cpp exe
@@ -44,11 +46,5 @@ RUN make build
 
 # third stage : copy all files
 FROM server
-
-WORKDIR /credentials
-COPY credentials .
-
-WORKDIR /src
-COPY src .
 
 COPY --from=builder /src/prototypeur.exe /src/brique2/cpp/
