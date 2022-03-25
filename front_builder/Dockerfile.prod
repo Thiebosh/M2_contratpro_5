@@ -1,18 +1,33 @@
-# build environment
-FROM node:slim as build
+# production environment
+FROM python:3.9-alpine as server
+
 WORKDIR /app
+
+ARG arg_port
+EXPOSE $arg_port
+
+CMD ["python", "-m", "http.server", "5000"]
+
+
+# build environment
+FROM node:slim as builder
+
+WORKDIR /app
+
+COPY package.json .
+# COPY package-lock.json .
 ENV PATH /app/node_modules/.bin:$PATH
-COPY package.json ./
-# COPY package-lock.json ./ # idem
-RUN npm ci
-RUN npm install react-scripts@3.4.1 -g
-COPY . ./
+RUN npm install
+
+COPY . .
 RUN npm run build
 
+RUN ls
+
+
 # production environment
-FROM python:3.9-alpine
-ARG arg_port
-WORKDIR /app
-COPY --from=build /app/build .
-EXPOSE $arg_port
-CMD ["python", "-m", "http.server", "5000"]
+FROM server
+
+COPY --from=builder /app/build .
+# where is the build folder ???
+# https://reactjsexample.com/a-simple-vite-solidjs-electron-integration-template/

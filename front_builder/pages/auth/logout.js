@@ -63,4 +63,4 @@ export const getServerSideProps = withSessionSsr(
   }
 );
 
-Logout.layout = false;
+//Logout.layout = false;

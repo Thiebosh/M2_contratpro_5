@@ -18,10 +18,10 @@ EXPOSE $arg_port
 ENV HOST=0.0.0.0
 ENV PORT=$arg_port
 
+CMD ["python", "."]
+
 WORKDIR /credentials
 COPY credentials .
 
 WORKDIR /src
 COPY src .
-
-CMD ["python", "."]
