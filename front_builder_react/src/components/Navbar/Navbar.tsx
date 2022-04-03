@@ -1,12 +1,17 @@
-import Link from '@mui/material/Link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleUser } from '@fortawesome/free-solid-svg-icons'
+import { faCircleUser } from '@fortawesome/free-solid-svg-icons';
+import {setSessionUser, removeSessionUser} from '../../session/user'
 
 import './Navbar.scss';
 
 function User() {
+
     return (
-        <FontAwesomeIcon className="user" icon={faCircleUser}/>
+        <div>
+            <FontAwesomeIcon className="user" icon={faCircleUser}/>
+            <a href="/user/projects"><button onClick={() => setSessionUser("some")}>co</button></a>
+            <a href="/"><button onClick={removeSessionUser}>déco</button></a>
+        </div>
     );
 }
 
