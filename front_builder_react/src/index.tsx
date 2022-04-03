@@ -16,7 +16,7 @@ import Project from './pages/Project';
 import Projects from './pages/Projects';
 import Create from './pages/user/Create';
 import Login from './pages/user/Login';
-import Account from './pages/user/Account';
+import Profile from './pages/user/Profile';
 import Settings from './pages/user/Settings';
 
 import './index.scss';
@@ -34,7 +34,7 @@ ReactDOM.render(
 
                 <Route path="/user/create" element={<Create/>} />
                 <Route path="/user/login" element={<Login/>} />
-                <Route path="/user/account" element={requireLoggedUser(<Account/>)} />
+                <Route path="/user/profile" element={requireLoggedUser(<Profile/>)} />
                 <Route path="/user/settings" element={requireLoggedUser(<Settings/>)} />
 
                 <Route path="/*" element={<NotFound/>} />

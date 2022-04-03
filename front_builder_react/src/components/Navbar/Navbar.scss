@@ -5,7 +5,8 @@
     height: 4em;
     background-color: var(--color-primary);
     color: white;
-    
+    padding: 0 1em;
+
     .title {
         cursor: pointer;
         display: flex;
@@ -24,6 +25,11 @@
             margin-left: 1em;
             margin-right: 1em;
         }
+    }
+
+    .left-part {
+        display: flex;
+        flex-direction: row;
     }
 
     .user {
