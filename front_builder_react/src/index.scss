@@ -1,0 +1,99 @@
+:root {
+	--color-primary: rgb(43 108 176);
+    --color-shadow: #272728;
+}
+
+body {
+    margin: 0;
+    text-align: center;
+}
+
+section {
+    margin: auto;
+
+    input {
+        background-color: var(--color-secondary);
+        color: var(--color-text);
+        font-family: var(--font-family);
+        font-size: 14px;
+        line-height: 24px;
+        text-transform: capitalize;
+    }
+
+    input[type=month] {
+        cursor: pointer;
+    }
+
+    button {
+        color: #e8e6e3;
+        border-color: brown;
+        background-color: var(--color-primary);
+        font-family: var(--font-family);
+        font-size: 14px;
+        border-radius: 4px;
+        cursor: pointer;
+        height: 30px;
+    }
+
+    .bold {
+        font-weight: bold;
+    }
+
+    .normal {
+        font-weight: normal;
+    }
+
+    .title {
+        color: var(--color-title);
+    }
+
+    .subtitle {
+        color: var(--color-sub-title);
+    }
+
+    .text {
+        color: var(--color-text);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        color: var(--color-title);
+    }
+
+    h2 {
+        font-size: 30px;
+        margin-bottom: 20px;
+    }
+
+    h3 {
+        font-size: 18px;
+    }
+
+    .btn {
+        border: 0;
+        border-radius: 0;
+
+        &.btn-primary {
+            background-color: var(--color-primary);
+        }
+
+        &.btn-primary:hover {
+            background-color: var(--color-primary-light);
+        }
+    }
+
+    a {
+        text-decoration: none;
+        -webkit-transition: 300ms;
+        -moz-transition: 300ms;
+        -o-transition: 300ms;
+        transition: 300ms;
+        color: var(--color-primary);
+
+        &:hover,
+        &:focus {
+            text-decoration: none;
+            outline: none;
+            color: var(--color-primary-light);
+        }
+    }
+}

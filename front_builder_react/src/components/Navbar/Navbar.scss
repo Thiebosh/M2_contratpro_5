@@ -1,0 +1,33 @@
+#navbar {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    height: 4em;
+    background-color: var(--color-primary);
+    color: white;
+    
+    .title {
+        cursor: pointer;
+        display: flex;
+        transition: all 400ms ease-in-out;
+        text-decoration: none;
+        color: inherit;
+
+        &:hover {
+            background-color: rgba(0,0,0,.2);
+        }
+
+        & > div {
+            font-size: 25px;
+            font-weight: bold;
+            margin: auto;
+            margin-left: 1em;
+            margin-right: 1em;
+        }
+    }
+
+    .user {
+        margin: auto 1em;
+        height: 2.2em;
+    }
+}
