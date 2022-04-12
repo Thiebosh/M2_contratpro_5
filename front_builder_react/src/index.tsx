@@ -15,7 +15,7 @@ import NotFound from './pages/NotFound';
 import {Home} from './pages/Home';
 import Project from './pages/Project';
 import Projects from './pages/Projects';
-import Create from './pages/user/Create';
+import {Create} from './pages/user/Create';
 import Login from './pages/user/Login';
 import Profile from './pages/user/Profile';
 import Settings from './pages/user/Settings';
