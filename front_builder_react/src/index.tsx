@@ -8,7 +8,7 @@ import {
 } from 'react-router-dom';
 import {requireLoggedUser} from './session/user'
 
-import NavBar from './components/Navbar';
+import NavBar from './components/NavBar';
 
 import NotFound from './pages/NotFound';
 import Home from './pages/Home';
