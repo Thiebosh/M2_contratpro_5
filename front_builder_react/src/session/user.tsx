@@ -16,6 +16,6 @@ export function removeSessionUser() {
     sessionStorage.setItem(userKey, "");
 }
 
-export function requireLoggedUser(component:JSX.Element) {
+export function requireUser(component:JSX.Element) {
     return (sessionStorage.getItem(userKey) ? component : <Navigate to="/user/login"/> );
 }

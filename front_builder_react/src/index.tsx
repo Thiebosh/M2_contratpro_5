@@ -6,7 +6,8 @@ import {
 	Route,
     Navigate
 } from 'react-router-dom';
-import {requireLoggedUser} from './session/user'
+import {requireUser} from './session/user';
+import {requireProject} from './session/project';
 
 import NavBar from './components/NavBar';
 
@@ -29,14 +30,12 @@ ReactDOM.render(
             <Routes>
                 <Route path="/" element={<Navigate replace to="/home" />} />
                 <Route path="/home" element={<Home />} />
-                <Route path="/user/projects" element={requireLoggedUser(<Projects/>)} />
-                <Route path="/user/project/*" element={requireLoggedUser(<Project/>)} />
-
                 <Route path="/user/create" element={<Create/>} />
                 <Route path="/user/login" element={<Login/>} />
-                <Route path="/user/profile" element={requireLoggedUser(<Profile/>)} />
-                <Route path="/user/settings" element={requireLoggedUser(<Settings/>)} />
-
+                <Route path="/user/profile" element={requireUser(<Profile/>)} />
+                <Route path="/user/settings" element={requireUser(<Settings/>)} />
+                <Route path="/user/projects" element={requireUser(<Projects/>)} />
+                <Route path="/user/project/*" element={requireProject(requireUser(<Project/>))} />
                 <Route path="/*" element={<NotFound/>} />
             </Routes>
         </Router>
