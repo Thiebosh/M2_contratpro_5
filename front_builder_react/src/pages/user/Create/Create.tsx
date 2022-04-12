@@ -1,6 +1,19 @@
+import { useEffect } from 'react';
+import { postAccountCreate } from '../../../partners/rest';
+
 import './Create.scss';
 
 export default function Create() {
+    useEffect(() => {
+        postAccountCreate("test", "test")
+        .then((data) => 
+            console.log(data)
+        )
+        .catch(error => {
+            console.log("Error:", error);
+        });
+    }, []);
+
     return (
         <div id="create">
             Create account page

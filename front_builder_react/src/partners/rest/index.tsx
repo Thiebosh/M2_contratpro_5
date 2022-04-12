@@ -1,11 +1,9 @@
 import {
-    getInitSearch,
-    getDataSearch,
-    getConsoSearch
+    postAccountCreate
 } from './RestPartner';
+// export type {
 
+// };
 export {
-    getInitSearch,
-    getDataSearch,
-    getConsoSearch
+    postAccountCreate
 };
