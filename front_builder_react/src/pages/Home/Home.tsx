@@ -1,12 +1,17 @@
 import './Home.scss';
 
-export default function Home() {
+export function Home() {
     return (
-        <div id="home">
-            Home page : présentation du concept et création de compte
+        <section id="home">
+            <h1>Welcome to <span>&#60;SpecTry/&#62;</span></h1>
             <br/>
+            <p>
+                Explication intérêt application
+            </p>
             <br/>
-            <a href="/user/create"><button>créer user</button></a>
-        </div>
+            <p>
+                Explication utilisation application
+            </p>
+        </section>
     );
 }

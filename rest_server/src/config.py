@@ -2,6 +2,10 @@ from dataclasses import dataclass
 import os
 import pathlib
 
+os.environ.setdefault("MONGO_USERNAME", "thibaut")
+os.environ.setdefault("MONGO_PASSWORD", "thibaut")
+os.environ.setdefault("MONGO_URL", "cluster0.7geff.mongodb.net/TP1?retryWrites=true&w=majority")
+
 @dataclass
 class Config:
     DEBUG = False

@@ -12,7 +12,7 @@ import {requireProject} from './session/project';
 import NavBar from './components/NavBar';
 
 import NotFound from './pages/NotFound';
-import Home from './pages/Home';
+import {Home} from './pages/Home';
 import Project from './pages/Project';
 import Projects from './pages/Projects';
 import Create from './pages/user/Create';
