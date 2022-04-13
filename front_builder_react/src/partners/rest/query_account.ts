@@ -22,6 +22,16 @@ export async function postAccountConnect(name:string, password:string): Promise<
     return await _postRequest('/account/connect', data);
 }
 
+interface AccountGet {
+    name:string
+}
+export async function postAccountGet(id:string): Promise<AccountGet> {
+    const data = {
+        id: id
+    }
+    return await _postRequest('/account/get', data);
+}
+
 interface AccountUpdate {
     success:string|boolean
 }

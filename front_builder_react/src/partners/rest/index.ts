@@ -1,6 +1,7 @@
 import {
     postAccountCreate,
     postAccountConnect,
+    postAccountGet,
     postAccountUpdate,
     postAccountSearch,
     postAccountDelete,
@@ -18,6 +19,7 @@ import {
 export {
     postAccountCreate,
     postAccountConnect,
+    postAccountGet,
     postAccountUpdate,
     postAccountSearch,
     postAccountDelete,

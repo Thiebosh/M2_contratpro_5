@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { postAccountConnect } from '../../../partners/rest';
-import {setSessionUser, getSessionUser} from '../../../session/user';
+import { setSessionUser } from '../../../session/user';
 
 import './Login.scss';
 
@@ -36,8 +36,8 @@ function Card() {
                 return;
             }
             setSessionUser(data.id);
+            navigate('/projects');
         })
-        .then(() => navigate('/user/profile'))
         .catch(error => {
             setErrorMsg("Internal error");
             console.log("Error:", error);
@@ -63,7 +63,7 @@ function Card() {
     );
 }
 
-export default function Login() {
+export function Login() {
     return (
         <section id="login">
             <h1>Login</h1>

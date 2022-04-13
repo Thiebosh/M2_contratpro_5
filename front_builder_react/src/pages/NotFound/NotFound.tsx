@@ -1,6 +1,6 @@
 import './NotFound.scss';
 
-export default function NotFound() {
+export function NotFound() {
     return (
         <div id="notFound">
             404

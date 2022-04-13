@@ -45,7 +45,7 @@ export default function NavBar() {
                     &#60;SpecTry/&#62;
                 </div>
             </a>
-            <a href='/user/projects' className="title">
+            <a href='/projects' className="title">
                 <div>
                     Projets
                 </div>

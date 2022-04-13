@@ -4,18 +4,18 @@ import {
 
 const userKey = "user";
 
-export function getSessionUser() {
+export function getSessionUser():string|null {
     return sessionStorage.getItem(userKey);
 }
 
-export function setSessionUser(user: string) {
+export function setSessionUser(user:string):void {
     sessionStorage.setItem(userKey, user);
 }
 
-export function removeSessionUser() {
+export function removeSessionUser():void {
     sessionStorage.setItem(userKey, "");
 }
 
-export function requireUser(component:JSX.Element) {
+export function requireUser(component:JSX.Element):JSX.Element {
     return (sessionStorage.getItem(userKey) ? component : <Navigate to="/user/login"/> );
 }
