@@ -29,14 +29,14 @@ function Card() {
             return;
         }
 
-        if (password != passwordCheck) {
+        if (password !== passwordCheck) {
             setWarnMsg("Differents passwords");
             return;
         }
 
         postAccountCreate(name, password)
         .then((data) => {
-            if (data.success == "already exist") {
+            if (data.success === "already exist") {
                 setErrorMsg("Username already used");
                 return;
             }
@@ -63,7 +63,7 @@ function Card() {
             <div className='input_group'>
                 <label>Password check</label>
                 <br/>
-                <input type='password'  onChange={(event) => setPasswordCheck(event.target.value)}/>
+                <input type='password' onChange={(event) => setPasswordCheck(event.target.value)}/>
             </div>
             <div className='button' onClick={triggerCreate}>Create</div>
             { warnMsg && <div className='warning'>{warnMsg}</div> }

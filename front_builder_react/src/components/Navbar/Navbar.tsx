@@ -12,7 +12,6 @@ function Card() {
                 getSessionUser() ? 
                     <>
                         <a href='/user/profile'>Account</a>
-                        <a href='/user/settings'>Settings</a>
                         <hr/>
                         <a href='/' onClick={removeSessionUser}>Logout</a>
                     </>

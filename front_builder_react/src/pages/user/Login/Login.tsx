@@ -54,7 +54,7 @@ function Card() {
             <div className='input_group'>
                 <label>Password</label>
                 <br/>
-                <input type='password'  onChange={(event) => setPassword(event.target.value)}/>
+                <input type='password' onChange={(event) => setPassword(event.target.value)}/>
             </div>
             <div className='button' onClick={triggerLogin}>Sign in</div>
             { warnMsg && <div className='warning'>{warnMsg}</div> }

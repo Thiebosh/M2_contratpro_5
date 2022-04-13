@@ -35,10 +35,11 @@ export async function postAccountGet(id:string): Promise<AccountGet> {
 interface AccountUpdate {
     success:string|boolean
 }
-export async function postAccountUpdate(name?:string, password?:string): Promise<AccountUpdate> {
-    const data = {// maybe conditionnal
-        name: name,
-        password: password,
+export async function postAccountUpdate(id:string, name?:string, password?:string): Promise<AccountUpdate> {
+    const data = {
+        id: id,
+        ...(name && {name: name}),
+        ...(password && {password: password})
     }
     return await _postRequest('/account/update', data);
 }
