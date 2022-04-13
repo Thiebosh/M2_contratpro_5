@@ -4,6 +4,8 @@ import {
     postAccountUpdate,
     postAccountSearch,
     postAccountDelete,
+} from './query_account';
+import {
     postProjectCreate,
     postProjectUpdate,
     postProjectSearch,
@@ -11,10 +13,8 @@ import {
     postProjectAddUser,
     postProjectRemoveUser,
     postProjectDelete
-} from './RestPartner';
-// export type {
-
-// };
+} from './query_project';
+// export type {};
 export {
     postAccountCreate,
     postAccountConnect,
