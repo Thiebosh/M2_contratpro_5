@@ -62,17 +62,14 @@ function Edit(props:EditProps) {
         <>
             <div className='input_group'>
                 <label>Change your username</label>
-                <br/>
                 <input type='text' onChange={(event) => setName(event.target.value)}/>
             </div>
             <div className='input_group'>
                 <label>Change your password</label>
-                <br/>
                 <input type='password'  onChange={(event) => setPassword(event.target.value)}/>
             </div>
             <div className='input_group'>
                 <label>Password check</label>
-                <br/>
                 <input type='password'  onChange={(event) => setPasswordCheck(event.target.value)}/>
             </div>
             <div className='button' onClick={triggerUpdate}>Confirm</div>

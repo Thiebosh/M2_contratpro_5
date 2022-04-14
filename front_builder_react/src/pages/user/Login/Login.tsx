@@ -48,12 +48,10 @@ function Card() {
         <div className='card'>
             <div className='input_group'>
                 <label>Username</label>
-                <br/>
                 <input type='text' onChange={(event) => setName(event.target.value)}/>
             </div>
             <div className='input_group'>
                 <label>Password</label>
-                <br/>
                 <input type='password' onChange={(event) => setPassword(event.target.value)}/>
             </div>
             <div className='button' onClick={triggerLogin}>Sign in</div>
