@@ -181,7 +181,7 @@ async def search_by_user():
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
-    user_id = post.get("id", type=str, default=None)
+    user_id = post.get("user_id", type=str, default=None)
 
     if not user_id:
         return "", status.HTTP_400_BAD_REQUEST
