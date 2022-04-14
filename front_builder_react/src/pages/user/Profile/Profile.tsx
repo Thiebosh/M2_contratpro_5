@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { getSessionUser } from '../../../session/user';
-import { postAccountGet, postAccountUpdate } from '../../../partners/rest';
+import { useNavigate } from 'react-router-dom';
+import { getSessionUser, removeSessionUser } from '../../../session/user';
+import { postAccountGet, postAccountUpdate, postAccountDelete } from '../../../partners/rest';
 
 import './Profile.scss';
 
@@ -10,22 +11,17 @@ interface EditProps {
     setName: React.Dispatch<React.SetStateAction<string>>
 };
 function Edit(props:EditProps) {
+    const navigate = useNavigate();
     const [name, setName] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [passwordCheck, setPasswordCheck] = useState<string>("");
     const [warnMsg, setWarnMsg] = useState<string>("");
     const [errorMsg, setErrorMsg] = useState<string>("");
+    const [deleteMsg, setDeleteMsg] = useState<string>("");
 
-    useEffect(() => {
-        if (warnMsg) {
-            setTimeout(() => setWarnMsg(""), 4000);
-        }
-    }, [warnMsg]);
-    useEffect(() => {
-        if (errorMsg) {
-            setTimeout(() => setErrorMsg(""), 4000);
-        }
-    }, [errorMsg]);
+    useEffect(() => { warnMsg && setTimeout(() => setWarnMsg(""), 4000) }, [warnMsg]);
+    useEffect(() => { errorMsg && setTimeout(() => setErrorMsg(""), 4000) }, [errorMsg]);
+    useEffect(() => { deleteMsg && setTimeout(() => setDeleteMsg(""), 4000) }, [deleteMsg]);
 
     function triggerUpdate() {
         if (!(name || password || passwordCheck)) {
@@ -58,6 +54,23 @@ function Edit(props:EditProps) {
         });
     }
 
+    function triggerDelete() {
+        // hover confirm button ?
+        postAccountDelete(props.id)
+        .then((data) => {
+            if (!data.success) {
+                setDeleteMsg("Something wrong appened");
+                return;
+            }
+            removeSessionUser(); // naviguer direct sur /user/logout et généraliser le comportement
+            navigate('/home');
+        })
+        .catch(error => {
+            setErrorMsg("Internal error");
+            console.log("Error:", error);
+        });
+    }
+
     return (
         <>
             <div className='input_group'>
@@ -75,6 +88,8 @@ function Edit(props:EditProps) {
             <div className='button' onClick={triggerUpdate}>Confirm</div>
             { warnMsg && <div className='warning'>{warnMsg}</div> }
             { errorMsg && <div className='error'>{errorMsg}</div> }
+            <div className='button delete' onClick={triggerDelete}>Delete</div>
+            { deleteMsg && <div className='error'>{deleteMsg}</div> }
         </>
     );
 }

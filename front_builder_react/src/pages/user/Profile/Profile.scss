@@ -83,6 +83,11 @@
             font-weight: bold;
             cursor: pointer;
             font-size: 17px;
+
+            &.delete {
+                margin-top: 0.6em;
+                background-color: rgb(199, 12, 12);
+            }
         }
     }
 }
