@@ -40,7 +40,7 @@ function Project(props: ProjectProps) {
     );
 }
 
-export default function Projects() {
+export function Projects() {
     const userContext = useUserContext();
 
     const [projects, setProjects] = useState<ProjectProps[]>([]);

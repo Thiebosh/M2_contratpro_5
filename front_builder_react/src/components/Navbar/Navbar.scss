@@ -14,7 +14,7 @@
         text-decoration: none;
         color: inherit;
 
-        &:hover {
+        &:hover, &.current {
             background-color: rgba(0, 0, 0, 0.2);
         }
 

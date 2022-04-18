@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { postProjectExistForUser } from '../../partners/rest';
-import { useUserContext } from '../../session/user';
+import { postProjectExistForUser } from '../../../partners/rest';
+import { useUserContext } from '../../../session/user';
 
-import './Project.scss';
+import './Specs.scss';
 
-export default function Project() {
+export function Specs() {
     const navigate = useNavigate();
     const { name } = useParams();
     const userContext = useUserContext();
@@ -25,12 +25,8 @@ export default function Project() {
     }, [userContext.user, name, navigate]);
 
     return (
-        <div id="project">
-            Project page
-            display one project
-            - needs (with compile)
-            - prototype
-            - settings
-        </div>
+        <section id="specs">
+            specs section
+        </section>
     );
 }

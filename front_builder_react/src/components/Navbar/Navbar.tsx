@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createBrowserHistory } from 'history';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleUser } from '@fortawesome/free-solid-svg-icons';
 
@@ -38,20 +39,44 @@ function User() {
     );
 }
 
-export default function NavBar() {
+interface LinkProps {
+    currentPath?: string,
+    path: string,
+    text: string
+}
+function Link(props:LinkProps) {
+    return (
+        <a href={props.path} className={props.currentPath === props.path ? "title current" : "title"}>
+            <div>
+                {props.text}
+            </div>
+        </a>
+    );
+}
+
+export function NavBar() {
+    const currentPath:string = createBrowserHistory().location.pathname;
+
+    let projectName = '';
+    if (currentPath.startsWith('/project/')) {
+        const split = currentPath.split('/');
+        if (split.length > 2) {
+            projectName = split[2];
+        }
+    }
+
     return (
     <nav id='navbar'>
         <div className='left-part'>
-            <a href='/home' className="title">
-                <div>
-                    &#60;SpecTry/&#62;
-                </div>
-            </a>
-            <a href='/projects' className="title">
-                <div>
-                    Projets
-                </div>
-            </a>
+            <Link path={'/home'} text={'<SpecTry/>'}/>
+            <Link currentPath={currentPath} path={'/projects'} text={'Projets'}/>
+            {
+                projectName && (
+                <>
+                    <Link currentPath={currentPath} path={'/project/'+projectName+'/specs'} text={'Specifications'}/>
+                    <Link currentPath={currentPath} path={'/project/'+projectName+'/proto'} text={'Prototype'}/>
+                </>)
+            }
         </div>
         <User/>
     </nav>

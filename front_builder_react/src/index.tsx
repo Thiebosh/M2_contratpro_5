@@ -8,15 +8,17 @@ import {
 } from 'react-router-dom';
 import {requireUser, userContext, userContextMethods} from './session/user';
 
-import NavBar from './components/NavBar';
+import {NavBar} from './components/NavBar';
 
 import {NotFound} from './pages/NotFound';
 import {Home} from './pages/Home';
-import Project from './pages/Project';
-import Projects from './pages/Projects';
-import {Create} from './pages/user/Create';
 import {Login} from './pages/user/Login';
+import {Create} from './pages/user/Create';
 import {Profile} from './pages/user/Profile';
+import {Projects} from './pages/Projects';
+import {Project} from './pages/project/Project';
+import {Specs} from './pages/project/Specs';
+import {Proto} from './pages/project/Proto';
 
 import './index.scss';
 
@@ -36,6 +38,8 @@ function App():JSX.Element {
                         <Route path="/user/profile" element={requireUser(<Profile/>)} />
                         <Route path="/projects" element={requireUser(<Projects/>)} />
                         <Route path="/project/:name" element={requireUser(<Project/>)} />
+                        <Route path="/project/:name/specs" element={requireUser(<Specs/>)} />
+                        <Route path="/project/:name/proto" element={requireUser(<Proto/>)} />
                         <Route path="/*" element={<NotFound/>} />
                     </Routes>
                 </Router>
