@@ -1,19 +1,22 @@
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleUser } from '@fortawesome/free-solid-svg-icons';
-import { getSessionUser, removeSessionUser } from '../../session/user';
+
+import { useUserContext } from '../../session/user';
 
 import './NavBar.scss';
 
 function Card() {
+    const UserContext = useUserContext();
+
     return (
         <div className='card'>
             {
-                getSessionUser() ? 
+                UserContext.user ? 
                     <>
                         <a href='/user/profile'>Account</a>
                         <hr/>
-                        <a href='/' onClick={removeSessionUser}>Logout</a>
+                        <a href='/' onClick={UserContext.removeUser}>Logout</a>
                     </>
                     :
                     <>

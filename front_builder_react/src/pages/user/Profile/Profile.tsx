@@ -1,17 +1,20 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getSessionUser, removeSessionUser } from '../../../session/user';
+import { Fade } from 'react-awesome-reveal';
+
+import { useUserContext } from '../../../session/user';
 import { postAccountGet, postAccountUpdate, postAccountDelete } from '../../../partners/rest';
 
 import './Profile.scss';
 
 interface EditProps {
-    id: string,
     editOff: () => void,
     setName: React.Dispatch<React.SetStateAction<string>>
 };
 function Edit(props:EditProps) {
     const navigate = useNavigate();
+    const UserContext = useUserContext();
+
     const [name, setName] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [passwordCheck, setPasswordCheck] = useState<string>("");
@@ -39,7 +42,7 @@ function Edit(props:EditProps) {
             return;
         }
 
-        postAccountUpdate(props.id, name, password)
+        postAccountUpdate(UserContext.user, name, password)
         .then((data) => {
             if (data.success === "already exist") {
                 setErrorMsg("Username already used");
@@ -55,14 +58,13 @@ function Edit(props:EditProps) {
     }
 
     function triggerDelete() {
-        // hover confirm button ?
-        postAccountDelete(props.id)
+        postAccountDelete(UserContext.user)
         .then((data) => {
             if (!data.success) {
                 setDeleteMsg("Something wrong appened");
                 return;
             }
-            removeSessionUser(); // naviguer direct sur /user/logout et généraliser le comportement
+            UserContext.removeUser();
             navigate('/home');
         })
         .catch(error => {
@@ -86,16 +88,17 @@ function Edit(props:EditProps) {
                 <input type='password'  onChange={(event) => setPasswordCheck(event.target.value)}/>
             </div>
             <div className='button' onClick={triggerUpdate}>Confirm</div>
-            { warnMsg && <div className='warning'>{warnMsg}</div> }
-            { errorMsg && <div className='error'>{errorMsg}</div> }
+            { warnMsg && <Fade><div className='warning'>{warnMsg}</div></Fade> }
+            { errorMsg && <Fade><div className='error'>{errorMsg}</div></Fade> }
             <div className='button delete' onClick={triggerDelete}>Delete</div>
-            { deleteMsg && <div className='error'>{deleteMsg}</div> }
+            { deleteMsg && <Fade><div className='error'>{deleteMsg}</div></Fade> }
         </>
     );
 }
 
 export function Profile() {
-    const id = getSessionUser() || "";
+    const UserContext = useUserContext();
+
     const [name, setName] = useState<string>("");
 
     const [edit, setEdit] = useState<boolean>(false);
@@ -104,14 +107,14 @@ export function Profile() {
     const editOff = () => setEdit(false);
 
     useEffect(() => {
-        postAccountGet(id)
+        postAccountGet(UserContext.user)
         .then((data) => {
             setName(data.name);
         })
         .catch(error => {
             console.log("Error:", error);
         });
-    }, [id]);
+    }, [UserContext.user]);
 
     return (
         <section id="profile">
@@ -121,7 +124,7 @@ export function Profile() {
                     <img src='' alt='avatar'/>
                     <p>{name}</p>
                 </div>
-                { edit ? <Edit id={id} editOff={editOff} setName={setName}/> : <div className='button' onClick={editOn}>Edit</div>}
+                { edit ? <Edit editOff={editOff} setName={setName}/> : <div className='button' onClick={editOn}>Edit</div>}
             </div>
         </section>
     );

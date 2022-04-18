@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import {
 	BrowserRouter as Router,
@@ -6,7 +6,7 @@ import {
 	Route,
     Navigate
 } from 'react-router-dom';
-import {requireUser} from './session/user';
+import {requireUser, UserContext, userContextMethods} from './session/user';
 import {requireProject} from './session/project';
 
 import NavBar from './components/NavBar';
@@ -21,21 +21,33 @@ import {Profile} from './pages/user/Profile';
 
 import './index.scss';
 
+function App():JSX.Element {
+    const triggerRefresh = useState<boolean>(false)[1];
+
+    return (
+        <>
+            <UserContext.Provider value={userContextMethods(triggerRefresh)}>
+                <NavBar/>
+                <Router>
+                    <Routes>
+                        <Route path="/" element={<Navigate replace to="/home" />} />
+                        <Route path="/home" element={<Home />} />
+                        <Route path="/user/create" element={<Create/>} />
+                        <Route path="/user/login" element={<Login/>} />
+                        <Route path="/user/profile" element={requireUser(<Profile/>)} />
+                        <Route path="/projects" element={requireUser(<Projects/>)} />
+                        <Route path="/project/*" element={requireProject(requireUser(<Project/>))} />
+                        <Route path="/*" element={<NotFound/>} />
+                    </Routes>
+                </Router>
+            </UserContext.Provider>
+        </>
+    );
+}
+
 ReactDOM.render(
     <React.StrictMode>
-        <NavBar/>
-        <Router>
-            <Routes>
-                <Route path="/" element={<Navigate replace to="/home" />} />
-                <Route path="/home" element={<Home />} />
-                <Route path="/user/create" element={<Create/>} />
-                <Route path="/user/login" element={<Login/>} />
-                <Route path="/user/profile" element={requireUser(<Profile/>)} />
-                <Route path="/projects" element={requireUser(<Projects/>)} />
-                <Route path="/project/*" element={requireProject(requireUser(<Project/>))} />
-                <Route path="/*" element={<NotFound/>} />
-            </Routes>
-        </Router>
+        <App/>
     </React.StrictMode>,
     document.getElementById('root')
 );

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Fade } from 'react-awesome-reveal';
+
 import { postAccountCreate } from '../../../partners/rest';
 
 import './Create.scss';
@@ -63,8 +65,8 @@ function Card() {
                 <input type='password' onChange={(event) => setPasswordCheck(event.target.value)}/>
             </div>
             <div className='button' onClick={triggerCreate}>Create</div>
-            { warnMsg && <div className='warning'>{warnMsg}</div> }
-            { errorMsg && <div className='error'>{errorMsg}</div> }
+            { warnMsg && <Fade><div className='warning'>{warnMsg}</div></Fade> }
+            { errorMsg && <Fade><div className='error'>{errorMsg}</div></Fade> }
         </div>
     );
 }

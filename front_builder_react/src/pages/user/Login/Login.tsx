@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Fade } from 'react-awesome-reveal';
+
 import { postAccountConnect } from '../../../partners/rest';
-import { setSessionUser } from '../../../session/user';
+import { useUserContext } from '../../../session/user';
 
 import './Login.scss';
 
 function Card() {
     const navigate = useNavigate();
+    const UserContext = useUserContext();
+
     const [name, setName] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [warnMsg, setWarnMsg] = useState<string>("");
@@ -35,7 +39,7 @@ function Card() {
                 setErrorMsg("Credentials invalid");
                 return;
             }
-            setSessionUser(data.id);
+            UserContext.setUser(data.id);
             navigate('/projects');
         })
         .catch(error => {
@@ -55,8 +59,8 @@ function Card() {
                 <input type='password' onChange={(event) => setPassword(event.target.value)}/>
             </div>
             <div className='button' onClick={triggerLogin}>Sign in</div>
-            { warnMsg && <div className='warning'>{warnMsg}</div> }
-            { errorMsg && <div className='error'>{errorMsg}</div> }
+            { warnMsg && <Fade><div className='warning'>{warnMsg}</div></Fade> }
+            { errorMsg && <Fade><div className='error'>{errorMsg}</div></Fade> }
         </div>
     );
 }

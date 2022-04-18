@@ -1,11 +1,12 @@
+import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
+
 import { postProjectSearchByUser } from '../../partners/rest';
-import { getSessionUser } from '../../session/user';
+import { useUserContext } from '../../session/user';
 import { setSessionProject } from '../../session/project';
 
 import './Projects.scss';
-import { useEffect, useState } from 'react';
 
 interface ProjectProps {
     id: string;
@@ -34,10 +35,12 @@ function Project(props: ProjectProps) {
 }
 
 export default function Projects() {
+    const UserContext = useUserContext();
+
     const [projects, setProjects] = useState<ProjectProps[]>([]);
 
     useEffect(() => {
-        postProjectSearchByUser(getSessionUser() || "")
+        postProjectSearchByUser(UserContext.user)
         .then((data) => {
             setProjects(data.result);
         })
@@ -45,7 +48,7 @@ export default function Projects() {
             // setErrorMsg("Internal error");
             console.log("Error:", error);
         });
-    }, []);
+    }, [UserContext.user]);
 
     return (
         <section id="projects">
