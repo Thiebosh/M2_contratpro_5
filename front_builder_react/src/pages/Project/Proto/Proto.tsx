@@ -24,9 +24,16 @@ export function Proto() {
         });
     }, [userContext.user, name, navigate]);
 
+    // récupérer websocket prête à l'emploi
+
     return (
         <section id="proto">
-            prototype section
+            <div>
+                fil d'ariane : liens d'accès aux pages du prototype
+            </div>
+            <div>
+                prototype section
+            </div>
         </section>
     );
 }

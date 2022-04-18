@@ -24,9 +24,16 @@ export function Specs() {
         });
     }, [userContext.user, name, navigate]);
 
+    // récupérer websocket prête à l'emploi
+
     return (
         <section id="specs">
-            specs section
+            <div>
+                menu statique en haut à gauche avec boutons générer et enregistrer
+            </div>
+            <div>
+                specs section : arbre d'antoine
+            </div>
         </section>
     );
 }

@@ -24,11 +24,12 @@ import './index.scss';
 
 function App():JSX.Element {
     const triggerRefresh = useState<boolean>(false)[1];
-
     return (
         <>
             <userContext.Provider value={userContextMethods(triggerRefresh)}>
                 <NavBar/>
+                {/* ajouter websocket prodiver dans un composant dédié qui surveille les patterns de route et qui manipule la socket en fonction :
+                si project/:name/quelque chose, crée et initie si pas déjà le cas ; sinon, ferme si pas déjà le cas */}
                 <Router>
                     <Routes>
                         <Route path="/" element={<Navigate replace to="/home" />} />
