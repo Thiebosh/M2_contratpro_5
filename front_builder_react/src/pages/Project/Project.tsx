@@ -8,21 +8,21 @@ import './Project.scss';
 
 export default function Project() {
     const navigate = useNavigate();
-    const { id } = useParams();
+    const { name } = useParams();
     const userContext = useUserContext();
 
     useEffect(() => {
-        postProjectExistForUser(userContext.user, id || "")
+        postProjectExistForUser(userContext.user, name || "")
         .then((data) => {
-            console.log(data);
-            // data.result || navigate('/projects')
+            if (!data.id) navigate('/projects');
+            console.log(data.id);
         })
         .catch(error => {
             // setErrorMsg("Internal error");
             console.log("Error:", error);
-            // navigate('/projects');
+            navigate('/projects');
         });
-    }, [userContext.user, id, navigate]);
+    }, [userContext.user, name, navigate]);
 
     return (
         <div id="project">

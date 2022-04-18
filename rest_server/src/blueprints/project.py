@@ -123,29 +123,34 @@ async def exist_for_user():
         return "", status.HTTP_400_BAD_REQUEST
 
     user_id = post.get("user_id", type=str, default=None)
-    project_id = post.get("project_id", type=str, default=None)
+    project_name = post.get("project_name", type=str, default=None)
 
-    if not (user_id and project_id):
-        return "", status.HTTP_400_BAD_REQUEST
-
-    try:
-        project_id = ObjectId(project_id)
-    except Exception as e:
-        print(e)
+    if not (user_id and project_name):
         return "", status.HTTP_400_BAD_REQUEST
 
     filter_q = {
-        "_id": project_id,
+        "name": project_name,
         "users": user_id
+    }
+    fields = {
+        "_id": 0,
+        "id": {
+            "$toString": "$_id"
+        },
     }
 
     try:
-        return {
-            "result": bool(await current_app.config["partners"]["db"].count(COLLECTION, filter_q))
-        }, status.HTTP_200_OK
+        result = await current_app.config["partners"]["db"].find_one(COLLECTION, filter_q, fields)
     except Exception as e:
         print(e)
         return "", status.HTTP_503_SERVICE_UNAVAILABLE
+
+    if not result:
+        return {"id": False}, status.HTTP_200_OK
+
+    return {
+        "id": result["id"]
+    }, status.HTTP_200_OK
 
 
 @bp_project.route("/search", methods=['POST'])

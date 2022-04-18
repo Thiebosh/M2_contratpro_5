@@ -120,11 +120,11 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 
 **Arguments requis :**
 - "user_id" (str) : l'identifiant du compte à vérifier.
-- "project_id" (str) : l'identifiant du projet à vérifier.
+- "project_name" (str) : l'identifiant du projet à vérifier.
 
 **Retours :**
-- { "result": False } : le projet n'existe pas ou l'utilisateur n'y est pas associé.
-- { "result": True } : le projet existe et l'utilisateur y est associé.
+- { "id": False } : le projet n'existe pas ou l'utilisateur n'y est pas associé.
+- { "id": "str" } : le projet existe et l'utilisateur y est associé : reçoit l'id du projet.
 
 
 # /project/search

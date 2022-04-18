@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import moment from 'moment';
 
 import { postProjectSearchForUser } from '../../partners/rest';
 import { useUserContext } from '../../session/user';
@@ -21,14 +22,20 @@ interface ProjectProps {
 function Project(props: ProjectProps) {
     return (
         <tr>
-            <td>{props.name}</td>
-            <td>todo</td>
-            <td>{props.last_specs}</td>
+            <td><a className='button' href={"/project/"+props.name}>{props.name}</a></td>
             <td>
-                <a className='button' href={"/project/"+props.id}>
-                    accès
-                </a>
+                <div className='users'>
+                    {props.users.map(user => (
+                        <div className='bubble' key={user.name}>
+                            {user.name[0]}
+                            <span>{user.name}</span>
+                        </div>
+                    ))}
+                </div>
             </td>
+            <td>{moment(props.creation).format("YYYY/MM/DD HH:mm")}</td>
+            <td>{moment(props.last_specs).format("YYYY/MM/DD HH:mm")}</td>
+            <td>{moment(props.last_proto).format("YYYY/MM/DD HH:mm")}</td>
         </tr>
     );
 }
@@ -52,7 +59,7 @@ export default function Projects() {
     return (
         <section id="projects">
             <div className='head'>
-                <img src='' alt='avatar'/>
+                <img src='/img/avatar.jpg' alt='avatar'/>
                 <h1>Projects</h1>
                 <div className='button'>
                     <FontAwesomeIcon icon={faPlus}/>
@@ -64,9 +71,10 @@ export default function Projects() {
                     <thead>
                         <tr>
                             <th>Name</th>
+                            <th>Collaborators</th>
                             <th>Creation date</th>
                             <th>Last modified</th>
-                            <th>Actions</th>
+                            <th>Last prototype</th>
                         </tr>
                     </thead>
                     <tbody>

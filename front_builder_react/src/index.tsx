@@ -35,7 +35,7 @@ function App():JSX.Element {
                         <Route path="/user/login" element={<Login/>} />
                         <Route path="/user/profile" element={requireUser(<Profile/>)} />
                         <Route path="/projects" element={requireUser(<Projects/>)} />
-                        <Route path="/project/:id" element={requireUser(<Project/>)} />
+                        <Route path="/project/:name" element={requireUser(<Project/>)} />
                         <Route path="/*" element={<NotFound/>} />
                     </Routes>
                 </Router>

@@ -121,7 +121,7 @@ export function Profile() {
             <div className='card'>
                 <h1>User Profile</h1>
                 <div className='summary'>
-                    <img src='' alt='avatar'/>
+                    <img src='/img/avatar.jpg' alt='avatar'/>
                     <p>{name}</p>
                 </div>
                 { edit ? <Edit editOff={editOff} setName={setName}/> : <div className='button' onClick={editOn}>Edit</div>}

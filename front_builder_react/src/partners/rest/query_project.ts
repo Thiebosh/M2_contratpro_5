@@ -23,13 +23,12 @@ export async function postProjectUpdate(id:string, name:string): Promise<Project
 }
 
 interface ProjectExistForUser {
-    result: boolean
+    id: string|boolean
 }
-export async function postProjectExistForUser(user_id:string, project_id:string): Promise<ProjectExistForUser> {
-    console.log(user_id);
+export async function postProjectExistForUser(user_id:string, project_name:string): Promise<ProjectExistForUser> {
     const data = {
         user_id: user_id,
-        project_id: project_id
+        project_name: project_name
     }
     return await _postRequest('/project/exist_for_user', data);
 }
