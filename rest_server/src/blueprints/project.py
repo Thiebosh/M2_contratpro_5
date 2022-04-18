@@ -70,7 +70,11 @@ async def update():
     if not (project_id and project_name):
         return "", status.HTTP_400_BAD_REQUEST
 
-    project_id = ObjectId(project_id)
+    try:
+        project_id = ObjectId(project_id)
+    except Exception as e:
+        print(e)
+        return "", status.HTTP_400_BAD_REQUEST
 
     # verify if name does not exist for other than id
     filter_q = {
@@ -112,6 +116,38 @@ async def update():
         return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
+@bp_project.route("/exist_for_user", methods=['POST'])
+async def exist_for_user():
+    post = ImmutableMultiDict(await request.get_json())
+    if len(post) != 2:
+        return "", status.HTTP_400_BAD_REQUEST
+
+    user_id = post.get("user_id", type=str, default=None)
+    project_id = post.get("project_id", type=str, default=None)
+
+    if not (user_id and project_id):
+        return "", status.HTTP_400_BAD_REQUEST
+
+    try:
+        project_id = ObjectId(project_id)
+    except Exception as e:
+        print(e)
+        return "", status.HTTP_400_BAD_REQUEST
+
+    filter_q = {
+        "_id": project_id,
+        "users": user_id
+    }
+
+    try:
+        return {
+            "result": bool(await current_app.config["partners"]["db"].count(COLLECTION, filter_q))
+        }, status.HTTP_200_OK
+    except Exception as e:
+        print(e)
+        return "", status.HTTP_503_SERVICE_UNAVAILABLE
+
+
 @bp_project.route("/search", methods=['POST'])
 async def search():
     post = ImmutableMultiDict(await request.get_json())
@@ -123,10 +159,16 @@ async def search():
     if not project_id:
         return "", status.HTTP_400_BAD_REQUEST
 
+    try:
+        project_id = ObjectId(project_id)
+    except Exception as e:
+        print(e)
+        return "", status.HTTP_400_BAD_REQUEST
+
     aggregation = [
         {
             "$match": {
-                "_id": ObjectId(project_id)
+                "_id": project_id
             }
         },
         {
@@ -256,8 +298,14 @@ async def add_user():
     if not (project_id and user_id):
         return "", status.HTTP_400_BAD_REQUEST
 
+    try:
+        project_id = ObjectId(project_id)
+    except Exception as e:
+        print(e)
+        return "", status.HTTP_400_BAD_REQUEST
+
     filter_q = {
-        "_id": ObjectId(project_id),
+        "_id": project_id,
         "users": {
             "$ne": user_id
         }
@@ -289,8 +337,14 @@ async def remove_user():
     if not (project_id and user_id):
         return "", status.HTTP_400_BAD_REQUEST
 
+    try:
+        project_id = ObjectId(project_id)
+    except Exception as e:
+        print(e)
+        return "", status.HTTP_400_BAD_REQUEST
+
     filter_q = {
-        "_id": ObjectId(project_id),
+        "_id": project_id,
         "users": user_id
     }
     update_q = {
@@ -319,8 +373,14 @@ async def delete():
     if not project_id:
         return "", status.HTTP_400_BAD_REQUEST
 
+    try:
+        project_id = ObjectId(project_id)
+    except Exception as e:
+        print(e)
+        return "", status.HTTP_400_BAD_REQUEST
+
     filter_q = {
-        "_id": ObjectId(project_id)
+        "_id": project_id
     }
 
     try:

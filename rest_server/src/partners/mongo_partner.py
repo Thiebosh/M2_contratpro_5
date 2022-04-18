@@ -16,6 +16,13 @@ class MongoPartner:
         self.conn.close()
 
 
+    async def count(self, collection, filter_q):
+        if collection not in self.collections:
+            return False
+
+        return self.collections[collection].count_documents(filter_q)
+
+
     async def insert_one(self, collection, data):
         if collection not in self.collections:
             return False

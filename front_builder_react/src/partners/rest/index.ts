@@ -9,6 +9,7 @@ import {
 import {
     postProjectCreate,
     postProjectUpdate,
+    postProjectExistForUser,
     postProjectSearch,
     postProjectSearchByUser,
     postProjectAddUser,
@@ -25,6 +26,7 @@ export {
     postAccountDelete,
     postProjectCreate,
     postProjectUpdate,
+    postProjectExistForUser,
     postProjectSearch,
     postProjectSearchByUser,
     postProjectAddUser,

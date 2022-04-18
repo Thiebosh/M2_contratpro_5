@@ -102,13 +102,19 @@ async def get():
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST
 
-    id = post.get("id", type=str, default=None)
+    user_id = post.get("id", type=str, default=None)
 
-    if not id:
+    if not user_id:
+        return "", status.HTTP_400_BAD_REQUEST
+
+    try:
+        user_id = ObjectId(user_id)
+    except Exception as e:
+        print(e)
         return "", status.HTTP_400_BAD_REQUEST
 
     filter_q = {
-        "_id": ObjectId(id),
+        "_id": user_id,
     }
     fields = {
         "_id": 0,
@@ -142,7 +148,11 @@ async def update():
     if not (user_id and (username or password)):
         return "", status.HTTP_400_BAD_REQUEST
 
-    user_id = ObjectId(user_id)
+    try:
+        user_id = ObjectId(user_id)
+    except Exception as e:
+        print(e)
+        return "", status.HTTP_400_BAD_REQUEST
 
     if username:
         # verify if name does not exist for other than id
@@ -230,8 +240,14 @@ async def delete():
     if not user_id:
         return "", status.HTTP_400_BAD_REQUEST
 
+    try:
+        user_id = ObjectId(user_id)
+    except Exception as e:
+        print(e)
+        return "", status.HTTP_400_BAD_REQUEST
+
     filter_user = {
-        "_id": ObjectId(user_id)
+        "_id": user_id
     }
     filter_unique_contrib_projects = {
         "users": [user_id]

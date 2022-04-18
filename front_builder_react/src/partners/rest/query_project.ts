@@ -22,6 +22,18 @@ export async function postProjectUpdate(id:string, name:string): Promise<Project
     return await _postRequest('/project/update', data);
 }
 
+interface ProjectExistForUser {
+    result: boolean
+}
+export async function postProjectExistForUser(user_id:string, project_id:string): Promise<ProjectExistForUser> {
+    console.log(user_id);
+    const data = {
+        user_id: user_id,
+        project_id: project_id
+    }
+    return await _postRequest('/project/exist_for_user', data);
+}
+
 interface ProjectSearch {
     result: {//peut simplifier car un seul projet... recherche par id
         name: string,

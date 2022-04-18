@@ -19,7 +19,6 @@ interface ProjectProps {
     last_proto: string;
 }
 function Project(props: ProjectProps) {
-
     return (
         <tr>
             <td>{props.name}</td>
@@ -40,14 +39,14 @@ export default function Projects() {
     const [projects, setProjects] = useState<ProjectProps[]>([]);
 
     useEffect(() => {
-        postProjectSearchByUser(userContext.user)
-        .then((data) => {
-            setProjects(data.result);
-        })
-        .catch(error => {
-            // setErrorMsg("Internal error");
-            console.log("Error:", error);
-        });
+        // postProjectSearchByUser(userContext.user)
+        // .then((data) => {
+        //     setProjects(data.result);
+        // })
+        // .catch(error => {
+        //     // setErrorMsg("Internal error");
+        //     console.log("Error:", error);
+        // });
     }, [userContext.user]);
 
     return (
