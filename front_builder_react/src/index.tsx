@@ -30,6 +30,7 @@ function App():JSX.Element {
                 <NavBar/>
                 {/* ajouter websocket prodiver dans un composant dédié qui surveille les patterns de route et qui manipule la socket en fonction :
                 si project/:name/quelque chose, crée et initie si pas déjà le cas ; sinon, ferme si pas déjà le cas */}
+                {/* https://dev.to/itays123/using-websockets-with-react-js-the-right-way-no-library-needed-15d0 */}
                 <Router>
                     <Routes>
                         <Route path="/" element={<Navigate replace to="/home" />} />

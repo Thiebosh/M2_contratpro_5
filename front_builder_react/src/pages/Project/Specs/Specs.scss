@@ -1,2 +1,9 @@
 #specs {
+    svg {
+        path, .notFill {
+            fill: none;
+            stroke: black;
+            stroke-width: 1.5px;
+        }
+    }
 }

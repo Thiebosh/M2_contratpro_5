@@ -13,10 +13,7 @@ export function Proto() {
 
     useEffect(() => {
         postProjectExistForUser(userContext.user, name || "")
-        .then((data) => {
-            if (!data.id) navigate('/projects');
-            console.log(data.id);
-        })
+        .then((data) => data.id || navigate('/projects'))
         .catch(error => {
             // setErrorMsg("Internal error");
             console.log("Error:", error);
