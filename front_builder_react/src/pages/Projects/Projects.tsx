@@ -4,7 +4,6 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 import { postProjectSearchByUser } from '../../partners/rest';
 import { useUserContext } from '../../session/user';
-import { useProjectContext } from '../../session/project';
 
 import './Projects.scss';
 
@@ -20,7 +19,6 @@ interface ProjectProps {
     last_proto: string;
 }
 function Project(props: ProjectProps) {
-    const projectContext = useProjectContext();
 
     return (
         <tr>
@@ -28,7 +26,7 @@ function Project(props: ProjectProps) {
             <td>todo</td>
             <td>{props.last_specs}</td>
             <td>
-                <a className='button' href={"/project/"+props.id} onClick={() => projectContext.setProject(props.id)}>
+                <a className='button' href={"/project/"+props.id}>
                     accès
                 </a>
             </td>

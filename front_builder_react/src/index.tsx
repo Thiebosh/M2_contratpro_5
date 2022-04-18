@@ -7,7 +7,6 @@ import {
     Navigate
 } from 'react-router-dom';
 import {requireUser, userContext, userContextMethods} from './session/user';
-import {requireProject, projectContext, projectContextMethods} from './session/project';
 
 import NavBar from './components/NavBar';
 
@@ -27,21 +26,19 @@ function App():JSX.Element {
     return (
         <>
             <userContext.Provider value={userContextMethods(triggerRefresh)}>
-                <projectContext.Provider value={projectContextMethods(triggerRefresh)}>
-                    <NavBar/>
-                    <Router>
-                        <Routes>
-                            <Route path="/" element={<Navigate replace to="/home" />} />
-                            <Route path="/home" element={<Home />} />
-                            <Route path="/user/create" element={<Create/>} />
-                            <Route path="/user/login" element={<Login/>} />
-                            <Route path="/user/profile" element={requireUser(<Profile/>)} />
-                            <Route path="/projects" element={requireUser(<Projects/>)} />
-                            <Route path="/project/*" element={requireProject(requireUser(<Project/>))} />
-                            <Route path="/*" element={<NotFound/>} />
-                        </Routes>
-                    </Router>
-                </projectContext.Provider>
+                <NavBar/>
+                <Router>
+                    <Routes>
+                        <Route path="/" element={<Navigate replace to="/home" />} />
+                        <Route path="/home" element={<Home />} />
+                        <Route path="/user/create" element={<Create/>} />
+                        <Route path="/user/login" element={<Login/>} />
+                        <Route path="/user/profile" element={requireUser(<Profile/>)} />
+                        <Route path="/projects" element={requireUser(<Projects/>)} />
+                        <Route path="/project/:id" element={requireUser(<Project/>)} />
+                        <Route path="/*" element={<NotFound/>} />
+                    </Routes>
+                </Router>
             </userContext.Provider>
         </>
     );
