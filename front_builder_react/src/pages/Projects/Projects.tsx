@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
-import { postProjectSearchByUser } from '../../partners/rest';
+import { postProjectSearchForUser } from '../../partners/rest';
 import { useUserContext } from '../../session/user';
 
 import './Projects.scss';
@@ -39,14 +39,14 @@ export default function Projects() {
     const [projects, setProjects] = useState<ProjectProps[]>([]);
 
     useEffect(() => {
-        // postProjectSearchByUser(userContext.user)
-        // .then((data) => {
-        //     setProjects(data.result);
-        // })
-        // .catch(error => {
-        //     // setErrorMsg("Internal error");
-        //     console.log("Error:", error);
-        // });
+        postProjectSearchForUser(userContext.user)
+        .then((data) => {
+            setProjects(data.result);
+        })
+        .catch(error => {
+            // setErrorMsg("Internal error");
+            console.log("Error:", error);
+        });
     }, [userContext.user]);
 
     return (

@@ -11,7 +11,7 @@ import {
     postProjectUpdate,
     postProjectExistForUser,
     postProjectSearch,
-    postProjectSearchByUser,
+    postProjectSearchForUser,
     postProjectAddUser,
     postProjectRemoveUser,
     postProjectDelete
@@ -28,7 +28,7 @@ export {
     postProjectUpdate,
     postProjectExistForUser,
     postProjectSearch,
-    postProjectSearchByUser,
+    postProjectSearchForUser,
     postProjectAddUser,
     postProjectRemoveUser,
     postProjectDelete

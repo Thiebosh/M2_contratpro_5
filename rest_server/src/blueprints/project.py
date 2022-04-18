@@ -217,8 +217,8 @@ async def search():
         return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
-@bp_project.route("/search_by_user", methods=['POST'])
-async def search_by_user():
+@bp_project.route("/search_for_user", methods=['POST'])
+async def search_for_user():
     post = ImmutableMultiDict(await request.get_json())
     if len(post) != 1:
         return "", status.HTTP_400_BAD_REQUEST

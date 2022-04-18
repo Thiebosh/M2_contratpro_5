@@ -63,11 +63,11 @@ interface ProjectSearchByUser {
         last_proto: string
     }[]
 }
-export async function postProjectSearchByUser(user_id:string): Promise<ProjectSearchByUser> {
+export async function postProjectSearchForUser(user_id:string): Promise<ProjectSearchByUser> {
     const data = {
         user_id: user_id
     }
-    return await _postRequest('/project/search_by_user', data);
+    return await _postRequest('/project/search_for_user', data);
 }
 
 interface ProjectAddUser {

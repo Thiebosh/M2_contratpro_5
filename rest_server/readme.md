@@ -137,7 +137,7 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 - { "result": [{"name": "str", "users": [{"id": "str", "name": "str"}, ...]}, ...] } : le nom du projet et les utilisateurs associés.
 
 
-# /project/search_by_user
+# /project/search_for_user
 **Utilisation :** lister les projets accessibles pour un compte.
 
 **Arguments requis :**
