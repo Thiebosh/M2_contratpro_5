@@ -1,21 +1,30 @@
+import { createContext, useContext } from 'react';
 import {
     Navigate
 } from 'react-router-dom';
 
 const projectKey = "project";
 
-export function getSessionProject() {
-    return sessionStorage.getItem(projectKey);
-}
-
-export function setSessionProject(project: string) {
-    sessionStorage.setItem(projectKey, project);
-}
-
-export function removeSessionProject() {
-    sessionStorage.setItem(projectKey, "");
-}
-
-export function requireProject(component:JSX.Element) {
+export function requireProject(component:JSX.Element):JSX.Element {
     return (sessionStorage.getItem(projectKey) ? component : <Navigate to="/user/login"/> );//project set ?
 }
+
+export function projectContextMethods(triggerRefresh:React.Dispatch<React.SetStateAction<boolean>>) {
+    return {
+        project: sessionStorage.getItem(projectKey) || '',
+        setProject: (projectId: string) => {
+            sessionStorage.setItem(projectKey, projectId);
+            triggerRefresh(true);
+        },
+        removeProject: () => {
+            sessionStorage.setItem(projectKey, '');
+            triggerRefresh(true);
+        }
+    };
+}
+export const projectContext = createContext({
+    project: '',
+    setProject: (projectId:string) => {},
+    removeProject: () => {}
+});
+export const useProjectContext = () => useContext(projectContext);

@@ -9,7 +9,7 @@ import './Login.scss';
 
 function Card() {
     const navigate = useNavigate();
-    const UserContext = useUserContext();
+    const userContext = useUserContext();
 
     const [name, setName] = useState<string>("");
     const [password, setPassword] = useState<string>("");
@@ -39,7 +39,7 @@ function Card() {
                 setErrorMsg("Credentials invalid");
                 return;
             }
-            UserContext.setUser(data.id);
+            userContext.setUser(data.id);
             navigate('/projects');
         })
         .catch(error => {

@@ -13,7 +13,7 @@ interface EditProps {
 };
 function Edit(props:EditProps) {
     const navigate = useNavigate();
-    const UserContext = useUserContext();
+    const userContext = useUserContext();
 
     const [name, setName] = useState<string>("");
     const [password, setPassword] = useState<string>("");
@@ -42,7 +42,7 @@ function Edit(props:EditProps) {
             return;
         }
 
-        postAccountUpdate(UserContext.user, name, password)
+        postAccountUpdate(userContext.user, name, password)
         .then((data) => {
             if (data.success === "already exist") {
                 setErrorMsg("Username already used");
@@ -58,13 +58,13 @@ function Edit(props:EditProps) {
     }
 
     function triggerDelete() {
-        postAccountDelete(UserContext.user)
+        postAccountDelete(userContext.user)
         .then((data) => {
             if (!data.success) {
                 setDeleteMsg("Something wrong appened");
                 return;
             }
-            UserContext.removeUser();
+            userContext.removeUser();
             navigate('/home');
         })
         .catch(error => {
@@ -97,7 +97,7 @@ function Edit(props:EditProps) {
 }
 
 export function Profile() {
-    const UserContext = useUserContext();
+    const userContext = useUserContext();
 
     const [name, setName] = useState<string>("");
 
@@ -107,14 +107,14 @@ export function Profile() {
     const editOff = () => setEdit(false);
 
     useEffect(() => {
-        postAccountGet(UserContext.user)
+        postAccountGet(userContext.user)
         .then((data) => {
             setName(data.name);
         })
         .catch(error => {
             console.log("Error:", error);
         });
-    }, [UserContext.user]);
+    }, [userContext.user]);
 
     return (
         <section id="profile">

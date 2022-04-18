@@ -22,9 +22,9 @@ export function userContextMethods(triggerRefresh:React.Dispatch<React.SetStateA
         }
     };
 }
-export const UserContext = createContext({
+export const userContext = createContext({
     user: '',
     setUser: (userId:string) => {},
     removeUser: () => {}
 });
-export const useUserContext = () => useContext(UserContext);
+export const useUserContext = () => useContext(userContext);

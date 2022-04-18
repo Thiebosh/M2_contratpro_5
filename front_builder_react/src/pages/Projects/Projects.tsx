@@ -4,7 +4,7 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 import { postProjectSearchByUser } from '../../partners/rest';
 import { useUserContext } from '../../session/user';
-import { setSessionProject } from '../../session/project';
+import { useProjectContext } from '../../session/project';
 
 import './Projects.scss';
 
@@ -20,13 +20,15 @@ interface ProjectProps {
     last_proto: string;
 }
 function Project(props: ProjectProps) {
+    const projectContext = useProjectContext();
+
     return (
         <tr>
             <td>{props.name}</td>
             <td>todo</td>
             <td>{props.last_specs}</td>
             <td>
-                <a className='button' href={"/project/"+props.id} onClick={() => setSessionProject(props.id)}>
+                <a className='button' href={"/project/"+props.id} onClick={() => projectContext.setProject(props.id)}>
                     accès
                 </a>
             </td>
@@ -35,12 +37,12 @@ function Project(props: ProjectProps) {
 }
 
 export default function Projects() {
-    const UserContext = useUserContext();
+    const userContext = useUserContext();
 
     const [projects, setProjects] = useState<ProjectProps[]>([]);
 
     useEffect(() => {
-        postProjectSearchByUser(UserContext.user)
+        postProjectSearchByUser(userContext.user)
         .then((data) => {
             setProjects(data.result);
         })
@@ -48,7 +50,7 @@ export default function Projects() {
             // setErrorMsg("Internal error");
             console.log("Error:", error);
         });
-    }, [UserContext.user]);
+    }, [userContext.user]);
 
     return (
         <section id="projects">

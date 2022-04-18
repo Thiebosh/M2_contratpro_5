@@ -7,16 +7,16 @@ import { useUserContext } from '../../session/user';
 import './NavBar.scss';
 
 function Card() {
-    const UserContext = useUserContext();
+    const userContext = useUserContext();
 
     return (
         <div className='card'>
             {
-                UserContext.user ? 
+                userContext.user ? 
                     <>
                         <a href='/user/profile'>Account</a>
                         <hr/>
-                        <a href='/' onClick={UserContext.removeUser}>Logout</a>
+                        <a href='/' onClick={userContext.removeUser}>Logout</a>
                     </>
                     :
                     <>
