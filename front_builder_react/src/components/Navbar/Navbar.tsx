@@ -73,8 +73,9 @@ export function NavBar() {
             {
                 projectName && (
                 <>
-                    <Link currentPath={currentPath} path={'/project/'+projectName+'/specs'} text={'Specifications'}/>
-                    <Link currentPath={currentPath} path={'/project/'+projectName+'/proto'} text={'Prototype'}/>
+                    <Link currentPath={currentPath} path={'/project/'+projectName} text='Project'/>
+                    <Link currentPath={currentPath} path={'/project/'+projectName+'/specs'} text='Specifications'/>
+                    <Link currentPath={currentPath} path={'/project/'+projectName+'/proto'} text='Prototype'/>
                 </>)
             }
         </div>
