@@ -6,7 +6,7 @@ import {
 const projectKey = "project";
 
 export function requireProject(component:JSX.Element):JSX.Element {
-    return (sessionStorage.getItem(projectKey) ? component : <Navigate to="/user/login"/> );//project set ?
+    return (sessionStorage.getItem(projectKey) ? component : <Navigate to="/projects"/> );
 }
 
 export function projectContextMethods(triggerRefresh:React.Dispatch<React.SetStateAction<boolean>>) {
