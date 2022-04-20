@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { postProjectExistForUser } from '../../../partners/rest';
-import { useUserContext } from '../../../session/user';
+import { postProjectExistForUser } from '../../partners/rest';
+import { useUserContext } from '../../session/user';
 
 import './Project.scss';
 

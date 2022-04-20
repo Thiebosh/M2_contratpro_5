@@ -16,9 +16,9 @@ import {Login} from './pages/user/Login';
 import {Create} from './pages/user/Create';
 import {Profile} from './pages/user/Profile';
 import {Projects} from './pages/Projects';
-import {Project} from './pages/project/Project';
-import {Specs} from './pages/project/Specs';
-import {Proto} from './pages/project/Proto';
+import {Project} from './pages/Project';
+import {Specs} from './pages/Project/Specs';
+import {Proto} from './pages/Project/Proto';
 
 import './index.scss';
 

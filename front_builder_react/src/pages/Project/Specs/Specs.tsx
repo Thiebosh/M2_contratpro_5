@@ -77,7 +77,6 @@ export function Specs() {
         ],
         name: 'Parent'
     }
-    const foreignObjectProps = { width: 200, height: 200, x: 20 };
 
     return (
         <section id="specs">
