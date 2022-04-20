@@ -11,6 +11,17 @@ export async function postProjectCreate(name:string, users_id:string[]): Promise
     return await _postRequest('/project/create', data);
 }
 
+interface ProjectGet {
+    name:string
+    // et tous les autres champs
+}
+export async function postProjectGet(id:string): Promise<ProjectGet> {
+    const data = {
+        id: id
+    }
+    return await _postRequest('/project/get', data);
+}
+
 interface ProjectUpdate {
     success: string|boolean
 }
@@ -23,7 +34,7 @@ export async function postProjectUpdate(id:string, name:string): Promise<Project
 }
 
 interface ProjectExistForUser {
-    id: string|boolean
+    id: string|false
 }
 export async function postProjectExistForUser(user_id:string, project_name:string): Promise<ProjectExistForUser> {
     const data = {

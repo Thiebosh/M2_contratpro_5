@@ -8,6 +8,7 @@ import {
 } from './query_account';
 import {
     postProjectCreate,
+    postProjectGet,
     postProjectUpdate,
     postProjectExistForUser,
     postProjectSearch,
@@ -25,6 +26,7 @@ export {
     postAccountSearch,
     postAccountDelete,
     postProjectCreate,
+    postProjectGet,
     postProjectUpdate,
     postProjectExistForUser,
     postProjectSearch,

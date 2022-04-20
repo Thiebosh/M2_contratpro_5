@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { postProjectExistForUser } from '../../partners/rest';
+import { CardPage } from '../../components/CardPage';
 import { useUserContext } from '../../session/user';
+import { postProjectExistForUser, postProjectGet } from '../../partners/rest';
 
 import './Project.scss';
 
@@ -14,6 +15,17 @@ export function Project() {
     useEffect(() => {
         postProjectExistForUser(userContext.user, name || "")
         .then((data) => data.id || navigate('/projects'))
+        .then((id) => {
+            if (!id) throw new Error("empty project id");
+
+            postProjectGet(id)
+            .then((data) => {
+                console.log(data); // todo : mapping
+            })
+            .catch(error => {
+                console.log("Error:", error);
+            });
+        })
         .catch(error => {
             // setErrorMsg("Internal error");
             console.log("Error:", error);
@@ -23,10 +35,13 @@ export function Project() {
 
     return (
         <section id="project">
-            title<br/>
-            collabs (+edit)<br/>
-            <hr/>
-            description (+edit)<br/>
+            <h1>Project Summary</h1>
+            <CardPage size='large'>
+                title<br/>
+                collabs (+edit)<br/>
+                <hr/>
+                description (+edit)<br/>
+            </CardPage>
         </section>
     );
 }

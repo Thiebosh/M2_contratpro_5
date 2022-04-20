@@ -51,7 +51,7 @@ export function CreateProject() {
 
     return (
         <section id="createproject">
-            <h1>Create project</h1>
+            <h1>Create Project</h1>
             <CardPage size='large'>
                 <div className='input_group'>
                     <label>Project name</label>

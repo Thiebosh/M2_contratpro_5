@@ -45,7 +45,7 @@ export function CreateUser() {
 
     return (
         <section id='create'>
-            <h1>Create account</h1>
+            <h1>Create Account</h1>
             <CardPage size='small'>
                 <div className='input_group'>
                     <label>Username</label>
