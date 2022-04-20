@@ -3,8 +3,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 
-import { postProjectSearchForUser } from '../../partners/rest';
+import { CardPage } from '../../components/CardPage';
 import { useUserContext } from '../../session/user';
+import { postProjectSearchForUser } from '../../partners/rest';
 
 import './Projects.scss';
 
@@ -61,12 +62,12 @@ export function Projects() {
             <div className='head'>
                 <img src='/img/avatar.jpg' alt='avatar'/>
                 <h1>Projects</h1>
-                <div className='button'>
+                <a className='button' href='/projects/create'>
                     <FontAwesomeIcon icon={faPlus}/>
                     New project
-                </div>
+                </a>
             </div>
-            <div className='card'>
+            <CardPage size='wide'>
                 <table>
                     <thead>
                         <tr>
@@ -81,7 +82,7 @@ export function Projects() {
                         { projects.map((project) => <Project key={project.id} {...project}/>) }
                     </tbody>
                 </table>
-            </div>
+            </CardPage>
         </section>
     );
 }

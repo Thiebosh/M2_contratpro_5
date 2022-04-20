@@ -1,4 +1,4 @@
-#profile {
+#createproject {
     h1 {
         font-size: 36px;
     }
@@ -8,7 +8,7 @@
         flex-direction: row;
         align-items: center;
         text-align: left;
-        margin-bottom: 1em;
+        margin: 1em 0;
 
         img {
             $size: 6em;

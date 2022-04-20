@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Fade } from 'react-awesome-reveal';
 
+import { CardPage } from '../../../components/CardPage';
 import { postAccountCreate } from '../../../partners/rest';
 
-import './Create.scss';
+import './CreateUser.scss';
 
-function Card() {
+export function CreateUser() {
     const navigate = useNavigate();
     const [name, setName] = useState<string>("");
     const [password, setPassword] = useState<string>("");
@@ -14,16 +15,8 @@ function Card() {
     const [warnMsg, setWarnMsg] = useState<string>("");
     const [errorMsg, setErrorMsg] = useState<string>("");
 
-    useEffect(() => {
-        if (warnMsg) {
-            setTimeout(() => setWarnMsg(""), 4000);
-        }
-    }, [warnMsg]);
-    useEffect(() => {
-        if (errorMsg) {
-            setTimeout(() => setErrorMsg(""), 4000);
-        }
-    }, [errorMsg]);
+    useEffect(() => { warnMsg && setTimeout(() => setWarnMsg(""), 4000) }, [warnMsg]);
+    useEffect(() => { errorMsg && setTimeout(() => setErrorMsg(""), 4000) }, [errorMsg]);
 
     function triggerCreate() {
         if (!(name && password && passwordCheck)) {
@@ -51,31 +44,25 @@ function Card() {
     }
 
     return (
-        <div className='card'>
-            <div className='input_group'>
-                <label>Username</label>
-                <input type='text' onChange={(event) => setName(event.target.value)}/>
-            </div>
-            <div className='input_group'>
-                <label>Password</label>
-                <input type='password'  onChange={(event) => setPassword(event.target.value)}/>
-            </div>
-            <div className='input_group'>
-                <label>Password check</label>
-                <input type='password' onChange={(event) => setPasswordCheck(event.target.value)}/>
-            </div>
-            <div className='button' onClick={triggerCreate}>Create</div>
-            { warnMsg && <Fade><div className='warning'>{warnMsg}</div></Fade> }
-            { errorMsg && <Fade><div className='error'>{errorMsg}</div></Fade> }
-        </div>
-    );
-}
-
-export function Create() {
-    return (
-        <section id="create">
+        <section id='create'>
             <h1>Create account</h1>
-            <Card/>
+            <CardPage size='small'>
+                <div className='input_group'>
+                    <label>Username</label>
+                    <input type='text' onChange={(event) => setName(event.target.value)}/>
+                </div>
+                <div className='input_group'>
+                    <label>Password</label>
+                    <input type='password'  onChange={(event) => setPassword(event.target.value)}/>
+                </div>
+                <div className='input_group'>
+                    <label>Password check</label>
+                    <input type='password' onChange={(event) => setPasswordCheck(event.target.value)}/>
+                </div>
+                <div className='button' onClick={triggerCreate}>Create</div>
+                { warnMsg && <Fade><div className='warning'>{warnMsg}</div></Fade> }
+                { errorMsg && <Fade><div className='error'>{errorMsg}</div></Fade> }
+            </CardPage>
         </section>
     );
 }

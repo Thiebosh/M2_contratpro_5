@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Fade } from 'react-awesome-reveal';
 
+import { CardPage } from '../../../components/CardPage';
 import { useUserContext } from '../../../session/user';
 import { postAccountGet, postAccountUpdate, postAccountDelete } from '../../../partners/rest';
 
@@ -100,7 +101,6 @@ export function Profile() {
     const userContext = useUserContext();
 
     const [name, setName] = useState<string>("");
-
     const [edit, setEdit] = useState<boolean>(false);
 
     const editOn = () => setEdit(true);
@@ -117,15 +117,15 @@ export function Profile() {
     }, [userContext.user]);
 
     return (
-        <section id="profile">
-            <div className='card'>
-                <h1>User Profile</h1>
+        <section id='profile'>
+            <h1>User Profile</h1>
+            <CardPage size='medium'>
                 <div className='summary'>
                     <img src='/img/avatar.jpg' alt='avatar'/>
                     <p>{name}</p>
                 </div>
                 { edit ? <Edit editOff={editOff} setName={setName}/> : <div className='button' onClick={editOn}>Edit</div>}
-            </div>
+            </CardPage>
         </section>
     );
 }

@@ -1,2 +1,2 @@
-import CardPage from './CardPage';
-export default CardPage;
+import {CardPage} from './CardPage';
+export {CardPage};

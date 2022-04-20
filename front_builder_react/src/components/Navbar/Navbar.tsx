@@ -69,7 +69,7 @@ export function NavBar() {
     <nav id='navbar'>
         <div className='left-part'>
             <Link path={'/home'} text={'<SpecTry/>'}/>
-            <Link currentPath={currentPath} path={'/projects'} text={'Projets'}/>
+            <Link currentPath={currentPath} path={'/projects'} text={'Projects'}/>
             {
                 projectName && (
                 <>

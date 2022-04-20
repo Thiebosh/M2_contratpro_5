@@ -12,10 +12,11 @@ import {NavBar} from './components/NavBar';
 
 import {NotFound} from './pages/NotFound';
 import {Home} from './pages/Home';
+import {CreateUser} from './pages/user/CreateUser';
 import {Login} from './pages/user/Login';
-import {Create} from './pages/user/Create';
 import {Profile} from './pages/user/Profile';
 import {Projects} from './pages/Projects';
+import {CreateProject} from './pages/Project/CreateProject';
 import {Project} from './pages/Project';
 import {Specs} from './pages/Project/Specs';
 import {Proto} from './pages/Project/Proto';
@@ -35,10 +36,11 @@ function App():JSX.Element {
                     <Routes>
                         <Route path="/" element={<Navigate replace to="/home" />} />
                         <Route path="/home" element={<Home />} />
-                        <Route path="/user/create" element={<Create/>} />
+                        <Route path="/user/create" element={<CreateUser/>} />
                         <Route path="/user/login" element={<Login/>} />
                         <Route path="/user/profile" element={requireUser(<Profile/>)} />
                         <Route path="/projects" element={requireUser(<Projects/>)} />
+                        <Route path="/projects/create" element={requireUser(<CreateProject/>)} />
                         <Route path="/project/:name" element={requireUser(<Project/>)} />
                         <Route path="/project/:name/specs" element={requireUser(<Specs/>)} />
                         <Route path="/project/:name/proto" element={requireUser(<Proto/>)} />
