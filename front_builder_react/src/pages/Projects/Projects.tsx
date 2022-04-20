@@ -25,11 +25,11 @@ function Project(props: ProjectProps) {
         <tr>
             <td><a className='button' href={"/project/"+props.name}>{props.name}</a></td>
             <td>
-                <div className='users'>
-                    {props.users.map(user => (
-                        <div className='bubble' key={user.name}>
-                            {user.name[0]}
-                            <span>{user.name}</span>
+                <div className='collabs'>
+                    {props.users.map(item => (
+                        <div className='bubble' key={item.name}>
+                            {item.name[0]}
+                            <span>{item.name}</span>
                         </div>
                     ))}
                 </div>
