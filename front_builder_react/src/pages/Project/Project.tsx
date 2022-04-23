@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { CardPage } from '../../components/CardPage';
 import { useUserContext } from '../../session/user';
-import { postProjectExistForUser, postProjectGet } from '../../partners/rest';
+import { postProjectDelete, postProjectExistForUser, postProjectGet } from '../../partners/rest';
 
 import './Project.scss';
 
@@ -12,6 +12,8 @@ export function Project() {
     const { name } = useParams();
     const userContext = useUserContext();
 
+    const [projectId, setProjectId] = useState<string>('');
+
     useEffect(() => {
         postProjectExistForUser(userContext.user, name || "")
         .then((data) => data.id || navigate('/projects'))
@@ -19,6 +21,7 @@ export function Project() {
             if (!id) throw new Error("empty project id");
 
             console.log(id);
+            setProjectId(id);
             postProjectGet(id)
             .then((data) => {
                 console.log(data); // todo : mapping
@@ -34,6 +37,23 @@ export function Project() {
         });
     }, [userContext.user, name, navigate]);
 
+    function triggerDelete() {
+        postProjectDelete(projectId)
+        .then((data) => {
+            console.log(data)
+            // if (!data.success) {
+            //     setDeleteMsg("Something wrong appened");
+            //     return;
+            // }
+            // userContext.removeUser();
+            navigate('/projects');
+        })
+        .catch(error => {
+            // setErrorMsg("Internal error");
+            console.log("Error:", error);
+        });
+    }
+
     return (
         <section id="project">
             <h1>Project Summary</h1>
@@ -42,6 +62,7 @@ export function Project() {
                 collabs (+edit)<br/>
                 <hr/>
                 description (+edit)<br/>
+                <div className='button delete' onClick={triggerDelete}>Delete</div>
             </CardPage>
         </section>
     );
