@@ -6,14 +6,13 @@ interface ProjectCreate {
 export async function postProjectCreate(name:string, users_id:string[]): Promise<ProjectCreate> {
     const data = {
         name: name,
-        users_id: users_id
+        users_id: JSON.stringify(users_id)
     }
     return await _postRequest('/project/create', data);
 }
 
 interface ProjectGet {
-    name:string
-    // et tous les autres champs
+    project:any
 }
 export async function postProjectGet(id:string): Promise<ProjectGet> {
     const data = {

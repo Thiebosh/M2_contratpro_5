@@ -198,31 +198,45 @@ async def update():
 @bp_account.route("/search", methods=['POST'])
 async def search():
     post = ImmutableMultiDict(await request.get_json())
-    if len(post) != 1:
+    if len(post) != 3:
         return "", status.HTTP_400_BAD_REQUEST
 
     username = post.get("name", type=str, default=None)
+    limit = post.get("limit", type=int, default=None)
+    current_user = post.get("current_user", type=str, default=None)
 
-    if not username:
+    if not (username and limit and current_user):
         return "", status.HTTP_400_BAD_REQUEST
 
-    filter_q = {
-        "name": {
-            "$regex": username,
-            "$options": "i"
-        }
-    }
-    fields = {
-        "_id": 0,
-        "id": {
-            "$toString": "$_id"
+    aggregation = [
+        {
+            "$match": {
+                "_id": {
+                    "$ne": ObjectId(current_user)
+                },
+                "name": {
+                    "$regex": username,
+                    "$options": "i"
+                }
+            }
         },
-        "name": 1
-    }
+        { 
+            "$limit" : limit
+        },
+        {
+            "$project": {
+                "_id": 0,
+                "id": {
+                    "$toString": "$_id"
+                },
+                "name": 1
+            }
+        },
+    ]
 
     try:
         return {
-            "result": await current_app.config["partners"]["db"].find_list(COLLECTION_ACCOUNTS, filter_q, fields)
+            "result": await current_app.config["partners"]["db"].aggregate_list(COLLECTION_ACCOUNTS, aggregation)
         }, status.HTTP_200_OK
     except Exception as e:
         print(e)

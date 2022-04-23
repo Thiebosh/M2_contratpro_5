@@ -58,6 +58,43 @@ async def create():
         return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
+@bp_project.route("/get", methods=['POST'])
+async def get():
+    post = ImmutableMultiDict(await request.get_json())
+    if len(post) != 1:
+        return "", status.HTTP_400_BAD_REQUEST
+
+    project_id = post.get("id", type=str, default=None)
+
+    if not project_id:
+        return "", status.HTTP_400_BAD_REQUEST
+
+    try:
+        project_id = ObjectId(project_id)
+    except Exception as e:
+        print(e)
+        return "", status.HTTP_400_BAD_REQUEST
+
+    filter_q = {
+        "_id": project_id
+    }
+
+    try:
+        result = await current_app.config["partners"]["db"].find_list(COLLECTION, filter_q)
+    except Exception as e:
+        print(e)
+        return "", status.HTTP_503_SERVICE_UNAVAILABLE
+
+    print(result)
+
+    if not result:
+        return {}, status.HTTP_500_INTERNAL_SERVER_ERROR
+
+    return {
+        "project": result
+    }, status.HTTP_200_OK
+
+
 @bp_project.route("/update", methods=['POST'])
 async def update():
     post = ImmutableMultiDict(await request.get_json())

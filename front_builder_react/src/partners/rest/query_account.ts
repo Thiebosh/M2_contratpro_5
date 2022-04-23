@@ -50,9 +50,11 @@ interface AccountSearch {
        name: string
     }[]
 }
-export async function postAccountSearch(name:string): Promise<AccountSearch> {
+export async function postAccountSearch(name:string, limit:number, current_user:string): Promise<AccountSearch> {
     const data = {
-        name: name
+        name: name,
+        limit: limit,
+        current_user: current_user,
     }
     return await _postRequest('/account/search', data);
 }

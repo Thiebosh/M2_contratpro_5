@@ -18,6 +18,7 @@ export function Project() {
         .then((id) => {
             if (!id) throw new Error("empty project id");
 
+            console.log(id);
             postProjectGet(id)
             .then((data) => {
                 console.log(data); // todo : mapping
