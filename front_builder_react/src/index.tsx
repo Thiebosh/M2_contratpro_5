@@ -16,10 +16,10 @@ import {CreateUser} from './pages/user/CreateUser';
 import {Login} from './pages/user/Login';
 import {Profile} from './pages/user/Profile';
 import {Projects} from './pages/Projects';
-import {CreateProject} from './pages/Project/CreateProject';
-import {Project} from './pages/Project';
-import {Specs} from './pages/Project/Specs';
-import {Proto} from './pages/Project/Proto';
+import {CreateProject} from './pages/project/CreateProject';
+import {Detail} from './pages/project/Detail';
+import {Specs} from './pages/project/Specs';
+import {Proto} from './pages/project/Proto';
 
 import './index.scss';
 
@@ -41,7 +41,7 @@ function App():JSX.Element {
                         <Route path="/user/profile" element={requireUser(<Profile/>)} />
                         <Route path="/projects" element={requireUser(<Projects/>)} />
                         <Route path="/projects/create" element={requireUser(<CreateProject/>)} />
-                        <Route path="/project/:urlName" element={requireUser(<Project/>)} />
+                        <Route path="/project/:urlName" element={requireUser(<Detail/>)} />
                         <Route path="/project/:urlName/specs" element={requireUser(<Specs/>)} />
                         <Route path="/project/:urlName/proto" element={requireUser(<Proto/>)} />
                         <Route path="/*" element={<NotFound/>} />

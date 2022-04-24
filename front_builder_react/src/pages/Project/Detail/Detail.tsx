@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { CardPage } from '../../components/CardPage';
-import { useUserContext } from '../../session/user';
-import { postProjectDelete, postProjectExistForUser, postProjectGet } from '../../partners/rest';
+import { CardPage } from '../../../components/CardPage';
+import { useUserContext } from '../../../session/user';
+import { postProjectDelete, postProjectExistForUser, postProjectGet } from '../../../partners/rest';
 
-import './Project.scss';
+import './Detail.scss';
 
-export function Project() {
+export function Detail() {
     const navigate = useNavigate();
     const { urlName } = useParams();
     const userContext = useUserContext();
@@ -62,7 +62,7 @@ export function Project() {
     }
 
     return (
-        <section id="project">
+        <section id="projectdetail">
             <h1>Project Summary</h1>
             <CardPage size='large'>
                 name: {projectName}<br/>
@@ -72,7 +72,8 @@ export function Project() {
                 last specs: {projectLastSpecs}<br/>
                 last proto: {projectLastProto}<br/>
                 <hr/>
-                description (+edit)<br/>
+                description<br/>
+                <div className='button'>Edit</div>
                 <div className='button delete' onClick={triggerDelete}>Delete</div>
             </CardPage>
         </section>
