@@ -25,11 +25,11 @@ interface ProjectProps {
 }
 function Project(props: ProjectProps) {
     const userId = useUserContext().user;
-    const nullableDate = (date:string) => date && moment(date).format(dateFormat) || <>-</>;
+    const nullableDate = (date:string) => (date && moment(date).format(dateFormat)) || <>-</>;
     return (
         <tr>
             <td><a className='button' href={"/project/"+props.name}>{props.name}</a></td>
-            <td><Collabs usernames={props.users.filter(item => item.id != userId).map(item => item.name)} /></td>
+            <td><Collabs usernames={props.users.filter(item => item.id !== userId).map(item => item.name)} /></td>
             <td>{moment(props.creation).format(dateFormat)}</td>
             <td>{nullableDate(props.last_specs)}</td>
             <td>{nullableDate(props.last_proto)}</td>

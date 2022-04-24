@@ -122,7 +122,7 @@ export function Detail() {
     const editOn = () => setEdit(true);
     const editOff = () => setEdit(false);
 
-    const nullableDate = (date:string) => date && moment(date).format(dateFormat) || <>-</>;
+    const nullableDate = (date:string) => (date && moment(date).format(dateFormat)) || <>-</>;
 
     useEffect(() => {
         postProjectExistForUser(userId, urlName || "")
@@ -155,7 +155,7 @@ export function Detail() {
             <h1>Project Summary</h1>
             <CardPage size='large'>
                 <h1>{projectName}</h1>
-                <Collabs usernames={projectUsers.filter(item => item.id != userId).map(item => item.name)}/><br/>
+                <Collabs usernames={projectUsers.filter(item => item.id !== userId).map(item => item.name)}/><br/>
                 <hr/>
                 <h2>Statistics</h2>
                 <table>
