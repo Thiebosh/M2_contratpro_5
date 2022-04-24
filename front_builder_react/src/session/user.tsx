@@ -6,18 +6,18 @@ import {
 const userKey = "user";
 
 export function requireUser(component:JSX.Element):JSX.Element {
-    return (sessionStorage.getItem(userKey) ? component : <Navigate to="/user/login"/>);
+    return (localStorage.getItem(userKey) ? component : <Navigate to="/user/login"/>);
 }
 
 export function userContextMethods(triggerRefresh:React.Dispatch<React.SetStateAction<boolean>>) {
     return {
-        user: sessionStorage.getItem(userKey) || '',
+        user: localStorage.getItem(userKey) || '',
         setUser: (userId: string) => {
-            sessionStorage.setItem(userKey, userId);
+            localStorage.setItem(userKey, userId);
             triggerRefresh(true);
         },
         removeUser: () => {
-            sessionStorage.setItem(userKey, '');
+            localStorage.setItem(userKey, '');
             triggerRefresh(true);
         }
     };
