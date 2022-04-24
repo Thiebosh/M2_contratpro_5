@@ -1,16 +1,20 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import moment from 'moment';
 
 import { CardPage } from '../../../components/CardPage';
+import { Collabs } from '../../../components/Collabs';
 import { useUserContext } from '../../../session/user';
 import { postProjectDelete, postProjectExistForUser, postProjectGet } from '../../../partners/rest';
+
+import { dateFormat } from '../../..';
 
 import './Detail.scss';
 
 export function Detail() {
     const navigate = useNavigate();
     const { urlName } = useParams();
-    const userContext = useUserContext();
+    const userId = useUserContext().user;
 
     const [projectId, setProjectId] = useState<string>('');
     const [projectName, setProjectName] = useState<string>('');
@@ -20,7 +24,7 @@ export function Detail() {
     const [projectLastProto, setProjectLastProto] = useState<string>('');
 
     useEffect(() => {
-        postProjectExistForUser(userContext.user, urlName || "")
+        postProjectExistForUser(userId, urlName || "")
         .then((data) => data.id || navigate('/projects'))
         .then((id) => {
             if (!id) throw new Error("empty project id");
@@ -43,7 +47,7 @@ export function Detail() {
             console.log("Error:", error);
             navigate('/projects');
         });
-    }, [userContext.user, urlName, navigate]);
+    }, [userId, urlName, navigate]);
 
     function triggerDelete() {
         postProjectDelete(projectId)
@@ -66,11 +70,11 @@ export function Detail() {
             <h1>Project Summary</h1>
             <CardPage size='large'>
                 name: {projectName}<br/>
-                collabs: <div>{projectUsers.map((item) => (<div key={item.id}>{item.name}</div>))}</div><br/>
+                <Collabs usernames={projectUsers.filter(item => item.id != userId).map(item => item.name)}/><br/>
                 <hr/>
-                creation: {projectCreation}<br/>
-                last specs: {projectLastSpecs}<br/>
-                last proto: {projectLastProto}<br/>
+                creation: {moment(projectCreation).format(dateFormat)}<br/>
+                last specs: {moment(projectLastSpecs).format(dateFormat)}<br/>
+                last proto: {moment(projectLastProto).format(dateFormat)}<br/>
                 <hr/>
                 description<br/>
                 <div className='button'>Edit</div>

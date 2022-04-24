@@ -23,6 +23,8 @@ import {Proto} from './pages/project/Proto';
 
 import './index.scss';
 
+export const dateFormat = "YYYY/MM/DD HH:mm";
+
 function App():JSX.Element {
     const triggerRefresh = useState<boolean>(false)[1];
     return (

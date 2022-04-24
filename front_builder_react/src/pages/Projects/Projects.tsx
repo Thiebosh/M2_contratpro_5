@@ -3,9 +3,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 
-import { CardPage } from '../../components/CardPage';
 import { useUserContext } from '../../session/user';
+import { CardPage } from '../../components/CardPage';
+import { Collabs } from '../../components/Collabs';
 import { postProjectSearchForUser } from '../../partners/rest';
+
+import {dateFormat} from '../../index';
 
 import './Projects.scss';
 
@@ -21,33 +24,25 @@ interface ProjectProps {
     last_proto: string;
 }
 function Project(props: ProjectProps) {
+    const userId = useUserContext().user;
     return (
         <tr>
             <td><a className='button' href={"/project/"+props.name}>{props.name}</a></td>
-            <td>
-                <div className='collabs'>
-                    {props.users.map(item => (
-                        <div className='bubble' key={item.name}>
-                            {item.name[0]}
-                            <span>{item.name}</span>
-                        </div>
-                    ))}
-                </div>
-            </td>
-            <td>{moment(props.creation).format("YYYY/MM/DD HH:mm")}</td>
-            <td>{moment(props.last_specs).format("YYYY/MM/DD HH:mm")}</td>
-            <td>{moment(props.last_proto).format("YYYY/MM/DD HH:mm")}</td>
+            <td><Collabs usernames={props.users.filter(item => item.id != userId).map(item => item.name)} /></td>
+            <td>{moment(props.creation).format(dateFormat)}</td>
+            <td>{moment(props.last_specs).format(dateFormat)}</td>
+            <td>{moment(props.last_proto).format(dateFormat)}</td>
         </tr>
     );
 }
 
 export function Projects() {
-    const userContext = useUserContext();
+    const userId = useUserContext().user;
 
     const [projects, setProjects] = useState<ProjectProps[]>([]);
 
     useEffect(() => {
-        postProjectSearchForUser(userContext.user)
+        postProjectSearchForUser(userId)
         .then((data) => {
             setProjects(data.result);
         })
@@ -55,7 +50,7 @@ export function Projects() {
             // setErrorMsg("Internal error");
             console.log("Error:", error);
         });
-    }, [userContext.user]);
+    }, [userId]);
 
     return (
         <section id="projects">
