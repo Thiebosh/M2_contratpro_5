@@ -78,9 +78,17 @@ async def get():
     filter_q = {
         "_id": project_id
     }
+    fields = {
+        "_id": 0,
+        "name": 1,
+        "users": 1,
+        "creation": 1,
+        "last_specs": 1,
+        "last_proto": 1
+    }
 
     try:
-        result = await current_app.config["partners"]["db"].find_list(COLLECTION, filter_q)
+        result = await current_app.config["partners"]["db"].find_list(COLLECTION, filter_q, fields)
     except Exception as e:
         print(e)
         return "", status.HTTP_503_SERVICE_UNAVAILABLE
@@ -91,7 +99,7 @@ async def get():
         return {}, status.HTTP_500_INTERNAL_SERVER_ERROR
 
     return {
-        "project": result
+        "result": result[0]
     }, status.HTTP_200_OK
 
 

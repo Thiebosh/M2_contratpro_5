@@ -12,7 +12,13 @@ export async function postProjectCreate(name:string, users_id:string[]): Promise
 }
 
 interface ProjectGet {
-    project:any
+    result: {
+        name:string,
+        users:string[],
+        creation:string,
+        last_specs:string|null,
+        last_proto:string|null
+    }
 }
 export async function postProjectGet(id:string): Promise<ProjectGet> {
     const data = {

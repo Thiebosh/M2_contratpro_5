@@ -24,7 +24,7 @@ export function Project() {
             setProjectId(id);
             postProjectGet(id)
             .then((data) => {
-                console.log(data); // todo : mapping
+                console.log(data.result); // todo : mapping
             })
             .catch(error => {
                 console.log("Error:", error);
@@ -41,11 +41,10 @@ export function Project() {
         postProjectDelete(projectId)
         .then((data) => {
             console.log(data)
-            // if (!data.success) {
-            //     setDeleteMsg("Something wrong appened");
-            //     return;
-            // }
-            // userContext.removeUser();
+            if (!data.success) {
+                // setDeleteMsg("Something wrong appened");
+                return;
+            }
             navigate('/projects');
         })
         .catch(error => {
