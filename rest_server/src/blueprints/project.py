@@ -75,25 +75,57 @@ async def get():
         print(e)
         return "", status.HTTP_400_BAD_REQUEST
 
-    filter_q = {
-        "_id": project_id
-    }
-    fields = {
-        "_id": 0,
-        "name": 1,
-        "users": 1,
-        "creation": 1,
-        "last_specs": 1,
-        "last_proto": 1
-    }
+    aggregation = [
+        {
+            "$match": {
+                "_id": project_id
+            }
+        },
+        {
+            "$project": {
+                "_id": 0,
+                "name": 1,
+                "users": {
+                    "$map": {
+                        "input": "$users",
+                        "in": { "$toObjectId": "$$this" }
+                    }
+                },
+                "creation": 1,
+                "last_specs": 1,
+                "last_proto": 1
+            }
+        },
+        {
+            "$lookup": {
+                "from": "accounts",
+                "localField": "users",
+                "foreignField": "_id",
+                "as": "users"
+            }
+        },
+        {
+            "$addFields": {
+                "users": {
+                    "$map": {
+                        "input": "$users",
+                        "in": { 
+                            "id": {
+                                "$toString": "$$this._id"
+                            },
+                            "name": "$$this.name"
+                        }
+                    }
+                }
+            }
+        },
+    ]
 
     try:
-        result = await current_app.config["partners"]["db"].find_list(COLLECTION, filter_q, fields)
+        result = await current_app.config["partners"]["db"].aggregate_list(COLLECTION, aggregation)
     except Exception as e:
         print(e)
         return "", status.HTTP_503_SERVICE_UNAVAILABLE
-
-    print(result)
 
     if not result:
         return {}, status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -196,75 +228,6 @@ async def exist_for_user():
     return {
         "id": result["id"]
     }, status.HTTP_200_OK
-
-
-@bp_project.route("/search", methods=['POST'])
-async def search():
-    post = ImmutableMultiDict(await request.get_json())
-    if len(post) != 1:
-        return "", status.HTTP_400_BAD_REQUEST
-
-    project_id = post.get("id", type=str, default=None)
-
-    if not project_id:
-        return "", status.HTTP_400_BAD_REQUEST
-
-    try:
-        project_id = ObjectId(project_id)
-    except Exception as e:
-        print(e)
-        return "", status.HTTP_400_BAD_REQUEST
-
-    aggregation = [
-        {
-            "$match": {
-                "_id": project_id
-            }
-        },
-        {
-            "$project": {
-                "_id": 0,
-                "name": 1,
-                "users": {
-                    "$map": {
-                        "input": "$users",
-                        "in": { "$toObjectId": "$$this" }
-                    }
-                }
-            }
-        },
-        {
-            "$lookup": {
-                "from": "accounts",
-                "localField": "users",
-                "foreignField": "_id",
-                "as": "users"
-            }
-        },
-        {
-            "$addFields": {
-                "users": {
-                    "$map": {
-                        "input": "$users",
-                        "in": { 
-                            "id": {
-                                "$toString": "$$this._id"
-                            },
-                            "name": "$$this.name"
-                        }
-                    }
-                }
-            }
-        },
-    ]
-
-    try:
-        return {
-            "result": await current_app.config["partners"]["db"].aggregate_list(COLLECTION, aggregation)
-        }, status.HTTP_200_OK
-    except Exception as e:
-        print(e)
-        return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
 @bp_project.route("/search_for_user", methods=['POST'])

@@ -9,22 +9,30 @@ import './Project.scss';
 
 export function Project() {
     const navigate = useNavigate();
-    const { name } = useParams();
+    const { urlName } = useParams();
     const userContext = useUserContext();
 
     const [projectId, setProjectId] = useState<string>('');
+    const [projectName, setProjectName] = useState<string>('');
+    const [projectCreation, setProjectCreation] = useState<string>('');
+    const [projectUsers, setProjectUsers] = useState<{id:string, name:string}[]>([]);
+    const [projectLastSpecs, setProjectLastSpecs] = useState<string>('');
+    const [projectLastProto, setProjectLastProto] = useState<string>('');
 
     useEffect(() => {
-        postProjectExistForUser(userContext.user, name || "")
+        postProjectExistForUser(userContext.user, urlName || "")
         .then((data) => data.id || navigate('/projects'))
         .then((id) => {
             if (!id) throw new Error("empty project id");
-
-            console.log(id);
             setProjectId(id);
+
             postProjectGet(id)
             .then((data) => {
-                console.log(data.result); // todo : mapping
+                setProjectName(data.result.name);
+                setProjectCreation(data.result.creation);
+                setProjectUsers(data.result.users);
+                setProjectLastSpecs(data.result.last_specs || '');
+                setProjectLastProto(data.result.last_proto || '');
             })
             .catch(error => {
                 console.log("Error:", error);
@@ -35,7 +43,7 @@ export function Project() {
             console.log("Error:", error);
             navigate('/projects');
         });
-    }, [userContext.user, name, navigate]);
+    }, [userContext.user, urlName, navigate]);
 
     function triggerDelete() {
         postProjectDelete(projectId)
@@ -57,8 +65,12 @@ export function Project() {
         <section id="project">
             <h1>Project Summary</h1>
             <CardPage size='large'>
-                title<br/>
-                collabs (+edit)<br/>
+                name: {projectName}<br/>
+                collabs: <div>{projectUsers.map((item) => (<div key={item.id}>{item.name}</div>))}</div><br/>
+                <hr/>
+                creation: {projectCreation}<br/>
+                last specs: {projectLastSpecs}<br/>
+                last proto: {projectLastProto}<br/>
                 <hr/>
                 description (+edit)<br/>
                 <div className='button delete' onClick={triggerDelete}>Delete</div>

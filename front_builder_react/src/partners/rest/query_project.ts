@@ -14,7 +14,10 @@ export async function postProjectCreate(name:string, users_id:string[]): Promise
 interface ProjectGet {
     result: {
         name:string,
-        users:string[],
+        users: {
+            id: string,
+            name: string
+        }[]
         creation:string,
         last_specs:string|null,
         last_proto:string|null
@@ -47,22 +50,6 @@ export async function postProjectExistForUser(user_id:string, project_name:strin
         project_name: project_name
     }
     return await _postRequest('/project/exist_for_user', data);
-}
-
-interface ProjectSearch {
-    result: {//peut simplifier car un seul projet... recherche par id
-        name: string,
-        users: {
-            id: string,
-            name: string
-        }[]
-    }[]
-}
-export async function postProjectSearch(id:string): Promise<ProjectSearch> {
-    const data = {
-        id: id
-    }
-    return await _postRequest('/project/search', data);
 }
 
 interface ProjectSearchByUser {

@@ -41,9 +41,9 @@ function App():JSX.Element {
                         <Route path="/user/profile" element={requireUser(<Profile/>)} />
                         <Route path="/projects" element={requireUser(<Projects/>)} />
                         <Route path="/projects/create" element={requireUser(<CreateProject/>)} />
-                        <Route path="/project/:name" element={requireUser(<Project/>)} />
-                        <Route path="/project/:name/specs" element={requireUser(<Specs/>)} />
-                        <Route path="/project/:name/proto" element={requireUser(<Proto/>)} />
+                        <Route path="/project/:urlName" element={requireUser(<Project/>)} />
+                        <Route path="/project/:urlName/specs" element={requireUser(<Specs/>)} />
+                        <Route path="/project/:urlName/proto" element={requireUser(<Proto/>)} />
                         <Route path="/*" element={<NotFound/>} />
                     </Routes>
                 </Router>

@@ -47,18 +47,18 @@ function CustomChild() {
 
 export function Specs() {
     const navigate = useNavigate();
-    const { name } = useParams();
+    const { urlName } = useParams();
     const userContext = useUserContext();
 
     useEffect(() => {
-        postProjectExistForUser(userContext.user, name || "")
+        postProjectExistForUser(userContext.user, urlName || "")
         .then((data) => data.id || navigate('/projects'))
         .catch(error => {
             // setErrorMsg("Internal error");
             console.log("Error:", error);
             navigate('/projects');
         });
-    }, [userContext.user, name, navigate]);
+    }, [userContext.user, urlName, navigate]);
 
     // récupérer websocket prête à l'emploi
 
