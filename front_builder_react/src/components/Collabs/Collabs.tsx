@@ -24,6 +24,7 @@ export function Collabs(props: CollabsProps) {
 
 interface CollabsInputProps {
     currentCollabIds: string[],
+    excludedCollabIds?: string[],
     setCurrentCollabIds: React.Dispatch<React.SetStateAction<string[]>>,
     setErrorMsg: React.Dispatch<React.SetStateAction<string>>
 }
@@ -31,6 +32,7 @@ export function CollabsInput(props:CollabsInputProps):JSX.Element {
     const userId = useUserContext().user;
 
     const currentCollabIds = props.currentCollabIds;
+    const excludedCollabIds = props.excludedCollabIds;
     const setCurrentCollabIds = props.setCurrentCollabIds;
     const setErrorMsg = props.setErrorMsg;
 
@@ -51,7 +53,7 @@ export function CollabsInput(props:CollabsInputProps):JSX.Element {
         setSearchCollabMapNameToId(new Map());
 
         if (!collab) return;
-        postAccountSearch(collab, 6, userId)
+        postAccountSearch(collab, 6, [userId, ...(excludedCollabIds || [])])
         .then((data) => {
             data.result = data.result.filter(item => !currentCollabNames.includes(item.name));
             setSearchCollabNames(data.result.map(item => item.name));

@@ -39,5 +39,28 @@
                 background-color: rgb(199, 12, 12);
             }
         }
+
+        .input_group {
+            margin-bottom: 1.2em;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+
+            label {
+                font-weight: bold;
+                font-size: 16px;
+            }
+
+            input, select, textarea {
+                margin-top: 10px;
+                border: 1px solid lightgray;
+                border-radius: 5px;
+                padding: 13px 16px 9px;
+                font-size: 16px;
+            }
+            textarea {
+                height: 6em;
+            }
+        }
     }
 }

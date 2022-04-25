@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Fade } from 'react-awesome-reveal';
 import moment from 'moment';
 
-import { Collabs } from '../../../components/Collabs';
+import { Collabs, CollabsInput } from '../../../components/Collabs';
 import { useUserContext } from '../../../session/user';
 import { postProjectDelete, postProjectExistForUser, postProjectGet } from '../../../partners/rest';
 
@@ -116,12 +116,21 @@ export function Detail() {
     const [projectLastSpecs, setProjectLastSpecs] = useState<string>('');
     const [projectLastProto, setProjectLastProto] = useState<string>('');
 
-    const [edit, setEdit] = useState<boolean>(false);
+    const nullableDate = (date:string) => (date && moment(date).format(dateFormat)) || <>-</>;
 
+    const [edit, setEdit] = useState<boolean>(false);
     const editOn = () => setEdit(true);
     const editOff = () => setEdit(false);
 
-    const nullableDate = (date:string) => (date && moment(date).format(dateFormat)) || <>-</>;
+    const [name, setName] = useState<string>("");
+    const [currentCollabIds, setCurrentCollabIds] = useState<string[]>([userId]);
+    const [description, setDescription] = useState<string>("");
+    const [warnMsg, setWarnMsg] = useState<string>("");
+    const [errorMsg, setErrorMsg] = useState<string>("");
+
+    function triggerUpdate() {
+
+    }
 
     useEffect(() => {
         postProjectExistForUser(userId, urlName || "")
@@ -140,13 +149,11 @@ export function Detail() {
             })
             .catch(error => {
                 console.log("Error:", error);
+                setErrorMsg("Internal error");
+                console.log("Error:", error);
             });
         })
-        .catch(error => {
-            // setErrorMsg("Internal error");
-            console.log("Error:", error);
-            navigate('/projects');
-        });
+        .catch(() => navigate('/projects'));
     }, [userId, urlName, navigate]);
 
     return (
@@ -154,7 +161,24 @@ export function Detail() {
             <h1>Project Summary</h1>
             <div className='card large'>
                 <h1>{projectName}</h1>
-                <Collabs usernames={projectUsers.filter(item => item.id !== userId).map(item => item.name)}/><br/>
+                <Collabs usernames={projectUsers.filter(item => item.id !== userId).map(item => item.name)}/>
+                { edit &&
+                <>
+                    <div className='input_group'>
+                        <label>Project name</label>
+                        <input type='text'
+                            onChange={(event) => setName(event.target.value)}
+                            onKeyDown={(event) => (event.key === "Enter") && triggerUpdate()}
+                        />
+                    </div>
+                    <CollabsInput
+                        currentCollabIds={currentCollabIds}
+                        excludedCollabIds={projectUsers.map(item => item.id)}
+                        setCurrentCollabIds={setCurrentCollabIds}
+                        setErrorMsg={setErrorMsg}
+                    />
+                </> }
+                <br/>
                 <hr/>
                 <h2>Statistics</h2>
                 <table>
@@ -176,6 +200,14 @@ export function Detail() {
                 </table>
                 <hr/>
                 <h2>Description</h2>
+                { edit && 
+                <div className='input_group'>
+                    <label>Description</label>
+                    <textarea
+                        onChange={(event) => setDescription(event.target.value)}
+                        onKeyDown={(event) => (event.key === "Enter") && triggerUpdate()}
+                    />
+                </div> }
                 <p>...</p>
                 { edit ? <Edit editOff={editOff} projectId={projectId}/> : <div className='button' onClick={editOn}>Edit</div>}
             </div>

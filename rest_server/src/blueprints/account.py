@@ -1,4 +1,4 @@
-from quart import Blueprint, request, current_app
+from quart import Blueprint, json, request, current_app
 from flask_api import status
 from bson.objectid import ObjectId
 from werkzeug.datastructures import ImmutableMultiDict
@@ -203,16 +203,16 @@ async def search():
 
     username = post.get("name", type=str, default=None)
     limit = post.get("limit", type=int, default=None)
-    current_user = post.get("current_user", type=str, default=None)
+    excluded_users = post.get("excluded_users", type=str, default=None)
 
-    if not (username and limit and current_user):
+    if not (username and limit and excluded_users):
         return "", status.HTTP_400_BAD_REQUEST
 
     aggregation = [
         {
             "$match": {
                 "_id": {
-                    "$ne": ObjectId(current_user)
+                    "$nin": [ObjectId(user) for user in json.loads(excluded_users)]
                 },
                 "name": {
                     "$regex": username,
