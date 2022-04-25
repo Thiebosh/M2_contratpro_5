@@ -6,7 +6,7 @@ import {
 	Route,
     Navigate
 } from 'react-router-dom';
-import {requireUser, userContext, userContextMethods} from './session/user';
+import {requireNoUser, requireUser, userContext, userContextMethods} from './session/user';
 
 import {NavBar} from './components/NavBar';
 
@@ -38,8 +38,8 @@ function App():JSX.Element {
                     <Routes>
                         <Route path="/" element={<Navigate replace to="/home" />} />
                         <Route path="/home" element={<Home />} />
-                        <Route path="/user/create" element={<CreateUser/>} />
-                        <Route path="/user/login" element={<Login/>} />
+                        <Route path="/user/create" element={requireNoUser(<CreateUser/>)} />
+                        <Route path="/user/login" element={requireNoUser(<Login/>)} />
                         <Route path="/user/profile" element={requireUser(<Profile/>)} />
                         <Route path="/projects" element={requireUser(<Projects/>)} />
                         <Route path="/projects/create" element={requireUser(<CreateProject/>)} />

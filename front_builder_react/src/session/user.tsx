@@ -1,3 +1,4 @@
+import moment, { Moment } from 'moment';
 import { createContext, useContext } from 'react';
 import {
     Navigate
@@ -5,19 +6,50 @@ import {
 
 const userKey = "user";
 
+interface timedUser {
+    userId:string,
+    valid:string,
+}
+
+function refreshSetUser(userId:string) {
+    const storage:timedUser = {
+        userId: userId,
+        valid: moment().add(5, 'minutes').toISOString()
+    };
+    localStorage.setItem(userKey, JSON.stringify(storage));
+}
+
+function refreshGetUser() {
+    const value = localStorage.getItem(userKey);
+    if (!value) return null;
+
+    const storage:timedUser = JSON.parse(value);
+    if (moment().isAfter(storage.valid)) {
+        localStorage.removeItem(userKey);
+        return null;
+    }
+
+    refreshSetUser(storage.userId);
+    return storage.userId;
+}
+
+export function requireNoUser(component:JSX.Element):JSX.Element {
+    return (refreshGetUser() ? <Navigate to="/user/profile"/> : component);
+}
+
 export function requireUser(component:JSX.Element):JSX.Element {
-    return (localStorage.getItem(userKey) ? component : <Navigate to="/user/login"/>);
+    return (refreshGetUser() ? component : <Navigate to="/user/login"/>);
 }
 
 export function userContextMethods(triggerRefresh:React.Dispatch<React.SetStateAction<boolean>>) {
     return {
-        user: localStorage.getItem(userKey) || '',
+        user: refreshGetUser() || '',
         setUser: (userId: string) => {
-            localStorage.setItem(userKey, userId);
+            refreshSetUser(userId);
             triggerRefresh(true);
         },
         removeUser: () => {
-            localStorage.setItem(userKey, '');
+            localStorage.removeItem(userKey);
             triggerRefresh(true);
         }
     };
