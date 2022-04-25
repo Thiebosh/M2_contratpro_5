@@ -1,6 +1,7 @@
 .collabs {
     display: flex;
     flex-direction: row;
+    overflow-x: auto;
 
     .bubble {
         margin-right: .3em;

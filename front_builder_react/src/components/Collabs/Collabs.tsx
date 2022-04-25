@@ -24,7 +24,6 @@ export function Collabs(props: CollabsProps) {
 
 interface CollabsInputProps {
     currentCollabIds: string[],
-    excludedCollabIds?: string[],
     setCurrentCollabIds: React.Dispatch<React.SetStateAction<string[]>>,
     setErrorMsg: React.Dispatch<React.SetStateAction<string>>
 }
@@ -32,7 +31,6 @@ export function CollabsInput(props:CollabsInputProps):JSX.Element {
     const userId = useUserContext().user;
 
     const currentCollabIds = props.currentCollabIds;
-    const excludedCollabIds = props.excludedCollabIds;
     const setCurrentCollabIds = props.setCurrentCollabIds;
     const setErrorMsg = props.setErrorMsg;
 
@@ -53,9 +51,8 @@ export function CollabsInput(props:CollabsInputProps):JSX.Element {
         setSearchCollabMapNameToId(new Map());
 
         if (!collab) return;
-        postAccountSearch(collab, 6, [userId, ...(excludedCollabIds || [])])
+        postAccountSearch(collab, 6, [userId, ...currentCollabIds])
         .then((data) => {
-            data.result = data.result.filter(item => !currentCollabNames.includes(item.name));
             setSearchCollabNames(data.result.map(item => item.name));
             setSearchCollabMapNameToId(data.result.reduce((accu, item) => accu.set(item.name, item.id), new Map<string, string>()));
         })
@@ -93,14 +90,6 @@ export function CollabsInput(props:CollabsInputProps):JSX.Element {
         <div className='input_group'>
             <label>Choose collaborators</label>
             <Collabs usernames={currentCollabNames} onClick={(item:string) => removeCollab(item)}/>
-            {/* <div className='collabs'>
-                {currentCollabNames.map(item => (
-                    <div className='bubble' key={item} onClick={() => removeCollab(item)}>
-                        {item[0]}
-                        <span>{item}</span>
-                    </div>
-                ))}
-            </div> */}
             <input type="text" list="exampleList"
                 value={inputValue}
                 onChange={(event) => onChangeInputDataList(event.nativeEvent, event.target.value)}

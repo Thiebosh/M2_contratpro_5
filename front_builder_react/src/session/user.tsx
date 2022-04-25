@@ -1,8 +1,8 @@
-import moment from 'moment';
 import { createContext, useContext } from 'react';
-import {
-    Navigate
-} from 'react-router-dom';
+import moment from 'moment';
+import {Navigate} from 'react-router-dom';
+
+import {sessionDuration} from '../index';
 
 const userKey = "user";
 
@@ -14,7 +14,7 @@ interface timedUser {
 function refreshSetUser(userId:string) {
     const storage:timedUser = {
         userId: userId,
-        valid: moment().add(5, 'minutes').toISOString()
+        valid: moment().add(sessionDuration, 'minutes').toISOString()
     };
     localStorage.setItem(userKey, JSON.stringify(storage));
 }

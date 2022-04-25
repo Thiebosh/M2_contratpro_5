@@ -23,6 +23,7 @@ import {Proto} from './pages/project/Proto';
 
 import './index.scss';
 
+export const sessionDuration = 20; //min
 export const dateFormat = "YYYY/MM/DD HH:mm";
 
 function App():JSX.Element {

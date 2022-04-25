@@ -124,7 +124,7 @@ export function Detail() {
 
     const [name, setName] = useState<string>("");
     const [currentCollabIds, setCurrentCollabIds] = useState<string[]>([userId]);
-    const [description, setDescription] = useState<string>("");
+    const [description, setDescription] = useState<string>("...");
     const [warnMsg, setWarnMsg] = useState<string>("");
     const [errorMsg, setErrorMsg] = useState<string>("");
 
@@ -146,6 +146,8 @@ export function Detail() {
                 setProjectUsers(data.result.users);
                 setProjectLastSpecs(data.result.last_specs || '');
                 setProjectLastProto(data.result.last_proto || '');
+
+                setCurrentCollabIds(data.result.users.map(item => item.id));
             })
             .catch(error => {
                 console.log("Error:", error);
@@ -165,7 +167,7 @@ export function Detail() {
                 { edit &&
                 <>
                     <div className='input_group'>
-                        <label>Project name</label>
+                        <label>Change project name</label>
                         <input type='text'
                             onChange={(event) => setName(event.target.value)}
                             onKeyDown={(event) => (event.key === "Enter") && triggerUpdate()}
@@ -173,7 +175,6 @@ export function Detail() {
                     </div>
                     <CollabsInput
                         currentCollabIds={currentCollabIds}
-                        excludedCollabIds={projectUsers.map(item => item.id)}
                         setCurrentCollabIds={setCurrentCollabIds}
                         setErrorMsg={setErrorMsg}
                     />
@@ -200,16 +201,18 @@ export function Detail() {
                 </table>
                 <hr/>
                 <h2>Description</h2>
+                <p>{description}</p>
                 { edit && 
                 <div className='input_group'>
-                    <label>Description</label>
+                    <label>Change description</label>
                     <textarea
                         onChange={(event) => setDescription(event.target.value)}
                         onKeyDown={(event) => (event.key === "Enter") && triggerUpdate()}
                     />
                 </div> }
-                <p>...</p>
                 { edit ? <Edit editOff={editOff} projectId={projectId}/> : <div className='button' onClick={editOn}>Edit</div>}
+                { warnMsg && <Fade><div className='warning'>{warnMsg}</div></Fade> }
+                { errorMsg && <Fade><div className='error'>{errorMsg}</div></Fade> }
             </div>
         </section>
     );
