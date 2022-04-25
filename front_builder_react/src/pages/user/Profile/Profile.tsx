@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Fade } from 'react-awesome-reveal';
 
-import { CardPage } from '../../../components/CardPage';
 import { useUserContext } from '../../../session/user';
 import { postAccountGet, postAccountUpdate, postAccountDelete } from '../../../partners/rest';
 
@@ -128,13 +127,13 @@ export function Profile() {
     return (
         <section id='profile'>
             <h1>User Profile</h1>
-            <CardPage size='medium'>
+            <div className='card medium'>
                 <div className='summary'>
                     <img src='/img/avatar.jpg' alt='avatar'/>
                     <p>{name}</p>
                 </div>
                 { edit ? <Edit editOff={editOff} setName={setName}/> : <div className='button' onClick={editOn}>Edit</div>}
-            </CardPage>
+            </div>
         </section>
     );
 }

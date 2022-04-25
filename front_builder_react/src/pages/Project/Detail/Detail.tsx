@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Fade } from 'react-awesome-reveal';
 import moment from 'moment';
 
-import { CardPage } from '../../../components/CardPage';
 import { Collabs } from '../../../components/Collabs';
 import { useUserContext } from '../../../session/user';
 import { postProjectDelete, postProjectExistForUser, postProjectGet } from '../../../partners/rest';
@@ -153,7 +152,7 @@ export function Detail() {
     return (
         <section id="detail">
             <h1>Project Summary</h1>
-            <CardPage size='large'>
+            <div className='card large'>
                 <h1>{projectName}</h1>
                 <Collabs usernames={projectUsers.filter(item => item.id !== userId).map(item => item.name)}/><br/>
                 <hr/>
@@ -179,7 +178,7 @@ export function Detail() {
                 <h2>Description</h2>
                 <p>...</p>
                 { edit ? <Edit editOff={editOff} projectId={projectId}/> : <div className='button' onClick={editOn}>Edit</div>}
-            </CardPage>
+            </div>
         </section>
     );
 }

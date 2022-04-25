@@ -4,7 +4,6 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 
 import { useUserContext } from '../../session/user';
-import { CardPage } from '../../components/CardPage';
 import { Collabs } from '../../components/Collabs';
 import { postProjectSearchForUser } from '../../partners/rest';
 
@@ -63,7 +62,7 @@ export function Projects() {
                     New project
                 </a>
             </div>
-            <CardPage size='wide'>
+            <div className='card wide'>
                 <table>
                     <thead>
                         <tr>
@@ -78,7 +77,7 @@ export function Projects() {
                         { projects.map((project) => <Project key={project.id} {...project}/>) }
                     </tbody>
                 </table>
-            </CardPage>
+            </div>
         </section>
     );
 }

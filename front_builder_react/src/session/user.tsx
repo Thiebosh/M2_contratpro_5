@@ -1,4 +1,4 @@
-import moment, { Moment } from 'moment';
+import moment from 'moment';
 import { createContext, useContext } from 'react';
 import {
     Navigate

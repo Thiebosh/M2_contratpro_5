@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Fade } from 'react-awesome-reveal';
 
-import { CardPage } from '../../../components/CardPage';
 import { postAccountCreate } from '../../../partners/rest';
 
 import './CreateUser.scss';
@@ -46,7 +45,7 @@ export function CreateUser() {
     return (
         <section id='create'>
             <h1>Create Account</h1>
-            <CardPage size='small'>
+            <div className='card small'>
                 <div className='input_group'>
                     <label>Username</label>
                     <input type='text'
@@ -71,7 +70,7 @@ export function CreateUser() {
                 <div className='button' onClick={triggerCreate}>Create</div>
                 { warnMsg && <Fade><div className='warning'>{warnMsg}</div></Fade> }
                 { errorMsg && <Fade><div className='error'>{errorMsg}</div></Fade> }
-            </CardPage>
+            </div>
         </section>
     );
 }

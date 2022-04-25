@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Fade } from 'react-awesome-reveal';
 
 import { useUserContext } from '../../../session/user';
-import { CardPage } from '../../../components/CardPage';
 import { CollabsInput } from '../../../components/Collabs';
 import { postProjectCreate } from '../../../partners/rest';
 
@@ -46,7 +45,7 @@ export function CreateProject() {
     return (
         <section id="createproject">
             <h1>Create Project</h1>
-            <CardPage size='large'>
+            <div className='card large'>
                 <div className='input_group'>
                     <label>Project name</label>
                     <input type='text'
@@ -69,7 +68,7 @@ export function CreateProject() {
                 <div className='button' onClick={triggerCreate}>Create</div>
                 { warnMsg && <Fade><div className='warning'>{warnMsg}</div></Fade> }
                 { errorMsg && <Fade><div className='error'>{errorMsg}</div></Fade> }
-            </CardPage>
+            </div>
         </section>
     );
 }

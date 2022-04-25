@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Fade } from 'react-awesome-reveal';
 
-import { CardPage } from '../../../components/CardPage';
 import { useUserContext } from '../../../session/user';
 import { postAccountConnect } from '../../../partners/rest';
 
@@ -52,7 +51,7 @@ export function Login() {
     return (
         <section id='login'>
             <h1>Login</h1>
-            <CardPage size='small'>
+            <div className='card small'>
                 <div className='input_group'>
                     <label>Username</label>
                     <input type='text'
@@ -70,7 +69,7 @@ export function Login() {
                 <div className='button' onClick={triggerLogin}>Sign in</div>
                 { warnMsg && <Fade><div className='warning'>{warnMsg}</div></Fade> }
                 { errorMsg && <Fade><div className='error'>{errorMsg}</div></Fade> }
-            </CardPage>
+            </div>
         </section>
     );
 }
