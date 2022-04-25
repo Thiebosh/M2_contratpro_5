@@ -3,10 +3,11 @@ import {_postRequest} from './core';
 interface ProjectCreate {
     success: string|boolean
 }
-export async function postProjectCreate(name:string, users_id:string[]): Promise<ProjectCreate> {
+export async function postProjectCreate(name:string, users_id:string[], description:string): Promise<ProjectCreate> {
     const data = {
         name: name,
-        users_id: JSON.stringify(users_id)
+        users_id: JSON.stringify(users_id),
+        // description: description, //TODO
     }
     return await _postRequest('/project/create', data);
 }

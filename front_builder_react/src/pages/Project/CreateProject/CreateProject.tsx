@@ -27,7 +27,7 @@ export function CreateProject() {
             return;
         }
 
-        postProjectCreate(name, currentCollabIds) // add description
+        postProjectCreate(name, currentCollabIds, description)
         .then((data) => {
             console.log(data);
             if (data.success === "already exist") {
@@ -54,6 +54,7 @@ export function CreateProject() {
                     />
                 </div>
                 <CollabsInput
+                    label='Choose collaborators'
                     currentCollabIds={currentCollabIds}
                     setCurrentCollabIds={setCurrentCollabIds}
                     setErrorMsg={setErrorMsg}

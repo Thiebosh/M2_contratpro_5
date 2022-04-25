@@ -22,7 +22,12 @@ export function Collabs(props: CollabsProps) {
     );
 }
 
+export interface Collab {
+    id:string,
+    name:string,
+}
 interface CollabsInputProps {
+    label:string,
     currentCollabIds: string[],
     setCurrentCollabIds: React.Dispatch<React.SetStateAction<string[]>>,
     setErrorMsg: React.Dispatch<React.SetStateAction<string>>
@@ -88,7 +93,7 @@ export function CollabsInput(props:CollabsInputProps):JSX.Element {
 
     return (
         <div className='input_group'>
-            <label>Choose collaborators</label>
+            <label>{props.label}</label>
             <Collabs usernames={currentCollabNames} onClick={(item:string) => removeCollab(item)}/>
             <input type="text" list="exampleList"
                 value={inputValue}

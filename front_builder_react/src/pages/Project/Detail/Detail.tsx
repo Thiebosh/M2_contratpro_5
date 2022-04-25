@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Fade } from 'react-awesome-reveal';
 import moment from 'moment';
 
-import { Collabs, CollabsInput } from '../../../components/Collabs';
+import { Collab, Collabs, CollabsInput } from '../../../components/Collabs';
 import { useUserContext } from '../../../session/user';
 import { postProjectDelete, postProjectExistForUser, postProjectGet } from '../../../partners/rest';
 
@@ -14,55 +14,32 @@ import './Detail.scss';
 interface EditProps {
     editOff: () => void,
     projectId:string,
-    // setName: React.Dispatch<React.SetStateAction<string>>
+    triggerUpdate:() => void,
+    warnMsg:string,
+    errorMsg:string,
+    deleteMsg:string,
+    setWarnMsg:React.Dispatch<React.SetStateAction<string>>,
+    setErrorMsg:React.Dispatch<React.SetStateAction<string>>,
+    setDeleteMsg:React.Dispatch<React.SetStateAction<string>>,
 };
 function Edit(props:EditProps) {
     const navigate = useNavigate();
-    // const userContext = useUserContext();
 
     const projectId = props.projectId;
+    const warnMsg = props.warnMsg;
+    const errorMsg = props.errorMsg;
+    const deleteMsg = props.deleteMsg;
+    const setWarnMsg = props.setWarnMsg;
+    const setErrorMsg = props.setErrorMsg;
+    const setDeleteMsg = props.setDeleteMsg;
 
-    // const [name, setName] = useState<string>("");
-    // const [password, setPassword] = useState<string>("");
-    // const [passwordCheck, setPasswordCheck] = useState<string>("");
-    const [warnMsg, setWarnMsg] = useState<string>("");
-    const [errorMsg, setErrorMsg] = useState<string>("");
-    const [deleteMsg, setDeleteMsg] = useState<string>("");
-
-    useEffect(() => { warnMsg && setTimeout(() => setWarnMsg(""), 4000) }, [warnMsg]);
-    useEffect(() => { errorMsg && setTimeout(() => setErrorMsg(""), 4000) }, [errorMsg]);
-    useEffect(() => { deleteMsg && setTimeout(() => setDeleteMsg(""), 4000) }, [deleteMsg]);
+    useEffect(() => { warnMsg && setTimeout(() => setWarnMsg(""), 4000) }, [warnMsg, setWarnMsg]);
+    useEffect(() => { errorMsg && setTimeout(() => setErrorMsg(""), 4000) }, [errorMsg, setErrorMsg]);
+    useEffect(() => { deleteMsg && setTimeout(() => setDeleteMsg(""), 4000) }, [deleteMsg, setDeleteMsg]);
 
     function triggerUpdate() {
         props.editOff();
-        // if (!(name || password || passwordCheck)) {
-        //     props.editOff();
-        //     return;
-        // }
-
-        // if (!(name || (password && passwordCheck))) {
-        //     setWarnMsg("Empty field(s)");
-        //     return;
-        // }
-
-        // if (password !== passwordCheck) {
-        //     setWarnMsg("Differents passwords");
-        //     return;
-        // }
-
-        // postAccountUpdate(userContext.user, name, password)
-        // .then((data) => {
-        //     if (data.success === "already exist") {
-        //         setErrorMsg("Username already used");
-        //         return;
-        //     }
-        //     props.setName(name);
-        //     props.editOff();
-        // })
-        // .catch(error => {
-        //     setErrorMsg("Internal error");
-        //     console.log("Error:", error);
-        // });
+        props.triggerUpdate();
     }
 
     function triggerDelete() {
@@ -83,18 +60,6 @@ function Edit(props:EditProps) {
 
     return (
         <>
-            {/* <div className='input_group'>
-                <label>Change your username</label>
-                <input type='text' onChange={(event) => setName(event.target.value)}/>
-            </div>
-            <div className='input_group'>
-                <label>Change your password</label>
-                <input type='password'  onChange={(event) => setPassword(event.target.value)}/>
-            </div>
-            <div className='input_group'>
-                <label>Password check</label>
-                <input type='password'  onChange={(event) => setPasswordCheck(event.target.value)}/>
-            </div> */}
             <div className='button' onClick={triggerUpdate}>Confirm</div>
             { warnMsg && <Fade><div className='warning'>{warnMsg}</div></Fade> }
             { errorMsg && <Fade><div className='error'>{errorMsg}</div></Fade> }
@@ -112,7 +77,7 @@ export function Detail() {
     const [projectId, setProjectId] = useState<string>('');
     const [projectName, setProjectName] = useState<string>('');
     const [projectCreation, setProjectCreation] = useState<string>('');
-    const [projectUsers, setProjectUsers] = useState<{id:string, name:string}[]>([]);
+    const [projectUsers, setProjectUsers] = useState<Collab[]>([]);
     const [projectLastSpecs, setProjectLastSpecs] = useState<string>('');
     const [projectLastProto, setProjectLastProto] = useState<string>('');
 
@@ -124,12 +89,14 @@ export function Detail() {
 
     const [name, setName] = useState<string>("");
     const [currentCollabIds, setCurrentCollabIds] = useState<string[]>([userId]);
-    const [description, setDescription] = useState<string>("...");
+    const [description, setDescription] = useState<string>('');
+
     const [warnMsg, setWarnMsg] = useState<string>("");
     const [errorMsg, setErrorMsg] = useState<string>("");
+    const [deleteMsg, setDeleteMsg] = useState<string>("");
 
     function triggerUpdate() {
-
+        //todo
     }
 
     useEffect(() => {
@@ -174,6 +141,7 @@ export function Detail() {
                         />
                     </div>
                     <CollabsInput
+                        label='Add collaborators'
                         currentCollabIds={currentCollabIds}
                         setCurrentCollabIds={setCurrentCollabIds}
                         setErrorMsg={setErrorMsg}
@@ -201,7 +169,7 @@ export function Detail() {
                 </table>
                 <hr/>
                 <h2>Description</h2>
-                <p>{description}</p>
+                <p>...</p>
                 { edit && 
                 <div className='input_group'>
                     <label>Change description</label>
@@ -210,9 +178,20 @@ export function Detail() {
                         onKeyDown={(event) => (event.key === "Enter") && triggerUpdate()}
                     />
                 </div> }
-                { edit ? <Edit editOff={editOff} projectId={projectId}/> : <div className='button' onClick={editOn}>Edit</div>}
-                { warnMsg && <Fade><div className='warning'>{warnMsg}</div></Fade> }
-                { errorMsg && <Fade><div className='error'>{errorMsg}</div></Fade> }
+                { edit
+                    ? <Edit
+                        editOff={editOff}
+                        projectId={projectId}
+                        triggerUpdate={triggerUpdate}
+                        warnMsg={warnMsg}
+                        errorMsg={errorMsg}
+                        deleteMsg={deleteMsg}
+                        setWarnMsg={setWarnMsg}
+                        setErrorMsg={setErrorMsg}
+                        setDeleteMsg={setDeleteMsg}
+                    />
+                    : <div className='button' onClick={editOn}>Edit</div>
+                }
             </div>
         </section>
     );
