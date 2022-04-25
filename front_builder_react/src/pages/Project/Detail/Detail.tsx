@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Fade } from 'react-awesome-reveal';
 import moment from 'moment';
 
-import { Collab, Collabs, CollabsInput } from '../../../components/Collabs';
+import { Collab, Collabs, CollabsInput, RemoveCollabsInput } from '../../../components/Collabs';
 import { useUserContext } from '../../../session/user';
 import { postProjectDelete, postProjectExistForUser, postProjectGet } from '../../../partners/rest';
 
@@ -81,14 +81,15 @@ export function Detail() {
     const [projectLastSpecs, setProjectLastSpecs] = useState<string>('');
     const [projectLastProto, setProjectLastProto] = useState<string>('');
 
-    const nullableDate = (date:string) => (date && moment(date).format(dateFormat)) || <>-</>;
+    const nullableDate = (date:string) => date ? moment(date).format(dateFormat) : <>-</>;
 
     const [edit, setEdit] = useState<boolean>(false);
     const editOn = () => setEdit(true);
     const editOff = () => setEdit(false);
 
     const [name, setName] = useState<string>("");
-    const [currentCollabIds, setCurrentCollabIds] = useState<string[]>([userId]);
+    const [addCollabIds, setAddCollabIds] = useState<string[]>([]);
+    const [removeCollabIds, setRemoveCollabIds] = useState<string[]>([]);
     const [description, setDescription] = useState<string>('');
 
     const [warnMsg, setWarnMsg] = useState<string>("");
@@ -97,6 +98,10 @@ export function Detail() {
 
     function triggerUpdate() {
         //todo
+        console.log("set title ", name)
+        console.log("add users ", addCollabIds)
+        console.log("remove users ", removeCollabIds)
+        console.log("set description ", description)
     }
 
     useEffect(() => {
@@ -113,8 +118,6 @@ export function Detail() {
                 setProjectUsers(data.result.users);
                 setProjectLastSpecs(data.result.last_specs || '');
                 setProjectLastProto(data.result.last_proto || '');
-
-                setCurrentCollabIds(data.result.users.map(item => item.id));
             })
             .catch(error => {
                 console.log("Error:", error);
@@ -142,8 +145,16 @@ export function Detail() {
                     </div>
                     <CollabsInput
                         label='Add collaborators'
-                        currentCollabIds={currentCollabIds}
-                        setCurrentCollabIds={setCurrentCollabIds}
+                        initialCollabIds={projectUsers.map(item => item.id)}
+                        currentCollabIds={addCollabIds}
+                        setCurrentCollabIds={setAddCollabIds}
+                        setErrorMsg={setErrorMsg}
+                    />
+                    <RemoveCollabsInput
+                        label='Remove collaborators'
+                        collabs={projectUsers.filter(item => item.id !== userId)}
+                        currentCollabIds={removeCollabIds}
+                        setCurrentCollabIds={setRemoveCollabIds}
                         setErrorMsg={setErrorMsg}
                     />
                 </> }
@@ -151,21 +162,23 @@ export function Detail() {
                 <hr/>
                 <h2>Statistics</h2>
                 <table>
-                    <tr>
-                        <th>Project creation date</th>
-                        <th>:</th>
-                        <td>{moment(projectCreation).format(dateFormat)}</td>
-                    </tr>
-                    <tr>
-                        <th>Last specifications update</th>
-                        <th>:</th>
-                        <td>{nullableDate(projectLastSpecs)}</td>
-                    </tr>
-                    <tr>
-                        <th>Last prototype generation</th>
-                        <th>:</th>
-                        <td>{nullableDate(projectLastProto)}</td>
-                    </tr>
+                    <tbody>
+                        <tr>
+                            <th>Project creation date</th>
+                            <th>:</th>
+                            <td>{moment(projectCreation).format(dateFormat)}</td>
+                        </tr>
+                        <tr>
+                            <th>Last specifications update</th>
+                            <th>:</th>
+                            <td>{nullableDate(projectLastSpecs)}</td>
+                        </tr>
+                        <tr>
+                            <th>Last prototype generation</th>
+                            <th>:</th>
+                            <td>{nullableDate(projectLastProto)}</td>
+                        </tr>
+                    </tbody>
                 </table>
                 <hr/>
                 <h2>Description</h2>

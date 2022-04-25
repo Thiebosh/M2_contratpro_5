@@ -33,5 +33,9 @@
         &:hover > span {
             display: initial;
         }
+
+        &.delete {
+            background-color: rgb(199, 12, 12);
+        }
     }
 }

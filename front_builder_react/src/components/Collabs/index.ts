@@ -1,3 +1,3 @@
-import {Collabs, CollabsInput, Collab} from './Collabs';
+import {Collabs, CollabsInput, RemoveCollabsInput, Collab} from './Collabs';
 export type {Collab};
-export {Collabs, CollabsInput};
+export {Collabs, CollabsInput, RemoveCollabsInput};
