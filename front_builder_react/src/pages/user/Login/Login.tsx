@@ -55,11 +55,17 @@ export function Login() {
             <CardPage size='small'>
                 <div className='input_group'>
                     <label>Username</label>
-                    <input type='text' onChange={(event) => setName(event.target.value)}/>
+                    <input type='text'
+                        onChange={(event) => setName(event.target.value)}
+                        onKeyDown={(event) => (event.key === "Enter") && triggerLogin()}
+                    />
                 </div>
                 <div className='input_group'>
                     <label>Password</label>
-                    <input type='password' onChange={(event) => setPassword(event.target.value)}/>
+                    <input type='password'
+                        onChange={(event) => setPassword(event.target.value)}
+                        onKeyDown={(event) => (event.key === "Enter") && triggerLogin()}
+                    />
                 </div>
                 <div className='button' onClick={triggerLogin}>Sign in</div>
                 { warnMsg && <Fade><div className='warning'>{warnMsg}</div></Fade> }

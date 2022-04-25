@@ -78,15 +78,24 @@ function Edit(props:EditProps) {
         <>
             <div className='input_group'>
                 <label>Change your username</label>
-                <input type='text' onChange={(event) => setName(event.target.value)}/>
+                <input type='text'
+                    onChange={(event) => setName(event.target.value)}
+                    onKeyDown={(event) => (event.key === "Enter") && triggerUpdate()}
+                />
             </div>
             <div className='input_group'>
                 <label>Change your password</label>
-                <input type='password'  onChange={(event) => setPassword(event.target.value)}/>
+                <input type='password'
+                    onChange={(event) => setPassword(event.target.value)}
+                    onKeyDown={(event) => (event.key === "Enter") && triggerUpdate()}
+                />
             </div>
             <div className='input_group'>
                 <label>Password check</label>
-                <input type='password'  onChange={(event) => setPasswordCheck(event.target.value)}/>
+                <input type='password'
+                    onChange={(event) => setPasswordCheck(event.target.value)}
+                    onKeyDown={(event) => (event.key === "Enter") && triggerUpdate()}
+                />
             </div>
             <div className='button' onClick={triggerUpdate}>Confirm</div>
             { warnMsg && <Fade><div className='warning'>{warnMsg}</div></Fade> }

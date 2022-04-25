@@ -49,7 +49,10 @@ export function CreateProject() {
             <CardPage size='large'>
                 <div className='input_group'>
                     <label>Project name</label>
-                    <input type='text' onChange={(event) => setName(event.target.value)}/>
+                    <input type='text'
+                        onChange={(event) => setName(event.target.value)}
+                        onKeyDown={(event) => (event.key === "Enter") && triggerCreate()}
+                    />
                 </div>
                 <CollabsInput
                     currentCollabIds={currentCollabIds}
@@ -58,7 +61,10 @@ export function CreateProject() {
                 />
                 <div className='input_group'>
                     <label>Description</label>
-                    <textarea onChange={(event) => setDescription(event.target.value)}/>
+                    <textarea
+                        onChange={(event) => setDescription(event.target.value)}
+                        onKeyDown={(event) => (event.key === "Enter") && triggerCreate()}
+                    />
                 </div>
                 <div className='button' onClick={triggerCreate}>Create</div>
                 { warnMsg && <Fade><div className='warning'>{warnMsg}</div></Fade> }
