@@ -145,7 +145,7 @@ async def update():
     username = post.get("name", type=str, default=None)
     password = post.get("password", type=str, default=None)
 
-    if not (user_id and (username or password)):
+    if not (user_id and (username or password)): # check if true count equals post length
         return "", status.HTTP_400_BAD_REQUEST
 
     try:

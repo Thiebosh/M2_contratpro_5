@@ -17,6 +17,22 @@
         table {
             margin: auto;
         }
+
+        .warning, .error {
+            border-radius: 5px;
+            color: white;
+            text-align: center;
+            padding: 2px 0;
+            margin: 5px 1em;
+        }
+    
+        .warning {
+            background-color: orange;
+        }
+    
+        .error {
+            background-color: rgb(199, 12, 12);
+        }
         
         .button {
             width: 100%;

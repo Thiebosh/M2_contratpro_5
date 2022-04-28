@@ -135,64 +135,6 @@ async def get():
     }, status.HTTP_200_OK
 
 
-@bp_project.route("/update", methods=['POST'])
-async def update():
-    post = ImmutableMultiDict(await request.get_json())
-    if len(post) != 2:
-        return "", status.HTTP_400_BAD_REQUEST
-
-    project_id = post.get("id", type=str, default=None)
-    project_name = post.get("name", type=str, default=None)
-
-    if not (project_id and project_name):
-        return "", status.HTTP_400_BAD_REQUEST
-
-    try:
-        project_id = ObjectId(project_id)
-    except Exception as e:
-        print(e)
-        return "", status.HTTP_400_BAD_REQUEST
-
-    # verify if name does not exist for other than id
-    filter_q = {
-        "_id": {
-            "$ne": project_id
-        },
-        "name": project_name
-    }
-    fields = {
-        "_id": 0,
-        "name": 1
-    }
-
-    try:
-        if await current_app.config["partners"]["db"].find_one(COLLECTION, filter_q, fields):
-            return {
-                "success": "already exist"
-            }, status.HTTP_200_OK
-    except Exception as e:
-        print(e)
-        return "", status.HTTP_503_SERVICE_UNAVAILABLE
-
-    # update fields
-    filter_q = {
-        "_id": project_id
-    }
-    update_q = {
-        "$set": {
-            "name": project_name
-        }
-    }
-
-    try:
-        return {
-            "success": await current_app.config["partners"]["db"].update_one(COLLECTION, filter_q, update_q)
-        }, status.HTTP_200_OK
-    except Exception as e:
-        print(e)
-        return "", status.HTTP_503_SERVICE_UNAVAILABLE
-
-
 @bp_project.route("/exist_for_user", methods=['POST'])
 async def exist_for_user():
     post = ImmutableMultiDict(await request.get_json())
@@ -299,72 +241,82 @@ async def search_for_user():
         return "", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
-@bp_project.route("/add_user", methods=['POST'])
-async def add_user():
+@bp_project.route("/update", methods=['POST'])
+async def update():
     post = ImmutableMultiDict(await request.get_json())
-    if len(post) != 2:
+    if not (2 <= len(post) <= 5):
         return "", status.HTTP_400_BAD_REQUEST
 
-    project_id = post.get("id", type=str, default=None)
-    user_id = post.get("user_id", type=str, default=None)
+    id = post.get("id", type=str, default=None)
+    name = post.get("name", type=str, default=None)
+    add_ids = post.get("addCollabIds", type=str, default=None)
+    remove_ids = post.get("removeCollabIds", type=str, default=None)
+    description = post.get("description", type=str, default=None)
 
-    if not (project_id and user_id):
+    if not (id and (name or add_ids or remove_ids or description)): # check if true count equals post length
         return "", status.HTTP_400_BAD_REQUEST
 
     try:
-        project_id = ObjectId(project_id)
+        id = ObjectId(id)
     except Exception as e:
         print(e)
         return "", status.HTTP_400_BAD_REQUEST
 
+    if name:
+        # verify if name does not exist for other than id
+        filter_q = {
+            "_id": {
+                "$ne": id
+            },
+            "name": name
+        }
+        fields = {
+            "_id": 0,
+            "name": 1
+        }
+
+        try:
+            if await current_app.config["partners"]["db"].find_one(COLLECTION, filter_q, fields):
+                return {
+                    "success": "already exist"
+                }, status.HTTP_200_OK
+        except Exception as e:
+            print(e)
+            return "", status.HTTP_503_SERVICE_UNAVAILABLE
+
+    # update fields
     filter_q = {
-        "_id": project_id,
-        "users": {
-            "$ne": user_id
+        "_id": id
+    }
+    update_q = {}
+
+    if name:
+        update_q = {
+            "$set": {
+                "name": name
+            }
         }
-    }
-    update_q = {
-        "$push": {
-            "users": user_id
+
+    if add_ids:
+        update_q = {
+            **update_q,
+            "$addToSet": {
+                "users": {
+                    "$each": json.loads(add_ids)
+                }
+            }
         }
-    }
 
-    try:
-        return {
-            "success": await current_app.config["partners"]["db"].update_one(COLLECTION, filter_q, update_q)
-        }, status.HTTP_200_OK
-    except Exception as e:
-        print(e)
-        return "", status.HTTP_503_SERVICE_UNAVAILABLE
-
-
-@bp_project.route("/remove_user", methods=['POST'])
-async def remove_user():
-    post = ImmutableMultiDict(await request.get_json()) 
-    if len(post) != 2:
-        return "", status.HTTP_400_BAD_REQUEST
-
-    project_id = post.get("id", type=str, default=None)
-    user_id = post.get("user_id", type=str, default=None)
-
-    if not (project_id and user_id):
-        return "", status.HTTP_400_BAD_REQUEST
-
-    try:
-        project_id = ObjectId(project_id)
-    except Exception as e:
-        print(e)
-        return "", status.HTTP_400_BAD_REQUEST
-
-    filter_q = {
-        "_id": project_id,
-        "users": user_id
-    }
-    update_q = {
-        "$pull": {
-            "users": user_id
+    if remove_ids:
+        update_q = {
+            **update_q,
+            "$pullAll": {
+                "users": json.loads(remove_ids)
+            }
         }
-    }
+
+    # if description:
+    #     update_q["$set"]["description"] = description
 
     try:
         return {

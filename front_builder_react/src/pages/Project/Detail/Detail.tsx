@@ -5,7 +5,7 @@ import moment from 'moment';
 
 import { Collab, Collabs, CollabsInput, RemoveCollabsInput } from '../../../components/Collabs';
 import { useUserContext } from '../../../session/user';
-import { postProjectDelete, postProjectExistForUser, postProjectGet } from '../../../partners/rest';
+import { postProjectGet, postProjectExistForUser, postProjectUpdate, postProjectDelete } from '../../../partners/rest';
 
 import { dateFormat } from '../../..';
 
@@ -37,11 +37,6 @@ function Edit(props:EditProps) {
     useEffect(() => { errorMsg && setTimeout(() => setErrorMsg(""), 4000) }, [errorMsg, setErrorMsg]);
     useEffect(() => { deleteMsg && setTimeout(() => setDeleteMsg(""), 4000) }, [deleteMsg, setDeleteMsg]);
 
-    function triggerUpdate() {
-        props.editOff();
-        props.triggerUpdate();
-    }
-
     function triggerDelete() {
         postProjectDelete(projectId)
         .then((data) => {
@@ -60,7 +55,7 @@ function Edit(props:EditProps) {
 
     return (
         <>
-            <div className='button' onClick={triggerUpdate}>Confirm</div>
+            <div className='button' onClick={props.triggerUpdate}>Confirm</div>
             { warnMsg && <Fade><div className='warning'>{warnMsg}</div></Fade> }
             { errorMsg && <Fade><div className='error'>{errorMsg}</div></Fade> }
             <div className='button delete' onClick={triggerDelete}>Delete</div>
@@ -80,6 +75,7 @@ export function Detail() {
     const [projectUsers, setProjectUsers] = useState<Collab[]>([]);
     const [projectLastSpecs, setProjectLastSpecs] = useState<string>('');
     const [projectLastProto, setProjectLastProto] = useState<string>('');
+    const [projectDescription, setProjectDescription] = useState<string>('');
 
     const nullableDate = (date:string) => date ? moment(date).format(dateFormat) : <>-</>;
 
@@ -87,22 +83,9 @@ export function Detail() {
     const editOn = () => setEdit(true);
     const editOff = () => setEdit(false);
 
-    const [name, setName] = useState<string>("");
-    const [addCollabIds, setAddCollabIds] = useState<string[]>([]);
-    const [removeCollabIds, setRemoveCollabIds] = useState<string[]>([]);
-    const [description, setDescription] = useState<string>('');
-
     const [warnMsg, setWarnMsg] = useState<string>("");
     const [errorMsg, setErrorMsg] = useState<string>("");
     const [deleteMsg, setDeleteMsg] = useState<string>("");
-
-    function triggerUpdate() {
-        //todo
-        console.log("set title ", name)
-        console.log("add users ", addCollabIds)
-        console.log("remove users ", removeCollabIds)
-        console.log("set description ", description)
-    }
 
     useEffect(() => {
         postProjectExistForUser(userId, urlName || "")
@@ -118,6 +101,7 @@ export function Detail() {
                 setProjectUsers(data.result.users);
                 setProjectLastSpecs(data.result.last_specs || '');
                 setProjectLastProto(data.result.last_proto || '');
+                setProjectDescription('...');
             })
             .catch(error => {
                 console.log("Error:", error);
@@ -127,6 +111,32 @@ export function Detail() {
         })
         .catch(() => navigate('/projects'));
     }, [userId, urlName, navigate]);
+
+    const [editName, setEditName] = useState<string>("");
+    const [addCollabIds, setAddCollabIds] = useState<string[]>([]);
+    const [removeCollabIds, setRemoveCollabIds] = useState<string[]>([]);
+    const [editDescription, setEditDescription] = useState<string>('');
+
+    function triggerUpdate() {
+        postProjectUpdate(projectId, editName, addCollabIds, removeCollabIds, editDescription)
+        .then((data) => {
+            console.log(data);
+            if (data.success === "already exist") {
+                setErrorMsg("Username already used");
+                return;
+            }
+            if (data.success) {
+                editOff();
+                if (editName) navigate('/project/' + editName);
+                else window.location.reload();
+            }
+            else setErrorMsg("Operation failure");
+        })
+        .catch(error => {
+            setErrorMsg("Internal error");
+            console.log("Error:", error);
+        });
+    }
 
     return (
         <section id="detail">
@@ -139,7 +149,7 @@ export function Detail() {
                     <div className='input_group'>
                         <label>Change project name</label>
                         <input type='text'
-                            onChange={(event) => setName(event.target.value)}
+                            onChange={(event) => setEditName(event.target.value)}
                             onKeyDown={(event) => (event.key === "Enter") && triggerUpdate()}
                         />
                     </div>
@@ -182,12 +192,12 @@ export function Detail() {
                 </table>
                 <hr/>
                 <h2>Description</h2>
-                <p>...</p>
+                <p>{projectDescription}</p>
                 { edit && 
                 <div className='input_group'>
                     <label>Change description</label>
                     <textarea
-                        onChange={(event) => setDescription(event.target.value)}
+                        onChange={(event) => setEditDescription(event.target.value)}
                         onKeyDown={(event) => (event.key === "Enter") && triggerUpdate()}
                     />
                 </div> }

@@ -34,10 +34,13 @@ export async function postProjectGet(id:string): Promise<ProjectGet> {
 interface ProjectUpdate {
     success: string|boolean
 }
-export async function postProjectUpdate(id:string, name:string): Promise<ProjectUpdate> {
+export async function postProjectUpdate(id:string, name:string, addCollabIds:string[], removeCollabIds:string[], description:string): Promise<ProjectUpdate> {
     const data = {
         id: id,
-        name: name
+        ...(name && {name: name}),
+        ...(addCollabIds.length && {addCollabIds: JSON.stringify(addCollabIds)}),
+        ...(removeCollabIds.length && {removeCollabIds: JSON.stringify(removeCollabIds)}),
+        ...(description && {description: description}),
     }
     return await _postRequest('/project/update', data);
 }
