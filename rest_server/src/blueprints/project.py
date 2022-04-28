@@ -288,39 +288,41 @@ async def update():
     filter_q = {
         "_id": id
     }
-    update_q = {}
+    operations = []
 
     if name:
-        update_q = {
+        operations.append(current_app.config["partners"]["db"].bulk_update_one(filter_q, {
             "$set": {
                 "name": name
             }
-        }
+        }))
 
     if add_ids:
-        update_q = {
-            **update_q,
+        operations.append(current_app.config["partners"]["db"].bulk_update_one(filter_q, {
             "$addToSet": {
                 "users": {
                     "$each": json.loads(add_ids)
                 }
             }
-        }
+        }))
 
     if remove_ids:
-        update_q = {
-            **update_q,
+        operations.append(current_app.config["partners"]["db"].bulk_update_one(filter_q, {
             "$pullAll": {
                 "users": json.loads(remove_ids)
             }
-        }
+        }))
 
     # if description:
-    #     update_q["$set"]["description"] = description
+    #     operations.append(current_app.config["partners"]["db"].bulk_update_one(filter_q, {
+    #         "$set": {
+    #             "description": description
+    #         }
+    #     }))
 
     try:
         return {
-            "success": await current_app.config["partners"]["db"].update_one(COLLECTION, filter_q, update_q)
+            "success": await current_app.config["partners"]["db"].bulk_write(COLLECTION, operations)
         }, status.HTTP_200_OK
     except Exception as e:
         print(e)
