@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { postProjectExistForUser } from '../../../partners/rest';
@@ -10,34 +10,13 @@ export function Proto() {
     const navigate = useNavigate();
     const { urlName } = useParams();
     const userContext = useUserContext();
+    const [socket, setSocket] = useState<WebSocket>();
 
     useEffect(() => {
         postProjectExistForUser(userContext.user, urlName || "")
         .then((data) => data.id || navigate('/projects'))
         .then(() => {
-            const websocket = new WebSocket('ws://127.0.0.1:8002')
-            websocket.onopen = () => {
-                console.log('connected')
-                const msg = JSON.stringify({"action":"connectRoom", "roomName" : urlName, "author": userContext.user}) // à traduire en nom ou le stocker
-                websocket.send(msg);
-            }
-            websocket.onmessage = (event) => {
-                const data = JSON.parse(event.data)
-                console.log(data);
-            }
-            websocket.onclose = function(event) {
-                if (event.wasClean) {
-                    console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-                } else {
-                    // e.g. server process killed or network down
-                    // event.code is usually 1006 in this case
-                    console.log('[close] Connection died');
-                }
-            };
-            websocket.onerror = function(error) {
-                websocket.close();
-                console.log(`[error] ${error}`);
-            };
+            setSocket(new WebSocket("ws://socket:5000"));
         })
         .catch(error => {
             // setErrorMsg("Internal error");
@@ -45,6 +24,33 @@ export function Proto() {
             navigate('/projects');
         });
     }, [userContext.user, urlName, navigate]);
+
+    useEffect(() => {
+        if (!socket) return;
+
+        socket.onerror = (error) => {
+            socket.close();
+            console.log(`[error] ${error}`);
+        };
+        socket.onclose = (event) => {
+            if (event.wasClean) {
+                console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+            } else {
+                // e.g. server process killed or network down
+                // event.code is usually 1006 in this case
+                console.log('[close] Connection died');
+            }
+        };
+        socket.onopen = () => {
+            console.log('connected')
+            const msg = JSON.stringify({"action":"connectRoom", "roomName" : urlName, "author": userContext.user}) // à traduire en nom ou le stocker
+            socket.send(msg);
+        };
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data)
+            console.log(data);
+        };
+    }, [socket]);
 
     // récupérer websocket prête à l'emploi
 
