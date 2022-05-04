@@ -3,8 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 //@ts-ignore
-import { Tree } from 'react-tree-graph';
-
+//import { Tree } from 'react-tree-graph';
+import { CustomTree} from "../../../components/Tree/Tree";
 import { postProjectExistForUser } from '../../../partners/rest';
 import { useUserContext } from '../../../session/user';
 
@@ -85,11 +85,7 @@ export function Specs() {
             </div>
             <div>
                 specs section
-                <Tree
-                    data={data}
-                    height={400}
-                    width={600}
-                />
+                <CustomTree/>
             </div>
         </section>
     );

@@ -16,10 +16,10 @@ import {CreateUser} from './pages/user/CreateUser';
 import {Login} from './pages/user/Login';
 import {Profile} from './pages/user/Profile';
 import {Projects} from './pages/Projects';
-import {CreateProject} from './pages/project/CreateProject';
-import {Detail} from './pages/project/Detail';
-import {Specs} from './pages/project/Specs';
-import {Proto} from './pages/project/Proto';
+import {CreateProject} from './pages/Project/CreateProject';
+import {Detail} from './pages/Project/Detail';
+import {Specs} from './pages/Project/Specs';
+import {Proto} from './pages/Project/Proto';
 
 import './index.scss';
 
