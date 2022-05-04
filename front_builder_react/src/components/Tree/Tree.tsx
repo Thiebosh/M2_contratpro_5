@@ -34,37 +34,32 @@ const debugData = [
 // }
 export function CustomTree(){
     // formatData(data)
-    // const [tree, setTree] = useState<any>();
+    const [state, setTree] = useState<any>({
+        data:debugData
+    });
     return (
         <div id="treeContent" style={{width: '1500px', height: '1000px'}}>
             <Tree
-                data={debugData}
+                data={state.data}
                 translate={{x:750,y:500}}
                 onNodeClick={(nodeData:any) => {
-                    console.log(nodeData);
                     if (nodeData.data.type === "adding"){
-                        console.log("adding");
-                        console.log(nodeData);
-                        let newNode = clone(nodeData.parent.children[0])
-                        newNode.x = -135;
-                        newNode.y = 285;
-                        nodeData.parent.children.push(newNode);
-                        console.log(nodeData)
-                        // setTree({nodeData})
-                        // const nextData = clone(state.data)[0];
-                        // console.log(nextData)
-                        // const target = nextData.children;
-                        // console.log(target);
-                        // const nextData = clone(nodeData.parent);
-                        // console.log(nextData.children)
-                        // const target = nextData?.children;
-                        // target[0].children.push({
-                        //     name: "12",
-                        //     children:[
-                                
-                        //     ]
-                        //   });
-                        // state = nextData;
+                        const nextData:any = clone(state.data)
+                        console.log(nextData[0])
+                        const target = nextData[0].children;
+                        target.push({
+                            name:"new",
+                            type:"array",
+                            children:[{
+                                name:"1",
+                                type:"object"
+
+                            }
+                            ]
+                        });
+                        setTree({
+                            data:nextData
+                        })
                     }
                 }}
             />
