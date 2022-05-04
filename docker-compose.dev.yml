@@ -4,30 +4,39 @@ services:
     front:
         build:
             context: ./front_builder_react/
+            dockerfile: Dockerfile.dev
             args:
-                arg_port: 5000
+                arg_port: 3000
                 rest_url: "http://rest:5000"
                 ws_url: "ws://socket:5000"
         ports:
-            - "80:5000" # http
-            - "443:5000" # https
+            - "8080:3000" # http
+            # - "443:3000" # https
+        volumes:
+            - "./front_builder_react/public/:/app/public/"
+            - "./front_builder_react/src/:/app/src/"
         # restart: always
 
     rest:
         build:
             context: ./rest_server/
+            dockerfile: Dockerfile.dev
             args:
                 arg_port: 5000
         # ports:
         #     - "8001:5000"
         env_file:
             - ./.env
+        volumes:
+            - "./rest_server/src/:/src/"
+            - "./rest_server/credentials/:/credentials/"
         tty: true # bind console
-        restart: always
+        restart: on-failure
 
     socket:
         build:
             context: ./websocket_server/
+            dockerfile: Dockerfile.dev
             args:
                 arg_port: 5000
                 php_url: "http://render:5000"
@@ -35,6 +44,10 @@ services:
         #     - "8002:5000"
         env_file:
             - ./.env
+        volumes:
+            - "./websocket_server/src/:/src/"
+            - "./websocket_server/cpp/:/src/brique2/cpp/"
+            - "./websocket_server/credentials/:/credentials/"
         tty: true # bind console
         # restart: always
         depends_on:
@@ -43,9 +56,12 @@ services:
     render:
         build:
             context: ./render_server/
+            dockerfile: Dockerfile.dev
             args:
                 arg_port: 5000
         # ports:
         #     - "8003:5000"
+        volumes:
+            - "./render_server/src/:/app/"
         tty: true # bind console
         restart: always
