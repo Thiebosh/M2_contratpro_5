@@ -1,12 +1,22 @@
 # step 1 - build the final image
-FROM python:3.9-alpine as server
+FROM nginx:1.17.8-alpine as server
 
-WORKDIR /app
+WORKDIR /var/www
 
-ARG arg_port
-EXPOSE $arg_port
+COPY nginx/nginx.conf /etc/nginx/conf.d
 
-CMD ["python", "-m", "http.server", "5000"]
+## add permissions for nginx user
+RUN chown -R nginx:nginx /var/cache/nginx && \
+    chown -R nginx:nginx /var/log/nginx && \
+    touch /var/run/nginx.pid && \
+    chown -R nginx:nginx /var/run/nginx.pid && \
+    chown -R nginx:nginx /etc/nginx/conf.d && \
+    chmod 003 /var/www
+
+EXPOSE 8080
+USER nginx
+
+CMD ["nginx", "-g", "daemon off;"]
 
 
 # step2 - pull official base image and build app

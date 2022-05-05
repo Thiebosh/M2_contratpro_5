@@ -4,7 +4,7 @@ export async function _postRequest(url: string, data: {}) {
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
     }
-    const response: Response = await fetch('http://rest:5000' + url, params); //process.env.BACKEND_URL
+    const response: Response = await fetch('http://127.0.0.1:8001' + url, params); //process.env.BACKEND_URL
     if (!response.ok) {
         return response.text().then(text => {throw new Error(text)});
     }
