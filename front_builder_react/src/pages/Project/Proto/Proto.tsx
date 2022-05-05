@@ -16,7 +16,7 @@ export function Proto() {
         postProjectExistForUser(userContext.user, urlName || "")
         .then((data) => data.id || navigate('/projects'))
         .then(() => {
-            setSocket(new WebSocket("ws://socket:5000"));
+            setSocket(new WebSocket("ws://localhost:8002"));
         })
         .catch(error => {
             // setErrorMsg("Internal error");

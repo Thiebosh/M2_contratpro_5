@@ -1,6 +1,8 @@
 import requests # eventuellement requests_async mais à voir car doit garder session
 from requests.exceptions import RequestException
 
+import os # tmp
+
 class PhpPartner():
     def __init__(self, base_url, state=None) -> None:
         self.base_url = base_url
@@ -34,10 +36,14 @@ class PhpPartner():
 
 
     def _get(self, endpoint, print_=False, get_code=False):
+        if bool(os.environ.get('RENDER_STATE', default="False")):
+            return True, {}
         return self._call(lambda: self.session.get(url=f"{self.base_url}?action={endpoint}"), endpoint, print_, get_code)
 
 
     def _post(self, endpoint, data, print_=False, get_code=False):
+        if bool(os.environ.get('RENDER_STATE', default="False")):
+            return True, {}
         return self._call(lambda: self.session.post(url=f"{self.base_url}?action={endpoint}", data=data), endpoint, print_, get_code)
 
 
