@@ -19,7 +19,7 @@ class Server():
             "db": db or MongoPartner(f"mongodb+srv://{os.environ.get('MONGO_USERNAME')}:{os.environ.get('MONGO_PASSWORD')}@{os.environ.get('MONGO_URL')}"),
             "storage": storage or DrivePartner(creds_path=os.environ.get('DRIVE_PATH'), scopes=['https://www.googleapis.com/auth/drive']),
             "generator": generator or CppPartner(exe_path=os.environ.get('CPP_PATH')),
-            "renderer": renderer or PhpPartner(base_url=os.environ.get('PHP_URL'))
+            "renderer": renderer or PhpPartner(base_url=os.environ.get('PHP_URL'), state=bool(os.environ.get('RENDER_STATE', default="False")))
         }
         self.inputs = []
         self.polling_freq = 0.5
