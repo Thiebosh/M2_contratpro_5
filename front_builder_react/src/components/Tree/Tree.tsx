@@ -34,18 +34,15 @@ const debugData = [
 // }
 export function CustomTree(){
     // formatData(data)
-    const [state, setTree] = useState<any>({
-        data:debugData
-    });
+    const [tree, setTree] = useState<any>(debugData);
     return (
         <div id="treeContent" style={{width: '1500px', height: '1000px'}}>
             <Tree
-                data={state.data}
+                data={tree}
                 translate={{x:750,y:500}}
                 onNodeClick={(nodeData:any) => {
                     if (nodeData.data.type === "adding"){
-                        const nextData:any = clone(state.data)
-                        console.log(nextData[0])
+                        const nextData:any = clone(tree)
                         const target = nextData[0].children;
                         target.push({
                             name:"new",
@@ -57,9 +54,7 @@ export function CustomTree(){
                             }
                             ]
                         });
-                        setTree({
-                            data:nextData
-                        })
+                        setTree(nextData)
                     }
                 }}
             />
