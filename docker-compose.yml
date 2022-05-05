@@ -31,8 +31,8 @@ services:
             args:
                 arg_port: 5000
                 php_url: "http://render:5000"
-        # ports:
-        #     - "8002:5000"
+        ports:
+            - "8002:5000"
         env_file:
             - ./.env
         tty: true # bind console
