@@ -10,7 +10,7 @@ import './CreateProject.scss';
 
 export function CreateProject() {
     const navigate = useNavigate();
-    const userId = useUserContext().user;
+    const userId = useUserContext().user.id;
 
     const [name, setName] = useState<string>("");
     const [currentCollabIds, setCurrentCollabIds] = useState<string[]>([userId]);

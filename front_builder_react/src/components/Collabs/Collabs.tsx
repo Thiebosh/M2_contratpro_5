@@ -36,7 +36,7 @@ interface CollabsInputProps {
     setErrorMsg: React.Dispatch<React.SetStateAction<string>>
 }
 export function CollabsInput(props:CollabsInputProps):JSX.Element {
-    const userId = useUserContext().user;
+    const userId = useUserContext().user.id;
 
     const initialCollabIds = props.initialCollabIds;
     const currentCollabIds = props.currentCollabIds;

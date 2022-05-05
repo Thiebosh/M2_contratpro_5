@@ -13,8 +13,10 @@ function Card() {
     return (
         <div className='card'>
             {
-                userContext.user ? 
+                userContext.user.id ?
                     <>
+                        <p>{userContext.user.name}</p>
+                        <hr/>
                         <a href='/user/profile'>Account</a>
                         <hr/>
                         <a href='/' onClick={userContext.removeUser}>Logout</a>

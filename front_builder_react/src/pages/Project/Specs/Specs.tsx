@@ -51,14 +51,14 @@ export function Specs() {
     const userContext = useUserContext();
 
     useEffect(() => {
-        postProjectExistForUser(userContext.user, urlName || "")
+        postProjectExistForUser(userContext.user.id, urlName || "")
         .then((data) => data.id || navigate('/projects'))
         .catch(error => {
             // setErrorMsg("Internal error");
             console.log("Error:", error);
             navigate('/projects');
         });
-    }, [userContext.user, urlName, navigate]);
+    }, [userContext.user.id, urlName, navigate]);
 
     // récupérer websocket prête à l'emploi
 

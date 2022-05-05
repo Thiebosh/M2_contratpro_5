@@ -23,7 +23,7 @@ interface ProjectProps {
     last_proto: string;
 }
 function Project(props: ProjectProps) {
-    const userId = useUserContext().user;
+    const userId = useUserContext().user.id;
     const nullableDate = (date:string) => (date && moment(date).format(dateFormat)) || <>-</>;
     return (
         <tr>
@@ -37,7 +37,7 @@ function Project(props: ProjectProps) {
 }
 
 export function Projects() {
-    const userId = useUserContext().user;
+    const userId = useUserContext().user.id;
 
     const [projects, setProjects] = useState<ProjectProps[]>([]);
 

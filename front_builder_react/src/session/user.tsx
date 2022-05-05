@@ -8,12 +8,14 @@ const userKey = "user";
 
 interface timedUser {
     userId:string,
+    userName:string,
     valid:string,
 }
 
-function refreshSetUser(userId:string) {
+function refreshSetUser(userId:string, userName:string) {
     const storage:timedUser = {
         userId: userId,
+        userName: userName,
         valid: moment().add(sessionDuration, 'minutes').toISOString()
     };
     localStorage.setItem(userKey, JSON.stringify(storage));
@@ -29,23 +31,29 @@ function refreshGetUser() {
         return null;
     }
 
-    refreshSetUser(storage.userId);
-    return storage.userId;
+    refreshSetUser(storage.userId, storage.userName);
+    return { 
+        id: storage.userId,
+        name: storage.userName,
+    };
 }
 
 export function requireNoUser(component:JSX.Element):JSX.Element {
-    return (refreshGetUser() ? <Navigate to="/user/profile"/> : component);
+    return (refreshGetUser()?.id ? <Navigate to="/user/profile"/> : component);
 }
 
 export function requireUser(component:JSX.Element):JSX.Element {
-    return (refreshGetUser() ? component : <Navigate to="/user/login"/>);
+    return (refreshGetUser()?.id ? component : <Navigate to="/user/login"/>);
 }
 
 export function userContextMethods(triggerRefresh:React.Dispatch<React.SetStateAction<boolean>>) {
     return {
-        user: refreshGetUser() || '',
-        setUser: (userId: string) => {
-            refreshSetUser(userId);
+        user: refreshGetUser() || {
+            id: '',
+            name: ''
+        },
+        setUser: (userId: string, userName: string) => {
+            refreshSetUser(userId, userName);
             triggerRefresh(true);
         },
         removeUser: () => {
@@ -55,8 +63,11 @@ export function userContextMethods(triggerRefresh:React.Dispatch<React.SetStateA
     };
 }
 export const userContext = createContext({
-    user: '',
-    setUser: (userId:string) => {},
+    user: {
+        id: '',
+        name: ''
+    },
+    setUser: (userId:string, userName:string) => {},
     removeUser: () => {}
 });
 export const useUserContext = () => useContext(userContext);

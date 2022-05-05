@@ -69,6 +69,13 @@
             flex-direction: column;
             align-items: stretch;
 
+            p, a {
+                color: rgb(26, 32, 44);
+                line-height: 24px;
+                padding: 6px 12px;
+                margin: 0;
+            }
+
             a {
                 text-align: left;
                 color: rgb(26, 32, 44);

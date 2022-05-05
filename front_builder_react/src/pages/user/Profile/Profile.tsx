@@ -42,7 +42,7 @@ function Edit(props:EditProps) {
             return;
         }
 
-        postAccountUpdate(userContext.user, name, password)
+        postAccountUpdate(userContext.user.id, name, password)
         .then((data) => {
             if (data.success === "already exist") {
                 setErrorMsg("Username already used");
@@ -58,7 +58,7 @@ function Edit(props:EditProps) {
     }
 
     function triggerDelete() {
-        postAccountDelete(userContext.user)
+        postAccountDelete(userContext.user.id)
         .then((data) => {
             if (!data.success) {
                 setDeleteMsg("Something wrong appened");
@@ -115,14 +115,14 @@ export function Profile() {
     const editOff = () => setEdit(false);
 
     useEffect(() => {
-        postAccountGet(userContext.user)
+        postAccountGet(userContext.user.id)
         .then((data) => {
             setName(data.name);
         })
         .catch(error => {
             console.log("Error:", error);
         });
-    }, [userContext.user]);
+    }, [userContext.user.id]);
 
     return (
         <section id='profile'>

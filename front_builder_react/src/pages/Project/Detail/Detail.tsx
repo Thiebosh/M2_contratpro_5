@@ -67,7 +67,7 @@ function Edit(props:EditProps) {
 export function Detail() {
     const navigate = useNavigate();
     const { urlName } = useParams();
-    const userId = useUserContext().user;
+    const userId = useUserContext().user.id;
 
     const [projectId, setProjectId] = useState<string>('');
     const [projectName, setProjectName] = useState<string>('');

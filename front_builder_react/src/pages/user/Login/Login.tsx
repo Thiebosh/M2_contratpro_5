@@ -39,7 +39,7 @@ export function Login() {
                 setErrorMsg("Credentials invalid");
                 return;
             }
-            userContext.setUser(data.id);
+            userContext.setUser(data.id, name);
             navigate('/projects');
         })
         .catch(error => {
