@@ -49,7 +49,7 @@ export function Proto() {
         socket.onopen = () => {
             console.log('connected')
             console.log("send ",projectId, userContext.user.name)
-            const msg = JSON.stringify({"action":"connectRoom", "roomName" : urlName, "author": userContext.user.name})
+            const msg = JSON.stringify({"action":"connectRoom", "roomId" : projectId, "author": userContext.user.name}) // add arg for specs or render
             socket.send(msg);
         };
         socket.onmessage = (event) => {

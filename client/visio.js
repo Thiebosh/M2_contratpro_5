@@ -6,7 +6,7 @@ $(function () {
     socket.onopen = function(event) {
         console.log("[open] Connection established");
         console.log("Sending to server");
-        msg = JSON.stringify({"action":"connectRoom", "roomName" : "test", "author": "moi"})
+        msg = JSON.stringify({"action":"connectRoom", "roomId" : "test", "author": "moi"})
         socket.send(msg);
     };
 

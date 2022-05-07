@@ -5,12 +5,12 @@ import json
 from input_manager import InputManager
 
 class Room():
-    def __init__(self, room_name, partners, callback_update_server_sockets, callback_remove_room, encoding) -> None:
-        print(f"{room_name} - Create room...")
+    def __init__(self, room_id, partners, callback_update_server_sockets, callback_remove_room, encoding) -> None:
+        print(f"{room_id} - Create room...")
         self.close_evt = threading.Event()
         self.queue = queue.Queue()
         self.lock = threading.Lock()
-        self.room_name = room_name
+        self.room_id = room_id
         self.socket_name = {}
         self.inputs = []
         self.outputs = []
@@ -20,17 +20,17 @@ class Room():
         self.partners = partners
 
         self.encoding = encoding
-        self.input_manager = InputManager(room_name, self.partners, self.send_conflict_message)
-        print(f"{room_name} - Room created")
+        self.input_manager = InputManager(room_id, self.partners, self.send_conflict_message)
+        print(f"{room_id} - Room created")
 
 
     async def close(self):
-        print(f"{self.room_name} - Closing room...")
+        print(f"{self.room_id} - Closing room...")
         for socket in self.inputs:
             socket.close()
         await self.input_manager.close()
-        self.callback_remove_room(self.room_name)
-        print(f"{self.room_name} - Room closed")
+        self.callback_remove_room(self.room_id)
+        print(f"{self.room_id} - Room closed")
 
 
     def get_param(self):
@@ -55,7 +55,7 @@ class Room():
 
 
     def close_client_connection_to_room(self, socket):
-        print(f"{self.room_name} - Close client")
+        print(f"{self.room_id} - Close client")
         if socket in self.outputs:
             self.outputs.remove(socket)
         self.inputs.remove(socket)
@@ -100,7 +100,7 @@ class Room():
         self.input_manager.inputs = [input_unit for input_unit in self.input_manager.inputs if input_unit.check_datetime() and not input_unit.failed]
 
     async def run(self, polling_freq=0.1):
-        print(f"{self.room_name} - Room ready")
+        print(f"{self.room_id} - Room ready")
         while not self.close_evt.is_set() and self.inputs:
             with self.lock:
                 while not self.queue.empty():
@@ -120,7 +120,7 @@ class Room():
                 try:
                     msg = json.loads(msg)
                 except json.JSONDecodeError:
-                    print(f"{self.room_name} - malformed json : {msg}")
+                    print(f"{self.room_id} - malformed json : {msg}")
                     # self.close_client_connection_to_room(socket)
                     continue
 

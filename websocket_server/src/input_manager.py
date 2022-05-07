@@ -6,16 +6,16 @@ from brique3.render_page import RenderPage
 import json
 
 class InputManager():
-    def __init__(self, room_name, partners, send_conflict_message_callback) -> None:
+    def __init__(self, room_id, partners, send_conflict_message_callback) -> None:
         self.partners = partners
-        self.room_name = room_name
+        self.room_id = room_id
         self.send_conflict_message_callback = send_conflict_message_callback
 
         self.inputs: "list[Input]" = []
 
-        self.json_handler = JsonHandler(partners, room_name)
-        self.files_manager = FilesManager(partners, room_name)
-        self.render_page = RenderPage(partners, room_name)
+        self.json_handler = JsonHandler(partners, room_id)
+        self.files_manager = FilesManager(partners, room_id)
+        self.render_page = RenderPage(partners, room_id)
 
         # tmp test
         # with open(f"{pathlib.Path(__file__).parent.absolute()}/brique2/needs.json", 'r') as file:
@@ -76,11 +76,11 @@ class InputManager():
 
         elif action == "generate":
             if self.json_handler.current_version_generated:
-                print(f"{self.room_name} - Project files already generated")
+                print(f"{self.room_id} - Project files already generated")
                 return True
 
             result = await self.files_manager.generate_files(json.dumps(self.json_handler.data))
-            print(f"{self.room_name} - Project files {'well' if result else 'not'} generated")
+            print(f"{self.room_id} - Project files {'well' if result else 'not'} generated")
 
             if result is False:
                 return False
@@ -88,7 +88,7 @@ class InputManager():
             self.json_handler.current_version_generated = result
 
             result = self.files_manager.update_stored_files()
-            print(f"{self.room_name} - Project files {'well' if result else 'not'} updated")
+            print(f"{self.room_id} - Project files {'well' if result else 'not'} updated")
 
         elif action == "execute":
             success, content = self.render_page.page(input_to_process.get_page())

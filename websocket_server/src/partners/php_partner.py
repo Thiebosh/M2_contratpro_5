@@ -47,33 +47,33 @@ class PhpPartner():
         return self._call(lambda: self.session.post(url=f"{self.base_url}?action={endpoint}", data=data), endpoint, print_, get_code)
 
 
-    def set_project_folder(self, project_name):
-        return self._post("create_folder", { "project_name": project_name })[0]
+    def set_project_folder(self, project_id):
+        return self._post("create_folder", { "project_name": project_id })[0]
 
 
-    def set_project_files(self, project_name, files):
+    def set_project_files(self, project_id, files):
         print("upload all files")
 
         for file in files:
             data = { 
-                "project_name": project_name,
+                "project_name": project_id,
                 "file_name": file['name'],
                 "file_content": file['content']
             }
             if not self._post("create_file", data)[0]:
                 return False
 
-        print("finish all files")
+        print("finish uploading all files")
 
         return True
 
 
-    def unset_project_files(self, project_name):
-        return self._post("remove_files", { "project_name": project_name })[0]
+    def unset_project_files(self, project_id):
+        return self._post("remove_files", { "project_name": project_id })[0]
 
 
-    def unset_project_folder(self, project_name):
-        return self._post("remove_folder", { "project_name": project_name })[0]
+    def unset_project_folder(self, project_id):
+        return self._post("remove_folder", { "project_name": project_id })[0]
 
 
     def set_session(self, session):
@@ -84,9 +84,9 @@ class PhpPartner():
         return self._get("get_session")
 
 
-    def get_project_page(self, project_name, page):
+    def get_project_page(self, project_id, page):
         data = {
-            "project_name": project_name,
+            "project_name": project_id,
             "page": page
         }
         return self._post("execute", data, get_code=True)

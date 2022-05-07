@@ -96,13 +96,13 @@ class Server():
                     self.close_client_connection(input_socket)
                     continue
 
-                if "action" in target and target["action"] == "connectRoom" and "author" in target:
+                if "action" in target and target["action"] == "connectRoom" and "author" in target: # add arg for specs or render
                     # plus tard : recupere name dans la db ici plutot que dans target
-                    if not target["roomName"] in self.room_m.rooms:
-                        self.room_m.create_room(target["roomName"], input_socket, target["author"], self.callback_update_server_sockets, self.encoding)
+                    if not target["roomId"] in self.room_m.rooms:
+                        self.room_m.create_room(target["roomId"], input_socket, target["author"], self.callback_update_server_sockets, self.encoding)
 
                     else:
-                        self.room_m.add_client_to_room(target["roomName"], input_socket, target["author"])
+                        self.room_m.add_client_to_room(target["roomId"], input_socket, target["author"])
 
                 self.inputs.remove(input_socket)
 

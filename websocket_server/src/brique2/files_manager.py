@@ -1,37 +1,25 @@
 import os
 
-COLLECTION_PROJECTS = "projects"
-
 class FilesManager():
-    def __init__(self, partners, project_name) -> None:
+    def __init__(self, partners, project_id) -> None:
         self.partners = partners
-        self.project_name = project_name
+        self.project_id = project_id
         self.files_currently_stored = True
 
-        filter_q = {
-            "name": self.project_name
-        }
-        fields = {
-            "_id": 0,
-            "id": {
-                "$toString": "$_id"
-            },
-        }
-        self.project_id = self.partners["db"].find_one(COLLECTION_PROJECTS, filter_q, fields)["id"]
         if not self.project_id:
             raise Exception("FilesGenerator - __init__: unknow project name")
 
         self.files = self.partners["storage"].download_files_from_folder(self.project_id)
 
-        if not self.partners["renderer"].set_project_folder(self.project_name):
-            raise Exception(f"{self.project_name} - PHP - folder not created")
+        if not self.partners["renderer"].set_project_folder(self.project_id):
+            raise Exception(f"{self.project_id} - PHP - folder not created")
 
         # tmp secure
-        if not self.partners["renderer"].unset_project_files(self.project_name):
-            raise Exception(f"{self.project_name} - PHP - folder emptiness pb")
+        if not self.partners["renderer"].unset_project_files(self.project_id):
+            raise Exception(f"{self.project_id} - PHP - folder emptiness pb")
 
-        if not self.partners["renderer"].set_project_files(self.project_name, self.files):
-            raise Exception(f"{self.project_name} - PHP - files not uploaded")
+        if not self.partners["renderer"].set_project_files(self.project_id, self.files):
+            raise Exception(f"{self.project_id} - PHP - files not uploaded")
 
 
     def _test(self):
@@ -57,16 +45,16 @@ class FilesManager():
 
 
     def close(self):
-        result = self.partners["renderer"].unset_project_files(self.project_name)
-        print(f"{self.project_name} - PHP - Project files {'well' if result else 'not'} removed")
+        result = self.partners["renderer"].unset_project_files(self.project_id)
+        print(f"{self.project_id} - PHP - Project files {'well' if result else 'not'} removed")
         if result is False:
             return
-        result = self.partners["renderer"].unset_project_folder(self.project_name)
-        print(f"{self.project_name} - PHP - Project directory {'well' if result else 'not'} removed")
+        result = self.partners["renderer"].unset_project_folder(self.project_id)
+        print(f"{self.project_id} - PHP - Project directory {'well' if result else 'not'} removed")
 
 
     async def generate_files(self, specs_json):
-        filepath = f"/src/brique2/cpp/{self.project_name}.json"
+        filepath = f"/src/brique2/cpp/{self.project_id}.json"
         open(filepath, "w").write(specs_json)
         args = (filepath,)
 
@@ -93,22 +81,22 @@ class FilesManager():
 
     def update_stored_files(self):
         if self.files_currently_stored:
-            print(f"{self.project_name} - Project files already stored")
+            print(f"{self.project_id} - Project files already stored")
             return True
 
         result = self.partners["storage"].upload_files_to_folder(self.project_id, self.files)
         if not result:
-            print(f"{self.project_name} - Project upload to storage failed")
+            print(f"{self.project_id} - Project upload to storage failed")
             return False
 
-        result = self.partners["renderer"].unset_project_files(self.project_name) # use id when ready
+        result = self.partners["renderer"].unset_project_files(self.project_id)
         if not result:
-            print(f"{self.project_name} - Project upload to renderer step1/2 failed")
+            print(f"{self.project_id} - Project upload to renderer step1/2 failed")
             return False
 
-        result = self.partners["renderer"].set_project_files(self.project_name, self.files) # use id when ready
+        result = self.partners["renderer"].set_project_files(self.project_id, self.files)
         if not result:
-            print(f"{self.project_name} - Project upload to renderer step2/2 failed")
+            print(f"{self.project_id} - Project upload to renderer step2/2 failed")
             return False
 
         self.files_currently_stored = True
