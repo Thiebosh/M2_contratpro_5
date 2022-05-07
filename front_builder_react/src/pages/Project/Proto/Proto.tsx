@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { init_websocket } from '../../..';
 
 import { postProjectExistForUser } from '../../../partners/rest';
 import { useUserContext } from '../../../session/user';
@@ -10,7 +11,6 @@ export function Proto() {
     const navigate = useNavigate();
     const { urlName } = useParams();
     const userContext = useUserContext();
-    const [projectId, setProjectId] = useState<string>();
     const [socket, setSocket] = useState<WebSocket>();
 
     useEffect(() => {
@@ -20,45 +20,25 @@ export function Proto() {
                 navigate('/projects');
                 return;
             }
-            setProjectId(data.id);
+            setSocket(init_websocket('proto', data.id, userContext.user.name));
         })
-        .then(() => setSocket(new WebSocket("ws://localhost:8002")))
         .catch(error => {
             // setErrorMsg("Internal error");
             console.log("Error:", error);
             navigate('/projects');
         });
-    }, [userContext.user.id, urlName, navigate]);
+    }, [userContext.user, urlName, navigate]);
 
     useEffect(() => {
-        if (!projectId || !socket) return;
+        if (!socket) return;
 
-        socket.onerror = (error) => {
-            socket.close();
-            console.log(`[error] ${error}`);
-        };
-        socket.onclose = (event) => {
-            if (event.wasClean) {
-                console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-            } else {
-                // e.g. server process killed or network down
-                // event.code is usually 1006 in this case
-                console.log('[close] Connection died');
-            }
-        };
-        socket.onopen = () => {
-            console.log('connected')
-            console.log("send ",projectId, userContext.user.name)
-            const msg = JSON.stringify({"action":"connectRoom", "roomId" : projectId, "author": userContext.user.name}) // add arg for specs or render
-            socket.send(msg);
-        };
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data)
             console.log(data);
         };
-    }, [projectId, socket, userContext.user.name]);
 
-    // récupérer websocket prête à l'emploi
+        return () => socket.close();
+    }, [socket]);
 
     return (
         <section id="proto">

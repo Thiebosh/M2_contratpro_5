@@ -62,7 +62,7 @@ export function userContextMethods(triggerRefresh:React.Dispatch<React.SetStateA
         }
     };
 }
-export const userContext = createContext({
+const userContext = createContext({
     user: {
         id: '',
         name: ''
@@ -70,4 +70,5 @@ export const userContext = createContext({
     setUser: (userId:string, userName:string) => {},
     removeUser: () => {}
 });
+export const UserProvider = userContext.Provider;
 export const useUserContext = () => useContext(userContext);

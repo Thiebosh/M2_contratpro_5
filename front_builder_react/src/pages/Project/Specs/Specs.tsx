@@ -1,16 +1,14 @@
-import { useEffect } from 'react';
+import { useEffect/*, useState*/ } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
-//@ts-ignore
-//import { Tree } from 'react-tree-graph';
 import { CustomTree} from "../../../components/Tree/Tree";
 import { postProjectExistForUser } from '../../../partners/rest';
 import { useUserContext } from '../../../session/user';
 
-import './Specs.scss';
+// import { init_websocket } from '../../..';
 
-//react-tree-graph est installé par défaut mais il existe aussi une librairie d3 (le premier est une surcouche du second)
+import './Specs.scss';
 
 //base library
 //https://github.com/react-d3-library/react-d3-library
@@ -49,18 +47,34 @@ export function Specs() {
     const navigate = useNavigate();
     const { urlName } = useParams();
     const userContext = useUserContext();
+    // const [socket, setSocket] = useState<WebSocket>();
 
     useEffect(() => {
         postProjectExistForUser(userContext.user.id, urlName || "")
-        .then((data) => data.id || navigate('/projects'))
+        .then((data) => {
+            if (!data.id) {
+                navigate('/projects');
+                return;
+            }
+            // setSocket(init_websocket('specs', data.id, userContext.user.name));
+        })
         .catch(error => {
             // setErrorMsg("Internal error");
             console.log("Error:", error);
             navigate('/projects');
         });
-    }, [userContext.user.id, urlName, navigate]);
+    }, [userContext.user, urlName, navigate]);
 
-    // récupérer websocket prête à l'emploi
+    // useEffect(() => {
+    //     if (!socket) return;
+
+    //     socket.onmessage = (event) => {
+    //         const data = JSON.parse(event.data)
+    //         console.log(data);
+    //     };
+
+    //     return () => socket.close();
+    // }, [socket]);
 
     const data = {
         children: [

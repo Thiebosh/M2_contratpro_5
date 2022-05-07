@@ -6,7 +6,7 @@ import {
 	Route,
     Navigate
 } from 'react-router-dom';
-import {requireNoUser, requireUser, userContext, userContextMethods} from './session/user';
+import {requireNoUser, requireUser, UserProvider, userContextMethods} from './session/user';
 
 import {NavBar} from './components/NavBar';
 
@@ -26,15 +26,40 @@ import './index.scss';
 export const sessionDuration = 20; //min
 export const dateFormat = "YYYY/MM/DD HH:mm";
 
+export function init_websocket(target:'specs'|'proto', projectId:string, username:string) {
+    const socket = new WebSocket("ws://localhost:8002");
+
+    socket.onopen = () => {
+        console.log('connecting...');
+        socket.send(JSON.stringify({
+            action: "connectRoom",
+            roomId: projectId,
+            author: username,
+            target: target
+        }));
+        console.log('connected');
+    };
+    socket.onerror = (error) => {
+        socket.close();
+        console.log(`[error] ${error}`);
+    };
+    socket.onclose = (event) => {
+        if (event.wasClean) {
+            console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+        } else {
+            console.log('[close] Connection died');
+        }
+    };
+
+    return socket;
+}
+
 function App():JSX.Element {
     const triggerRefresh = useState<boolean>(false)[1];
     return (
         <>
-            <userContext.Provider value={userContextMethods(triggerRefresh)}>
+            <UserProvider value={userContextMethods(triggerRefresh)}>
                 <NavBar/>
-                {/* ajouter websocket prodiver dans un composant dédié qui surveille les patterns de route et qui manipule la socket en fonction :
-                si project/:name/quelque chose, crée et initie si pas déjà le cas ; sinon, ferme si pas déjà le cas */}
-                {/* https://dev.to/itays123/using-websockets-with-react-js-the-right-way-no-library-needed-15d0 */}
                 <Router>
                     <Routes>
                         <Route path="/" element={<Navigate replace to="/home" />} />
@@ -50,7 +75,7 @@ function App():JSX.Element {
                         <Route path="/*" element={<NotFound/>} />
                     </Routes>
                 </Router>
-            </userContext.Provider>
+            </UserProvider>
         </>
     );
 }
