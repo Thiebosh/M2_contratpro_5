@@ -26,7 +26,7 @@ import './index.scss';
 export const sessionDuration = 20; //min
 export const dateFormat = "YYYY/MM/DD HH:mm";
 
-export function init_websocket(target:'specs'|'proto', projectId:string, username:string) {
+export function init_websocket(type:'specs'|'proto', projectId:string, username:string) {
     const socket = new WebSocket("ws://localhost:8002");
 
     socket.onopen = () => {
@@ -35,7 +35,7 @@ export function init_websocket(target:'specs'|'proto', projectId:string, usernam
             action: "connectRoom",
             roomId: projectId,
             author: username,
-            target: target
+            type: type
         }));
         console.log('connected');
     };

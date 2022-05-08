@@ -18,7 +18,8 @@ class PhpPartner():
         if hasattr(self, "state") and self.state is False:
             return False, ""
 
-        print("php - call", endpoint)
+        if print_:
+            print("php - call", endpoint)
         try:
             result:requests.Response = method_callback()
         except RequestException:
@@ -52,7 +53,7 @@ class PhpPartner():
 
 
     def set_project_files(self, project_id, files):
-        print("upload all files")
+        # print("upload all files")
 
         for file in files:
             data = { 
@@ -63,7 +64,7 @@ class PhpPartner():
             if not self._post("create_file", data)[0]:
                 return False
 
-        print("finish uploading all files")
+        # print("finish uploading all files")
 
         return True
 

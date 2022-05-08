@@ -13,7 +13,7 @@ from partners.php_partner import PhpPartner
 
 class Server():
     def __init__(self, websocket=None, db=None, storage=None, generator=None, renderer=None) -> None:
-        print("Starting server...")
+        print("SERVER - Starting...")
         self.partners = {
             "websocket": websocket or WebSocketPartner(),
             "db": db or MongoPartner(f"mongodb+srv://{os.environ.get('MONGO_USERNAME')}:{os.environ.get('MONGO_PASSWORD')}@{os.environ.get('MONGO_URL')}"),
@@ -28,7 +28,7 @@ class Server():
         self.port = int(os.environ.get("PORT"))
         self.encoding = "utf-8"
         self.init_server()
-        print("server started")
+        print("SERVER - started")
 
     def init_server(self, backlog=5):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -42,7 +42,7 @@ class Server():
         return readable, exception
 
     def close(self):
-        print("Get close signal")
+        print("SERVER - Get close signal")
         for input_socket in self.inputs:
             input_socket.close()
         for room in self.room_m.rooms.values():
@@ -55,20 +55,20 @@ class Server():
                 print(f"SERVER - new connexion {client_address}")
                 self.inputs.append(new_socket)  # new input socket
             else:
-                print("failed handshake")
+                print("SERVER - failed handshake")
 
         except timeout:
-            print('websocket connection timeout')
+            print('SERVER - websocket connection timeout')
 
     def close_client_connection(self, socket):
-        print("Close client")
+        print("SERVER - Close client")
         self.inputs.remove(socket)
         socket.close()
 
     def run(self):
         self.inputs.append(self.socket) # Contient tous les sockets (serveur + toutes les rooms)
 
-        print("Server ready")
+        print("SERVER - ready")
 
         while self.inputs:
             try:
@@ -96,13 +96,15 @@ class Server():
                     self.close_client_connection(input_socket)
                     continue
 
-                if "action" in target and target["action"] == "connectRoom" and "author" in target: # add arg for specs or render
-                    # plus tard : recupere name dans la db ici plutot que dans target
-                    if not target["roomId"] in self.room_m.rooms:
-                        self.room_m.create_room(target["roomId"], input_socket, target["author"], self.callback_update_server_sockets, self.encoding)
+                if "action" in target and target["action"] == "connectRoom" \
+                    and "type" in target and target["type"] in ["specs", "proto"] \
+                    and "author" in target:
+
+                    if not f"{target['roomId']}-{target['type']}" in self.room_m.rooms:
+                        self.room_m.create_room(target['roomId'], target['type'], input_socket, target["author"], self.callback_update_server_sockets, self.encoding)
 
                     else:
-                        self.room_m.add_client_to_room(target["roomId"], input_socket, target["author"])
+                        self.room_m.add_client_to_room(target['roomId'], target['type'], input_socket, target["author"])
 
                 self.inputs.remove(input_socket)
 
@@ -113,7 +115,7 @@ class Server():
 
             self.room_m.rooms = {key: values for key, values in self.room_m.rooms.items() if not values.get_param()["close_evt"].is_set()}
 
-        print("Closing server...")
+        print("SERVER - Closing server...")
 
 
     def callback_update_server_sockets(self,socket):

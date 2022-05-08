@@ -6,9 +6,10 @@ class JsonHandler():
     def check_if_similar_keys(dict1, dict2):
         return not set(dict1).isdisjoint(dict2)
 
-    def __init__(self, partners, project_id) -> None:
+    def __init__(self, partners, project_id, room_type) -> None:
         self.partners = partners
         self.project_id = project_id
+        self.room_type = room_type
         self.json_currently_stored = True
         self.current_version_generated = False # add field to db
 
@@ -17,11 +18,11 @@ class JsonHandler():
 
     async def close(self):
         result = await self.update_storage()
-        print(f"{self.project_id} - Mongo - Project {'well' if result else 'not'} updated")
+        print(f"{self.project_id}-{self.room_type} - Mongo - Project {'well' if result else 'not'} updated")
 
 
     async def update_storage(self):
-        print(f"{self.project_id} - {'' if self.json_currently_stored else 'no '}need of db update")
+        print(f"{self.project_id}-{self.room_type} - {'no ' if self.json_currently_stored else ''}need of db update")
         if self.json_currently_stored:
             return True
 
