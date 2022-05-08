@@ -92,7 +92,7 @@ class Server():
                 try:
                     target = json.loads(target)
                 except json.JSONDecodeError:
-                    print(f"malformed json : {target}")
+                    print(f"SERVER - malformed json : '{target}'")
                     self.close_client_connection(input_socket)
                     continue
 

@@ -74,7 +74,7 @@ export function Proto() {
     useEffect(() => {
         if (!(socket && socketUsable)) return;
         socket.send(JSON.stringify({"action":"execute", "page": ""})) // no page for default page
-    }, [socketUsable]);
+    }, [socket, socketUsable]);
 
     return (
         <section id="proto">
