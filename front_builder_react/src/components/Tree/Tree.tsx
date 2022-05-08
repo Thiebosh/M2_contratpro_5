@@ -1,7 +1,6 @@
 import Tree from "react-d3-tree"
-import data from "./example.json"
 import clone from "clone";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const debugData = [
     {
@@ -35,25 +34,41 @@ const debugData = [
 export function CustomTree(){
     // formatData(data)
     const [tree, setTree] = useState<any>(debugData);
+
+    
+    
+    useEffect(() => {getDataFromJson().then((d => init(d, setTree)))}, [])
+
+
     return (
         <div id="treeContent" style={{width: '1500px', height: '1000px'}}>
             <Tree
                 data={tree}
                 translate={{x:750,y:500}}
+                transitionDuration={0.5}
                 onNodeClick={(nodeData:any) => {
                     if (nodeData.data.type === "adding"){
+                        console.log(nodeData) 
+                        //nodeData = juste en accès, uniquement pour récup infos, pas pour modifier
                         const nextData:any = clone(tree)
-                        const target = nextData[0].children;
-                        target.push({
-                            name:"new",
-                            type:"array",
-                            children:[{
-                                name:"1",
-                                type:"object"
+                        if (nodeData.parent.data.type === "array"){
+                            addChild(nextData[0], nodeData.parent.data.name)
+                            // nodeData.parent.children.push({
+                            //     name:"newObject",
+                            //     type:"object"
+                            // })
+                        }
+                        // const target = nextData[0].children;
+                        // target.push({
+                        //     name:"new",
+                        //     type:"array",
+                        //     children:[{
+                        //         name:"1",
+                        //         type:"object"
 
-                            }
-                            ]
-                        });
+                        //     }
+                        //     ]
+                        // });
                         setTree(nextData)
                     }
                 }}
@@ -62,46 +77,71 @@ export function CustomTree(){
         )
 }
 
-function formatData(node:any){
-    Object.keys(node).map((key) => {
-        console.log(node[key])
-        console.log(Array.isArray(node[key]))
-        // formatData(elem[key]);
+function addChild(node:any, name:any){
+    if (node.children){
+        if(node.name === name){
+            node.children.splice(-1,0,{
+                name:"fd"
+            })
+        } else{
+            node.children.forEach((o: any) => addChild(o,name))
+        }
+
+    }
+}
+
+function init(data:any, setTree:any){
+    // console.log(data["root"])
+    // data["root"].children = data["root"];
+    // data["root"].name = "root";
+    // console.log(data["root"])
+
+    formatData(data["root"]);
+    data = [data["root"]]
+    data.name = "root"
+    setTree(data)
+    console.log(data)
+    // console.log(debugData)
+}
+
+function getDataFromJson(){
+    return fetch("/example.json").then(data => {
+        // fetch("/syntax.json").then(syntaxTree => syntaxTree.json())
+        // console.log(data.json())
+        return data.json()
+
     })
+    // fetch("/example.json").then((data:any,jsonData:any) =>  data.json())
 
-    // //Reprendre les 2 fonctions suivantes et les adapter
-    // function rec(syntax, node, parentNode){
-    //     for (const key in node){
-    //         if (Array.isArray(node[key])){ //On rencontre un JSON Array
-    //             let arrayNode = parentNode.addArrayChild(key);
-    //             for (let i = 0; i < node[key].length; i++){
-    //                 let arrayChildNode = arrayNode.addObjectChild(arrayNode.children.length)
-    //                 rec(syntax, node[key][i], arrayChildNode)
-    //                 arrayChildNode.children.push(arrayChildNode.children.splice(0,1)[0]) //On place le "+" en dernier enfant
-                    
-    //             }
-    //             arrayNode.children.push(arrayNode.children.splice(0,1)[0]) //On place le "+" en dernier enfant
-    //         } else if (typeof node[key] === "object"){ //On rencontre un JSON Object
-    //             let objectNode = parentNode.addObjectChild(key);
-    //             rec(syntax, node[key], objectNode);
-    //             objectNode.children.push(objectNode.children.splice(0,1)[0]) //On place le "+" en dernier enfant
+}
 
-    //         } else { //On rencontre une string (on arrive au bout de la branche de l'arbre)
-    //         }
-    //     }
-    // }
 
-    // function createTreeFromJson(json){
-    // 	$.getJSON("../syntax/syntax.json", function(syntax){
-    //         $.getJSON("json/example.json",function(json){
-    //             root = new MainNode();
-    //             // root.addArrayChild("Screen");
-    //             // root.addObjectChild("test").addArrayChild("fds")
-    //             rec(syntax, json["root"], root)
-    //             root.hierarchy = d3.hierarchy(root, function(d){return d.children;});
-    //             root.update(root)
-    //         });
-    // 	});
+function formatData(data:any){
+    for (const key in data){
+        if (Array.isArray(data[key])){ // if it's an array
+            for (let i = 0; i < data[key].length; i++){
+                data[key][i].name = key
+                if (!data.children){
+                    data.children = []
+                }
+                data.children.push(data[key][i])
+                // console.log(data);
+                // data[key][i].children = data[key][i];
+                // data[key][i].name = key + "_" + i;
+                // console.log(data)
+                // data[key][i] = [data[key][i]]
+                formatData(data[key][i]);
+            }
+        } else if (typeof data[key] != "string"){ // if it"s and object
+            data[key].name = key
+            if (!data.children){
+                data.children = []
+            }
+            data.children.push(data[key])
+            formatData(data[key]);
+        } else { // if it's a string
 
-    // }
+        }
+    }
+    // console.log(data)
 }
