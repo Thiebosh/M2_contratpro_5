@@ -100,8 +100,6 @@ function init(data:any, setTree:any){
     data = [data["root"]]
     data.name = "root"
     setTree(data)
-    console.log(data)
-    // console.log(debugData)
 }
 
 function getDataFromJson(){
@@ -121,27 +119,33 @@ function formatData(data:any){
         if (Array.isArray(data[key])){ // if it's an array
             for (let i = 0; i < data[key].length; i++){
                 data[key][i].name = key
+                data[key][i].type = "array"
                 if (!data.children){
                     data.children = []
                 }
                 data.children.push(data[key][i])
-                // console.log(data);
-                // data[key][i].children = data[key][i];
-                // data[key][i].name = key + "_" + i;
-                // console.log(data)
-                // data[key][i] = [data[key][i]]
+                if (i === data[key].length -1 ){
+                    data.children.push({
+                        name:"+",
+                        type:"adding"
+                    })
+                }
                 formatData(data[key][i]);
             }
-        } else if (typeof data[key] != "string"){ // if it"s and object
+        } else if (typeof data[key] != "string"){ // if it's and object
             data[key].name = key
+            data[key].type = "object"
             if (!data.children){
                 data.children = []
             }
             data.children.push(data[key])
+            // data.children.push({ // WIP : there is an extra "+" after style nodes
+            //     name:"+",
+            //     type:"adding"
+            // })
             formatData(data[key]);
         } else { // if it's a string
 
         }
     }
-    // console.log(data)
 }
