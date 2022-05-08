@@ -48,6 +48,7 @@ export function Specs() {
     const { urlName } = useParams();
     const userContext = useUserContext();
     // const [socket, setSocket] = useState<WebSocket>();
+    // const [socketUsable, setSocketUsable] = useState<boolean>(false);
 
     useEffect(() => {
         postProjectExistForUser(userContext.user.id, urlName || "")
@@ -56,7 +57,7 @@ export function Specs() {
                 navigate('/projects');
                 return;
             }
-            // setSocket(init_websocket('specs', data.id, userContext.user.name));
+            // setSocket(init_websocket('specs', data.id, userContext.user.name, setSocketUsable));
         })
         .catch(error => {
             // setErrorMsg("Internal error");

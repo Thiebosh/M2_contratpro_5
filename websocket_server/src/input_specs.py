@@ -7,9 +7,6 @@ class InputSpecs(Input):
         self.datetime = datetime.now()
         self.failed = False # failed if n'a pas les trois champs ?
 
-    def get_action(self):
-        return self.msg["action"]
-
     def get_path(self):
         return self.msg["path"]
 

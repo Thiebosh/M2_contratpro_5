@@ -26,7 +26,7 @@ import './index.scss';
 export const sessionDuration = 20; //min
 export const dateFormat = "YYYY/MM/DD HH:mm";
 
-export function init_websocket(type:'specs'|'proto', projectId:string, username:string) {
+export function init_websocket(type:'specs'|'proto', projectId:string, username:string, setUsable:React.Dispatch<React.SetStateAction<boolean>>) {
     const socket = new WebSocket("ws://localhost:8002");
 
     socket.onopen = () => {
@@ -38,12 +38,15 @@ export function init_websocket(type:'specs'|'proto', projectId:string, username:
             type: type
         }));
         console.log('connected');
+        setUsable(true);
     };
     socket.onerror = (error) => {
+        setUsable(false);
         socket.close();
         console.log(`[error] ${error}`);
     };
     socket.onclose = (event) => {
+        setUsable(false);
         if (event.wasClean) {
             console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
         } else {
