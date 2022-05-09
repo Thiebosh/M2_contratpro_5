@@ -17,14 +17,10 @@ export function Login() {
     const [errorMsg, setErrorMsg] = useState<string>("");
 
     useEffect(() => {
-        if (warnMsg) {
-            setTimeout(() => setWarnMsg(""), 4000);
-        }
+        if (warnMsg) setTimeout(() => setWarnMsg(""), 4000);
     }, [warnMsg]);
     useEffect(() => {
-        if (errorMsg) {
-            setTimeout(() => setErrorMsg(""), 4000);
-        }
+        if (errorMsg) setTimeout(() => setErrorMsg(""), 4000);
     }, [errorMsg]);
 
     function triggerLogin() {

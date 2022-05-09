@@ -15,7 +15,7 @@ function Card() {
             {
                 userContext.user.id ?
                     <>
-                        <p>{userContext.user.name}</p>
+                        <h3>{userContext.user.name}</h3>
                         <hr/>
                         <a href='/user/profile'>Account</a>
                         <hr/>
