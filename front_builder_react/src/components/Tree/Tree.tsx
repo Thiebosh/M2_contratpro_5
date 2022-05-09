@@ -117,7 +117,7 @@ function getDataFromJson(){
 
 function formatData(data:any, syntax:any){
     for (const key in data){
-        if (key === "name" || key === "type"){
+        if (key === "name"){
             continue;
         }
 
@@ -128,7 +128,6 @@ function formatData(data:any, syntax:any){
         if (syntax[key].type === "array"){ // if it's an array
             for (let i = 0; i < data[key].length; i++){
                 data[key][i].name = key
-                data[key][i].type = "array"
                 if (!data.children){
                     data.children = []
                 }
@@ -143,7 +142,6 @@ function formatData(data:any, syntax:any){
             }
         } else if (syntax[key].type === "object"){ // if it's and object
             data[key].name = key
-            data[key].type = "object"
             if (!data.children){
                 data.children = []
             }
