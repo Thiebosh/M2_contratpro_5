@@ -8,7 +8,7 @@ import {
 } from 'react-router-dom';
 import {requireNoUser, requireUser, UserProvider, userContextMethods} from './session/user';
 
-import {NavBar} from './components/NavBar';
+import {NavBar} from './components/NavBar/NavBar';
 
 import {NotFound} from './pages/NotFound';
 import {Home} from './pages/Home';

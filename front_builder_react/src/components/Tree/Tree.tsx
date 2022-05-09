@@ -94,11 +94,13 @@ function init(data:any, setTree:any){
     // data["root"].children = data["root"];
     // data["root"].name = "root";
     // console.log(data["root"])
-
-    formatData(data["root"]);
-    data = [data["root"]]
-    data.name = "root"
-    setTree(data)
+    fetch("/syntax.json").then(syntax => {return syntax.json()}).then(syntaxJson => {
+        formatData(data, syntaxJson);
+        data = [data["root"]]
+        data.name = "root"
+        setTree(data)
+    })
+    // console.log(data)
 }
 
 function getDataFromJson(){
@@ -113,9 +115,17 @@ function getDataFromJson(){
 }
 
 
-function formatData(data:any){
+function formatData(data:any, syntax:any){
     for (const key in data){
-        if (Array.isArray(data[key])){ // if it's an array
+        if (key === "name" || key === "type"){
+            continue;
+        }
+
+        if (!syntax[key]){
+            console.log(key, data[key])
+            continue;
+        }
+        if (syntax[key].type === "array"){ // if it's an array
             for (let i = 0; i < data[key].length; i++){
                 data[key][i].name = key
                 data[key][i].type = "array"
@@ -129,9 +139,9 @@ function formatData(data:any){
                         type:"adding"
                     })
                 }
-                formatData(data[key][i]);
+                formatData(data[key][i], syntax);
             }
-        } else if (typeof data[key] != "string"){ // if it's and object
+        } else if (syntax[key].type === "object"){ // if it's and object
             data[key].name = key
             data[key].type = "object"
             if (!data.children){
@@ -142,9 +152,7 @@ function formatData(data:any){
             //     name:"+",
             //     type:"adding"
             // })
-            formatData(data[key]);
-        } else { // if it's a string
-
+            formatData(data[key], syntax);
         }
     }
 }
