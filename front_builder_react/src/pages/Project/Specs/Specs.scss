@@ -1,9 +1,27 @@
 #specs {
-    svg {
-        path, .notFill {
-            fill: none;
-            stroke: black;
-            stroke-width: 1.5px;
+    position: fixed;
+    height: 100%;
+    width: 100%;
+
+    #menu {
+        background-color: whitesmoke;
+        position: absolute;
+        top: 1em;
+        left: 1em;
+        z-index: 10;
+        border: 1px solid black;
+        padding: 0.5em 0;
+
+        p {
+            margin: 0;
+            padding: 0 0.2em;
         }
+    }
+
+    #treeContent {
+        border: 1px solid black;
+        position: fixed;
+        height: 100%;
+        width: 100%;
     }
 }

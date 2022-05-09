@@ -95,11 +95,12 @@ export function Specs() {
 
     return (
         <section id="specs">
-            <div>
-                menu statique en haut à gauche avec boutons générer et enregistrer
+            <div id="menu">
+                <p>bouton générer</p>
+                <hr/>
+                <p>bouton enregistrer</p>
             </div>
-            <div>
-                specs section
+            <div id="treeContent">
                 <CustomTree/>
             </div>
         </section>

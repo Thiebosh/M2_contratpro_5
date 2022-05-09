@@ -1,2 +1,14 @@
 #proto {
+    position: fixed;
+    height: 100%;
+    width: 100%;
+
+    #exec_window {
+        border: 1px solid black;
+        position: fixed;
+        height: 100%;
+        width: 100%;
+        display: grid;
+        place-content: center;
+    }
 }

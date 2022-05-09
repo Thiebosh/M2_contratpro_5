@@ -26,8 +26,8 @@ const debugData = [
         }
       ]
     }
-  ];
-  
+];
+
 // var state:any = {
 //     data: debugData
 // }
@@ -35,16 +35,12 @@ export function CustomTree(){
     // formatData(data)
     const [tree, setTree] = useState<any>(debugData);
 
-    
-    
     useEffect(() => {getDataFromJson().then((d => init(d, setTree)))}, [])
 
-
     return (
-        <div id="treeContent" style={{width: '1500px', height: '1000px'}}>
             <Tree
                 data={tree}
-                translate={{x:750,y:500}}
+                translate={{x:250,y:200}}
                 transitionDuration={0.5}
                 onNodeClick={(nodeData:any) => {
                     if (nodeData.data.type === "adding"){
@@ -73,8 +69,7 @@ export function CustomTree(){
                     }
                 }}
             />
-        </div>
-        )
+    )
 }
 
 function addChild(node:any, name:any){

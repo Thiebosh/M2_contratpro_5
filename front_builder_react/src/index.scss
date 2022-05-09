@@ -5,6 +5,11 @@
     --color-shadow: #272728;
 }
 
+#root {
+    min-height: 100%;
+    position: relative;
+}
+
 html, body {
     height: 100%;
 }
