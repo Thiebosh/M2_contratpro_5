@@ -33,11 +33,6 @@ export function Proto() {
     const navigate = useNavigate();
     const { urlName } = useParams();
     const userContext = useUserContext();
-    const [socket, setSocket] = useState<WebSocket>();
-    const [socketUsable, setSocketUsable] = useState<boolean>(false);
-
-    const [loadingPage, setLoadingPage] = useState<boolean>(true);
-    const [proto, setProto] = useState<string>("{}");
 
     useEffect(() => {
         postProjectExistForUser(userContext.user.id, urlName || "")
@@ -55,7 +50,52 @@ export function Proto() {
         });
     }, [userContext.user, urlName, navigate]);
 
+    const [socket, setSocket] = useState<WebSocket>();
+    const [socketUsable, setSocketUsable] = useState<boolean>(false);
+
+    const [loadingPage, setLoadingPage] = useState<boolean>(true);
+    const [pages, setPages] = useState<{link:string, name:string}[]>([]);
+    const [proto, setProto] = useState<string>("{}");
+
     useEffect(() => {
+        setPages([ // tmp
+            {
+                link: "",
+                name: "fil",
+            },
+            {
+                link: "",
+                name: "d'ariane",
+            },
+            {
+                link: "",
+                name: ":",
+            },
+            {
+                link: "",
+                name: "liens",
+            },
+            {
+                link: "",
+                name: "d'accès",
+            },
+            {
+                link: "",
+                name: "aux",
+            },
+            {
+                link: "",
+                name: "pages",
+            },
+            {
+                link: "",
+                name: "du",
+            },
+            {
+                link: "",
+                name: "prototype",
+            },
+        ]);
         if (!socket) return;
 
         socket.onmessage = (event) => {
@@ -89,15 +129,7 @@ export function Proto() {
     return (
         <section id="proto">
             <div className='links'>
-                <p onClick={() => triggerLink("")}>fil</p>
-                <p onClick={() => triggerLink("")}>d'ariane</p>
-                <p onClick={() => triggerLink("")}>:</p>
-                <p onClick={() => triggerLink("")}>liens</p>
-                <p onClick={() => triggerLink("")}>d'accès</p>
-                <p onClick={() => triggerLink("")}>aux</p>
-                <p onClick={() => triggerLink("")}>pages</p>
-                <p onClick={() => triggerLink("")}>du</p>
-                <p onClick={() => triggerLink("")}>prototype</p>
+                { pages.map(item => <p key={item.name} onClick={() => triggerLink(item.link)}>{item.name}</p>) }
             </div>
             <ExecutionWindow proto={socketUsable ? (loadingPage ? "Loading..." : JSON.stringify(proto)) : "Connection to server..."}/>
         </section>
