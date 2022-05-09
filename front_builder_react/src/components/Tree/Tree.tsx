@@ -121,10 +121,6 @@ function formatData(data:any, syntax:any){
             continue;
         }
 
-        if (!syntax[key]){
-            console.log(key, data[key])
-            continue;
-        }
         if (syntax[key].type === "array"){ // if it's an array
             for (let i = 0; i < data[key].length; i++){
                 data[key][i].name = key
@@ -151,6 +147,10 @@ function formatData(data:any, syntax:any){
             //     type:"adding"
             // })
             formatData(data[key], syntax);
+        } else if(syntax[key].type === "field") {
+            if (syntax[syntax[key].field]){
+                
+            }
         }
     }
 }
