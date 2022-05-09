@@ -2,6 +2,7 @@ import Tree from "react-d3-tree"
 import clone from "clone";
 import { useEffect, useState } from "react";
 
+// la doc : https://bkrem.github.io/react-d3-tree/docs/interfaces/_tree_types_.treeprops.html
 const debugData = [
     {
       name: "root",
@@ -35,12 +36,15 @@ export function CustomTree(){
     // formatData(data)
     const [tree, setTree] = useState<any>(debugData);
 
-    useEffect(() => {getDataFromJson().then((d => init(d, setTree)))}, [])
+    useEffect(() => {
+        getDataFromJson()
+        .then((d => init(d, setTree)));
+    }, [])
 
     return (
             <Tree
                 data={tree}
-                translate={{x:250,y:200}}
+                translate={{x:window.innerWidth*1/4,y:window.innerHeight/2}}
                 transitionDuration={0.5}
                 onNodeClick={(nodeData:any) => {
                     if (nodeData.data.type === "adding"){
