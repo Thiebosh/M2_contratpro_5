@@ -25,7 +25,7 @@ function ExecutionWindow(props:ExecutionWindowProps) {
     // });
 
     return (<div id="exec_window">
-        {JSON.stringify(proto)}
+        {proto}
     </div>);
 }
 
@@ -36,7 +36,8 @@ export function Proto() {
     const [socket, setSocket] = useState<WebSocket>();
     const [socketUsable, setSocketUsable] = useState<boolean>(false);
 
-    const [proto, setProto] = useState<string>("Loading");
+    const [loadingPage, setLoadingPage] = useState<boolean>(true);
+    const [proto, setProto] = useState<string>("{}");
 
     useEffect(() => {
         postProjectExistForUser(userContext.user.id, urlName || "")
@@ -61,6 +62,7 @@ export function Proto() {
             const data = JSON.parse(event.data)
             console.log(data);
             if (data.execute.success) {
+                setLoadingPage(false);
                 setProto(data.execute.content);
             }
             else {
@@ -76,12 +78,28 @@ export function Proto() {
         socket.send(JSON.stringify({"action":"execute", "page": ""})) // no page for default page
     }, [socket, socketUsable]);
 
+    function triggerLink(page:string) {
+        if (!socket || !socketUsable) {
+            return;
+        }
+        setLoadingPage(true);
+        socket.send(JSON.stringify({"action":"execute", "page": page}));
+    }
+
     return (
         <section id="proto">
-            <div>
-                fil d'ariane : liens d'accès aux pages du prototype
+            <div className='links'>
+                <p onClick={() => triggerLink("")}>fil</p>
+                <p onClick={() => triggerLink("")}>d'ariane</p>
+                <p onClick={() => triggerLink("")}>:</p>
+                <p onClick={() => triggerLink("")}>liens</p>
+                <p onClick={() => triggerLink("")}>d'accès</p>
+                <p onClick={() => triggerLink("")}>aux</p>
+                <p onClick={() => triggerLink("")}>pages</p>
+                <p onClick={() => triggerLink("")}>du</p>
+                <p onClick={() => triggerLink("")}>prototype</p>
             </div>
-            <ExecutionWindow proto={proto}/>
+            <ExecutionWindow proto={socketUsable ? (loadingPage ? "Loading..." : JSON.stringify(proto)) : "Connection to server..."}/>
         </section>
     );
 }
