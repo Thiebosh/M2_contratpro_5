@@ -32,6 +32,8 @@ const debugData = [
 // var state:any = {
 //     data: debugData
 // }
+
+
 export function CustomTree(){
     // formatData(data)
     const [tree, setTree] = useState<any>(debugData);
@@ -41,11 +43,22 @@ export function CustomTree(){
         .then((d => init(d, setTree)));
     }, [])
 
+    const renderRectSvgNode = ({ nodeDatum, toggleNode }:any) => (
+        <g>
+          <circle r="25" onClick={toggleNode}>
+        </circle>
+          <text fill="white" textAnchor="middle">
+            {nodeDatum.name}
+          </text>
+        
+        </g>
+      );
     return (
             <Tree
                 data={tree}
                 translate={{x:window.innerWidth*1/4,y:window.innerHeight/2}}
                 transitionDuration={0.5}
+                renderCustomNodeElement={renderRectSvgNode}
                 onNodeClick={(nodeData:any) => {
                     if (nodeData.data.type === "adding"){
                         console.log(nodeData) 
@@ -69,7 +82,7 @@ export function CustomTree(){
                         //     }
                         //     ]
                         // });
-                        setTree(nextData)
+                        setTree(nextData);
                     }
                 }}
             />
@@ -90,28 +103,18 @@ function addChild(node:any, name:any){
 }
 
 function init(data:any, setTree:any){
-    // console.log(data["root"])
-    // data["root"].children = data["root"];
-    // data["root"].name = "root";
-    // console.log(data["root"])
     fetch("/syntax.json").then(syntax => {return syntax.json()}).then(syntaxJson => {
         formatData(data, syntaxJson);
-        data = [data["root"]]
-        data.name = "root"
-        setTree(data)
+        data = [data["root"]];
+        data.name = "root";
+        setTree(data);
     })
-    // console.log(data)
 }
 
 function getDataFromJson(){
     return fetch("/example.json").then(data => {
-        // fetch("/syntax.json").then(syntaxTree => syntaxTree.json())
-        // console.log(data.json())
-        return data.json()
-
+        return data.json();
     })
-    // fetch("/example.json").then((data:any,jsonData:any) =>  data.json())
-
 }
 
 
@@ -121,27 +124,27 @@ function formatData(data:any, syntax:any){
             continue;
         }
 
-        if (syntax[key].type === "array"){ // if it's an array
+        if (syntax[key].type === "array"){
             for (let i = 0; i < data[key].length; i++){
-                data[key][i].name = key
+                data[key][i].name = key;
                 if (!data.children){
-                    data.children = []
+                    data.children = [];
                 }
                 data.children.push(data[key][i])
                 if (i === data[key].length -1 ){
                     data.children.push({
                         name:"+",
                         type:"adding"
-                    })
+                    });
                 }
                 formatData(data[key][i], syntax);
             }
-        } else if (syntax[key].type === "object"){ // if it's and object
+        } else if (syntax[key].type === "object"){
             data[key].name = key
             if (!data.children){
                 data.children = []
             }
-            data.children.push(data[key])
+            data.children.push(data[key]);
             // data.children.push({ // WIP : there is an extra "+" after style nodes
             //     name:"+",
             //     type:"adding"
@@ -149,7 +152,23 @@ function formatData(data:any, syntax:any){
             formatData(data[key], syntax);
         } else if(syntax[key].type === "field") {
             if (syntax[syntax[key].field]){
-                
+                if (!data.children){
+                    data.children = []
+                }
+                let node = syntax[syntax[key].field];
+                if (!node.values){
+                    node.value = data[key];
+                }
+                console.log(node)
+                if (node.type === "input"){
+                    node.element = "<input type='"+ node.nature +"' value='"+ node.value +"'>";
+                } else if (node.type === "select"){
+                    node.element = "<label>"+ key +"</label><select> "
+                    + "<option value='"+ data[key] +"'></option>"
+                    //TODO : add all options thanks to node.value
+                    + "</select>";
+                }
+                data.children.push(node);
             }
         }
     }
