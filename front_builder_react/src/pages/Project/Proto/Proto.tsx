@@ -89,7 +89,7 @@ export function Proto() {
             if (data.execute.success) {
                 const targetElem = document.querySelector('#placeholder');
                 if (!targetElem) return;
-                targetElem.innerHTML = JSON.stringify(data.execute.content);
+                targetElem.innerHTML = JSON.stringify(data.execute.content); // tmp securité
             }
             else {
                 const targetElem = document.querySelector('#placeholder');
