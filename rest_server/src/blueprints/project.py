@@ -42,11 +42,13 @@ async def create():
     doc = {
         "name": project_name,
         "users": json.loads(users_id),
+        "description": "",
         "creation": datetime.utcnow(),
         "last_specs": None,
         "last_proto": None,
         "specs": { "root": {} },
-        "session": {}
+        "pages": [{ "default": ""}],
+        "session": {},
     }
 
     try:
@@ -93,7 +95,8 @@ async def get():
                 },
                 "creation": 1,
                 "last_specs": 1,
-                "last_proto": 1
+                "last_proto": 1,
+                "description": 1,
             }
         },
         {
@@ -313,12 +316,12 @@ async def update():
             }
         }))
 
-    # if description:
-    #     operations.append(current_app.config["partners"]["db"].bulk_update_one(filter_q, {
-    #         "$set": {
-    #             "description": description
-    #         }
-    #     }))
+    if description:
+        operations.append(current_app.config["partners"]["db"].bulk_update_one(filter_q, {
+            "$set": {
+                "description": description
+            }
+        }))
 
     try:
         return {

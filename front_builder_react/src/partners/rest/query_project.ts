@@ -21,7 +21,8 @@ interface ProjectGet {
         }[]
         creation:string,
         last_specs:string|null,
-        last_proto:string|null
+        last_proto:string|null,
+        description:string,
     }
 }
 export async function postProjectGet(id:string): Promise<ProjectGet> {

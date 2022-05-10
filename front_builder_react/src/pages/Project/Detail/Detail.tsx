@@ -101,7 +101,7 @@ export function Detail() {
                 setProjectUsers(data.result.users);
                 setProjectLastSpecs(data.result.last_specs || '');
                 setProjectLastProto(data.result.last_proto || '');
-                setProjectDescription('...');
+                setProjectDescription(data.result.description);
             })
             .catch(error => {
                 console.log("Error:", error);
@@ -118,6 +118,10 @@ export function Detail() {
     const [editDescription, setEditDescription] = useState<string>('');
 
     function triggerUpdate() {
+        if (!(editName || addCollabIds.length || removeCollabIds.length || editDescription)) {
+            editOff();
+            return;
+        }
         postProjectUpdate(projectId, editName, addCollabIds, removeCollabIds, editDescription)
         .then((data) => {
             console.log(data);
@@ -192,7 +196,7 @@ export function Detail() {
                 </table>
                 <hr/>
                 <h2>Description</h2>
-                <p>{projectDescription}</p>
+                <p>{projectDescription || 'Describe your project gloal'}</p>
                 { edit && 
                 <div className='input_group'>
                     <label>Change description</label>
