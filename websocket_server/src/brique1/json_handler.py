@@ -11,7 +11,7 @@ class JsonHandler():
         self.project_id = project_id
         self.room_type = room_type
         self.json_currently_stored = True
-        self.current_version_generated = False # add field to db
+        self.current_version_generated = False # add field to db and replace date with it
 
         self.data = self.partners["db"].aggregate_list(COLLECTION_PROJECTS, MongoQueries.getSpecsFromId(self.project_id))[0]
 

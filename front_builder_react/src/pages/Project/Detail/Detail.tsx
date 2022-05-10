@@ -181,7 +181,7 @@ export function Detail() {
                 </> }
                 <br/>
                 <hr/>
-                <h2>Statistics</h2>
+                <h2>Summary</h2>
                 <table>
                     <tbody>
                         <tr>

@@ -115,6 +115,8 @@ class Server():
 
             self.room_m.rooms = {key: values for key, values in self.room_m.rooms.items() if not values.get_param()["close_evt"].is_set()}
 
+            # can't sleep because of handshakes
+
         print("SERVER - Closing server...")
 
 

@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+import asyncio
+from datetime import datetime, timedelta
 import queue
 import threading
 import select
@@ -21,8 +23,9 @@ class Room(ABC):
         self.callback_update_server_sockets = callback_update_server_sockets
         self.callback_remove_room = callback_remove_room
         self.partners = partners
-
         self.encoding = encoding
+        self.delay = datetime.now()
+
         self.input_manager:InputManager = input_manager
         print(f"{room_id}-{room_type} - Room created")
 
@@ -62,6 +65,7 @@ class Room(ABC):
         del self.client_connection_queue[socket]
         del self.socket_name[socket]
         self.callback_update_server_sockets(socket)
+        self.delay = datetime.now()
 
 
     def add_message_in_queue(self, socket_receiver, msg):
@@ -77,11 +81,16 @@ class Room(ABC):
 
     async def run(self, polling_freq=0.1):
         print(f"{self.room_id}-{self.room_type} - Room ready")
-        while not self.close_evt.is_set() and self.inputs:
+        while not self.close_evt.is_set() and (self.inputs or (datetime.now() - self.delay <= timedelta(minutes=5))):
             with self.lock:
                 while not self.queue.empty():
                     client = self.queue.get()
                     self.open_client_connection_to_room(client["socket"], client["name"]) # When "get" called, it removes item from queue
+
+            if not self.inputs:
+                await asyncio.sleep(1)
+                continue
+
             try:
                 readable, writable, exception = self.read(polling_freq)
             except KeyboardInterrupt:
@@ -118,5 +127,7 @@ class Room(ABC):
 
             for socket in exception:
                 self.close_client_connection_to_room(socket)
+
+            await asyncio.sleep(0.1)
 
         await self.close()
