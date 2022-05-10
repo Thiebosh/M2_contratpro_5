@@ -64,6 +64,19 @@ export async function postProjectExistForUser(user_id:string, project_name:strin
     return await _postRequest('/project/exist_for_user', data);
 }
 
+interface GetProtoPages {
+    pages: {
+        link: string,
+        name: string,
+    }[]
+}
+export async function postProjectGetProtoPages(project_id:string): Promise<GetProtoPages> {
+    const data = {
+        project_id: project_id
+    }
+    return await _postRequest('/project/get_proto_pages', data);
+}
+
 interface ProjectSearchByUser {
     result: {//peut simplifier car un seul projet... recherche par id
         id: string,

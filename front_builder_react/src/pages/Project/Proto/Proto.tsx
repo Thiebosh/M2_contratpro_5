@@ -2,49 +2,10 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { init_websocket } from '../../..';
 
-import { postProjectExistForUser } from '../../../partners/rest';
+import { postProjectExistForUser, postProjectGetProtoPages } from '../../../partners/rest';
 import { useUserContext } from '../../../session/user';
 
 import './Proto.scss';
-
-const tmpPages = [
-    {
-        link: "",
-        name: "fil",
-    },
-    {
-        link: "",
-        name: "d'ariane",
-    },
-    {
-        link: "",
-        name: ":",
-    },
-    {
-        link: "",
-        name: "liens",
-    },
-    {
-        link: "",
-        name: "d'accès",
-    },
-    {
-        link: "",
-        name: "aux",
-    },
-    {
-        link: "",
-        name: "pages",
-    },
-    {
-        link: "",
-        name: "du",
-    },
-    {
-        link: "",
-        name: "prototype",
-    },
-]
 
 export function Proto() {
     const navigate = useNavigate();
@@ -68,18 +29,27 @@ export function Proto() {
         });
     }, [userContext.user, urlName, navigate]);
 
+    const [pages, setPages] = useState<{link:string, name:string}[]>([]);
+
+    useEffect(() => {
+        if (!projectId) return;
+        postProjectGetProtoPages(projectId)
+        .then((data) => setPages(data.pages))
+        .catch(error => {
+            // setErrorMsg("Internal error");
+            console.log("Error:", error);
+        });
+    }, [projectId]);
+
     const [socket, setSocket] = useState<WebSocket>();
     const [socketUsable, setSocketUsable] = useState<boolean>(false);
-
     const [loadingPage, setLoadingPage] = useState<boolean>(true);
-    const [pages, setPages] = useState<{link:string, name:string}[]>([]);
 
     useEffect(() => {
         if (projectId && !socketUsable) setSocket(init_websocket('proto', projectId, userContext.user.name, setSocketUsable));
     }, [projectId, userContext.user.name, socketUsable]);
 
     useEffect(() => {
-        setPages(tmpPages);//tmp
         if (!socket) return;
 
         socket.onmessage = (event) => {

@@ -175,6 +175,42 @@ async def exist_for_user():
     }, status.HTTP_200_OK
 
 
+@bp_project.route("/get_proto_pages", methods=['POST'])
+async def get_proto_pages():
+    post = ImmutableMultiDict(await request.get_json())
+    if len(post) != 1:
+        return "", status.HTTP_400_BAD_REQUEST
+
+    project_id = post.get("project_id", type=str, default=None)
+
+    if not project_id:
+        return "", status.HTTP_400_BAD_REQUEST
+
+    aggregation = [
+        {
+            "$match": {
+                "_id": ObjectId(project_id)
+            }
+        },
+        {
+            "$project": {
+                "_id": 0,
+                "pages": 1
+            }
+        },
+    ]
+
+    try:
+        pages = (await current_app.config["partners"]["db"].aggregate_list(COLLECTION, aggregation))[0]["pages"]
+    except Exception as e:
+        print(e)
+        return "", status.HTTP_503_SERVICE_UNAVAILABLE
+
+    return {
+        "pages": [{"name": key, "link": value}for couple in pages for key, value in couple.items()]
+    }, status.HTTP_200_OK
+
+
 @bp_project.route("/search_for_user", methods=['POST'])
 async def search_for_user():
     post = ImmutableMultiDict(await request.get_json())
