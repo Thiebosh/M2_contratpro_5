@@ -46,7 +46,7 @@ export function Login() {
 
     return (
         <section id='login'>
-            <h1>Login</h1>
+            <h1>Log in</h1>
             <div className='card small'>
                 <div className='input_group'>
                     <label>Username</label>
@@ -62,9 +62,11 @@ export function Login() {
                         onKeyDown={(event) => (event.key === "Enter") && triggerLogin()}
                     />
                 </div>
-                <div className='button' onClick={triggerLogin}>Sign in</div>
+                <div className='button' onClick={triggerLogin}>Log in</div>
                 { warnMsg && <Fade><div className='warning'>{warnMsg}</div></Fade> }
                 { errorMsg && <Fade><div className='error'>{errorMsg}</div></Fade> }
+                <br/>
+                <a href="/user/create"><div className='button'>Create account</div></a>
             </div>
         </section>
     );

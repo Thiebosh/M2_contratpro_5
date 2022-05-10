@@ -70,6 +70,8 @@ export function CreateUser() {
                 <div className='button' onClick={triggerCreate}>Create</div>
                 { warnMsg && <Fade><div className='warning'>{warnMsg}</div></Fade> }
                 { errorMsg && <Fade><div className='error'>{errorMsg}</div></Fade> }
+                <br/>
+                <a href="/user/login"><div className='button'>Log in</div></a>
             </div>
         </section>
     );

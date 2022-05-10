@@ -164,13 +164,15 @@ export function Detail() {
                         setCurrentCollabIds={setAddCollabIds}
                         setErrorMsg={setErrorMsg}
                     />
-                    <RemoveCollabsInput
-                        label='Remove collaborators'
-                        collabs={projectUsers.filter(item => item.id !== userId)}
-                        currentCollabIds={removeCollabIds}
-                        setCurrentCollabIds={setRemoveCollabIds}
-                        setErrorMsg={setErrorMsg}
-                    />
+                    { (projectUsers.length > 1) &&
+                        <RemoveCollabsInput
+                            label='Remove collaborators'
+                            collabs={projectUsers.filter(item => item.id !== userId)}
+                            currentCollabIds={removeCollabIds}
+                            setCurrentCollabIds={setRemoveCollabIds}
+                            setErrorMsg={setErrorMsg}
+                        />
+                    }
                 </> }
                 <br/>
                 <hr/>
