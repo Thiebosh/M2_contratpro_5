@@ -66,3 +66,23 @@ class MongoQueries():
                 }
             }
         )
+
+    @staticmethod
+    def getProtoStateFromId(id:str):
+        return (
+            {"_id": ObjectId(id)},
+            {
+                "_id": 0,
+                "latest_proto": 1,
+            }
+        )
+
+    @staticmethod
+    def updateProtoStateForId(id:str, state:bool):
+        return (
+            {"_id": ObjectId(id)},
+            {"$set": {
+                "latest_proto": state,
+                }
+            }
+        )

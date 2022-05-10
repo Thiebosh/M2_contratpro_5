@@ -63,11 +63,11 @@ export function Specs() {
     }, [socket]);
 
     function triggerGenerate() {
-        // if (!socket || !socketUsable) {
+        if (!socket || !socketUsable) {
             setErrorMsg("Not connected to server!");
             return;
-        // }
-        // socket.send(JSON.stringify({"action":"generate"}));
+        }
+        socket.send(JSON.stringify({"action":"generate"}));
     }
 
     function triggerSave() {

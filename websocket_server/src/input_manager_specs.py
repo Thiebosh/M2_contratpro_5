@@ -2,6 +2,8 @@ from input_manager import InputManager
 from brique1.json_handler import JsonHandler
 from brique2.files_manager_specs import FilesManagerSpecs
 import json
+from partners.mongo_queries import MongoQueries, COLLECTION_PROJECTS
+from input_specs import InputSpecs
 # import pathlib
 
 class InputManagerSpecs(InputManager):
@@ -13,6 +15,8 @@ class InputManagerSpecs(InputManager):
         self.json_handler = JsonHandler(partners, room_id, room_type)
         self.files_manager = FilesManagerSpecs(partners, room_id, room_type)
 
+        self.current_version_generated = self.partners["db"].find_one(COLLECTION_PROJECTS, *MongoQueries.getProtoStateFromId(self.room_id))['latest_proto']
+
         # tmp test
         # with open(f"{pathlib.Path(__file__).parent.absolute()}/brique2/needs.json", 'r') as file:
         #     self.json_handler.data = json.loads(file.read().replace('\n', '').replace('\n', ''))
@@ -21,7 +25,7 @@ class InputManagerSpecs(InputManager):
         await self.json_handler.close()
         self.files_manager.close()
 
-    def check_conflicts(self, input_to_process):
+    def check_conflicts(self, input_to_process:InputSpecs):
         for current_input in self.inputs:
             if current_input == input_to_process or current_input.failed:
                 continue
@@ -67,7 +71,7 @@ class InputManagerSpecs(InputManager):
             print(f"Project {'well' if result else 'not'} updated")
 
         elif action == "generate":
-            if self.json_handler.current_version_generated:
+            if self.current_version_generated:
                 print(f"{self.room_id}-{self.room_type} - Project files already generated")
                 return True
 
@@ -77,11 +81,16 @@ class InputManagerSpecs(InputManager):
             if result is False:
                 return False
 
-            self.json_handler.current_version_generated = result
+            self.current_version_generated = True
+            await self.partners["db"].update_one_async(COLLECTION_PROJECTS, *MongoQueries.updateProtoStateForId(self.room_id, True))
 
             result = self.files_manager.update_stored_files()
             print(f"{self.room_id}-{self.room_type} - Project files {'well' if result else 'not'} updated")
 
         # else: error et renvoie wrong action ?
+
+        if action in ["create", "update", "delete"] and result:
+            self.current_version_generated = False
+            await self.partners["db"].update_one_async(COLLECTION_PROJECTS, *MongoQueries.updateProtoStateForId(self.room_id, False))
 
         return result

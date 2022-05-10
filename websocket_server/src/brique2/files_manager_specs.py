@@ -8,6 +8,9 @@ class FilesManagerSpecs(FilesManager):
 
 
     async def generate_files(self, specs_json):
+        if bool(os.environ.get('RENDER_STATE', default="False")):
+            return True
+
         filepath = f"/src/brique2/cpp/{self.project_id}.json"
         open(filepath, "w").write(specs_json)
         args = (filepath,)

@@ -1,6 +1,7 @@
 from input_manager import InputManager
 from brique2.files_manager_proto import FilesManagerProto
 from brique3.render_page import RenderPage
+from input_proto import InputProto
 
 class InputManagerProto(InputManager):
     def __init__(self, room_id, room_type, partners) -> None:
@@ -13,7 +14,7 @@ class InputManagerProto(InputManager):
         self.files_manager.close()
         await self.render_page.close()
 
-    async def check_and_execute_action_function(self, input_to_process):
+    async def check_and_execute_action_function(self, input_to_process:InputProto):
         if input_to_process.failed:
             return False
 
