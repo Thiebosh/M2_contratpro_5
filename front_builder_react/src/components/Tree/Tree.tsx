@@ -1,6 +1,8 @@
+import { useEffect, useState } from "react";
 import Tree from "react-d3-tree"
 import clone from "clone";
-import { useEffect, useState } from "react";
+
+import './Tree.scss';
 
 // la doc : https://bkrem.github.io/react-d3-tree/docs/interfaces/_tree_types_.treeprops.html
 const debugData = [
@@ -55,6 +57,7 @@ export function CustomTree(){
       );
     return (
             <Tree
+                svgClassName="tree"
                 data={tree}
                 translate={{x:window.innerWidth*1/4,y:window.innerHeight/2}}
                 transitionDuration={0.5}
