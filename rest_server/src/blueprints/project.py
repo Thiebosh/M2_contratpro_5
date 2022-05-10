@@ -247,7 +247,7 @@ async def search_for_user():
 @bp_project.route("/update", methods=['POST'])
 async def update():
     post = ImmutableMultiDict(await request.get_json())
-    if not (2 <= len(post) <= 5):
+    if not (2 <= len(post) <= 6):
         return "", status.HTTP_400_BAD_REQUEST
 
     id = post.get("id", type=str, default=None)
@@ -255,8 +255,9 @@ async def update():
     add_ids = post.get("addCollabIds", type=str, default=None)
     remove_ids = post.get("removeCollabIds", type=str, default=None)
     description = post.get("description", type=str, default=None)
+    deleteDescription = post.get("deleteDescription", type=bool, default=None)
 
-    if not (id and (name or add_ids or remove_ids or description)): # check if true count equals post length
+    if not (id and (name or add_ids or remove_ids or description or deleteDescription)): # check if true count equals post length
         return "", status.HTTP_400_BAD_REQUEST
 
     try:
@@ -320,6 +321,13 @@ async def update():
         operations.append(current_app.config["partners"]["db"].bulk_update_one(filter_q, {
             "$set": {
                 "description": description
+            }
+        }))
+
+    if deleteDescription and not description:
+        operations.append(current_app.config["partners"]["db"].bulk_update_one(filter_q, {
+            "$set": {
+                "description": ''
             }
         }))
 

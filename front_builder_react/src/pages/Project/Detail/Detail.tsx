@@ -116,13 +116,18 @@ export function Detail() {
     const [addCollabIds, setAddCollabIds] = useState<string[]>([]);
     const [removeCollabIds, setRemoveCollabIds] = useState<string[]>([]);
     const [editDescription, setEditDescription] = useState<string>('');
+    const [deleteDescription, setDeleteDescription] = useState<boolean>(false);
 
     function triggerUpdate() {
-        if (!(editName || addCollabIds.length || removeCollabIds.length || editDescription)) {
+        if (!(editName || addCollabIds.length || removeCollabIds.length || editDescription || deleteDescription)) {
             editOff();
             return;
         }
-        postProjectUpdate(projectId, editName, addCollabIds, removeCollabIds, editDescription)
+        if (editDescription && deleteDescription) {
+            setWarnMsg("New description and delete description are incompatibles");
+            return;
+        }
+        postProjectUpdate(projectId, editName, addCollabIds, removeCollabIds, editDescription, deleteDescription)
         .then((data) => {
             console.log(data);
             if (data.success === "already exist") {
@@ -198,8 +203,19 @@ export function Detail() {
                 </table>
                 <hr/>
                 <h2>Description</h2>
-                <p>{projectDescription || 'Describe your project gloal'}</p>
-                { edit && 
+                { edit && projectDescription && 
+                <div className='input_group'>
+                    <label>
+                        Delete description
+                        <input
+                            type='checkbox'
+                            checked={deleteDescription}
+                            onChange={() => setDeleteDescription(!deleteDescription)}
+                        />
+                    </label>
+                </div>}
+                <p>{projectDescription || (edit ? '' : 'Describe your project gloal')}</p>
+                { edit &&
                 <div className='input_group'>
                     <label>Change description</label>
                     <textarea
