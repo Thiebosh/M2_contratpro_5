@@ -20,7 +20,7 @@ interface ProjectProps {
     }[];
     creation: string;
     last_specs: string;
-    last_proto: string;
+    proto_synchro: boolean;
 }
 function Project(props: ProjectProps) {
     const userId = useUserContext().user.id;
@@ -31,7 +31,7 @@ function Project(props: ProjectProps) {
             <td><Collabs usernames={props.users.filter(item => item.id !== userId).map(item => item.name)} /></td>
             <td>{moment(props.creation).format(dateFormat)}</td>
             <td>{nullableDate(props.last_specs)}</td>
-            <td>{nullableDate(props.last_proto)}</td>
+            <td>{props.proto_synchro ? "Up to date" : "Outdated"}</td>
         </tr>
     );
 }
@@ -70,7 +70,7 @@ export function Projects() {
                             <th>Collaborators</th>
                             <th>Creation date</th>
                             <th>Last modified</th>
-                            <th>Last prototype</th>
+                            <th>Prototype status</th>
                         </tr>
                     </thead>
                     <tbody>

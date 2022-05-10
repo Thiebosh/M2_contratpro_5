@@ -74,7 +74,7 @@ export function Detail() {
     const [projectCreation, setProjectCreation] = useState<string>('');
     const [projectUsers, setProjectUsers] = useState<Collab[]>([]);
     const [projectLastSpecs, setProjectLastSpecs] = useState<string>('');
-    const [projectLastProto, setProjectLastProto] = useState<string>('');
+    const [projectProtoSynchro, setProjectProtoSynchro] = useState<boolean>(false);
     const [projectDescription, setProjectDescription] = useState<string>('');
 
     const nullableDate = (date:string) => date ? moment(date).format(dateFormat) : <>-</>;
@@ -100,7 +100,7 @@ export function Detail() {
                 setProjectCreation(data.result.creation);
                 setProjectUsers(data.result.users);
                 setProjectLastSpecs(data.result.last_specs || '');
-                setProjectLastProto(data.result.last_proto || '');
+                setProjectProtoSynchro(data.result.proto_synchro);
                 setProjectDescription(data.result.description);
             })
             .catch(error => {
@@ -152,9 +152,7 @@ export function Detail() {
             <h1>Project Summary</h1>
             <div className='card large'>
                 <h1>{projectName}</h1>
-                <Collabs usernames={projectUsers.filter(item => item.id !== userId).map(item => item.name)}/>
                 { edit &&
-                <>
                     <div className='input_group'>
                         <label>Change project name</label>
                         <input type='text'
@@ -162,6 +160,13 @@ export function Detail() {
                             onKeyDown={(event) => (event.key === "Enter") && triggerUpdate()}
                         />
                     </div>
+                }
+                { (projectUsers.length > 1)
+                    ? <Collabs usernames={projectUsers.filter(item => item.id !== userId).map(item => item.name)}/>
+                    : !edit && <p>No collabs</p>
+                }
+                { edit &&
+                <>
                     <CollabsInput
                         label='Add collaborators'
                         initialCollabIds={projectUsers.map(item => item.id)}
@@ -179,7 +184,6 @@ export function Detail() {
                         />
                     }
                 </> }
-                <br/>
                 <hr/>
                 <h2>Summary</h2>
                 <table>
@@ -195,9 +199,9 @@ export function Detail() {
                             <td>{nullableDate(projectLastSpecs)}</td>
                         </tr>
                         <tr>
-                            <th>Last prototype generation</th>
+                            <th>Prototype status</th>
                             <th>:</th>
-                            <td>{nullableDate(projectLastProto)}</td>
+                            <td>{projectProtoSynchro ? "Up to date" : "Outdated"}</td>
                         </tr>
                     </tbody>
                 </table>
