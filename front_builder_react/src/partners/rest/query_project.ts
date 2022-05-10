@@ -21,7 +21,7 @@ interface ProjectGet {
         }[]
         creation:string,
         last_specs:string|null,
-        proto_synchro:boolean,
+        latest_proto:boolean,
         description:string,
     }
 }
@@ -87,7 +87,7 @@ interface ProjectSearchByUser {
         }[],
         creation: string,
         last_specs: string,
-        proto_synchro: boolean
+        latest_proto: boolean
     }[]
 }
 export async function postProjectSearchForUser(user_id:string): Promise<ProjectSearchByUser> {

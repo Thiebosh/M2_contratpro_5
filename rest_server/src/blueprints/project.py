@@ -45,7 +45,7 @@ async def create():
         "description": "",
         "creation": datetime.utcnow(),
         "last_specs": None,
-        "proto_synchro": True,
+        "latest_proto": True,
         "specs": { "root": {} },
         "pages": [{ "default": ""}],
         "session": {},
@@ -95,7 +95,7 @@ async def get():
                 },
                 "creation": 1,
                 "last_specs": 1,
-                "proto_synchro": 1,
+                "latest_proto": 1,
                 "description": 1,
             }
         },
@@ -243,7 +243,7 @@ async def search_for_user():
                 },
                 "creation": 1,
                 "last_specs": 1,
-                "proto_synchro": 1
+                "latest_proto": 1
             }
         },
         {

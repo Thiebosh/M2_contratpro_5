@@ -74,7 +74,7 @@ export function Detail() {
     const [projectCreation, setProjectCreation] = useState<string>('');
     const [projectUsers, setProjectUsers] = useState<Collab[]>([]);
     const [projectLastSpecs, setProjectLastSpecs] = useState<string>('');
-    const [projectProtoSynchro, setProjectProtoSynchro] = useState<boolean>(false);
+    const [projectLatestProto, setProjectLatestProto] = useState<boolean>(false);
     const [projectDescription, setProjectDescription] = useState<string>('');
 
     const nullableDate = (date:string) => date ? moment(date).format(dateFormat) : <>-</>;
@@ -100,7 +100,7 @@ export function Detail() {
                 setProjectCreation(data.result.creation);
                 setProjectUsers(data.result.users);
                 setProjectLastSpecs(data.result.last_specs || '');
-                setProjectProtoSynchro(data.result.proto_synchro);
+                setProjectLatestProto(data.result.latest_proto);
                 setProjectDescription(data.result.description);
             })
             .catch(error => {
@@ -199,9 +199,9 @@ export function Detail() {
                             <td>{nullableDate(projectLastSpecs)}</td>
                         </tr>
                         <tr>
-                            <th>Prototype status</th>
+                            <th>Prototype generation status</th>
                             <th>:</th>
-                            <td>{projectProtoSynchro ? "Up to date" : "Outdated"}</td>
+                            <td>{projectLatestProto ? "Up to date" : "Outdated"}</td>
                         </tr>
                     </tbody>
                 </table>
