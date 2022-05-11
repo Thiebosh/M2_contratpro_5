@@ -44,26 +44,14 @@ std::map<string, std::map<Container, string>> alignContainer = {
 void outputResultFiles() {
     if (!htmlPages.size()) displayError(ErrorType::input, ErrorObject::no_files_transmitted, "");
 
+    // afficher default page
+    cout << "default page:" << endl << /*defaultPage*/"ecran1.html" << endl << endl << endl << endl; // ajouter element de pattern pour determiner page par défaut ou alors prendre première page comme défaut
+
     // print routeur.php
     cout << "routeur.php" << endl;
     std::ifstream routeur_template("templates/routeur.php");
     if (!routeur_template.is_open()) displayError(ErrorType::internal, ErrorObject::template_not_found, "templates/routeur.php");
-    std::string lineBuffer;
-    bool setDefaultFlag = false;
-    while (routeur_template) {
-        std::getline(routeur_template, lineBuffer);
-
-        if (!setDefaultFlag) {
-            std::size_t found = lineBuffer.find("\"\"");
-            if (found != std::string::npos) {
-                setDefaultFlag = true;
-                lineBuffer.insert(found+1, defaultPage != "" ? defaultPage : htmlPages[0]);
-            }
-        }
-
-        cout << lineBuffer << endl;
-    }
-    cout << endl << endl;
+    cout << routeur_template.rdbuf() << endl << endl << endl << endl;
 
     //print html files
 	for (auto file : fileContent) cout << file.first << endl << file.second << endl << endl;

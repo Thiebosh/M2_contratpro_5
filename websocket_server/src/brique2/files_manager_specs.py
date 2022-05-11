@@ -29,11 +29,11 @@ class FilesManagerSpecs(FilesManager):
             print(f"cpp executable return error '{retcode}' : {error_line}")
             return False
 
-        chunks = lines.split("\n\n\n\n")
+        chunks = [chunk.strip() for chunk in lines.split("\n\n\n\n") if chunk != '']
 
         self.files_currently_stored = False
-        self.files = [{"name": line.split("\n")[0], "content": line[line.find("\n")+1:]} for line in chunks][:-1]
-        self.pages = [
+        self.files = [{"name": line.split("\n")[0], "content": line[line.find("\n")+1:]} for line in chunks][1:]
+        self.pages = [{"Default": chunks[0].split("\n")[1]}] + [
             {''.join(value.split(".")[:-1]): value}
             for page in self.files 
             for key, value in page.items() 
