@@ -18,10 +18,10 @@ class InputManagerSpecs(InputManager):
         self.current_version_generated = self.partners["db"].find_one(COLLECTION_PROJECTS, *MongoQueries.getProtoStateFromId(self.room_id))['latest_proto']
 
         # tmp test
-        import pathlib
-        with open(f"{pathlib.Path(__file__).parent.absolute()}/brique2/needs.json", 'r') as file:
-            self.json_handler.data = json.loads(file.read().replace('\n', '').replace('\n', ''))
-        self.current_version_generated = False
+        # import pathlib
+        # with open(f"{pathlib.Path(__file__).parent.absolute()}/brique2/needs.json", 'r') as file:
+        #     self.json_handler.data = json.loads(file.read().replace('\n', '').replace('\n', ''))
+        # self.current_version_generated = False
 
     async def close(self):
         await self.json_handler.close()

@@ -10,7 +10,6 @@ class FilesManagerSpecs(FilesManager):
 
     async def generate_files(self, specs_json):
         if strtobool(os.environ.get('RENDER_STATE', default="False")):
-            print("generate file bypass?")
             return True
 
         filepath = f"/src/brique2/cpp/{self.project_id}.json"
@@ -32,8 +31,8 @@ class FilesManagerSpecs(FilesManager):
         self.files = [{"name": line.split("\n")[0], "content": line[line.find("\n")+1:]} for line in chunks][:-1]
         self.files_currently_stored = False
 
-        import pprint
-        pprint.pprint(self.files)
+        # import pprint
+        # pprint.pprint(self.files)
 
         return True
 
