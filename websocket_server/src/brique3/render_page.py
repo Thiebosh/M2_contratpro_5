@@ -1,4 +1,6 @@
+from distutils.util import strtobool
 import json
+import os
 from partners.mongo_queries import MongoQueries, COLLECTION_PROJECTS
 
 class RenderPage():
@@ -13,6 +15,9 @@ class RenderPage():
 
 
     async def close(self):
+        if strtobool(os.environ.get('RENDER_STATE', default="False")):
+            return
+
         success, session = self.partners["renderer"].get_session()
 
         if not success:

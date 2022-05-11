@@ -19,10 +19,14 @@ export function Specs() {
     const [socketUsable, setSocketUsable] = useState<boolean>(false);
 
     const [successMsg, setSuccessMsg] = useState<string>("");
+    const [infoMsg, setInfoMsg] = useState<string>("");
     const [errorMsg, setErrorMsg] = useState<string>("");
     useEffect(() => {
         if (successMsg) setTimeout(() => setSuccessMsg(""), 4000);
     }, [successMsg]);
+    useEffect(() => {
+        if (infoMsg) setTimeout(() => setInfoMsg(""), 4000);
+    }, [infoMsg]);
     useEffect(() => {
         if (errorMsg) setTimeout(() => setErrorMsg(""), 4000);
     }, [errorMsg]);
@@ -67,6 +71,7 @@ export function Specs() {
             setErrorMsg("Not connected to server!");
             return;
         }
+        setInfoMsg("Send generation request...");
         socket.send(JSON.stringify({"action":"generate"}));
     }
 
@@ -75,6 +80,7 @@ export function Specs() {
             setErrorMsg("Not connected to server!");
             return;
         }
+        setInfoMsg("Send save request...");
         socket.send(JSON.stringify({"action":"save"}));
     }
 
@@ -87,6 +93,7 @@ export function Specs() {
             </div>
             <div className='popup'>
                 { successMsg && <Fade><div className='success'>{successMsg}</div></Fade> }
+                { infoMsg && <Fade><div className='info'>{infoMsg}</div></Fade> }
                 { errorMsg && <Fade><div className='error'>{errorMsg}</div></Fade> }
             </div>
             <div id="treeContent">

@@ -29,12 +29,12 @@ export function Proto() {
         });
     }, [userContext.user, urlName, navigate]);
 
-    const [pages, setPages] = useState<{link:string, name:string}[]>([]);
+    const [pages, setPages] = useState<{link:string, name:string}[]>([{name:'Default', link:''}]);
 
     useEffect(() => {
         if (!projectId) return;
         postProjectGetProtoPages(projectId)
-        .then((data) => setPages(data.pages))
+        .then((data) => setPages([{name:'404', link:''}, ...data.pages]))
         .catch(error => {
             // setErrorMsg("Internal error");
             console.log("Error:", error);
@@ -57,7 +57,9 @@ export function Proto() {
             setLoadingPage(false);
             const targetElem = document.querySelector('#placeholder');
             if (!targetElem) return;
-            targetElem.innerHTML = data.execute.success === 200 ? data.execute.content : "Http response error : "+data.execute.success;
+            targetElem.innerHTML = data.execute.success === 200 
+                ? data.execute.content
+                : `<p class='centered'>Http response error : ${data.execute.success}</p>`;
         };
 
         return () => {
@@ -85,6 +87,7 @@ export function Proto() {
             const targetPage = (event.target as HTMLElement).attributes.getNamedItem("href")?.nodeValue;
             if (!targetPage || !socket || !socketUsable) return;
 
+            setLoadingPage(true);
             socket.send(JSON.stringify({"action":"execute", "page": targetPage}));
         }
         const targetElem = document.querySelector('#placeholder');
@@ -98,7 +101,7 @@ export function Proto() {
                 { pages.map(item => <p key={item.name} onClick={() => triggerLink(item.link)}>{item.name}</p>) }
             </div>
             <div id="exec_window">
-                { socketUsable ? (loadingPage ? "Loading..." : <div id="placeholder"/>) : "Connection to server..." }
+                { socketUsable ? (loadingPage ? <p className='centered'>Loading...</p> : <div id="placeholder"/>) : <p className='centered'>Connection to server...</p> }
             </div>
         </section>
     );

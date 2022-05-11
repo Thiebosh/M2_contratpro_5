@@ -13,6 +13,7 @@
 
         p {
             text-decoration: none;
+            text-transform: capitalize;
             color: white;
             background-color: var(--color-primary-light);
             border: 2px solid var(--color-primary-medium);
@@ -30,10 +31,24 @@
 
     #exec_window {
         border-top: 1px solid black;
-        position: fixed;
         height: 100%;
         width: 100%;
-        display: grid;
-        place-content: center;
+
+        .centered {
+            display: grid;
+            place-content: center;
+            height: 70% !important;
+            margin: 0;
+        }
+
+        #placeholder {
+            height: 100%;
+            width: 100%;
+            text-align: left;
+
+            &>* {
+                height: 100%;
+            }
+        }
     }
 }

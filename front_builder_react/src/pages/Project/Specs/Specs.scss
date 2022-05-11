@@ -41,7 +41,7 @@
         transform: translateX(-50%);
         z-index: 20;
 
-        .success, .error {
+        .success, .info, .error {
             border-radius: 5px;
             color: white;
             text-align: center;
@@ -51,6 +51,10 @@
 
         .success {
             background-color: rgb(43, 135, 43);
+        }
+
+        .info {
+            background-color: orange;
         }
 
         .error {
