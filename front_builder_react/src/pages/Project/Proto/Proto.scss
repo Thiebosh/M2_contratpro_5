@@ -34,10 +34,10 @@
         height: 100%;
         width: 100%;
 
-        & > .centered {
+        .centered {
             display: grid;
             place-content: center;
-            height: 70%;
+            height: 70% !important;
             margin: 0;
         }
 

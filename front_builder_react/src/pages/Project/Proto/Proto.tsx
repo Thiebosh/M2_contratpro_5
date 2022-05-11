@@ -34,7 +34,7 @@ export function Proto() {
     useEffect(() => {
         if (!projectId) return;
         postProjectGetProtoPages(projectId)
-        .then((data) => setPages([{name:'Default', link:''}, ...data.pages]))
+        .then((data) => setPages([{name:'404', link:''}, ...data.pages]))
         .catch(error => {
             // setErrorMsg("Internal error");
             console.log("Error:", error);
@@ -57,7 +57,9 @@ export function Proto() {
             setLoadingPage(false);
             const targetElem = document.querySelector('#placeholder');
             if (!targetElem) return;
-            targetElem.innerHTML = data.execute.success === 200 ? data.execute.content : "Http response error : "+data.execute.success;
+            targetElem.innerHTML = data.execute.success === 200 
+                ? data.execute.content
+                : `<p class='centered'>Http response error : ${data.execute.success}</p>`;
         };
 
         return () => {
