@@ -29,12 +29,12 @@ export function Proto() {
         });
     }, [userContext.user, urlName, navigate]);
 
-    const [pages, setPages] = useState<{link:string, name:string}[]>([]);
+    const [pages, setPages] = useState<{link:string, name:string}[]>([{name:'Default', link:''}]);
 
     useEffect(() => {
         if (!projectId) return;
         postProjectGetProtoPages(projectId)
-        .then((data) => setPages(data.pages))
+        .then((data) => setPages([{name:'Default', link:''}, ...data.pages]))
         .catch(error => {
             // setErrorMsg("Internal error");
             console.log("Error:", error);
