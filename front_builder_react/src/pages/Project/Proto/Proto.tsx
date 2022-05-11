@@ -54,18 +54,10 @@ export function Proto() {
 
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data)
-            console.log(data);
             setLoadingPage(false);
-            if (data.execute.success) {
-                const targetElem = document.querySelector('#placeholder');
-                if (!targetElem) return;
-                targetElem.innerHTML = JSON.stringify(data.execute.content); // tmp securité
-            }
-            else {
-                const targetElem = document.querySelector('#placeholder');
-                if (!targetElem) return;
-                targetElem.innerHTML = "Error";
-            }
+            const targetElem = document.querySelector('#placeholder');
+            if (!targetElem) return;
+            targetElem.innerHTML = data.execute.success === 200 ? data.execute.content : "Http response error : "+data.execute.success;
         };
 
         return () => {

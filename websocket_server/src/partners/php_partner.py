@@ -39,13 +39,13 @@ class PhpPartner():
 
     def _get(self, endpoint, print_=False, get_code=False):
         if strtobool(os.environ.get('RENDER_STATE', default="false")):
-            return True, {}
+            return 500, ""
         return self._call(lambda: self.session.get(url=f"{self.base_url}?action={endpoint}"), endpoint, print_, get_code)
 
 
     def _post(self, endpoint, data, print_=False, get_code=False):
         if strtobool(os.environ.get('RENDER_STATE', default="False")):
-            return True, {}
+            return 200, ""
         return self._call(lambda: self.session.post(url=f"{self.base_url}?action={endpoint}", data=data), endpoint, print_, get_code)
 
 
