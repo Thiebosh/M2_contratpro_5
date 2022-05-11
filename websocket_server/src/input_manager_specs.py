@@ -4,7 +4,7 @@ from brique2.files_manager_specs import FilesManagerSpecs
 import json
 from partners.mongo_queries import MongoQueries, COLLECTION_PROJECTS
 from input_specs import InputSpecs
-# import pathlib
+
 
 class InputManagerSpecs(InputManager):
     def __init__(self, room_id, room_type, partners, send_conflict_message_callback) -> None:
@@ -18,8 +18,10 @@ class InputManagerSpecs(InputManager):
         self.current_version_generated = self.partners["db"].find_one(COLLECTION_PROJECTS, *MongoQueries.getProtoStateFromId(self.room_id))['latest_proto']
 
         # tmp test
-        # with open(f"{pathlib.Path(__file__).parent.absolute()}/brique2/needs.json", 'r') as file:
-        #     self.json_handler.data = json.loads(file.read().replace('\n', '').replace('\n', ''))
+        import pathlib
+        with open(f"{pathlib.Path(__file__).parent.absolute()}/brique2/needs.json", 'r') as file:
+            self.json_handler.data = json.loads(file.read().replace('\n', '').replace('\n', ''))
+        self.current_version_generated = False
 
     async def close(self):
         await self.json_handler.close()
@@ -81,11 +83,11 @@ class InputManagerSpecs(InputManager):
             if result is False:
                 return False
 
-            self.current_version_generated = True
-            await self.partners["db"].update_one_async(COLLECTION_PROJECTS, *MongoQueries.updateProtoStateForId(self.room_id, True))
-
             result = self.files_manager.update_stored_files()
             print(f"{self.room_id}-{self.room_type} - Project files {'well' if result else 'not'} updated")
+
+            self.current_version_generated = True
+            await self.partners["db"].update_one_async(COLLECTION_PROJECTS, *MongoQueries.updateProtoStateForId(self.room_id, True))
 
         # else: error et renvoie wrong action ?
 

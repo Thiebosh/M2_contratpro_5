@@ -1,3 +1,4 @@
+from distutils.util import strtobool
 from .files_manager import FilesManager
 import os
 
@@ -8,7 +9,8 @@ class FilesManagerSpecs(FilesManager):
 
 
     async def generate_files(self, specs_json):
-        if bool(os.environ.get('RENDER_STATE', default="False")):
+        if strtobool(os.environ.get('RENDER_STATE', default="False")):
+            print("generate file bypass?")
             return True
 
         filepath = f"/src/brique2/cpp/{self.project_id}.json"
@@ -20,18 +22,18 @@ class FilesManagerSpecs(FilesManager):
         if os.path.exists(filepath):
             os.remove(filepath)
 
-        if retcode == -1:
+        error_line = lines.split('\n')[-1]
+        if retcode == -1 or "GENERATION_ERROR:" in error_line:
+            print(f"cpp executable return error '{retcode}' : {error_line}")
             return False
 
         chunks = lines.split("\n\n\n\n")
 
-        if chunks[-1].split("\n")[0] == "error":  # retcode and retcode != 0:  # execution error
-            print(f"cpp executable return error '{retcode}'")
-            print(lines)
-            return False
-
         self.files = [{"name": line.split("\n")[0], "content": line[line.find("\n")+1:]} for line in chunks][:-1]
         self.files_currently_stored = False
+
+        import pprint
+        pprint.pprint(self.files)
 
         return True
 

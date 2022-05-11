@@ -26,7 +26,7 @@ COPY credentials .
 
 WORKDIR /src
 COPY src .
-
+COPY cpp/templates ./templates
 
 # second stage : build cpp exe
 FROM python:3.9-slim-buster as builder

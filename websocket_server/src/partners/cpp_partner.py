@@ -9,7 +9,7 @@ class CppPartner():
 
         if state == None:
             self.state = os.path.exists(exe_path)
-            # print("cpp - path : ", exe_path)
+            print("cpp - path : ", exe_path)
             print(f"cpp - path is {'correct' if self.state else 'incorrect'}")
 
     def copy_partner(self):
@@ -27,5 +27,4 @@ class CppPartner():
                 break
             await asyncio.sleep(poll_freq)
 
-        print(f"cpp - retcode = {retcode}")
         return process.communicate()[0], retcode
