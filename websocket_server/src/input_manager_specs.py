@@ -83,7 +83,7 @@ class InputManagerSpecs(InputManager):
             if result is False:
                 return False
 
-            result = self.files_manager.update_stored_files()
+            result = await self.files_manager.update_stored_files()
             print(f"{self.room_id}-{self.room_type} - Project files {'well' if result else 'not'} updated")
 
             self.current_version_generated = True

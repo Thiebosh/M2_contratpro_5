@@ -30,10 +30,24 @@
 
     #exec_window {
         border-top: 1px solid black;
-        position: fixed;
         height: 100%;
         width: 100%;
-        display: grid;
-        place-content: center;
+
+        & > .centered {
+            display: grid;
+            place-content: center;
+            height: 70%;
+            margin: 0;
+        }
+
+        #placeholder {
+            height: 100%;
+            width: 100%;
+            text-align: left;
+
+            &>* {
+                height: 100%;
+            }
+        }
     }
 }

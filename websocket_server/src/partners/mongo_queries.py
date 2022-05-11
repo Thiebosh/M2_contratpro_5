@@ -1,3 +1,4 @@
+from typing import Any
 from bson import ObjectId
 from datetime import datetime
 
@@ -83,6 +84,16 @@ class MongoQueries():
             {"_id": ObjectId(id)},
             {"$set": {
                 "latest_proto": state,
+                }
+            }
+        )
+
+    @staticmethod
+    def updateProtoPagesForId(id:str, pages:"list[dict[str, Any]]"):
+        return (
+            {"_id": ObjectId(id)},
+            {"$set": {
+                "pages": pages,
                 }
             }
         )
