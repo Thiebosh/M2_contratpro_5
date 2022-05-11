@@ -45,7 +45,29 @@ export function CustomTree(){
         .then((d => init(d, setTree)));
     }, [])
 
-    const renderRectSvgNode = ({ nodeDatum, toggleNode }:any) => (
+    const renderRectSvgNode = ({ nodeDatum, toggleNode }:any) => {
+        if(nodeDatum.type === "input"){
+            return (
+                <g>
+                    <foreignObject width={100} height={100} y={-10} x={-30}>
+                        <input type={nodeDatum.nature} defaultValue={nodeDatum.value} onChange={() => console.log("fds")}/>
+                    </foreignObject>
+                </g>
+            );
+        } else if (nodeDatum.type === "select"){
+            return (
+                <g>
+                    <foreignObject width={100} height={100} y={-10} x={-30}>
+                        <label>{nodeDatum.label} :</label>
+                        <select>
+                            {nodeDatum.values.map((v:any) =>
+                            {return <option value={v}>{v}</option>})}
+                        </select>
+                    </foreignObject>
+                </g>
+            );
+        }
+        return(
         <g>
           <circle r="25" onClick={toggleNode}>
         </circle>
@@ -53,8 +75,8 @@ export function CustomTree(){
             {nodeDatum.name}
           </text>
         
-        </g>
-      );
+        </g>)
+    };
     return (
             <Tree
                 svgClassName="tree"
@@ -145,7 +167,7 @@ function formatData(data:any, syntax:any){
         } else if (syntax[key].type === "object"){
             data[key].name = key
             if (!data.children){
-                data.children = []
+                data.children = [];
             }
             data.children.push(data[key]);
             // data.children.push({ // WIP : there is an extra "+" after style nodes
@@ -156,20 +178,14 @@ function formatData(data:any, syntax:any){
         } else if(syntax[key].type === "field") {
             if (syntax[syntax[key].field]){
                 if (!data.children){
-                    data.children = []
+                    data.children = [];
                 }
                 let node = syntax[syntax[key].field];
                 if (!node.values){
                     node.value = data[key];
                 }
-                console.log(node)
-                if (node.type === "input"){
-                    node.element = "<input type='"+ node.nature +"' value='"+ node.value +"'>";
-                } else if (node.type === "select"){
-                    node.element = "<label>"+ key +"</label><select> "
-                    + "<option value='"+ data[key] +"'></option>"
-                    //TODO : add all options thanks to node.value
-                    + "</select>";
+                if (node.type === "select"){
+                    node.label = key;
                 }
                 data.children.push(node);
             }
