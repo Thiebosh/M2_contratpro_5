@@ -38,6 +38,6 @@ FROM server
 
 COPY --from=builder /app/build .
 
-RUN chmod -R 644 $(find . -type f) && chmod -R 755 $(find . -type d)
+RUN chmod 644 $(find . -type f) && chmod 755 $(find . -type d)
 
 USER nginx
