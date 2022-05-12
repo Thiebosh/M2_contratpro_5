@@ -3,6 +3,8 @@ FROM nginx:1.17.8-alpine as server
 
 WORKDIR /var/www
 
+CMD ["nginx", "-g", "daemon off;"]
+
 COPY nginx/nginx.conf /etc/nginx/conf.d
 
 ## add permissions for nginx user
@@ -14,9 +16,6 @@ RUN chown -R nginx:nginx /var/cache/nginx && \
     chmod 003 /var/www
 
 EXPOSE 8080
-USER nginx
-
-CMD ["nginx", "-g", "daemon off;"]
 
 
 # step2 - pull official base image and build app
@@ -38,3 +37,7 @@ RUN npm run build
 FROM server
 
 COPY --from=builder /app/build .
+
+RUN chmod -R 644 $(find . -type f) && chmod -R 755 $(find . -type d)
+
+USER nginx
