@@ -12,13 +12,11 @@ export function Proto() {
     const { urlName } = useParams();
     const userContext = useUserContext();
     const [projectId, setProjectId] = useState<string>();
-    const [syntaxId, setSyntaxId] = useState<string>();
 
     useEffect(() => {
         postProjectExistForUser(userContext.user.id, urlName || "")
         .then((data) => {
             setProjectId(data.project_id);
-            setSyntaxId(data.syntax_id);
         })
         .catch(error => {
             // setErrorMsg("Internal error");
@@ -69,7 +67,7 @@ export function Proto() {
     useEffect(() => {
         if (!(socket && socketUsable && pages.length >= 2)) return;
         socket.send(JSON.stringify({"action":"execute", "page": pages[1].link}))
-    }, [socket, socketUsable]);
+    }, [socket, socketUsable, pages]);
 
     function triggerLink(page:string) {
         if (!socket || !socketUsable) return;

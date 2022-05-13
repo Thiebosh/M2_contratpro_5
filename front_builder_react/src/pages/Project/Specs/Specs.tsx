@@ -8,21 +8,16 @@ import { init_websocket } from '../../..';
 
 import './Specs.scss';
 
-interface Dictionary<T> {
-    [Key: string]: T;
-}
 export function Specs() {
     const navigate = useNavigate();
     const { urlName } = useParams();
     const userContext = useUserContext();
     const [projectId, setProjectId] = useState<string>();
-    const [syntaxId, setSyntaxId] = useState<string>();
 
     useEffect(() => {
         postProjectExistForUser(userContext.user.id, urlName || "")
         .then((data) => {
             setProjectId(data.project_id);
-            setSyntaxId(data.syntax_id);
         })
         .catch(error => {
             // setErrorMsg("Internal error");
@@ -33,17 +28,21 @@ export function Specs() {
 
     const [socket, setSocket] = useState<WebSocket>();
     const [socketUsable, setSocketUsable] = useState<boolean>(false);
-    // const [loadingSpecs, setLoadingSpecs] = useState<boolean>(true);
+    // const [loadingPage, setLoadingPage] = useState<boolean>(true);
 
     useEffect(() => {
-        if (projectId && !socketUsable) setSocket(init_websocket('specs', projectId, userContext.user.name, setSocketUsable));
+        if (projectId && !socketUsable) {
+            // setLoadingPage(true);
+            setSocket(init_websocket('specs', projectId, userContext.user.name, setSocketUsable));
+        }
     }, [projectId, userContext.user.name, socketUsable]);
 
     useEffect(() => {
         if (!socket) return;
 
         socket.onmessage = (event) => {
-            const data:Dictionary<string> = JSON.parse(event.data)
+            // setLoadingPage(false);
+            const data:Record<string, unknown> = JSON.parse(event.data)
             console.log(data);
             switch(Object.keys(data)[0]) {
                 case 'save':
@@ -112,6 +111,7 @@ export function Specs() {
             <div id="treeContent">
                 <CustomTree/>
             </div>
+            {/* { socketUsable ? (loadingPage ? <p className='centered'>Loading...</p> : <div id="placeholder"/>) : <p className='centered'>Connection to server...</p> } */}
         </section>
     );
 }

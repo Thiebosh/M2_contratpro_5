@@ -186,8 +186,7 @@ async def exist_for_user():
         "_id": 0,
         "id": {
             "$toString": "$_id"
-        },
-        "syntax_id": 1
+        }
     }
 
     try:
@@ -200,8 +199,7 @@ async def exist_for_user():
         return "", status.HTTP_401_UNAUTHORIZED
 
     return {
-        "project_id": result["id"],
-        "syntax_id": result["syntax_id"]
+        "project_id": result["id"]
     }, status.HTTP_200_OK
 
 

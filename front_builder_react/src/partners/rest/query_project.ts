@@ -56,8 +56,7 @@ export async function postProjectUpdate(
 }
 
 interface ProjectExistForUser {
-    project_id: string,
-    syntax_id: string,
+    project_id: string
 }
 export async function postProjectExistForUser(user_id:string, project_name:string): Promise<ProjectExistForUser> {
     const data = {
