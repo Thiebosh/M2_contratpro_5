@@ -12,8 +12,10 @@ class InputManagerSpecs(InputManager):
 
         self.send_conflict_message_callback = send_conflict_message_callback
 
-        self.json_handler = JsonHandler(partners, room_id, room_type)
-        self.files_manager = FilesManagerSpecs(partners, room_id, room_type)
+        self.partners["generator"].set_exe_file(self.partners["db"].find_one(COLLECTION_PROJECTS, *MongoQueries.getSyntaxIdFromId(self.room_id))["syntax_id"])
+
+        self.json_handler = JsonHandler(self.partners, room_id, room_type)
+        self.files_manager = FilesManagerSpecs(self.partners, room_id, room_type)
 
         self.current_version_generated = self.partners["db"].find_one(COLLECTION_PROJECTS, *MongoQueries.getProtoStateFromId(self.room_id))['latest_proto']
 

@@ -97,3 +97,13 @@ class MongoQueries():
                 }
             }
         )
+
+    @staticmethod
+    def getSyntaxIdFromId(id:str):
+        return (
+            {"_id": ObjectId(id)},
+            {
+                "_id": 0,
+                "syntax_id": 1,
+            }
+        )

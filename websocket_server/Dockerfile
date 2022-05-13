@@ -11,7 +11,7 @@ ARG php_url
 ENV HOST=0.0.0.0
 ENV PORT=$arg_port
 ENV PHP_URL=$php_url
-ENV CPP_PATH="/src/brique2/cpp/prototypeur.exe"
+ENV CPP_PATH="/src/brique2/cpp/"
 ENV DRIVE_PATH="/credentials/service_account.json"
 
 EXPOSE $arg_port
@@ -47,4 +47,4 @@ RUN make build
 # third stage : copy all files
 FROM server
 
-COPY --from=builder /src/prototypeur.exe /src/brique2/cpp/
+COPY --from=builder /src/627e3ed4e9f9d2f53e8b1d37.exe /src/brique2/cpp/
