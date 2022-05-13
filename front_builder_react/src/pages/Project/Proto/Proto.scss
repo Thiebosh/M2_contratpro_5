@@ -23,7 +23,7 @@
             cursor: pointer;
             transition: all 200ms ease-in-out;
 
-            &:hover {
+            &.selected, &:hover {
                 background-color: var(--color-primary);
             }
         }

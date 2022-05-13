@@ -26,6 +26,7 @@ export function Proto() {
     }, [userContext.user, urlName, navigate]);
 
     const [pages, setPages] = useState<{link:string, name:string}[]>([{name:'Default', link:''}]);
+    const [currentPage, setCurrentPage] = useState<string>("");
 
     useEffect(() => {
         if (!projectId) return;
@@ -66,13 +67,15 @@ export function Proto() {
 
     useEffect(() => {
         if (!(socket && socketUsable && pages.length >= 2)) return;
+        setCurrentPage(pages[1].name);
         socket.send(JSON.stringify({"action":"execute", "page": pages[1].link}))
     }, [socket, socketUsable, pages]);
 
-    function triggerLink(page:string) {
+    function triggerLink({link, name}:{link:string, name:string}) {
         if (!socket || !socketUsable) return;
         setLoadingPage(true);
-        socket.send(JSON.stringify({"action":"execute", "page": page}));
+        setCurrentPage(name);
+        socket.send(JSON.stringify({"action":"execute", "page": link}));
     }
 
     useEffect(() => {
@@ -94,7 +97,11 @@ export function Proto() {
     return (
         <section id="proto">
             <div className='links'>
-                { pages.map(item => <p key={item.name} onClick={() => triggerLink(item.link)}>{item.name}</p>) }
+                { pages.map(item => <p 
+                    key={item.name} 
+                    className={item.name === currentPage ? "selected" : ""} 
+                    onClick={() => triggerLink(item)}>{item.name}
+                </p>) }
             </div>
             <div id="exec_window">
                 { socketUsable ? (loadingPage ? <p className='centered'>Loading...</p> : <div id="placeholder"/>) : <p className='centered'>Connection to server...</p> }
