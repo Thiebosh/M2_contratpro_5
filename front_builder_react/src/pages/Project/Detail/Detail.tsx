@@ -90,12 +90,10 @@ export function Detail() {
 
     useEffect(() => {
         postProjectExistForUser(userId, urlName || "")
-        .then((data) => data.id || navigate('/projects'))
-        .then((id) => {
-            if (!id) throw new Error("empty project id");
-            setProjectId(id);
+        .then((data) => {
+            setProjectId(data.project_id);
 
-            postProjectGet(id)
+            postProjectGet(data.project_id)
             .then((data) => {
                 setProjectName(data.result.name);
                 setProjectSyntax(data.result.syntax);

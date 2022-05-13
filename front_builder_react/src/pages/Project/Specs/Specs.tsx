@@ -15,30 +15,14 @@ export function Specs() {
     const navigate = useNavigate();
     const { urlName } = useParams();
     const userContext = useUserContext();
-    const [socket, setSocket] = useState<WebSocket>();
-    const [socketUsable, setSocketUsable] = useState<boolean>(false);
-
-    const [successMsg, setSuccessMsg] = useState<string>("");
-    const [infoMsg, setInfoMsg] = useState<string>("");
-    const [errorMsg, setErrorMsg] = useState<string>("");
-    useEffect(() => {
-        if (successMsg) setTimeout(() => setSuccessMsg(""), 4000);
-    }, [successMsg]);
-    useEffect(() => {
-        if (infoMsg) setTimeout(() => setInfoMsg(""), 4000);
-    }, [infoMsg]);
-    useEffect(() => {
-        if (errorMsg) setTimeout(() => setErrorMsg(""), 4000);
-    }, [errorMsg]);
+    const [projectId, setProjectId] = useState<string>();
+    const [syntaxId, setSyntaxId] = useState<string>();
 
     useEffect(() => {
         postProjectExistForUser(userContext.user.id, urlName || "")
         .then((data) => {
-            if (!data.id) {
-                navigate('/projects');
-                return;
-            }
-            setSocket(init_websocket('specs', data.id, userContext.user.name, setSocketUsable));
+            setProjectId(data.project_id);
+            setSyntaxId(data.syntax_id);
         })
         .catch(error => {
             // setErrorMsg("Internal error");
@@ -46,6 +30,14 @@ export function Specs() {
             navigate('/projects');
         });
     }, [userContext.user, urlName, navigate]);
+
+    const [socket, setSocket] = useState<WebSocket>();
+    const [socketUsable, setSocketUsable] = useState<boolean>(false);
+    // const [loadingSpecs, setLoadingSpecs] = useState<boolean>(true);
+
+    useEffect(() => {
+        if (projectId && !socketUsable) setSocket(init_websocket('specs', projectId, userContext.user.name, setSocketUsable));
+    }, [projectId, userContext.user.name, socketUsable]);
 
     useEffect(() => {
         if (!socket) return;
@@ -63,8 +55,29 @@ export function Specs() {
             }
         };
 
-        return () => socket.close();
+        return () => {
+            setSocketUsable(false);
+            socket.close();
+        }
     }, [socket]);
+
+    useEffect(() => {
+        if (!(socket && socketUsable)) return;
+        // socket.send(JSON.stringify({"action":"execute", "page": ""})) // init if needed
+    }, [socket, socketUsable]);
+
+    const [successMsg, setSuccessMsg] = useState<string>("");
+    const [infoMsg, setInfoMsg] = useState<string>("");
+    const [errorMsg, setErrorMsg] = useState<string>("");
+    useEffect(() => {
+        if (successMsg) setTimeout(() => setSuccessMsg(""), 4000);
+    }, [successMsg]);
+    useEffect(() => {
+        if (infoMsg) setTimeout(() => setInfoMsg(""), 4000);
+    }, [infoMsg]);
+    useEffect(() => {
+        if (errorMsg) setTimeout(() => setErrorMsg(""), 4000);
+    }, [errorMsg]);
 
     function triggerGenerate() {
         if (!socket || !socketUsable) {
