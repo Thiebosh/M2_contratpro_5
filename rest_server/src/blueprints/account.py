@@ -106,6 +106,10 @@ async def get():
 
     if not user_id:
         return "", status.HTTP_400_BAD_REQUEST
+    
+    count_filter_q = {
+        "users": user_id
+    }
 
     try:
         user_id = ObjectId(user_id)
@@ -113,16 +117,17 @@ async def get():
         print(e)
         return "", status.HTTP_400_BAD_REQUEST
 
-    filter_q = {
+    find_filter_q = {
         "_id": user_id,
     }
-    fields = {
+    find_fields = {
         "_id": 0,
         "name": 1
     }
 
     try:
-        result = await current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, filter_q, fields)
+        result = await current_app.config["partners"]["db"].find_one(COLLECTION_ACCOUNTS, find_filter_q, find_fields)
+        count = await current_app.config["partners"]["db"].count(COLLECTION_PROJECTS, count_filter_q)
     except Exception as e:
         print(e)
         return "", status.HTTP_503_SERVICE_UNAVAILABLE
@@ -131,7 +136,8 @@ async def get():
         return {}, status.HTTP_500_INTERNAL_SERVER_ERROR
 
     return {
-        "name": result["name"]
+        "name": result["name"],
+        "nbProjects": count,
     }, status.HTTP_200_OK
 
 

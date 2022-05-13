@@ -15,7 +15,7 @@ export function CreateProject() {
     const [name, setName] = useState<string>("");
     const [currentCollabIds, setCurrentCollabIds] = useState<string[]>([userId]);
     const [syntaxList, setSyntaxList] = useState<{id:string, name:string, description:string}[]>([]);
-    const [syntaxId, setSyntax] = useState<string>("");
+    const [syntaxId, setSyntaxId] = useState<string>("");
     const [description, setDescription] = useState<string>("");
     const [warnMsg, setWarnMsg] = useState<string>("");
     const [errorMsg, setErrorMsg] = useState<string>("");
@@ -23,6 +23,7 @@ export function CreateProject() {
     useEffect(() => {
         postSyntaxGetList()
         .then((data) => {
+            setSyntaxId(data.result[0].id);
             setSyntaxList(data.result);
         })
         .catch(error => {
@@ -35,7 +36,7 @@ export function CreateProject() {
     useEffect(() => { errorMsg && setTimeout(() => setErrorMsg(""), 4000) }, [errorMsg]);
 
     function triggerCreate() {
-        if (!name || !syntaxId) {
+        if (!(name && syntaxId)) {
             setWarnMsg("Empty mandatory field(s)");
             return;
         }
@@ -75,7 +76,7 @@ export function CreateProject() {
                 {/* remplacer simple liste déroulante par un tableau dans un scroller avec nom et description et current selected en surbrillance bleue */}
                 <div className='input_group'>
                     <label>Project syntax</label>
-                    <select onChange={(event) => setSyntax(event.target.value)}>
+                    <select onChange={(event) => setSyntaxId(event.target.value)}>
                         {syntaxList.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
                     </select>
                 </div>

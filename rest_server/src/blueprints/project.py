@@ -13,14 +13,15 @@ async def create():
     post = ImmutableMultiDict(await request.get_json())
     if len(post) != 4:
         return "", status.HTTP_400_BAD_REQUEST
+    print(post)
 
     project_name = post.get("name", type=str, default=None)
     users_id = post.get("users_id", type=str, default=None)
     syntax_id = post.get("syntax_id", type=str, default=None)
     description = post.get("description", type=str, default=None)
 
-    if not (project_name and users_id and syntax_id and description):
-        return "", status.HTTP_400_BAD_REQUEST
+    if not (project_name and users_id):
+        return "detail", status.HTTP_400_BAD_REQUEST
 
     # verify if name does not exist
     filter_q = {

@@ -109,6 +109,7 @@ export function Profile() {
     const userContext = useUserContext();
 
     const [name, setName] = useState<string>("");
+    const [nbProjects, setNbProjects] = useState<number>(0);
     const [edit, setEdit] = useState<boolean>(false);
 
     const editOn = () => setEdit(true);
@@ -118,6 +119,7 @@ export function Profile() {
         postAccountGet(userContext.user.id)
         .then((data) => {
             setName(data.name);
+            setNbProjects(data.nbProjects);
         })
         .catch(error => {
             console.log("Error:", error);
@@ -130,7 +132,10 @@ export function Profile() {
             <div className='card medium'>
                 <div className='summary'>
                     <img src='/img/avatar.jpg' alt='avatar'/>
-                    <p>{name}</p>
+                    <div>
+                        <h1>{name}</h1>
+                        <p>{nbProjects} project{nbProjects > 1 && "s"}</p>
+                    </div>
                 </div>
                 { edit ? <Edit editOff={editOff} setName={setName}/> : <div className='button' onClick={editOn}>Edit</div>}
             </div>

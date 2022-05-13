@@ -23,7 +23,8 @@ export async function postAccountConnect(name:string, password:string): Promise<
 }
 
 interface AccountGet {
-    name:string
+    name:string,
+    nbProjects:number,
 }
 export async function postAccountGet(id:string): Promise<AccountGet> {
     const data = {
