@@ -73,12 +73,20 @@ export function CreateProject() {
                     setCurrentCollabIds={setCurrentCollabIds}
                     setErrorMsg={setErrorMsg}
                 />
-                {/* remplacer simple liste déroulante par un tableau dans un scroller avec nom et description et current selected en surbrillance bleue */}
                 <div className='input_group'>
                     <label>Project syntax</label>
-                    <select onChange={(event) => setSyntaxId(event.target.value)}>
-                        {syntaxList.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
-                    </select>
+                    <div className='syntaxes'>
+                        { syntaxList.map((item) => (
+                            <div 
+                                key={item.id}
+                                className={"syntax "+(syntaxId === item.id && "current")}
+                                onClick={() => setSyntaxId(item.id)}>
+                                <h3>{item.name}</h3>
+                                <hr/>
+                                <p>{item.description}</p>
+                            </div>
+                        )) }
+                    </div>
                 </div>
                 <div className='input_group'>
                     <label>Description</label>

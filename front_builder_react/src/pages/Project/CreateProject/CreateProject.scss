@@ -44,6 +44,41 @@
         textarea {
             height: 6em;
         }
+
+        .syntaxes {
+            display: flex;
+            border: 1px solid lightgray;
+            border-radius: 5px;
+            flex-direction: column;
+            padding: 1em 1em 0;
+            overflow-y: auto;
+            height: 10em;
+
+            .syntax {
+                margin-bottom: 1em;
+                border: 1px solid lightgray;
+                border-radius: 0.5em;
+                text-align: center;
+                padding: 1em 2em;
+                cursor: pointer;
+                transition: all 400ms ease-in-out;
+
+                &:hover, &.current {
+                    background-color: var(--color-primary-light);
+                    color: white;
+                    box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.1);
+                }
+
+                &>* {
+                    margin: 0;
+                }
+
+                hr {
+                    margin: 5px auto;
+                    width: 50%;
+                }
+            }
+        }
     }
 
     .warning, .error {
