@@ -12,11 +12,14 @@ import {
     postProjectUpdate,
     postProjectExistForUser,
     postProjectGetProtoPages,
-    postProjectSearchForUser,
+    postProjectsSearchForUser,
     postProjectAddUser,
     postProjectRemoveUser,
     postProjectDelete
 } from './query_project';
+import {
+    postSyntaxGetList
+} from './query_syntax';
 // export type {};
 export {
     postAccountCreate,
@@ -30,8 +33,9 @@ export {
     postProjectUpdate,
     postProjectExistForUser,
     postProjectGetProtoPages,
-    postProjectSearchForUser,
+    postProjectsSearchForUser,
     postProjectAddUser,
     postProjectRemoveUser,
-    postProjectDelete
+    postProjectDelete,
+    postSyntaxGetList,
 };

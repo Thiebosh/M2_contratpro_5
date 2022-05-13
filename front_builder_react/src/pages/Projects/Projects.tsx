@@ -5,22 +5,23 @@ import moment from 'moment';
 
 import { useUserContext } from '../../session/user';
 import { Collabs } from '../../components/Collabs';
-import { postProjectSearchForUser } from '../../partners/rest';
+import { postProjectsSearchForUser } from '../../partners/rest';
 
 import {dateFormat} from '../../index';
 
 import './Projects.scss';
 
 interface ProjectProps {
-    id: string;
-    name: string;
+    id: string,
+    name: string,
     users: {
-        id: string;
-        name: string;
-    }[];
-    creation: string;
-    last_specs: string;
-    latest_proto: boolean;
+        id: string,
+        name: string,
+    }[],
+    syntax_name:string,
+    creation: string,
+    last_specs: string,
+    latest_proto: boolean,
 }
 function Project(props: ProjectProps) {
     const userId = useUserContext().user.id;
@@ -29,6 +30,7 @@ function Project(props: ProjectProps) {
         <tr>
             <td><a className='button' href={"/project/"+props.name}>{props.name}</a></td>
             <td><Collabs usernames={props.users.filter(item => item.id !== userId).map(item => item.name)} /></td>
+            <td>{props.syntax_name}</td>
             <td>{moment(props.creation).format(dateFormat)}</td>
             <td>{nullableDate(props.last_specs)}</td>
             <td>{props.latest_proto ? "Up to date" : "Outdated"}</td>
@@ -42,7 +44,7 @@ export function Projects() {
     const [projects, setProjects] = useState<ProjectProps[]>([]);
 
     useEffect(() => {
-        postProjectSearchForUser(userId)
+        postProjectsSearchForUser(userId)
         .then((data) => {
             setProjects(data.result);
         })
@@ -68,6 +70,7 @@ export function Projects() {
                         <tr>
                             <th>Name</th>
                             <th>Collaborators</th>
+                            <th>Syntax</th>
                             <th>Creation date</th>
                             <th>Last modified</th>
                             <th>Prototype status</th>

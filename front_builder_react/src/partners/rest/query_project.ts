@@ -3,11 +3,12 @@ import {_postRequest} from './core';
 interface ProjectCreate {
     success: string|boolean
 }
-export async function postProjectCreate(name:string, users_id:string[], description:string): Promise<ProjectCreate> {
+export async function postProjectCreate(name:string, users_id:string[], syntax_id:string, description:string): Promise<ProjectCreate> {
     const data = {
         name: name,
         users_id: JSON.stringify(users_id),
-        // description: description, //TODO
+        syntax_id: syntax_id,
+        description: description,
     }
     return await _postRequest('/project/create', data);
 }
@@ -18,7 +19,8 @@ interface ProjectGet {
         users: {
             id: string,
             name: string
-        }[]
+        }[],
+        syntax:string,
         creation:string,
         last_specs:string|null,
         latest_proto:boolean,
@@ -77,20 +79,21 @@ export async function postProjectGetProtoPages(project_id:string): Promise<GetPr
     return await _postRequest('/project/get_proto_pages', data);
 }
 
-interface ProjectSearchByUser {
-    result: {//peut simplifier car un seul projet... recherche par id
+interface ProjectsSearchForUser {
+    result: {
         id: string,
         name: string,
         users: {
             id: string,
             name: string
         }[],
+        syntax_name: string,
         creation: string,
         last_specs: string,
         latest_proto: boolean
     }[]
 }
-export async function postProjectSearchForUser(user_id:string): Promise<ProjectSearchByUser> {
+export async function postProjectsSearchForUser(user_id:string): Promise<ProjectsSearchForUser> {
     const data = {
         user_id: user_id
     }

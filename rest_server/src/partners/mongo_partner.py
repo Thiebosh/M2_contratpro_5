@@ -8,7 +8,8 @@ class MongoPartner:
         self.conn = MongoClient(mongo_url, tlsAllowInvalidCertificates=True)
         self.collections = {
             "accounts": self.conn.spectry.accounts,
-            "projects": self.conn.spectry.projects
+            "projects": self.conn.spectry.projects,
+            "syntax": self.conn.spectry.syntax,
         }
 
 

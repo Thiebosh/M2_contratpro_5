@@ -70,6 +70,7 @@ export function Detail() {
     const userId = useUserContext().user.id;
 
     const [projectId, setProjectId] = useState<string>('');
+    const [projectSyntax, setProjectSyntax] = useState<string>('');
     const [projectName, setProjectName] = useState<string>('');
     const [projectCreation, setProjectCreation] = useState<string>('');
     const [projectUsers, setProjectUsers] = useState<Collab[]>([]);
@@ -97,6 +98,7 @@ export function Detail() {
             postProjectGet(id)
             .then((data) => {
                 setProjectName(data.result.name);
+                setProjectSyntax(data.result.syntax);
                 setProjectCreation(data.result.creation);
                 setProjectUsers(data.result.users);
                 setProjectLastSpecs(data.result.last_specs || '');
@@ -188,6 +190,11 @@ export function Detail() {
                 <h2>Summary</h2>
                 <table>
                     <tbody>
+                        <tr>
+                            <th>Syntax selected</th>
+                            <th>:</th>
+                            <td>{projectSyntax}</td>
+                        </tr>
                         <tr>
                             <th>Project creation date</th>
                             <th>:</th>

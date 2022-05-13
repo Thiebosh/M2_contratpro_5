@@ -4,7 +4,7 @@ import { Fade } from 'react-awesome-reveal';
 
 import { useUserContext } from '../../../session/user';
 import { CollabsInput } from '../../../components/Collabs';
-import { postProjectCreate } from '../../../partners/rest';
+import { postProjectCreate, postSyntaxGetList } from '../../../partners/rest';
 
 import './CreateProject.scss';
 
@@ -14,20 +14,33 @@ export function CreateProject() {
 
     const [name, setName] = useState<string>("");
     const [currentCollabIds, setCurrentCollabIds] = useState<string[]>([userId]);
+    const [syntaxList, setSyntaxList] = useState<{id:string, name:string, description:string}[]>([]);
+    const [syntaxId, setSyntax] = useState<string>("");
     const [description, setDescription] = useState<string>("");
     const [warnMsg, setWarnMsg] = useState<string>("");
     const [errorMsg, setErrorMsg] = useState<string>("");
+
+    useEffect(() => {
+        postSyntaxGetList()
+        .then((data) => {
+            setSyntaxList(data.result);
+        })
+        .catch(error => {
+            setErrorMsg("Internal error");
+            console.log("Error:", error);
+        });
+    }, []);
 
     useEffect(() => { warnMsg && setTimeout(() => setWarnMsg(""), 4000) }, [warnMsg]);
     useEffect(() => { errorMsg && setTimeout(() => setErrorMsg(""), 4000) }, [errorMsg]);
 
     function triggerCreate() {
-        if (!name) {
+        if (!name || !syntaxId) {
             setWarnMsg("Empty mandatory field(s)");
             return;
         }
 
-        postProjectCreate(name, currentCollabIds, description)
+        postProjectCreate(name, currentCollabIds, syntaxId, description)
         .then((data) => {
             console.log(data);
             if (data.success === "already exist") {
@@ -59,6 +72,13 @@ export function CreateProject() {
                     setCurrentCollabIds={setCurrentCollabIds}
                     setErrorMsg={setErrorMsg}
                 />
+                {/* remplacer simple liste déroulante par un tableau dans un scroller avec nom et description et current selected en surbrillance bleue */}
+                <div className='input_group'>
+                    <label>Project syntax</label>
+                    <select onChange={(event) => setSyntax(event.target.value)}>
+                        {syntaxList.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
+                    </select>
+                </div>
                 <div className='input_group'>
                     <label>Description</label>
                     <textarea

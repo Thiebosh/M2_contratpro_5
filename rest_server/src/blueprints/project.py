@@ -11,13 +11,15 @@ COLLECTION = "projects"
 @bp_project.route("/create", methods=['POST'])
 async def create():
     post = ImmutableMultiDict(await request.get_json())
-    if len(post) != 2:
+    if len(post) != 4:
         return "", status.HTTP_400_BAD_REQUEST
 
     project_name = post.get("name", type=str, default=None)
     users_id = post.get("users_id", type=str, default=None)
+    syntax_id = post.get("syntax_id", type=str, default=None)
+    description = post.get("description", type=str, default=None)
 
-    if not (project_name and users_id):
+    if not (project_name and users_id and syntax_id and description):
         return "", status.HTTP_400_BAD_REQUEST
 
     # verify if name does not exist
@@ -42,7 +44,8 @@ async def create():
     doc = {
         "name": project_name,
         "users": json.loads(users_id),
-        "description": "",
+        "syntax_id": syntax_id,
+        "description": description,
         "creation": datetime.utcnow(),
         "last_specs": None,
         "latest_proto": True,
@@ -93,6 +96,9 @@ async def get():
                         "in": { "$toObjectId": "$$this" }
                     }
                 },
+                "syntax_id": {
+                    "$toObjectId": "$syntax_id"
+                },
                 "creation": 1,
                 "last_specs": 1,
                 "latest_proto": 1,
@@ -108,6 +114,14 @@ async def get():
             }
         },
         {
+            "$lookup": {
+                "from": "syntax",
+                "localField": "syntax_id",
+                "foreignField": "_id",
+                "as": "syntaxes"
+            }
+        },
+        {
             "$addFields": {
                 "users": {
                     "$map": {
@@ -119,7 +133,21 @@ async def get():
                             "name": "$$this.name"
                         }
                     }
+                },
+                "syntax": {
+                    "$arrayElemAt": ["$syntaxes", 0]
                 }
+            }
+        },
+        {
+            "$project": {
+                "id": 1,
+                "name": 1,
+                "users": 1,
+                "syntax": "$syntax.name",
+                "creation": 1,
+                "last_specs": 1,
+                "latest_proto": 1
             }
         },
     ]
@@ -241,6 +269,9 @@ async def search_for_user():
                         "in": { "$toObjectId": "$$this" }
                     }
                 },
+                "syntax_id": {
+                    "$toObjectId": "$syntax_id"
+                },
                 "creation": 1,
                 "last_specs": 1,
                 "latest_proto": 1
@@ -255,6 +286,14 @@ async def search_for_user():
             }
         },
         {
+            "$lookup": {
+                "from": "syntax",
+                "localField": "syntax_id",
+                "foreignField": "_id",
+                "as": "syntaxes"
+            }
+        },
+        {
             "$addFields": {
                 "users": {
                     "$map": {
@@ -266,7 +305,21 @@ async def search_for_user():
                             "name": "$$this.name"
                         }
                     }
+                },
+                "syntax": {
+                    "$arrayElemAt": ["$syntaxes", 0]
                 }
+            }
+        },
+        {
+            "$project": {
+                "id": 1,
+                "name": 1,
+                "users": 1,
+                "syntax_name": "$syntax.name",
+                "creation": 1,
+                "last_specs": 1,
+                "latest_proto": 1
             }
         },
     ]
