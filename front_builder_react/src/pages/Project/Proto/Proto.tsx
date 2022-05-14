@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { init_websocket } from '../../..';
+import { Collabs } from '../../../components/Collabs';
 
 import { postProjectExistForUser, postProjectGetProtoPages } from '../../../partners/rest';
 import { useUserContext } from '../../../session/user';
@@ -133,15 +134,26 @@ export function Proto() {
 
     return (
         <section id="proto">
-            <div className='links'>
-                { pages.map(item => <p 
-                    key={item.name} 
-                    className={item.name === currentPage ? "selected" : ""} 
-                    onClick={() => triggerLink(item)}>{item.name}
-                </p>) }
+            <div className='session'>
+                <div className="users">
+                    <Collabs usernames={[userContext.user.name+" (you)", ...loggedCollabs]} />
+                </div>
+                <hr/>
+                <div className='button'>Reset session</div>
+                <code>['session']</code>
+                <pre>['session']</pre>
             </div>
-            <div id="exec_window">
-                { socketUsable ? (loadingPage ? <p className='centered'>Loading...</p> : <div id="placeholder"/>) : <p className='centered'>Connection to server...</p> }
+            <div>
+                <div className='links'>
+                    { pages.map(item => <p 
+                        key={item.name} 
+                        className={item.name === currentPage ? "selected" : ""} 
+                        onClick={() => triggerLink(item)}>{item.name}
+                    </p>) }
+                </div>
+                <div id="exec_window">
+                    { socketUsable ? (loadingPage ? <p className='centered'>Loading...</p> : <div id="placeholder"/>) : <p className='centered'>Connection to server...</p> }
+                </div>
             </div>
         </section>
     );

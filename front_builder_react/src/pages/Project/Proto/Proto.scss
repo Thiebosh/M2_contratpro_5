@@ -2,52 +2,96 @@
     position: fixed;
     height: 100%;
     width: 100%;
+    display: flex;
 
-    .links {
-        display: flex;
-        width: 80%;
-        margin: 0.8em auto;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: space-evenly;
+    .session {
+        width: 20%;
+        border-right: 1px solid black;
 
-        p {
-            text-decoration: none;
-            text-transform: capitalize;
+        .users {
+            margin: 1em 0;
+            padding-left: 0.5em;
+
+            .collabs {
+                flex-wrap: wrap;
+
+                .bubble {
+                    margin-bottom: .3em;
+                }
+            }
+        }
+
+        .button {
+            width: 60%;
+            margin: 1em auto;
             color: white;
             background-color: var(--color-primary-light);
-            border: 2px solid var(--color-primary-medium);
-            box-shadow: 0 1px 1.5px 1.5px rgba(0, 0, 0, 0.2);
-            padding: 4px 8px;
-            border-radius: 20%;
+            padding: .6em 0 .5em;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
             cursor: pointer;
-            transition: all 200ms ease-in-out;
+            font-size: 17px;
+        }
 
-            &.selected, &:hover {
-                background-color: var(--color-primary);
-            }
+        code, pre {
+            font-family: Consolas,"courier new";
+            color: crimson;
+            background-color: #f1f1f1;
+            padding: 2px;
+            font-size: 105%;
         }
     }
 
-    #exec_window {
-        border-top: 1px solid black;
-        height: 100%;
-        width: 100%;
+    .session+div {
+        flex-grow: 1;
 
-        .centered {
-            display: grid;
-            place-content: center;
-            height: 70% !important;
-            margin: 0;
+        .links {
+            display: flex;
+            width: 80%;
+            margin: 0.8em auto;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+
+            p {
+                text-decoration: none;
+                text-transform: capitalize;
+                color: white;
+                background-color: var(--color-primary-light);
+                border: 2px solid var(--color-primary-medium);
+                box-shadow: 0 1px 1.5px 1.5px rgba(0, 0, 0, 0.2);
+                padding: 4px 8px;
+                border-radius: 20%;
+                cursor: pointer;
+                transition: all 200ms ease-in-out;
+
+                &.selected, &:hover {
+                    background-color: var(--color-primary);
+                }
+            }
         }
 
-        #placeholder {
+        #exec_window {
+            border-top: 1px solid black;
             height: 100%;
             width: 100%;
-            text-align: left;
 
-            &>* {
+            .centered {
+                display: grid;
+                place-content: center;
+                height: 70% !important;
+                margin: 0;
+            }
+
+            #placeholder {
                 height: 100%;
+                width: 100%;
+                text-align: left;
+
+                &>* {
+                    height: 100%;
+                }
             }
         }
     }
