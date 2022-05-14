@@ -90,10 +90,10 @@ export function Specs() {
                     setRemoveCollab(data["remove_collab"] as string);
                     break;
                 case 'save':
-                    data["save"] ? setSuccessMsg("save: success") : setErrorMsg("save: failure");
+                    data["save"] ? setSuccessMsg("Save: success") : setErrorMsg("Save: failure");
                     break;
                 case 'generate':
-                    data["generate"] ? setSuccessMsg("generate: success") : setErrorMsg("generate: failure");
+                    data["generate"] ? setSuccessMsg("Generate: success") : setErrorMsg("Generate: failure");
                     break;
             }
         };
@@ -152,7 +152,6 @@ export function Specs() {
                     <Collabs usernames={[userContext.user.name+" (you)", ...loggedCollabs]} />
                 </div>
             </div>
-
             <div className='popup'>
                 { successMsg && <Fade><div className='success'>{successMsg}</div></Fade> }
                 { infoMsg && <Fade><div className='info'>{infoMsg}</div></Fade> }

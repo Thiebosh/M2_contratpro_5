@@ -33,3 +33,9 @@ class RenderPage():
 
     def page(self, page):
         return self.partners["renderer"].get_project_page(self.project_id, page)
+
+    def get_session(self):
+        return self.partners["renderer"].get_session()
+
+    def reset_session(self):
+        return self.partners["renderer"].reset_session()

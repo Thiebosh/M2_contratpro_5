@@ -11,6 +11,10 @@ class RoomProto(Room):
     def open_client_connection_to_room(self, socket, name):
         super().open_client_connection_to_room(socket, name)
 
+        result = self.input_manager.render_page.get_session()
+        if result[0]:
+            self.add_message_in_queue(socket, json.dumps({"set_session": json.loads(result[1])}))
+
 
     async def process_running_inputs(self):
         for input_to_process in self.input_manager.inputs:

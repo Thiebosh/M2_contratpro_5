@@ -86,6 +86,10 @@ class PhpPartner():
         return self._get("get_session")
 
 
+    def reset_session(self):
+        return self._get("reset_session")[0]
+
+
     def get_project_page(self, project_id, page):
         data = {
             "project_name": project_id,

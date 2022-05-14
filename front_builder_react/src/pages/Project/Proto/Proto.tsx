@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Fade } from 'react-awesome-reveal';
 import { useNavigate, useParams } from 'react-router-dom';
 import { init_websocket } from '../../..';
 import { Collabs } from '../../../components/Collabs';
@@ -43,6 +44,7 @@ export function Proto() {
     const [socketUsable, setSocketUsable] = useState<boolean>(false);
     const [loadingPage, setLoadingPage] = useState<boolean>(true);
     const [loggedCollabs, setLoggedCollabs] = useState<string[]>([]);
+    const [session, setSession] = useState<any>({});
 
     const [initCollab, setInitCollab] = useState<string[]>([]);
     const [addCollab, setAddCollab] = useState<string>();
@@ -86,6 +88,13 @@ export function Proto() {
                 case 'remove_collab':
                     setRemoveCollab(data["remove_collab"] as string);
                     break;
+                case 'set_session':
+                    setSession(data["set_session"]);
+                    break;
+                case 'reset_session':
+                    data["reset_session"] ? setSuccessMsg("Reset session: success") : setErrorMsg("Reset session: failure");
+                    if (data["reset_session"]) setSession({});
+                    break;
                 case 'execute':
                     setLoadingPage(false);
                     const targetElem = document.querySelector('#placeholder');
@@ -109,11 +118,30 @@ export function Proto() {
         socket.send(JSON.stringify({"action":"execute", "page": pages[1].link}))
     }, [socket, socketUsable, pages]);
 
+    const [successMsg, setSuccessMsg] = useState<string>("");
+    const [infoMsg, setInfoMsg] = useState<string>("");
+    const [errorMsg, setErrorMsg] = useState<string>("");
+    useEffect(() => {
+        if (successMsg) setTimeout(() => setSuccessMsg(""), 4000);
+    }, [successMsg]);
+    useEffect(() => {
+        if (infoMsg) setTimeout(() => setInfoMsg(""), 4000);
+    }, [infoMsg]);
+    useEffect(() => {
+        if (errorMsg) setTimeout(() => setErrorMsg(""), 4000);
+    }, [errorMsg]);
+
     function triggerLink({link, name}:{link:string, name:string}) {
         if (!socket || !socketUsable) return;
         setLoadingPage(true);
         setCurrentPage(name);
         socket.send(JSON.stringify({"action":"execute", "page": link}));
+    }
+
+    function triggerResetSession() {
+        if (!socket || !socketUsable) return;
+        setInfoMsg("Send reset session request...");
+        socket.send(JSON.stringify({"action":"reset_session"}));
     }
 
     useEffect(() => {
@@ -134,14 +162,18 @@ export function Proto() {
 
     return (
         <section id="proto">
+            <div className='popup'>
+                { successMsg && <Fade><div className='success'>{successMsg}</div></Fade> }
+                { infoMsg && <Fade><div className='info'>{infoMsg}</div></Fade> }
+                { errorMsg && <Fade><div className='error'>{errorMsg}</div></Fade> }
+            </div>
             <div className='session'>
                 <div className="users">
                     <Collabs usernames={[userContext.user.name+" (you)", ...loggedCollabs]} />
                 </div>
-                <hr/>
-                <div className='button'>Reset session</div>
-                <code>['session']</code>
-                <pre>['session']</pre>
+                <h2>Server session</h2>
+                <div className='button' onClick={triggerResetSession}>Reset</div>
+                <pre>{JSON.stringify(session, null, 2)}</pre>
             </div>
             <div>
                 <div className='links'>
