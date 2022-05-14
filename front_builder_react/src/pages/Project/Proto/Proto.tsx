@@ -41,6 +41,29 @@ export function Proto() {
     const [socket, setSocket] = useState<WebSocket>();
     const [socketUsable, setSocketUsable] = useState<boolean>(false);
     const [loadingPage, setLoadingPage] = useState<boolean>(true);
+    const [loggedCollabs, setLoggedCollabs] = useState<string[]>([]);
+
+    const [initCollab, setInitCollab] = useState<string[]>([]);
+    const [addCollab, setAddCollab] = useState<string>();
+    const [removeCollab, setRemoveCollab] = useState<string>();
+    useEffect(() => {
+        if (initCollab.length) {
+            setLoggedCollabs(initCollab);
+            setInitCollab([]);
+        }
+    }, [initCollab]);
+    useEffect(() => {
+        if (addCollab) {
+            setLoggedCollabs([...loggedCollabs, addCollab]);
+            setAddCollab(undefined);
+        }
+    }, [addCollab, loggedCollabs]);
+    useEffect(() => {
+        if (removeCollab) {
+            setLoggedCollabs([...loggedCollabs.filter(item => item !== removeCollab)]);
+            setRemoveCollab(undefined);
+        }
+    }, [removeCollab, loggedCollabs]);
 
     useEffect(() => {
         if (projectId && !socketUsable) setSocket(init_websocket('proto', projectId, userContext.user.name, setSocketUsable));
@@ -51,12 +74,26 @@ export function Proto() {
 
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data)
-            setLoadingPage(false);
-            const targetElem = document.querySelector('#placeholder');
-            if (!targetElem) return;
-            targetElem.innerHTML = data.execute.success === 200 
-                ? data.execute.content
-                : `<p class='centered'>Http response error : ${data.execute.success}</p>`;
+            console.log(data);
+            switch(Object.keys(data)[0]) {
+                case 'init_collabs':
+                    setInitCollab(data["init_collabs"] as string[]);
+                    break;
+                case 'add_collab':
+                    setAddCollab(data["add_collab"] as string);
+                    break;
+                case 'remove_collab':
+                    setRemoveCollab(data["remove_collab"] as string);
+                    break;
+                case 'execute':
+                    setLoadingPage(false);
+                    const targetElem = document.querySelector('#placeholder');
+                    if (!targetElem) return;
+                    targetElem.innerHTML = data["execute"]["success"] === 200 
+                        ? data["execute"]["content"]
+                        : `<p class='centered'>Http response error : ${data["execute"]["success"]}</p>`;
+                    break;
+            }
         };
 
         return () => {

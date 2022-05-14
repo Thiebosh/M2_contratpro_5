@@ -11,14 +11,11 @@ class RoomSpecs(Room):
     def open_client_connection_to_room(self, socket, name):
         super().open_client_connection_to_room(socket, name)
 
-        self.client_connection_queue[socket].put(json.dumps({"init": self.input_manager.json_handler.data}))
-        self.outputs.append(socket)
+        self.add_message_in_queue(socket, json.dumps({"init": self.input_manager.json_handler.data}))
 
 
     def send_conflict_message(self, input_to_process):
-        self.client_connection_queue[input_to_process.socket].put(json.dumps({"error": "conflict"}))
-        if input_to_process.socket not in self.outputs:
-            self.outputs.append(input_to_process.socket)
+        self.add_message_in_queue(input_to_process.socket, json.dumps({"error": "conflict"}))
 
 
     async def process_running_inputs(self):

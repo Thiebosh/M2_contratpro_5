@@ -52,9 +52,18 @@ class Room(ABC):
 
 
     def open_client_connection_to_room(self, socket, name):
+        names = list(self.socket_name.values())
+
         self.inputs.append(socket)
         self.socket_name[socket] = name
         self.client_connection_queue[socket] = queue.Queue()
+
+        self.add_message_in_queue(socket, json.dumps({"init_collabs": names}))
+
+        for client_socket in self.client_connection_queue:
+            if socket == client_socket:
+                continue
+            self.add_message_in_queue(client_socket, json.dumps({"add_collab": name}))
 
 
     def close_client_connection_to_room(self, socket):
@@ -63,9 +72,14 @@ class Room(ABC):
             self.outputs.remove(socket)
         self.inputs.remove(socket)
         del self.client_connection_queue[socket]
-        del self.socket_name[socket]
+        name = self.socket_name.pop(socket)
         self.callback_update_server_sockets(socket)
         self.delay = datetime.now()
+
+        for client_socket in self.client_connection_queue:
+            if socket == client_socket:
+                continue
+            self.add_message_in_queue(client_socket, json.dumps({"remove_collab": name}))
 
 
     def add_message_in_queue(self, socket_receiver, msg):
@@ -99,6 +113,7 @@ class Room(ABC):
             for socket in readable: #Get all sockets and put the ones which have a msg to a list
                 msg = self.partners["websocket"].recv(socket, self.encoding)
                 if not msg:
+                    print(f"close {self.socket_name[socket]} because empty msg")
                     self.close_client_connection_to_room(socket)
                     continue
 
@@ -110,6 +125,7 @@ class Room(ABC):
                     continue
 
                 if msg["action"] == "exitRoom":
+                    print(f"close {self.socket_name[socket]} because asked")
                     self.close_client_connection_to_room(socket)
                     continue
 

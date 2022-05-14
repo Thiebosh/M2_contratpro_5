@@ -7,6 +7,7 @@ import { useUserContext } from '../../../session/user';
 import { init_websocket } from '../../..';
 
 import './Specs.scss';
+import { Collabs } from '../../../components/Collabs';
 
 export function Specs() {
     const navigate = useNavigate();
@@ -35,11 +36,34 @@ export function Specs() {
             console.log("Error:", error);
             navigate('/projects');
         });
-    }, [userContext.user, urlName, navigate]);
+    }, [userContext.user.id, urlName, navigate]);
 
     const [socket, setSocket] = useState<WebSocket>();
     const [socketUsable, setSocketUsable] = useState<boolean>(false);
     // const [loadingPage, setLoadingPage] = useState<boolean>(true);
+    const [loggedCollabs, setLoggedCollabs] = useState<string[]>([]);
+
+    const [initCollab, setInitCollab] = useState<string[]>([]);
+    const [addCollab, setAddCollab] = useState<string>();
+    const [removeCollab, setRemoveCollab] = useState<string>();
+    useEffect(() => {
+        if (initCollab.length) {
+            setLoggedCollabs(initCollab);
+            setInitCollab([]);
+        }
+    }, [initCollab]);
+    useEffect(() => {
+        if (addCollab) {
+            setLoggedCollabs([...loggedCollabs, addCollab]);
+            setAddCollab(undefined);
+        }
+    }, [addCollab, loggedCollabs]);
+    useEffect(() => {
+        if (removeCollab) {
+            setLoggedCollabs([...loggedCollabs.filter(item => item !== removeCollab)]);
+            setRemoveCollab(undefined);
+        }
+    }, [removeCollab, loggedCollabs]);
 
     useEffect(() => {
         if (projectId && !socketUsable) {
@@ -56,6 +80,15 @@ export function Specs() {
             const data:Record<string, unknown> = JSON.parse(event.data)
             console.log(data);
             switch(Object.keys(data)[0]) {
+                case 'init_collabs':
+                    setInitCollab(data["init_collabs"] as string[]);
+                    break;
+                case 'add_collab':
+                    setAddCollab(data["add_collab"] as string);
+                    break;
+                case 'remove_collab':
+                    setRemoveCollab(data["remove_collab"] as string);
+                    break;
                 case 'save':
                     data["save"] ? setSuccessMsg("save: success") : setErrorMsg("save: failure");
                     break;
@@ -109,11 +142,17 @@ export function Specs() {
 
     return (
         <section id="specs">
-            <div id="menu">
-                <p onClick={triggerSave}>Save specifications</p>
-                <hr/>
-                <p onClick={triggerGenerate}>Generate prototype</p>
+            <div className="hover_menu">
+                <div className="menu">
+                    <p onClick={triggerSave}>Save specifications</p>
+                    <hr/>
+                    <p onClick={triggerGenerate}>Generate prototype</p>
+                </div>
+                <div className="users">
+                    <Collabs usernames={[userContext.user.name+" (you)", ...loggedCollabs]} />
+                </div>
             </div>
+
             <div className='popup'>
                 { successMsg && <Fade><div className='success'>{successMsg}</div></Fade> }
                 { infoMsg && <Fade><div className='info'>{infoMsg}</div></Fade> }

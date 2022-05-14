@@ -11,9 +11,6 @@ class RoomProto(Room):
     def open_client_connection_to_room(self, socket, name):
         super().open_client_connection_to_room(socket, name)
 
-        # self.client_connection_queue[socket].put(json.dumps({"init": self.input_manager.json_handler.data})) # envoyer association pages / url ?
-        # self.outputs.append(socket)
-
 
     async def process_running_inputs(self):
         for input_to_process in self.input_manager.inputs:

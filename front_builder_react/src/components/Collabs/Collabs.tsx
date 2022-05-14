@@ -19,7 +19,7 @@ export function Collabs(props: CollabsProps) {
     return (
         <div className='collabs'>
             {props.usernames.map(item => (
-                <div className={'bubble '+props.className} key={item} onClick={() => props.onClick && props.onClick(item)}>
+                <div className={'bubble '+(props.className || "")} key={item} onClick={() => props.onClick && props.onClick(item)}>
                     {item[0]}
                     <span>{item}</span>
                 </div>
