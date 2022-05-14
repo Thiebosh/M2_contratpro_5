@@ -9,22 +9,24 @@ import {
 import {
     postProjectCreate,
     postProjectGet,
+    postProjectGetSyntaxId,
     postProjectUpdate,
     postProjectExistForUser,
     postProjectGetProtoPages,
     postProjectsSearchForUser,
     postProjectAddUser,
     postProjectRemoveUser,
-    postProjectDelete
+    postProjectDelete,
 } from './query_project';
 import {
-    postSyntaxGetList
+    postSyntaxGetList,
 } from './query_syntax';
 // export type {};
 export {
     postAccountCreate,
     postAccountConnect,
     postAccountGet,
+    postProjectGetSyntaxId,
     postAccountUpdate,
     postAccountSearch,
     postAccountDelete,

@@ -34,6 +34,16 @@ export async function postProjectGet(id:string): Promise<ProjectGet> {
     return await _postRequest('/project/get', data);
 }
 
+interface ProjectGetSyntaxId {
+    id:string
+}
+export async function postProjectGetSyntaxId(project_id:string): Promise<ProjectGetSyntaxId> {
+    const data = {
+        project_id: project_id,
+    }
+    return await _postRequest('/project/get_syntax_id', data);
+}
+
 interface ProjectUpdate {
     success: string|boolean
 }

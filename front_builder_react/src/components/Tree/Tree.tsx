@@ -5,44 +5,46 @@ import clone from "clone";
 import './Tree.scss';
 
 // la doc : https://bkrem.github.io/react-d3-tree/docs/interfaces/_tree_types_.treeprops.html
-const debugData = [
-    {
-      name: "root",
-      children: [
-        {
-          name: "screen",
-          type:"array",
-          children:[
-              {
-                  name:"0",
-                  type:"object",
-              },
-              {
-                  name:"1",
-                  type:"object"
-              },
-              {
-                  name:"+",
-                  type:"adding"
-              }
-          ]
-        }
-      ]
-    }
-];
+// const debugData = [
+//     {
+//       name: "root",
+//       children: [
+//         {
+//           name: "screen",
+//           type:"array",
+//           children:[
+//               {
+//                   name:"0",
+//                   type:"object",
+//               },
+//               {
+//                   name:"1",
+//                   type:"object"
+//               },
+//               {
+//                   name:"+",
+//                   type:"adding"
+//               }
+//           ]
+//         }
+//       ]
+//     }
+// ];
 
 // var state:any = {
 //     data: debugData
 // }
 
-
-export function CustomTree(){
+interface CustomTreeProps {
+    syntax_filename:string
+}
+export function CustomTree(props:CustomTreeProps){
     // formatData(data)
-    const [tree, setTree] = useState<any>(debugData);
+    const [tree, setTree] = useState<any>();
 
     useEffect(() => {
         getDataFromJson()
-        .then((d => init(d, setTree)));
+        .then((data => init(props.syntax_filename, data, setTree)));
     }, [])
 
     const renderRectSvgNode = ({ nodeDatum, toggleNode }:any) => {
@@ -78,6 +80,7 @@ export function CustomTree(){
         </g>)
     };
     return (
+        <>{ tree &&
             <Tree
                 svgClassName="tree"
                 data={tree}
@@ -111,6 +114,7 @@ export function CustomTree(){
                     }
                 }}
             />
+        }</>
     )
 }
 
@@ -127,8 +131,10 @@ function addChild(node:any, name:any){
     }
 }
 
-function init(data:any, setTree:any){
-    fetch("/syntax.json").then(syntax => {return syntax.json()}).then(syntaxJson => {
+function init(filename:string, data:any, setTree:React.Dispatch<any>){
+    fetch("/syntaxes/"+filename+".json")
+    .then(syntax => syntax.json())
+    .then(syntaxJson => {
         formatData(data, syntaxJson);
         data = [data["root"]];
         data.name = "root";
@@ -136,10 +142,9 @@ function init(data:any, setTree:any){
     })
 }
 
-function getDataFromJson(){
-    return fetch("/example.json").then(data => {
-        return data.json();
-    })
+function getDataFromJson():Promise<Record<string, unknown>>{
+    return fetch("/example.json")
+    .then(data => data.json())
 }
 
 

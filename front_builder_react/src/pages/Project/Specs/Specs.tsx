@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Fade } from 'react-awesome-reveal';
 import { CustomTree} from "../../../components/Tree/Tree";
-import { postProjectExistForUser } from '../../../partners/rest';
+import { postProjectExistForUser, postProjectGetSyntaxId } from '../../../partners/rest';
 import { useUserContext } from '../../../session/user';
 import { init_websocket } from '../../..';
 
@@ -13,11 +13,22 @@ export function Specs() {
     const { urlName } = useParams();
     const userContext = useUserContext();
     const [projectId, setProjectId] = useState<string>();
+    const [syntaxId, setSyntaxId] = useState<string>();
 
     useEffect(() => {
         postProjectExistForUser(userContext.user.id, urlName || "")
         .then((data) => {
             setProjectId(data.project_id);
+
+            postProjectGetSyntaxId(data.project_id)
+            .then((data) => {
+                setSyntaxId(data.id);
+            })
+            .catch(error => {
+                // setErrorMsg("Internal error");
+                console.log("Error:", error);
+                navigate('/projects');
+            });
         })
         .catch(error => {
             // setErrorMsg("Internal error");
@@ -109,7 +120,9 @@ export function Specs() {
                 { errorMsg && <Fade><div className='error'>{errorMsg}</div></Fade> }
             </div>
             <div id="treeContent">
-                <CustomTree/>
+                { syntaxId &&
+                    <CustomTree syntax_filename={syntaxId}/>
+                }
             </div>
             {/* { socketUsable ? (loadingPage ? <p className='centered'>Loading...</p> : <div id="placeholder"/>) : <p className='centered'>Connection to server...</p> } */}
         </section>

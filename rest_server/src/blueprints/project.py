@@ -167,6 +167,45 @@ async def get():
     }, status.HTTP_200_OK
 
 
+@bp_project.route("/get_syntax_id", methods=['POST'])
+async def get_syntax_id():
+    post = ImmutableMultiDict(await request.get_json())
+    if len(post) != 1:
+        return "", status.HTTP_400_BAD_REQUEST
+
+    project_id = post.get("project_id", type=str, default=None)
+
+    if not project_id:
+        return "", status.HTTP_400_BAD_REQUEST
+
+    try:
+        project_id = ObjectId(project_id)
+    except Exception as e:
+        print(e)
+        return "", status.HTTP_400_BAD_REQUEST
+
+    filter_q = {
+        "_id": project_id,
+    }
+    fields = {
+        "_id": 0,
+        "syntax_id": 1
+    }
+
+    try:
+        result = await current_app.config["partners"]["db"].find_one(COLLECTION, filter_q, fields)
+    except Exception as e:
+        print(e)
+        return "", status.HTTP_503_SERVICE_UNAVAILABLE
+
+    if not result:
+        return {}, status.HTTP_500_INTERNAL_SERVER_ERROR
+
+    return {
+        "id": result["syntax_id"]
+    }, status.HTTP_200_OK
+
+
 @bp_project.route("/exist_for_user", methods=['POST'])
 async def exist_for_user():
     post = ImmutableMultiDict(await request.get_json())
