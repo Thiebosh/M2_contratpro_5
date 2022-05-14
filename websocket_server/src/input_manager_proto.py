@@ -26,7 +26,6 @@ class InputManagerProto(InputManager):
                 "success": success,
                 "content": content
             }
-            # if success, appeler la session et si différences, envoyer à tout le monde ?
 
         elif action == "reset_session":
             result = self.render_page.reset_session()

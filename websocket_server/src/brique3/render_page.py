@@ -13,6 +13,7 @@ class RenderPage():
         self.session:dict[str:Any] = self.partners["db"].aggregate_list(COLLECTION_PROJECTS, MongoQueries.getSessionFromId(self.project_id))[0]
         if not self.partners["renderer"].set_session(json.dumps(self.session)):
             raise Exception("RenderPage - PHP - session not setted")
+        self.session_update = False
 
 
     async def close(self):
@@ -40,7 +41,7 @@ class RenderPage():
             new_session = json.loads(new_session)
             if self.session != new_session:
                 self.session = new_session
-                # programmer un envoi global
+                self.session_update = True
 
         return result
 
@@ -48,6 +49,6 @@ class RenderPage():
     def reset_session(self):
         if self.session != {}:
             self.session = {}
-            # programmer un envoi global
+            self.session_update = True
 
         return self.partners["renderer"].reset_session()

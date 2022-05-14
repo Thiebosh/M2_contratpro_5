@@ -19,4 +19,8 @@ class RoomProto(Room):
             result = await self.input_manager.check_and_execute_action_function(input_to_process)
             self.add_message_in_queue(input_to_process.socket, json.dumps({input_to_process.get_action(): result}, ensure_ascii=False))
 
+        if self.input_manager.render_page.session_update:
+            self.broadcast_message(None, json.dumps({"set_session": self.input_manager.render_page.session}))
+            self.input_manager.render_page.session_update = False
+
         self.input_manager.inputs = []
