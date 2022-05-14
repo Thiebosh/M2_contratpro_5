@@ -59,11 +59,7 @@ class Room(ABC):
         self.client_connection_queue[socket] = queue.Queue()
 
         self.add_message_in_queue(socket, json.dumps({"init_collabs": names}))
-
-        for client_socket in self.client_connection_queue:
-            if socket == client_socket:
-                continue
-            self.add_message_in_queue(client_socket, json.dumps({"add_collab": name}))
+        self.broadcast_message(socket, json.dumps({"add_collab": name}))
 
 
     def close_client_connection_to_room(self, socket):
@@ -76,16 +72,20 @@ class Room(ABC):
         self.callback_update_server_sockets(socket)
         self.delay = datetime.now()
 
-        for client_socket in self.client_connection_queue:
-            if socket == client_socket:
-                continue
-            self.add_message_in_queue(client_socket, json.dumps({"remove_collab": name}))
+        self.broadcast_message(socket, json.dumps({"remove_collab": name}))
 
 
     def add_message_in_queue(self, socket_receiver, msg):
         self.client_connection_queue[socket_receiver].put(msg)
         if socket_receiver not in self.outputs:
             self.outputs.append(socket_receiver)
+
+    
+    def broadcast_message(self, socket_sender, msg):
+        for client_socket in self.client_connection_queue:
+            if socket_sender == client_socket:
+                continue
+            self.add_message_in_queue(client_socket, msg)
 
 
     @abstractmethod

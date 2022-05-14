@@ -34,9 +34,6 @@ class RoomSpecs(Room):
                 continue
 
             msg = json.dumps({"author": self.socket_name[input_to_process.get_socket()], **input_to_process.get_msg()})
-            for client_socket in self.client_connection_queue:
-                if input_to_process.socket == client_socket:
-                    continue
-                self.add_message_in_queue(client_socket, msg)
+            self.broadcast_message(input_to_process.socket, msg)
 
         self.input_manager.inputs = [input_unit for input_unit in self.input_manager.inputs if input_unit.check_datetime() and not input_unit.failed]
