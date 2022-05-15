@@ -175,6 +175,13 @@ function formatData(data:any, syntax:any){
             if (!data.children){
                 data.children = [];
             }
+            if (!data[key].children){
+                data[key].children = [];
+            }
+            data[key].children.push({
+                name:"+",
+                type:"adding"
+            });
             data.children.splice(-2,0,data[key]);
             formatData(data[key], syntax);
         } else if(syntax[key].type === "field") {
@@ -189,7 +196,7 @@ function formatData(data:any, syntax:any){
                 if (node.type === "select"){
                     node.label = key;
                 }
-                data.children.push(node);
+                data.children.splice(-2,0,node);
             }
         }
     }
