@@ -1,8 +1,7 @@
 # M2_contratpro_5
 
-http://www.delafond.org/traducmanfr/man/man1/flex.1.html
+todo : refaire le readme en présentant le projet et les participants, puis l'exécution avec le compose et les dockers (prod et dev), puis la découpe en services avec les technos associés à chaque
 
-generate requirements.txt : pipreqs ./path
 
 # Docker
 Each folder correspond to one part (server) of the project.
@@ -13,7 +12,3 @@ The docker-compose at root folder start all services in prod config (cold reload
 - rest: http://localhost:8001/probe
 - socket: open client and verify console logs
 - render: http://localhost:8003/?action=probe
-
-
-# Pipeline CI/CD
-https://docs.github.com/en/actions/migrating-to-github-actions/migrating-from-gitlab-cicd-to-github-actions
