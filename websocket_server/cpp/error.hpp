@@ -39,6 +39,6 @@ std::ostream& operator<<(std::ostream& out, const ErrorObject value) {
 }
 
 void displayError(ErrorType type, ErrorObject object, string msg) {
-    cout << "error" << endl << type << "-" << object << "-" << msg << endl;
+    cout << "GENERATION_ERROR: " << type << " - " << object << " - " << msg;
     exit(1);
 }

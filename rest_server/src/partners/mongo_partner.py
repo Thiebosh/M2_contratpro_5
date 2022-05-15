@@ -1,4 +1,4 @@
-from pymongo import MongoClient
+from pymongo import MongoClient, UpdateOne
 from pymongo.errors import WriteError
 
 LOGGER_ID = "MongoPartner:"
@@ -8,12 +8,20 @@ class MongoPartner:
         self.conn = MongoClient(mongo_url, tlsAllowInvalidCertificates=True)
         self.collections = {
             "accounts": self.conn.spectry.accounts,
-            "projects": self.conn.spectry.projects
+            "projects": self.conn.spectry.projects,
+            "syntax": self.conn.spectry.syntax,
         }
 
 
     def close(self):
         self.conn.close()
+
+
+    async def count(self, collection, filter_q):
+        if collection not in self.collections:
+            return False
+
+        return self.collections[collection].count_documents(filter_q)
 
 
     async def insert_one(self, collection, data):
@@ -44,6 +52,31 @@ class MongoPartner:
         success = False
         try:
             result = self.collections[collection].update_one(filter_q, update_q)
+            success = result.acknowledged
+            print(f"{LOGGER_ID} updated {result.modified_count} doc")
+
+        except WriteError as error:
+            print(LOGGER_ID, error.details)
+
+        except Exception as e:
+            print("something went wrong...")
+            print(type(e))
+            print(e)
+
+        return success
+
+
+    def bulk_update_one(self, filter, update):
+        return UpdateOne(filter, update)
+
+
+    async def bulk_write(self, collection, operations):
+        if collection not in self.collections:
+            return False
+
+        success = False
+        try:
+            result = self.collections[collection].bulk_write(operations)
             success = result.acknowledged
             print(f"{LOGGER_ID} updated {result.modified_count} doc")
 
