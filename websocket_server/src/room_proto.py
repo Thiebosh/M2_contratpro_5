@@ -4,6 +4,8 @@ from room import Room
 
 class RoomProto(Room):
     def __init__(self, room_id, room_type, shared_new_proto_flag, partners, callback_update_server_sockets, callback_remove_room, encoding) -> None:
+        shared_new_proto_flag.clear()
+
         input_manager = InputManagerProto(room_id, room_type, partners)
         super().__init__(room_id, room_type, partners, callback_update_server_sockets, callback_remove_room, encoding, input_manager)
 
