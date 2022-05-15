@@ -95,55 +95,58 @@ class Room(ABC):
 
     async def run(self, polling_freq=0.1):
         print(f"{self.room_id}-{self.room_type} - Room ready")
-        while not self.close_evt.is_set() and (self.inputs or (datetime.now() - self.delay <= timedelta(minutes=5))):
-            with self.lock:
-                while not self.queue.empty():
-                    client = self.queue.get()
-                    self.open_client_connection_to_room(client["socket"], client["name"]) # When "get" called, it removes item from queue
+        try:
+            while not self.close_evt.is_set() and (self.inputs or (datetime.now() - self.delay <= timedelta(minutes=0))):
+                with self.lock:
+                    while not self.queue.empty():
+                        client = self.queue.get()
+                        self.open_client_connection_to_room(client["socket"], client["name"]) # When "get" called, it removes item from queue
 
-            if not self.inputs:
-                await asyncio.sleep(1)
-                continue
-
-            try:
-                readable, writable, exception = self.read(polling_freq)
-            except KeyboardInterrupt:
-                break
-
-            for socket in readable: #Get all sockets and put the ones which have a msg to a list
-                msg = self.partners["websocket"].recv(socket, self.encoding)
-                if not msg:
-                    print(f"close {self.socket_name[socket]} because empty msg")
-                    self.close_client_connection_to_room(socket)
+                if not self.inputs:
+                    await asyncio.sleep(1)
                     continue
 
                 try:
-                    msg = json.loads(msg)
-                except json.JSONDecodeError:
-                    print(f"{self.room_id}-{self.room_type} - malformed json : {msg}")
-                    # self.close_client_connection_to_room(socket)
-                    continue
+                    readable, writable, exception = self.read(polling_freq)
+                except KeyboardInterrupt:
+                    break
 
-                if msg["action"] == "exitRoom":
-                    print(f"close {self.socket_name[socket]} because asked")
+                for socket in readable: #Get all sockets and put the ones which have a msg to a list
+                    msg = self.partners["websocket"].recv(socket, self.encoding)
+                    if not msg:
+                        print(f"close {self.socket_name[socket]} because empty msg")
+                        self.close_client_connection_to_room(socket)
+                        continue
+
+                    try:
+                        msg = json.loads(msg)
+                    except json.JSONDecodeError:
+                        print(f"{self.room_id}-{self.room_type} - malformed json : {msg}")
+                        # self.close_client_connection_to_room(socket)
+                        continue
+
+                    if msg["action"] == "exitRoom":
+                        print(f"close {self.socket_name[socket]} because asked")
+                        self.close_client_connection_to_room(socket)
+                        continue
+
+                    self.input_manager.add_new_input(socket, msg)
+
+                await self.process_running_inputs()
+
+                for socket in writable:
+                    try:
+                        next_msg = self.client_connection_queue[socket].get_nowait()  # unqueue msg
+                    except queue.Empty:
+                        self.outputs.remove(socket)
+                    else:
+                        self.partners["websocket"].send(socket, next_msg, self.encoding)
+
+                for socket in exception:
                     self.close_client_connection_to_room(socket)
-                    continue
 
-                self.input_manager.add_new_input(socket, msg)
-
-            await self.process_running_inputs()
-
-            for socket in writable:
-                try:
-                    next_msg = self.client_connection_queue[socket].get_nowait()  # unqueue msg
-                except queue.Empty:
-                    self.outputs.remove(socket)
-                else:
-                    self.partners["websocket"].send(socket, next_msg, self.encoding)
-
-            for socket in exception:
-                self.close_client_connection_to_room(socket)
-
-            await asyncio.sleep(0.1)
+                await asyncio.sleep(0.1)
+        except Exception as e:
+            print(f"{self.room_id}-{self.room_type} CRITICAL: {e}")
 
         await self.close()

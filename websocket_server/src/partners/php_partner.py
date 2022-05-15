@@ -83,6 +83,8 @@ class PhpPartner():
 
 
     def get_session(self):
+        if strtobool(os.environ.get('RENDER_STATE', default="false")):
+            return True, "{}"
         return self._get("get_session")
 
 

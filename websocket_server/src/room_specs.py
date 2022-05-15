@@ -3,9 +3,11 @@ from input_manager_specs import InputManagerSpecs
 from room import Room
 
 class RoomSpecs(Room):
-    def __init__(self, room_id, room_type, partners, callback_update_server_sockets, callback_remove_room, encoding) -> None:
+    def __init__(self, room_id, room_type, shared_is_new_proto, partners, callback_update_server_sockets, callback_remove_room, encoding) -> None:
         input_manager = InputManagerSpecs(room_id, room_type, partners, self.send_conflict_message)
         super().__init__(room_id, room_type, partners, callback_update_server_sockets, callback_remove_room, encoding, input_manager)
+
+        self.shared_is_new_proto = shared_is_new_proto
 
 
     def open_client_connection_to_room(self, socket, name):
