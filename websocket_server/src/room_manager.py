@@ -14,13 +14,13 @@ class RoomManager():
 
     def create_room(self, room_id, room_type, socket, name, callback_update_server_sockets, encoding):
         if room_id not in self.shared:
-            self.shared[room_id] = {"new_proto": (asyncio.Lock(),  asyncio.Event())}
-        shared_is_new_proto = self.shared[room_id]["new_proto"]
+            self.shared[room_id] = {"new_proto_flag": asyncio.Event()}
+        shared_new_proto_flag = self.shared[room_id]["new_proto_flag"]
 
         args = {
             "room_id": room_id,
             "room_type": room_type,
-            "shared_is_new_proto": shared_is_new_proto,
+            "shared_new_proto_flag": shared_new_proto_flag,
             "partners": self.copy_partners_dict(),
             "callback_update_server_sockets": callback_update_server_sockets,
             "callback_remove_room": self.callback_remove_room,

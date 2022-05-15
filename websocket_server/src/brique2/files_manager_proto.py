@@ -24,3 +24,16 @@ class FilesManagerProto(FilesManager):
             return # error ?
         result = self.partners["renderer"].unset_project_folder(self.project_id)
         print(f"{self.project_id}-{self.room_type} - PHP - Project directory {'well' if result else 'not'} removed")
+
+    
+    def reload_files(self):
+        result = self.partners["renderer"].unset_project_files(self.project_id)
+        print(f"{self.project_id}-{self.room_type} - PHP - Project files {'well' if result else 'not'} removed")
+        if result is False:
+            return # error ?
+
+        self.files = self.partners["storage"].download_files_from_folder(self.project_id)
+        if not self.partners["renderer"].set_project_files(self.project_id, self.files):
+            return # error ?
+
+        print(f"{self.project_id}-{self.room_type} - PHP - Project files {'well' if result else 'not'} updated")

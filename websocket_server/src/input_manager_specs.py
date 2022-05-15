@@ -7,10 +7,12 @@ from input_specs import InputSpecs
 
 
 class InputManagerSpecs(InputManager):
-    def __init__(self, room_id, room_type, partners, send_conflict_message_callback) -> None:
+    def __init__(self, room_id, room_type, shared_new_proto_flag, partners, send_conflict_message_callback) -> None:
         super().__init__(room_id, room_type, partners)
 
         self.send_conflict_message_callback = send_conflict_message_callback
+
+        self.shared_new_proto_flag = shared_new_proto_flag
 
         self.partners["generator"].set_exe_file(self.partners["db"].find_one(COLLECTION_PROJECTS, *MongoQueries.getSyntaxIdFromId(self.room_id))["syntax_id"])
 
@@ -90,6 +92,8 @@ class InputManagerSpecs(InputManager):
 
             self.current_version_generated = True
             await self.partners["db"].update_one_async(COLLECTION_PROJECTS, *MongoQueries.updateProtoStateForId(self.room_id, True))
+
+            self.shared_new_proto_flag.set()
 
         # else: error et renvoie wrong action ?
 

@@ -72,6 +72,8 @@ export function Proto() {
         if (projectId && !socketUsable) setSocket(init_websocket('proto', projectId, userContext.user.name, setSocketUsable));
     }, [projectId, userContext.user.name, socketUsable]);
 
+    const [protoUpdate, setProtoUpdate] = useState<boolean>(false);
+
     useEffect(() => {
         if (!socket) return;
 
@@ -94,6 +96,27 @@ export function Proto() {
                 case 'reset_session':
                     data["reset_session"] ? setSuccessMsg("Reset session: success") : setErrorMsg("Reset session: failure");
                     if (data["reset_session"]) setSession({});
+                    break;
+                case 'proto_update':
+                    if (data["proto_update"]) {
+                        setProtoUpdate(true);
+                        setLoadingPage(true);
+                        setInfoMsg("New prototype : reloading");
+                        setPages([{name:'404', link:''}]);
+                    }
+                    else {
+                        postProjectGetProtoPages(projectId as string)
+                        .then((data) => {
+                            setPages([{name:'404', link:''}, ...data.pages]);
+                            setSuccessMsg("New prototype : ready to use");
+                            setLoadingPage(false);
+                            setProtoUpdate(false);
+                        })
+                        .catch(error => {
+                            // setErrorMsg("Internal error");
+                            console.log("Error:", error);
+                        });
+                    }
                     break;
                 case 'execute':
                     setLoadingPage(false);
@@ -133,6 +156,10 @@ export function Proto() {
 
     function triggerLink({link, name}:{link:string, name:string}) {
         if (!socket || !socketUsable) return;
+        if (protoUpdate) {
+            setErrorMsg("Reloading prototype");
+            return;
+        }
         setLoadingPage(true);
         setCurrentPage(name);
         socket.send(JSON.stringify({"action":"execute", "page": link}));
@@ -140,6 +167,10 @@ export function Proto() {
 
     function triggerResetSession() {
         if (!socket || !socketUsable) return;
+        if (protoUpdate) {
+            setErrorMsg("Reloading prototype");
+            return;
+        }
         setInfoMsg("Send reset session request...");
         socket.send(JSON.stringify({"action":"reset_session"}));
     }

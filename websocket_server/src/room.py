@@ -96,7 +96,7 @@ class Room(ABC):
     async def run(self, polling_freq=0.1):
         print(f"{self.room_id}-{self.room_type} - Room ready")
         try:
-            while not self.close_evt.is_set() and (self.inputs or (datetime.now() - self.delay <= timedelta(minutes=0))):
+            while not self.close_evt.is_set() and (self.inputs or (datetime.now() - self.delay <= timedelta(minutes=5))):
                 with self.lock:
                     while not self.queue.empty():
                         client = self.queue.get()
