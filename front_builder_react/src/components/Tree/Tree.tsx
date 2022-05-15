@@ -150,23 +150,24 @@ function getDataFromJson():Promise<Record<string, unknown>>{
 
 function formatData(data:any, syntax:any){
     for (const key in data){
-        if (key === "name"){
+        if (key === "name" || key === "children"){
             continue;
         }
 
         if (syntax[key].type === "array"){
+            if (!data.children){
+                data.children = [];
+            }
             for (let i = 0; i < data[key].length; i++){
+                if (!data[key][i].children){
+                    data[key][i].children = [];
+                }
+                data[key][i].children.push({
+                    name:"+",
+                    type:"adding"
+                });
                 data[key][i].name = key;
-                if (!data.children){
-                    data.children = [];
-                }
-                data.children.push(data[key][i])
-                if (i === data[key].length -1 ){
-                    data.children.push({
-                        name:"+",
-                        type:"adding"
-                    });
-                }
+                data.children.splice(-2,0,data[key][i])
                 formatData(data[key][i], syntax);
             }
         } else if (syntax[key].type === "object"){
@@ -174,11 +175,14 @@ function formatData(data:any, syntax:any){
             if (!data.children){
                 data.children = [];
             }
-            data.children.push(data[key]);
-            // data.children.push({ // WIP : there is an extra "+" after style nodes
-            //     name:"+",
-            //     type:"adding"
-            // })
+            if (!data[key].children){
+                data[key].children = [];
+            }
+            data[key].children.push({
+                name:"+",
+                type:"adding"
+            });
+            data.children.splice(-2,0,data[key]);
             formatData(data[key], syntax);
         } else if(syntax[key].type === "field") {
             if (syntax[syntax[key].field]){
@@ -192,7 +196,7 @@ function formatData(data:any, syntax:any){
                 if (node.type === "select"){
                     node.label = key;
                 }
-                data.children.push(node);
+                data.children.splice(-2,0,node);
             }
         }
     }

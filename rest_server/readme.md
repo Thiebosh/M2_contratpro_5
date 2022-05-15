@@ -1,11 +1,18 @@
-# Exécution de l'api
-- Sous windows : start _start.bat
-- Sous unix : wip
+# Exécution du service
+```
+SET PORT=8001
+
+SET MONGO_URL=***
+SET MONGO_USERNAME=***
+SET MONGO_PASSWORD=***
+
+python src
+```
 
 
 
-# Connexion à l'api
-L'adresse ip et le port utilisés par le serveur sont spécifiés dans le fichier _start.bat.
+# Connexion au service
+Le serveur est consultable à l'url suivante : http://localhost:8001.
 
 
 
