@@ -115,6 +115,18 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 - { "success": True } : l'intégration en base de données a réussi.
 
 
+# /project/exist_for_user
+**Utilisation :** vérifier qu'un id projet existe et qu'un id utilisateur y est lié.
+
+**Arguments requis :**
+- "user_id" (str) : l'identifiant du compte à vérifier.
+- "project_name" (str) : l'identifiant du projet à vérifier.
+
+**Retours :**
+- { "id": False } : le projet n'existe pas ou l'utilisateur n'y est pas associé.
+- { "id": "str" } : le projet existe et l'utilisateur y est associé : reçoit l'id du projet.
+
+
 # /project/search
 **Utilisation :** chercher des projets.
 
@@ -125,7 +137,7 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 - { "result": [{"name": "str", "users": [{"id": "str", "name": "str"}, ...]}, ...] } : le nom du projet et les utilisateurs associés.
 
 
-# /project/search_by_user
+# /project/search_for_user
 **Utilisation :** lister les projets accessibles pour un compte.
 
 **Arguments requis :**

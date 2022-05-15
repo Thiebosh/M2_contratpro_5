@@ -1,23 +1,21 @@
 version: "3.7"
 
 services:
-    # front:
-    #     build:
-    #         context: ./front_builder/
-    #         dockerfile: Dockerfile.prod
-    #         args:
-    #             arg_port: 5000
-    #             rest_url: "http://rest:5000"
-    #             ws_url: "ws://socket:5000"
-    #     ports:
-    #         - "80:5000" # http
-    #         - "443:5000" # https
-    #     # restart: always
+    front:
+        build:
+            context: ./front_builder_react/
+            args:
+                arg_port: 8080
+                rest_url: "http://rest:5000"
+                ws_url: "ws://socket:5000"
+        ports:
+            - "80:8080" # http
+            - "443:8080" # https
+        # restart: always
 
     rest:
         build:
             context: ./rest_server/
-            dockerfile: Dockerfile.prod
             args:
                 arg_port: 5000
         ports:
@@ -30,7 +28,6 @@ services:
     socket:
         build:
             context: ./websocket_server/
-            dockerfile: Dockerfile.prod
             args:
                 arg_port: 5000
                 php_url: "http://render:5000"
@@ -46,10 +43,9 @@ services:
     render:
         build:
             context: ./render_server/
-            dockerfile: Dockerfile.prod
             args:
                 arg_port: 5000
-        ports:
-            - "8003:5000"
+        # ports:
+        #     - "8003:5000"
         tty: true # bind console
         restart: always

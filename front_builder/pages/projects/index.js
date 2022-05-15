@@ -40,13 +40,13 @@ export default function Projects({ user }) {
   const toast = useToast();
 
   function getProjectsByUser() {
-    fetch('http://localhost:8001/project/search_by_user', {
+    fetch('http://localhost:5000/project/search_for_user', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        id: user.id,
+        user_id: user.id,
       })
     })
     .then(resp => JSON.parse(resp))

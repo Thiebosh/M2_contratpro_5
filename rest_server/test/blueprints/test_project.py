@@ -63,11 +63,11 @@ async def test_project_create_exist(app: Quart) -> None:
 
 @pytest.mark.asyncio
 @pytest.mark.usefixtures("app")
-async def test_project_search_by_user_ok(app: Quart) -> None:
+async def test_project_search_for_user_ok(app: Quart) -> None:
     form = {
         "id": ID
     }
-    response:Response = await app.test_client().post("/project/search_by_user", form=form)
+    response:Response = await app.test_client().post("/project/search_for_user", form=form)
 
     assert response.status_code == status.HTTP_200_OK
     assert response.mimetype == "application/json"

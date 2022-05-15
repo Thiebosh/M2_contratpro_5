@@ -57,7 +57,11 @@ class WebSocketPartner():
         if ret.encode(encoding) == b'\x03\xc3\xa9':
             return None
 
-        return ret.encode("latin-1").decode(encoding) # raw str to latin-1 bytes + bytes to utf-8 str
+        try:
+            return ret.encode("latin-1").decode(encoding) # raw str to latin-1 bytes + bytes to utf-8 str
+        except UnicodeDecodeError as err:
+            print(f"websocket partner error - {err}")
+            return ret
 
     @staticmethod
     def send(conn, data:str, encoding):

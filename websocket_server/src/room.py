@@ -1,16 +1,21 @@
+from abc import ABC, abstractmethod
+import asyncio
+from datetime import datetime, timedelta
 import queue
 import threading
 import select
 import json
+
 from input_manager import InputManager
 
-class Room():
-    def __init__(self, room_name, partners, callback_update_server_sockets, callback_remove_room, encoding) -> None:
-        print(f"{room_name} - Create room...")
+class Room(ABC):
+    def __init__(self, room_id, room_type, partners, callback_update_server_sockets, callback_remove_room, encoding, input_manager) -> None:
+        print(f"{room_id}-{room_type} - Create room...")
         self.close_evt = threading.Event()
         self.queue = queue.Queue()
         self.lock = threading.Lock()
-        self.room_name = room_name
+        self.room_id = room_id
+        self.room_type = room_type
         self.socket_name = {}
         self.inputs = []
         self.outputs = []
@@ -18,19 +23,20 @@ class Room():
         self.callback_update_server_sockets = callback_update_server_sockets
         self.callback_remove_room = callback_remove_room
         self.partners = partners
-
         self.encoding = encoding
-        self.input_manager = InputManager(room_name, self.partners, self.send_conflict_message)
-        print(f"{room_name} - Room created")
+        self.delay = datetime.now()
+
+        self.input_manager:InputManager = input_manager
+        print(f"{room_id}-{room_type} - Room created")
 
 
     async def close(self):
-        print(f"{self.room_name} - Closing room...")
+        print(f"{self.room_id}-{self.room_type} - Closing room...")
         for socket in self.inputs:
             socket.close()
         await self.input_manager.close()
-        self.callback_remove_room(self.room_name)
-        print(f"{self.room_name} - Room closed")
+        self.callback_remove_room(self.room_id, self.room_type)
+        print(f"{self.room_id}-{self.room_type} - Room closed")
 
 
     def get_param(self):
@@ -46,22 +52,27 @@ class Room():
 
 
     def open_client_connection_to_room(self, socket, name):
+        names = list(self.socket_name.values())
+
         self.inputs.append(socket)
         self.socket_name[socket] = name
         self.client_connection_queue[socket] = queue.Queue()
 
-        self.client_connection_queue[socket].put(json.dumps({"init": self.input_manager.json_handler.data}))
-        self.outputs.append(socket)
+        self.add_message_in_queue(socket, json.dumps({"init_collabs": names}))
+        self.broadcast_message(socket, json.dumps({"add_collab": name}))
 
 
     def close_client_connection_to_room(self, socket):
-        print(f"{self.room_name} - Close client")
+        print(f"{self.room_id}-{self.room_type} - Close client")
         if socket in self.outputs:
             self.outputs.remove(socket)
         self.inputs.remove(socket)
         del self.client_connection_queue[socket]
-        del self.socket_name[socket]
+        name = self.socket_name.pop(socket)
         self.callback_update_server_sockets(socket)
+        self.delay = datetime.now()
+
+        self.broadcast_message(socket, json.dumps({"remove_collab": name}))
 
 
     def add_message_in_queue(self, socket_receiver, msg):
@@ -69,78 +80,73 @@ class Room():
         if socket_receiver not in self.outputs:
             self.outputs.append(socket_receiver)
 
+    
+    def broadcast_message(self, socket_sender, msg):
+        for client_socket in self.client_connection_queue:
+            if socket_sender == client_socket:
+                continue
+            self.add_message_in_queue(client_socket, msg)
 
-    def send_conflict_message(self, input_to_process):
-        self.client_connection_queue[input_to_process.socket].put("CONFLICTS !")
-        if input_to_process.socket not in self.outputs:
-            self.outputs.append(input_to_process.socket)
 
-
+    @abstractmethod
     async def process_running_inputs(self):
-        for input_to_process in self.input_manager.inputs:
-            if (input_to_process.check_datetime()) or input_to_process.failed:
-                continue
+        pass
 
-            #If no conflicts, execute the action ; in every case : remove socket from list
-            if self.input_manager.check_conflicts(input_to_process):
-                continue
-
-            result = await self.input_manager.check_and_execute_action_function(input_to_process)
-            self.add_message_in_queue(input_to_process.socket, json.dumps({input_to_process.get_action(): result}, ensure_ascii=False))
-
-            if result is False:
-                continue
-
-            msg = json.dumps({"author": self.socket_name[input_to_process.get_socket()], **input_to_process.get_msg()})
-            for client_socket in self.client_connection_queue:
-                if input_to_process.socket == client_socket:
-                    continue
-                self.add_message_in_queue(client_socket, msg)
-
-        self.input_manager.inputs = [input_unit for input_unit in self.input_manager.inputs if input_unit.check_datetime() and not input_unit.failed]
 
     async def run(self, polling_freq=0.1):
-        print(f"{self.room_name} - Room ready")
-        while not self.close_evt.is_set() and self.inputs:
-            with self.lock:
-                while not self.queue.empty():
-                    client = self.queue.get()
-                    self.open_client_connection_to_room(client["socket"], client["name"]) # When "get" called, it removes item from queue
-            try:
-                readable, writable, exception = self.read(polling_freq)
-            except KeyboardInterrupt:
-                break
+        print(f"{self.room_id}-{self.room_type} - Room ready")
+        try:
+            while not self.close_evt.is_set() and (self.inputs or (datetime.now() - self.delay <= timedelta(minutes=5))):
+                with self.lock:
+                    while not self.queue.empty():
+                        client = self.queue.get()
+                        self.open_client_connection_to_room(client["socket"], client["name"]) # When "get" called, it removes item from queue
 
-            for socket in readable: #Get all sockets and put the ones which have a msg to a list
-                msg = self.partners["websocket"].recv(socket, self.encoding)
-                if not msg:
-                    self.close_client_connection_to_room(socket)
+                if not self.inputs:
+                    await asyncio.sleep(1)
                     continue
 
                 try:
-                    msg = json.loads(msg)
-                except json.JSONDecodeError:
-                    print(f"{self.room_name} - malformed json : {msg}")
-                    # self.close_client_connection_to_room(socket)
-                    continue
+                    readable, writable, exception = self.read(polling_freq)
+                except KeyboardInterrupt:
+                    break
 
-                if msg["action"] == "exitRoom":
+                for socket in readable: #Get all sockets and put the ones which have a msg to a list
+                    msg = self.partners["websocket"].recv(socket, self.encoding)
+                    if not msg:
+                        print(f"close {self.socket_name[socket]} because empty msg")
+                        self.close_client_connection_to_room(socket)
+                        continue
+
+                    try:
+                        msg = json.loads(msg)
+                    except json.JSONDecodeError:
+                        print(f"{self.room_id}-{self.room_type} - malformed json : {msg}")
+                        # self.close_client_connection_to_room(socket)
+                        continue
+
+                    if msg["action"] == "exitRoom":
+                        print(f"close {self.socket_name[socket]} because asked")
+                        self.close_client_connection_to_room(socket)
+                        continue
+
+                    self.input_manager.add_new_input(socket, msg)
+
+                await self.process_running_inputs()
+
+                for socket in writable:
+                    try:
+                        next_msg = self.client_connection_queue[socket].get_nowait()  # unqueue msg
+                    except queue.Empty:
+                        self.outputs.remove(socket)
+                    else:
+                        self.partners["websocket"].send(socket, next_msg, self.encoding)
+
+                for socket in exception:
                     self.close_client_connection_to_room(socket)
-                    continue
 
-                self.input_manager.add_new_input(socket, msg)
-
-            await self.process_running_inputs()
-
-            for socket in writable:
-                try:
-                    next_msg = self.client_connection_queue[socket].get_nowait()  # unqueue msg
-                except queue.Empty:
-                    self.outputs.remove(socket)
-                else:
-                    self.partners["websocket"].send(socket, next_msg, self.encoding)
-
-            for socket in exception:
-                self.close_client_connection_to_room(socket)
+                await asyncio.sleep(0.1)
+        except Exception as e:
+            print(f"{self.room_id}-{self.room_type} CRITICAL: {e}")
 
         await self.close()
