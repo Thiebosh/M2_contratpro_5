@@ -83,9 +83,9 @@ $(function () {
   });
 
   $("#connectionButton").on("click", function(){
-    let roomName = $("#roomNameInput").val();
+    let roomId = $("#roomNameInput").val();
     let authorName = $("#userNameInput").val();
-    msg = JSON.stringify({"action":"connectRoom", "roomName" : roomName, "author": authorName})
+    msg = JSON.stringify({"action":"connectRoom", "roomId" : roomId, "author": authorName})
     socket.send(msg);
     inRoom = true;
 

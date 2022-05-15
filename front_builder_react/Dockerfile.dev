@@ -1,0 +1,12 @@
+FROM node:16.13.2-alpine
+
+CMD ["npm", "start"]
+#, " --port", "5000"]
+
+WORKDIR /app
+
+COPY package.json .
+COPY package-lock.json .
+RUN npm install
+
+COPY tsconfig.json .

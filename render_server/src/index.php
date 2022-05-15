@@ -121,6 +121,11 @@ if (isset($_GET['action'])) {
             http_response_code($RESP_CODE["success"]);
             exit();
 
+        case 'reset_session':
+            unset($_SESSION["data"]);
+            http_response_code($RESP_CODE["success"]);
+            exit();
+
         case "probe":
             echo("alive");
             http_response_code($RESP_CODE["success"]);

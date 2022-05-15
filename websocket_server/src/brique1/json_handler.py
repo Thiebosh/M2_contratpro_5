@@ -1,6 +1,4 @@
-from datetime import datetime
-
-COLLECTION_PROJECTS = "projects"
+from partners.mongo_queries import MongoQueries, COLLECTION_PROJECTS
 
 class JsonHandler():
 
@@ -8,51 +6,28 @@ class JsonHandler():
     def check_if_similar_keys(dict1, dict2):
         return not set(dict1).isdisjoint(dict2)
 
-    def __init__(self, partners, project_name) -> None:
+    def __init__(self, partners, project_id, room_type) -> None:
         self.partners = partners
-        self.project_name = project_name
+        self.project_id = project_id
+        self.room_type = room_type
         self.json_currently_stored = True
-        self.current_version_generated = False # add field to db
 
-        aggregation = [
-            {
-                "$match": {
-                    "name": self.project_name
-                }
-            },
-            {
-                "$project": {
-                    "_id": 0,
-                    "specs": 1,
-                }
-            },
-            {
-                "$replaceRoot": {
-                    "newRoot": "$specs"
-                }
-            }
-        ]
-        self.data = self.partners["db"].aggregate_list(COLLECTION_PROJECTS, aggregation)[0]
+        self.data = self.partners["db"].aggregate_list(COLLECTION_PROJECTS, MongoQueries.getSpecsFromId(self.project_id))[0]
 
 
     async def close(self):
         result = await self.update_storage()
-        print(f"{self.project_name} - Mongo - Project {'well' if result else 'not'} updated")
+        print(f"{self.project_id}-{self.room_type} - Mongo - Project {'well' if result else 'not'} updated")
 
 
     async def update_storage(self):
-        print(f"{self.project_name} - {'' if self.json_currently_stored else 'no '}need of db update")
+        print(f"{self.project_id}-{self.room_type} - {'no ' if self.json_currently_stored else ''}need of db update")
         if self.json_currently_stored:
             return True
 
         self.json_currently_stored = await self.partners["db"].update_one_async(
             COLLECTION_PROJECTS,
-            {"name":self.project_name},
-            {"$set": {
-                "last_specs":datetime.utcnow(),
-                "specs":self.data
-                }
-            }
+            *MongoQueries.updateSpecsForId(self.project_id, self.data)
         )
         return self.json_currently_stored
 
@@ -105,7 +80,6 @@ class JsonHandler():
             return False
 
         self.json_currently_stored = False
-        self.current_version_generated = False
         return True
 
 
@@ -126,7 +100,6 @@ class JsonHandler():
 
             del container[int(target)]
             self.json_currently_stored = False
-            self.current_version_generated = False
             return True
 
         return False
@@ -144,5 +117,4 @@ class JsonHandler():
         container[path[-1]] = content
 
         self.json_currently_stored = False
-        self.current_version_generated = False
         return True
