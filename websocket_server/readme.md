@@ -1,9 +1,26 @@
-no hot code reloading for python part..
-tested:
-- python script : https://github.com/stevekrenzel/autoreload
-- system package : https://towardsdatascience.com/2-tools-to-automatically-reload-when-python-files-change-90bb28139087
+# Exécution du service
+```
+SET HOST=0.0.0.0
+SET PORT=8002
+
+SET RENDER_STATE=true
+
+SET CPP_PATH=src/brique2/cpp/
+SET DRIVE_PATH=credentials/service_account.json
+
+SET MONGO_URL=***
+SET MONGO_USERNAME=***
+SET MONGO_PASSWORD=***
+
+python src
+```
 
 
 
-cpp pb :
-- https://stackoverflow.com/questions/62115979/how-to-implement-better-error-messages-for-flex-bison
+# Connexion au service
+Le serveur est consultable à l'url suivante : http://localhost:8002.
+
+
+
+# Messages
+TODO
