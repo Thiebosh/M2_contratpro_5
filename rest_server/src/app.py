@@ -8,6 +8,7 @@ from partners.drive_partner import DrivePartner
 
 from blueprints.account import bp_account
 from blueprints.project import bp_project
+from blueprints.syntax import bp_syntax
 
 
 def create_app(config, db=None, nas=None) -> Quart:
@@ -36,6 +37,7 @@ def create_app(config, db=None, nas=None) -> Quart:
     # register blueprints
     app.register_blueprint(bp_account, url_prefix="/account")
     app.register_blueprint(bp_project, url_prefix="/project")
+    app.register_blueprint(bp_syntax, url_prefix="/syntax")
 
     return app
 

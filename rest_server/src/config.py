@@ -18,10 +18,9 @@ class Config:
 
 @dataclass
 class ProductionConfig(Config):
-    DEBUG = False
+    pass
 
 @dataclass
 class DevelopmentConfig(Config):
     ENV = "development"
     DEVELOPMENT = True
-    DEBUG = True
