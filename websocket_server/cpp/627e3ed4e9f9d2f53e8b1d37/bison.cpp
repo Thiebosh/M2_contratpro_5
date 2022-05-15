@@ -1,6 +1,6 @@
 %define parse.error verbose
 %{
-    #include "../core.hpp"
+    #include "../627e3ed4e9f9d2f53e8b1d37/core.hpp"
 
     #define YYDEBUG 1
     #define YYERROR_VERBOSE 1

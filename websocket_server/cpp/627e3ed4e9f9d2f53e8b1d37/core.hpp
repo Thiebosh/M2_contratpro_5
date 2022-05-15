@@ -5,7 +5,7 @@
 #include <map>
 #include <vector>
 
-#include "error.hpp"
+#include "../error.hpp"
 
 #define INDENT false
 #define ONE_LINE true
