@@ -4,7 +4,7 @@
 **/.pytest_cache/
 
 **/compilation
-**/prototypeur.exe
+**/cpp/*.exe
 
 **/service_account.json
 
