@@ -24,22 +24,26 @@ class FilesManagerSpecs(FilesManager):
         if os.path.exists(filepath):
             os.remove(filepath)
 
-        error_line = lines.split('\n')[-1]
-        if retcode == -1 or "GENERATION_ERROR:" in error_line:
-            print(f"cpp executable return error '{retcode}' : {error_line}")
+        try:
+            error_line = lines.split('\n')[-1]
+            if retcode == -1 or "GENERATION_ERROR:" in error_line:
+                print(f"cpp executable return error '{retcode}' : {error_line}")
+                return False
+
+            chunks = [chunk.strip() for chunk in lines.split("\n\n\n\n") if chunk != '']
+
+            self.files_currently_stored = False
+            self.files = [{"name": line.split("\n")[0], "content": line[line.find("\n")+1:]} for line in chunks][1:]
+            self.pages = [{"Default": chunks[0].split("\n")[1]}] + [
+                {''.join(value.split(".")[:-1]): value}
+                for page in self.files 
+                for key, value in page.items() 
+                if key == "name" 
+                and value.split(".")[-1] == "html"
+            ]
+        except Exception as e:
+            print(f"cpp generated parse error: {e}")
             return False
-
-        chunks = [chunk.strip() for chunk in lines.split("\n\n\n\n") if chunk != '']
-
-        self.files_currently_stored = False
-        self.files = [{"name": line.split("\n")[0], "content": line[line.find("\n")+1:]} for line in chunks][1:]
-        self.pages = [{"Default": chunks[0].split("\n")[1]}] + [
-            {''.join(value.split(".")[:-1]): value}
-            for page in self.files 
-            for key, value in page.items() 
-            if key == "name" 
-            and value.split(".")[-1] == "html"
-        ]
 
         return True
 
