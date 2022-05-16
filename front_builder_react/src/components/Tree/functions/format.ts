@@ -1,53 +1,54 @@
 import clone from "clone";
 import {
     initChildrenIfNotDone,
-    skipKey
+    skipKey,
+    moveElementAtFirstPosition
 } from "./utils"
 import { addAddingNode } from "./node"
 
-function formatArray(data:any, key:string, syntax:any){
-    initChildrenIfNotDone(data); // to add children of current data as value of children key
+function formatArray(node:any, key:string, syntax:any){
+    // key is the key of the json for the current iteration, it's a data of the node
+    initChildrenIfNotDone(node); // to add children of current node as value of children key
 
-    for (let i = 0; i < data[key].length; i++){
-        initChildrenIfNotDone(data[key][i]); // to add adding node as child of all the children of the array
-        addAddingNode(data[key][i]);
+    for (let i = 0; i < node[key].length; i++){
+        initChildrenIfNotDone(node[key][i]); // to add adding node as child of all the children of the array
+        addAddingNode(node[key][i]);
 
-        data[key][i].name = key;
-        data.children.splice(-2,0,data[key][i]);
-        formatData(data[key][i], syntax);
+        node[key][i].name = key;
+        node.children.splice(-2,0,node[key][i]);
+        formatData(node[key][i], syntax);
     }
 }
 
-function formatObject(data:any, key:string, syntax:any){
-    data[key].name = key;
+function formatObject(node:any, key:string, syntax:any){
+    node[key].name = key;
 
-    initChildrenIfNotDone(data);
-    initChildrenIfNotDone(data[key]); // same as for formatArray
+    initChildrenIfNotDone(node);
+    initChildrenIfNotDone(node[key]); // same as for formatArray
     
-    addAddingNode(data[key]);
+    addAddingNode(node[key]);
 
-    data.children.splice(-2,0,data[key]);
-    formatData(data[key], syntax);
+    node.children.splice(-2,0,node[key]);
+    formatData(node[key], syntax);
 }
 
-function formatField(data:any, key:string, syntax:any){
-    if (syntax[syntax[key].field]){
-        if (!data.children){
-            data.children = [];
+function formatField(node:any, key:string, syntax:any){
+    const fieldType = syntax[key].field; // type of field for current node
+    const fieldSyntax = syntax[fieldType]; // sytnax for the specific field
+
+    if (fieldSyntax){
+        if (!node.children){
+            node.children = [];
         }
-        let node = clone(syntax[syntax[key].field]);
-        node.value = data[key];
+        let fieldSyntaxClone = clone(fieldSyntax);
+        fieldSyntaxClone.value = node[key];
         
-        if (node.values){
-            let selectedElemIndex = node.values.indexOf(data[key]);
-            node.values.splice(selectedElemIndex,1);
-            node.values.splice(0,0,data[key]);
-        }
-        if (node.type === "select"){
-            node.label = key;
+        if (fieldSyntaxClone.type === "select"){
+            fieldSyntaxClone.label = key;
+            moveElementAtFirstPosition(fieldSyntaxClone.values,node[key])
         }
 
-        data.children.splice(-2,0,node);
+        node.children.splice(-2,0,fieldSyntaxClone);
     }
 }
 
