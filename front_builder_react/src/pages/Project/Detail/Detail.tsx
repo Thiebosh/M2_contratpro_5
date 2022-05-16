@@ -101,7 +101,6 @@ export function Detail() {
                 setProjectUsers(data.result.users);
                 setProjectLastSpecs(data.result.last_specs || '');
                 setProjectLatestProto(data.result.latest_proto);
-                console.log(data.result);
                 setProjectDescription(data.result.description);
             })
             .catch(error => {
