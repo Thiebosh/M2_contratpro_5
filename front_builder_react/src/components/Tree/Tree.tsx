@@ -10,8 +10,8 @@ interface CustomTreeProps {
     syntax_filename:string,
     openClose:Function
 }
-function openModal(setIsOpen:any){
-    setIsOpen(true)
+function openModal(setIsOpen:Function, nodeData:any){
+    setIsOpen(true);
 }
 
 export function CustomTree(props:CustomTreeProps){
@@ -24,31 +24,31 @@ export function CustomTree(props:CustomTreeProps){
     }, [props.syntax_filename])
 
 
-    const renderRectSvgNode = ({ nodeDatum, toggleNode }:any) => {
-        if(nodeDatum.type === "input"){
+    const renderRectSvgNode = ({ nodeData, toggleNode }:any) => {
+        if(nodeData.type === "input"){
             return (
                 <g>
                     <foreignObject width={100} height={100} y={-10} x={-30}>
-                        <input type={nodeDatum.nature} defaultValue={nodeDatum.value} onChange={() => console.log("fds")}/>
+                        <input type={nodeData.nature} value={nodeData.value} onChange={() => console.log("fds")}/>
                     </foreignObject>
                 </g>
             );
-        } else if (nodeDatum.type === "select"){
+        } else if (nodeData.type === "select"){
             return (
                 <g>
                     <foreignObject width={100} height={100} y={-10} x={-30}>
-                        <label>{nodeDatum.label} :</label>
+                        <label>{nodeData.label} :</label>
                         <select>
-                            {nodeDatum.values.map((v:any) =>
+                            {nodeData.values.map((v:any) =>
                             {return <option value={v}>{v}</option>})}
                         </select>
                     </foreignObject>
                 </g>
             );
-        } else if (nodeDatum.type === "adding"){
+        } else if (nodeData.type === "adding"){
             return(
                 <g>
-                  <circle r="25" onClick={()=> openModal(props.openClose)}>
+                  <circle r="25" onClick={()=> openModal(props.openClose, nodeData)}>
                 </circle>
                   <text fill="white" textAnchor="middle">
                     +
@@ -61,7 +61,7 @@ export function CustomTree(props:CustomTreeProps){
           <circle r="25" onClick={toggleNode}>
         </circle>
           <text fill="white" textAnchor="middle">
-            {nodeDatum.name}
+            {nodeData.name}
           </text>
         
         </g>)
@@ -98,7 +98,7 @@ function getDataFromJson():Promise<Record<string, unknown>>{
 
 function formatData(data:any, syntax:any){
     for (const key in data){
-        if (key === "name" || key === "children"){
+        if (key === "name" || key === "children" || key === "parent"){
             continue;
         }
 
@@ -112,7 +112,8 @@ function formatData(data:any, syntax:any){
                 }
                 data[key][i].children.push({
                     name:"+",
-                    type:"adding"
+                    type:"adding",
+                    parent:data[key][i]
                 });
                 data[key][i].name = key;
                 data.children.splice(-2,0,data[key][i])
@@ -128,7 +129,8 @@ function formatData(data:any, syntax:any){
             }
             data[key].children.push({
                 name:"+",
-                type:"adding"
+                type:"adding",
+                parent:data[key]
             });
             data.children.splice(-2,0,data[key]);
             formatData(data[key], syntax);
@@ -137,7 +139,7 @@ function formatData(data:any, syntax:any){
                 if (!data.children){
                     data.children = [];
                 }
-                let node = syntax[syntax[key].field];
+                let node = clone(syntax[syntax[key].field]);
                 if (!node.values){
                     node.value = data[key];
                 }
