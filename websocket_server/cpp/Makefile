@@ -1,5 +1,4 @@
 build:
-	echo $(ID)
 	rm -rf $(valueID).exe
 	mkdir -p compilation
 	bison -d $(valueID)/bison.cpp -o compilation/compiled.bison.cpp
