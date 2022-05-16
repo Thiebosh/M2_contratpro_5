@@ -8,11 +8,15 @@ RUN apt update &&\
 ARG arg_port
 ARG php_url
 
+#content the path reference for our file
+ARG valueID="627e3ed4e9f9d2f53e8b1d37"
+
 ENV HOST=0.0.0.0
 ENV PORT=$arg_port
 ENV PHP_URL=$php_url
 ENV CPP_PATH="/src/brique2/cpp/"
 ENV DRIVE_PATH="/credentials/service_account.json"
+
 
 EXPOSE $arg_port
 
@@ -41,7 +45,7 @@ RUN apt update &&\
 WORKDIR /src
 COPY cpp .
 
-RUN make build
+RUN make build valueID="627e3ed4e9f9d2f53e8b1d37"
 
 
 # third stage : copy all files
