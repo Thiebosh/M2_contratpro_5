@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Tree from "react-d3-tree"
 import { formatData } from "./functions/format"
+import { addChildren } from "./functions/node"
 
 import './Tree.scss';
 
@@ -12,11 +13,12 @@ interface CustomTreeProps {
     setModalElements:Function
 }
 
+export let g_syntax:any = {};
+
 export function CustomTree(props:CustomTreeProps){
 
     const [tree, setTree] = useState<any>();
     const [syntax, setSyntax] = useState<any>();
-
 
     useEffect(() => {
         getDataFromJson()
@@ -79,15 +81,22 @@ export function CustomTree(props:CustomTreeProps){
     )
 }
 
+
+export let root = undefined;
+export let g_setTree:Function;
+
 function init(filename:string, data:any, setTree:React.Dispatch<any>, setSyntax:React.Dispatch<any>){
     fetch("/syntaxes/"+filename+".json")
     .then(syntax => syntax.json())
     .then(syntaxJson => {
         setSyntax(syntaxJson);
-        formatData(data, syntaxJson);
+        g_syntax = syntaxJson;
+        formatData(data);
         data = [data["root"]];
         data.name = "root";
         setTree(data);
+        root = data
+        g_setTree = setTree;
     })
 }
 
@@ -108,9 +117,9 @@ function getParentChildrenValues(nodeData:any){
     return parentChildrenValues;
 }
 
-function getPossibleChildrenSuggestion(nodeData:any, syntax:any){
+function getPossibleChildrenSuggestion(nodeData:any){
     let parentChildrenValues = getParentChildrenValues(nodeData);
-    let parentSyntax = syntax[nodeData.parent.name];
+    let parentSyntax = g_syntax[nodeData.parent.name];
     let newChildrenSuggestion:any = [];
 
     parentSyntax.values.forEach((v:any) => {
@@ -127,12 +136,12 @@ function getPossibleChildrenSuggestion(nodeData:any, syntax:any){
 }
 
 function openModal(setIsOpen:Function, nodeData:any, syntax:any, setModalElements:Function){
-    const newChildrenSuggestion = getPossibleChildrenSuggestion(nodeData, syntax);
+    const newChildrenSuggestion = getPossibleChildrenSuggestion(nodeData);
     const modalElements:any = []
     newChildrenSuggestion.forEach((suggestion:any) => {
         modalElements.push({
             text: suggestion,
-            onclick: () => console.log(suggestion)
+            onclick: () => addChildren(nodeData, suggestion)
     })});
     setModalElements(modalElements)
     setIsOpen(true);

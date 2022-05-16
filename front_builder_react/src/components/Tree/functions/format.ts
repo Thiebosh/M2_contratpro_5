@@ -4,9 +4,12 @@ import {
     skipKey,
     moveElementAtFirstPosition
 } from "./utils"
+
+import { g_syntax } from "../Tree"
+
 import { addAddingNode } from "./node"
 
-function formatArray(node:any, key:string, syntax:any){
+function formatArray(node:any, key:string){
     // key is the key of the json for the current iteration, it's a data of the node
     initChildrenIfNotDone(node); // to add children of current node as value of children key
 
@@ -15,12 +18,13 @@ function formatArray(node:any, key:string, syntax:any){
         addAddingNode(node[key][i]);
 
         node[key][i].name = key;
+
         node.children.splice(-2,0,node[key][i]);
-        formatData(node[key][i], syntax);
+        formatData(node[key][i]);
     }
 }
 
-function formatObject(node:any, key:string, syntax:any){
+function formatObject(node:any, key:string){
     node[key].name = key;
 
     initChildrenIfNotDone(node);
@@ -29,17 +33,16 @@ function formatObject(node:any, key:string, syntax:any){
     addAddingNode(node[key]);
 
     node.children.splice(-2,0,node[key]);
-    formatData(node[key], syntax);
+    formatData(node[key]);
 }
 
-function formatField(node:any, key:string, syntax:any){
-    const fieldType = syntax[key].field; // type of field for current node
-    const fieldSyntax = syntax[fieldType]; // sytnax for the specific field
+function formatField(node:any, key:string){
+    const fieldType = g_syntax[key].field; // type of field for current node
+    const fieldSyntax = g_syntax[fieldType]; // syntax for the specific field
 
     if (fieldSyntax){
-        if (!node.children){
-            node.children = [];
-        }
+        initChildrenIfNotDone(node);
+
         let fieldSyntaxClone = clone(fieldSyntax);
         fieldSyntaxClone.value = node[key];
         
@@ -52,20 +55,20 @@ function formatField(node:any, key:string, syntax:any){
     }
 }
 
-export function formatData(data:any, syntax:any){
+export function formatData(data:any){
     for (const key in data){
         if (skipKey(key)){
             continue;
         }
-        switch(syntax[key].type){
+        switch(g_syntax[key].type){
             case "array":
-                formatArray(data, key, syntax)
+                formatArray(data, key)
                 break;
             case "object":
-                formatObject(data, key, syntax)
+                formatObject(data, key)
                 break;
             case "field":
-                formatField(data, key, syntax)
+                formatField(data, key)
                 break;
         }
     }
