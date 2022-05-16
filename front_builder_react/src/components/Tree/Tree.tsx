@@ -10,17 +10,53 @@ interface CustomTreeProps {
     syntax_filename:string,
     openClose:Function
 }
-function openModal(setIsOpen:Function, nodeData:any){
+
+function getParentChildrenValues(nodeData:any){
+    let parentChildrenValues:any = [];
+
+    nodeData.parent.children.forEach((child:any) => {
+        if(child.type !== "adding"){
+            parentChildrenValues.push(child.name); // pour éviter de les proposer si object et qu'on ne peut pas en avoir plusieurs
+        }
+    });
+    return parentChildrenValues;
+}
+
+function getPossibleChildrenSuggestion(nodeData:any, syntax:any){
+    let parentChildrenValues = getParentChildrenValues(nodeData);
+    let parentSyntax = syntax[nodeData.parent.name];
+    let newChildrenSuggestion:any = [];
+
+    parentSyntax.values.forEach((v:any) => {
+        if(v[0] === "?"){
+            v = v.substring(1);
+        }
+
+        if (parentSyntax.type === "array" || (parentSyntax.type !== "array" && !parentChildrenValues.includes(v))){
+            newChildrenSuggestion.push(v)
+        }
+    });
+    
+    return newChildrenSuggestion;
+}
+
+function openModal(setIsOpen:Function, nodeData:any, syntax:any){
     setIsOpen(true);
+    let newChildrenSuggestion = getPossibleChildrenSuggestion(nodeData, syntax);
+
+    
+    console.log(newChildrenSuggestion);
 }
 
 export function CustomTree(props:CustomTreeProps){
-    // formatData(data)
+
     const [tree, setTree] = useState<any>();
+    const [syntax, setSyntax] = useState<any>();
+
 
     useEffect(() => {
         getDataFromJson()
-        .then((data => init(props.syntax_filename, data, setTree)));
+        .then((data => init(props.syntax_filename, data, setTree, setSyntax)));
     }, [props.syntax_filename])
 
 
@@ -48,7 +84,7 @@ export function CustomTree(props:CustomTreeProps){
         } else if (nodeDatum.type === "adding"){
             return(
                 <g>
-                  <circle r="25" onClick={()=> openModal(props.openClose, nodeDatum)}>
+                  <circle r="25" onClick={()=> openModal(props.openClose, nodeDatum, syntax)}>
                 </circle>
                   <text fill="white" textAnchor="middle">
                     +
@@ -79,10 +115,11 @@ export function CustomTree(props:CustomTreeProps){
     )
 }
 
-function init(filename:string, data:any, setTree:React.Dispatch<any>){
+function init(filename:string, data:any, setTree:React.Dispatch<any>, setSyntax:React.Dispatch<any>){
     fetch("/syntaxes/"+filename+".json")
     .then(syntax => syntax.json())
     .then(syntaxJson => {
+        setSyntax(syntaxJson);
         formatData(data, syntaxJson);
         data = [data["root"]];
         data.name = "root";
@@ -95,63 +132,83 @@ function getDataFromJson():Promise<Record<string, unknown>>{
     .then(data => data.json())
 }
 
+function skipKey(key:string){
+    const keysToSkip = ["name", "children", "parent"]
+    return keysToSkip.includes(key)
+}
+
+function formatArray(data:any, key:string, syntax:any){
+    if (!data.children){
+        data.children = [];
+    }
+    for (let i = 0; i < data[key].length; i++){
+        if (!data[key][i].children){
+            data[key][i].children = [];
+        }
+        data[key][i].children.push({
+            name:"+",
+            type:"adding",
+            parent:data[key][i]
+        });
+        data[key][i].name = key;
+        data.children.splice(-2,0,data[key][i])
+        formatData(data[key][i], syntax);
+    }
+}
+
+function formatObject(data:any, key:string, syntax:any){
+    data[key].name = key
+    if (!data.children){
+        data.children = [];
+    }
+    if (!data[key].children){
+        data[key].children = [];
+    }
+    data[key].children.push({
+        name:"+",
+        type:"adding",
+        parent:data[key]
+    });
+    data.children.splice(-2,0,data[key]);
+    formatData(data[key], syntax);
+}
+
+function formatField(data:any, key:string, syntax:any){
+    if (syntax[syntax[key].field]){
+        if (!data.children){
+            data.children = [];
+        }
+        let node = clone(syntax[syntax[key].field]);
+        node.value = data[key];
+
+        if (node.values){
+            let selectedElemIndex = node.values.indexOf(data[key]);
+            node.values.splice(selectedElemIndex,1);
+            node.values.splice(0,0,data[key]);
+        }
+        if (node.type === "select"){
+            node.label = key;
+        }
+
+        data.children.splice(-2,0,node);
+    }
+}
 
 function formatData(data:any, syntax:any){
     for (const key in data){
-        if (key === "name" || key === "children" || key === "parent"){
+        if (skipKey(key)){
             continue;
         }
-
-        if (syntax[key].type === "array"){
-            if (!data.children){
-                data.children = [];
-            }
-            for (let i = 0; i < data[key].length; i++){
-                if (!data[key][i].children){
-                    data[key][i].children = [];
-                }
-                data[key][i].children.push({
-                    name:"+",
-                    type:"adding",
-                    parent:data[key][i]
-                });
-                data[key][i].name = key;
-                data.children.splice(-2,0,data[key][i])
-                formatData(data[key][i], syntax);
-            }
-        } else if (syntax[key].type === "object"){
-            data[key].name = key
-            if (!data.children){
-                data.children = [];
-            }
-            if (!data[key].children){
-                data[key].children = [];
-            }
-            data[key].children.push({
-                name:"+",
-                type:"adding",
-                parent:data[key]
-            });
-            data.children.splice(-2,0,data[key]);
-            formatData(data[key], syntax);
-        } else if(syntax[key].type === "field") {
-            if (syntax[syntax[key].field]){
-                if (!data.children){
-                    data.children = [];
-                }
-                let node = clone(syntax[syntax[key].field]);
-                node.value = data[key];
-                
-                if (node.values){
-                    let selectedElemIndex = node.values.indexOf(data[key]);
-                    node.values.splice(selectedElemIndex,1);
-                    node.values.splice(0,0,data[key]);
-                }
-                if (node.type === "select"){
-                    node.label = key;
-                }
-                data.children.splice(-2,0,node);
-            }
+        switch(syntax[key].type){
+            case "array":
+                formatArray(data, key, syntax)
+                break;
+            case "object":
+                formatObject(data, key, syntax)
+                break;
+            case "field":
+                formatField(data, key, syntax)
+                break;
         }
     }
-}
+    }
