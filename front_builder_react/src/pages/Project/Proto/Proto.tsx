@@ -133,7 +133,7 @@ export function Proto() {
             setSocketUsable(false);
             socket.close();
         }
-    }, [socket]);
+    }, [projectId, socket]);
 
     useEffect(() => {
         if (!(socket && socketUsable && pages.length >= 2)) return;

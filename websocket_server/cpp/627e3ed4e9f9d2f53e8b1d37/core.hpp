@@ -45,7 +45,8 @@ void outputResultFiles() {
     if (!htmlPages.size()) displayError(ErrorType::input, ErrorObject::no_files_transmitted, "");
 
     // afficher default page
-    cout << "default page:" << endl << /*defaultPage*/"ecran1.html" << endl << endl << endl << endl; // ajouter element de pattern pour determiner page par défaut ou alors prendre première page comme défaut
+    if (defaultPage == "") defaultPage = htmlPages[0];
+    cout << "default page:" << endl << defaultPage << endl << endl << endl << endl;
 
     // print routeur.php
     cout << "routeur.php" << endl;

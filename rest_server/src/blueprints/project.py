@@ -148,7 +148,8 @@ async def get():
                 "syntax": "$syntax.name",
                 "creation": 1,
                 "last_specs": 1,
-                "latest_proto": 1
+                "latest_proto": 1,
+                "description": 1,
             }
         },
     ]
