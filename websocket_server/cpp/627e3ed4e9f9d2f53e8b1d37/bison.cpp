@@ -39,6 +39,7 @@
 %token TEXT
 %token TEXTVALUE
 %token TRUE
+%token FALSE
 
 %token <string> STR_VALUE
 %token <string> COLOR_VALUE
@@ -92,10 +93,11 @@ field
                     break;
             }
         }
+    |   HOME FALSE // do nothing
     |   HOME TRUE
         {
             if (defaultPage != "") displayError(ErrorType::input, ErrorObject::defaultPage_already_defined, "");
-            if (currentPage == "") displayError(ErrorType::generation, ErrorObject::defaultPage_no_value, "");
+            if (currentPage == "") displayError(ErrorType::generation, ErrorObject::defaultPage_no_value, ""); // can't know
             defaultPage = currentPage;
         }
     |   CONTENT array
