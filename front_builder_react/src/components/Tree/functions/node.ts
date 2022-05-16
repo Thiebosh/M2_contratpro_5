@@ -19,7 +19,8 @@ export function addChildren(nodeData:any, suggestion:any){
         })
         initChildrenIfNotDone(nodeData);
         addAddingNode(nodeData);
-        g_setTree(nodeData.parent);
+        // console.log(root);
+        g_setTree(root);
     }
     // console.log(values)
     // nodeData.parent.children.splice(-1,0,{name:suggestion})

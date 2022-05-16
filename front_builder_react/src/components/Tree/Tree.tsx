@@ -92,10 +92,10 @@ function init(filename:string, data:any, setTree:React.Dispatch<any>, setSyntax:
         setSyntax(syntaxJson);
         g_syntax = syntaxJson;
         formatData(data);
-        data = [data["root"]];
+        data = data["root"];
         data.name = "root";
         setTree(data);
-        root = data
+        root = data;
         g_setTree = setTree;
     })
 }
@@ -141,7 +141,10 @@ function openModal(setIsOpen:Function, nodeData:any, syntax:any, setModalElement
     newChildrenSuggestion.forEach((suggestion:any) => {
         modalElements.push({
             text: suggestion,
-            onclick: () => addChildren(nodeData, suggestion)
+            onclick: () => {
+                addChildren(nodeData, suggestion);
+                setIsOpen(false);
+            }
     })});
     setModalElements(modalElements)
     setIsOpen(true);
