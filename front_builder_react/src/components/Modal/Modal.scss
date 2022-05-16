@@ -41,3 +41,8 @@ h2 {
 .overlay {
     background-color: rgba(0,0,0,0.5);
 }
+
+.modalInput:hover {
+    color: var(--color-primary);
+    cursor: pointer;
+}

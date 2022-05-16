@@ -8,7 +8,8 @@ import './Tree.scss';
 
 interface CustomTreeProps {
     syntax_filename:string,
-    openClose:Function
+    openClose:Function,
+    setModalElements:Function
 }
 
 export function CustomTree(props:CustomTreeProps){
@@ -47,7 +48,7 @@ export function CustomTree(props:CustomTreeProps){
         } else if (nodeDatum.type === "adding"){
             return(
                 <g>
-                  <circle r="25" onClick={()=> openModal(props.openClose, nodeDatum, syntax)}>
+                  <circle r="25" onClick={()=> openModal(props.openClose, nodeDatum, syntax, props.setModalElements)}>
                 </circle>
                   <text fill="white" textAnchor="middle">
                     +
@@ -125,10 +126,15 @@ function getPossibleChildrenSuggestion(nodeData:any, syntax:any){
     return newChildrenSuggestion;
 }
 
-function openModal(setIsOpen:Function, nodeData:any, syntax:any){
+function openModal(setIsOpen:Function, nodeData:any, syntax:any, setModalElements:Function){
+    const newChildrenSuggestion = getPossibleChildrenSuggestion(nodeData, syntax);
+    const modalElements:any = []
+    newChildrenSuggestion.forEach((suggestion:any) => {
+        modalElements.push({
+            text: suggestion,
+            onclick: () => console.log(suggestion)
+    })});
+    setModalElements(modalElements)
     setIsOpen(true);
-    let newChildrenSuggestion = getPossibleChildrenSuggestion(nodeData, syntax);
-
     
-    console.log(newChildrenSuggestion);
 }
