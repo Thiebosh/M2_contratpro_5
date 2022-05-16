@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Tree from "react-d3-tree"
-import clone from "clone";
+import { formatData } from "./functions/format"
 
 import './Tree.scss';
 
@@ -131,84 +131,3 @@ function getDataFromJson():Promise<Record<string, unknown>>{
     return fetch("/example.json")
     .then(data => data.json())
 }
-
-function skipKey(key:string){
-    const keysToSkip = ["name", "children", "parent"]
-    return keysToSkip.includes(key)
-}
-
-function formatArray(data:any, key:string, syntax:any){
-    if (!data.children){
-        data.children = [];
-    }
-    for (let i = 0; i < data[key].length; i++){
-        if (!data[key][i].children){
-            data[key][i].children = [];
-        }
-        data[key][i].children.push({
-            name:"+",
-            type:"adding",
-            parent:data[key][i]
-        });
-        data[key][i].name = key;
-        data.children.splice(-2,0,data[key][i])
-        formatData(data[key][i], syntax);
-    }
-}
-
-function formatObject(data:any, key:string, syntax:any){
-    data[key].name = key
-    if (!data.children){
-        data.children = [];
-    }
-    if (!data[key].children){
-        data[key].children = [];
-    }
-    data[key].children.push({
-        name:"+",
-        type:"adding",
-        parent:data[key]
-    });
-    data.children.splice(-2,0,data[key]);
-    formatData(data[key], syntax);
-}
-
-function formatField(data:any, key:string, syntax:any){
-    if (syntax[syntax[key].field]){
-        if (!data.children){
-            data.children = [];
-        }
-        let node = clone(syntax[syntax[key].field]);
-        node.value = data[key];
-
-        if (node.values){
-            let selectedElemIndex = node.values.indexOf(data[key]);
-            node.values.splice(selectedElemIndex,1);
-            node.values.splice(0,0,data[key]);
-        }
-        if (node.type === "select"){
-            node.label = key;
-        }
-
-        data.children.splice(-2,0,node);
-    }
-}
-
-function formatData(data:any, syntax:any){
-    for (const key in data){
-        if (skipKey(key)){
-            continue;
-        }
-        switch(syntax[key].type){
-            case "array":
-                formatArray(data, key, syntax)
-                break;
-            case "object":
-                formatObject(data, key, syntax)
-                break;
-            case "field":
-                formatField(data, key, syntax)
-                break;
-        }
-    }
-    }
