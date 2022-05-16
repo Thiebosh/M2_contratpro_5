@@ -24,31 +24,31 @@ export function CustomTree(props:CustomTreeProps){
     }, [props.syntax_filename])
 
 
-    const renderRectSvgNode = ({ nodeData, toggleNode }:any) => {
-        if(nodeData.type === "input"){
+    const renderRectSvgNode = ({ nodeDatum, toggleNode }:any) => {
+        if(nodeDatum.type === "input"){
             return (
                 <g>
                     <foreignObject width={100} height={100} y={-10} x={-30}>
-                        <input type={nodeData.nature} value={nodeData.value} onChange={() => console.log("fds")}/>
+                        <input type={nodeDatum.nature} value={nodeDatum.value} onChange={() => console.log("fds")}/>
                     </foreignObject>
                 </g>
             );
-        } else if (nodeData.type === "select"){
+        } else if (nodeDatum.type === "select"){
             return (
                 <g>
                     <foreignObject width={100} height={100} y={-10} x={-30}>
-                        <label>{nodeData.label} :</label>
+                        <label>{nodeDatum.label} :</label>
                         <select>
-                            {nodeData.values.map((v:any) =>
+                            {nodeDatum.values.map((v:any) =>
                             {return <option value={v}>{v}</option>})}
                         </select>
                     </foreignObject>
                 </g>
             );
-        } else if (nodeData.type === "adding"){
+        } else if (nodeDatum.type === "adding"){
             return(
                 <g>
-                  <circle r="25" onClick={()=> openModal(props.openClose, nodeData)}>
+                  <circle r="25" onClick={()=> openModal(props.openClose, nodeDatum)}>
                 </circle>
                   <text fill="white" textAnchor="middle">
                     +
@@ -61,7 +61,7 @@ export function CustomTree(props:CustomTreeProps){
           <circle r="25" onClick={toggleNode}>
         </circle>
           <text fill="white" textAnchor="middle">
-            {nodeData.name}
+            {nodeDatum.name}
           </text>
         
         </g>)
