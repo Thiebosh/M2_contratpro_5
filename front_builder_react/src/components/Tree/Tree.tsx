@@ -140,8 +140,12 @@ function formatData(data:any, syntax:any){
                     data.children = [];
                 }
                 let node = clone(syntax[syntax[key].field]);
-                if (!node.values){
-                    node.value = data[key];
+                node.value = data[key];
+                
+                if (node.values){
+                    let selectedElemIndex = node.values.indexOf(data[key]);
+                    node.values.splice(selectedElemIndex,1);
+                    node.values.splice(0,0,data[key]);
                 }
                 if (node.type === "select"){
                     node.label = key;
