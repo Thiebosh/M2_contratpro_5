@@ -5,39 +5,15 @@ import clone from "clone";
 import './Tree.scss';
 
 // la doc : https://bkrem.github.io/react-d3-tree/docs/interfaces/_tree_types_.treeprops.html
-// const debugData = [
-//     {
-//       name: "root",
-//       children: [
-//         {
-//           name: "screen",
-//           type:"array",
-//           children:[
-//               {
-//                   name:"0",
-//                   type:"object",
-//               },
-//               {
-//                   name:"1",
-//                   type:"object"
-//               },
-//               {
-//                   name:"+",
-//                   type:"adding"
-//               }
-//           ]
-//         }
-//       ]
-//     }
-// ];
-
-// var state:any = {
-//     data: debugData
-// }
 
 interface CustomTreeProps {
-    syntax_filename:string
+    syntax_filename:string,
+    openClose:Function
 }
+function openModal(setIsOpen:any){
+    setIsOpen(true)
+}
+
 export function CustomTree(props:CustomTreeProps){
     // formatData(data)
     const [tree, setTree] = useState<any>();
@@ -46,6 +22,7 @@ export function CustomTree(props:CustomTreeProps){
         getDataFromJson()
         .then((data => init(props.syntax_filename, data, setTree)));
     }, [])
+
 
     const renderRectSvgNode = ({ nodeDatum, toggleNode }:any) => {
         if(nodeDatum.type === "input"){
@@ -68,6 +45,16 @@ export function CustomTree(props:CustomTreeProps){
                     </foreignObject>
                 </g>
             );
+        } else if (nodeDatum.type === "adding"){
+            return(
+                <g>
+                  <circle r="25" onClick={()=> openModal(props.openClose)}>
+                </circle>
+                  <text fill="white" textAnchor="middle">
+                    +
+                  </text>
+                
+                </g>)
         }
         return(
         <g>
@@ -87,48 +74,9 @@ export function CustomTree(props:CustomTreeProps){
                 translate={{x:window.innerWidth*1/4,y:window.innerHeight/2}}
                 transitionDuration={0.5}
                 renderCustomNodeElement={renderRectSvgNode}
-                onNodeClick={(nodeData:any) => {
-                    if (nodeData.data.type === "adding"){
-                        console.log(nodeData) 
-                        //nodeData = juste en accès, uniquement pour récup infos, pas pour modifier
-                        const nextData:any = clone(tree)
-                        if (nodeData.parent.data.type === "array"){
-                            addChild(nextData[0], nodeData.parent.data.name)
-                            // nodeData.parent.children.push({
-                            //     name:"newObject",
-                            //     type:"object"
-                            // })
-                        }
-                        // const target = nextData[0].children;
-                        // target.push({
-                        //     name:"new",
-                        //     type:"array",
-                        //     children:[{
-                        //         name:"1",
-                        //         type:"object"
-
-                        //     }
-                        //     ]
-                        // });
-                        setTree(nextData);
-                    }
-                }}
             />
         }</>
     )
-}
-
-function addChild(node:any, name:any){
-    if (node.children){
-        if(node.name === name){
-            node.children.splice(-1,0,{
-                name:"fd"
-            })
-        } else{
-            node.children.forEach((o: any) => addChild(o,name))
-        }
-
-    }
 }
 
 function init(filename:string, data:any, setTree:React.Dispatch<any>){

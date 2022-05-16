@@ -8,6 +8,7 @@ import { init_websocket } from '../../..';
 
 import './Specs.scss';
 import { Collabs } from '../../../components/Collabs';
+import { Modal } from "../../../components/Modal"
 
 export function Specs() {
     const navigate = useNavigate();
@@ -15,6 +16,8 @@ export function Specs() {
     const userContext = useUserContext();
     const [projectId, setProjectId] = useState<string>();
     const [syntaxId, setSyntaxId] = useState<string>();
+    const [isOpen, setIsOpen] = useState(false);
+
 
     useEffect(() => {
         postProjectExistForUser(userContext.user.id, urlName || "")
@@ -141,8 +144,8 @@ export function Specs() {
     }
 
     return (
-        <section id="specs">
-            <div className="hover_menu">
+        <section id="specs" className={isOpen ? "overlay": ""}>
+            <div className={"hover_menu" + (isOpen ? " inactive" : "")}>
                 <div className="menu">
                     <p onClick={triggerSave}>Save specifications</p>
                     <hr/>
@@ -157,10 +160,15 @@ export function Specs() {
                 { infoMsg && <Fade><div className='info'>{infoMsg}</div></Fade> }
                 { errorMsg && <Fade><div className='error'>{errorMsg}</div></Fade> }
             </div>
-            <div id="treeContent">
+            <div id="treeContent" className={isOpen ? "inactive": ""}>
                 { syntaxId &&
-                    <CustomTree syntax_filename={syntaxId}/>
+                    <CustomTree syntax_filename={syntaxId} openClose={setIsOpen}/>
                 }
+            </div>
+            <div>
+                {isOpen && (
+                    <Modal openClose={setIsOpen}/>
+                )}
             </div>
             {/* { socketUsable ? (loadingPage ? <p className='centered'>Loading...</p> : <div id="placeholder"/>) : <p className='centered'>Connection to server...</p> } */}
         </section>
