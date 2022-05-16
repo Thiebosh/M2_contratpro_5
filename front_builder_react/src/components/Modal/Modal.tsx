@@ -8,12 +8,13 @@ export function Modal(props:ModalProps){
     return (
         <>
         <div className="modal">
-            <header className="modal_header">
-            <h2>Modal Title</h2>
-            <button onClick={() => closeModal(props.openClose)} className="close-button">&times;</button>
+            <header className="modal-header">
+                <h2>Modal Title</h2>
+                <button onClick={() => closeModal(props.openClose)} className="close-button">&times;</button>
             </header>
-            <main className="modal_main">
-            <p>Some content here!</p>
+            <main className="modal-main">
+                <div id="modal-content">
+                </div>
             </main>
         </div>
     </>

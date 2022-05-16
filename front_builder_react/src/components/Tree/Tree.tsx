@@ -11,43 +11,6 @@ interface CustomTreeProps {
     openClose:Function
 }
 
-function getParentChildrenValues(nodeData:any){
-    let parentChildrenValues:any = [];
-
-    nodeData.parent.children.forEach((child:any) => {
-        if(child.type !== "adding"){
-            parentChildrenValues.push(child.name); // pour éviter de les proposer si object et qu'on ne peut pas en avoir plusieurs
-        }
-    });
-    return parentChildrenValues;
-}
-
-function getPossibleChildrenSuggestion(nodeData:any, syntax:any){
-    let parentChildrenValues = getParentChildrenValues(nodeData);
-    let parentSyntax = syntax[nodeData.parent.name];
-    let newChildrenSuggestion:any = [];
-
-    parentSyntax.values.forEach((v:any) => {
-        if(v[0] === "?"){
-            v = v.substring(1);
-        }
-
-        if (parentSyntax.type === "array" || (parentSyntax.type !== "array" && !parentChildrenValues.includes(v))){
-            newChildrenSuggestion.push(v)
-        }
-    });
-    
-    return newChildrenSuggestion;
-}
-
-function openModal(setIsOpen:Function, nodeData:any, syntax:any){
-    setIsOpen(true);
-    let newChildrenSuggestion = getPossibleChildrenSuggestion(nodeData, syntax);
-
-    
-    console.log(newChildrenSuggestion);
-}
-
 export function CustomTree(props:CustomTreeProps){
 
     const [tree, setTree] = useState<any>();
@@ -130,4 +93,42 @@ function init(filename:string, data:any, setTree:React.Dispatch<any>, setSyntax:
 function getDataFromJson():Promise<Record<string, unknown>>{
     return fetch("/example.json")
     .then(data => data.json())
+}
+
+
+function getParentChildrenValues(nodeData:any){
+    let parentChildrenValues:any = [];
+
+    nodeData.parent.children.forEach((child:any) => {
+        if(child.type !== "adding"){
+            parentChildrenValues.push(child.name); // pour éviter de les proposer si object et qu'on ne peut pas en avoir plusieurs
+        }
+    });
+    return parentChildrenValues;
+}
+
+function getPossibleChildrenSuggestion(nodeData:any, syntax:any){
+    let parentChildrenValues = getParentChildrenValues(nodeData);
+    let parentSyntax = syntax[nodeData.parent.name];
+    let newChildrenSuggestion:any = [];
+
+    parentSyntax.values.forEach((v:any) => {
+        if(v[0] === "?"){
+            v = v.substring(1);
+        }
+
+        if (parentSyntax.type === "array" || (parentSyntax.type !== "array" && !parentChildrenValues.includes(v))){
+            newChildrenSuggestion.push(v)
+        }
+    });
+    
+    return newChildrenSuggestion;
+}
+
+function openModal(setIsOpen:Function, nodeData:any, syntax:any){
+    setIsOpen(true);
+    let newChildrenSuggestion = getPossibleChildrenSuggestion(nodeData, syntax);
+
+    
+    console.log(newChildrenSuggestion);
 }
