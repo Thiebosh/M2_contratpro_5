@@ -21,7 +21,7 @@ export function CustomTree(props:CustomTreeProps){
     useEffect(() => {
         getDataFromJson()
         .then((data => init(props.syntax_filename, data, setTree)));
-    }, [])
+    }, [props.syntax_filename])
 
 
     const renderRectSvgNode = ({ nodeDatum, toggleNode }:any) => {
