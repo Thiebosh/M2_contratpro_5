@@ -273,3 +273,18 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 **Retours :**
 
 - { "success": mongo_result (bool), drive_result (bool)} : la suppression en base de données a échoué/ réussi.
+
+## /syntax
+
+# /syntax/get
+
+**Utilisation :** Obtenir la syntaxe d'un projet.
+
+**Arguments requis :**
+
+- "syntax" (str) : type de syntaxe à utiliser.
+
+**Retours :**
+
+- "result": result[{ collection, filter_q, fileds}]
+
