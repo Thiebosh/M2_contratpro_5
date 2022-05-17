@@ -1,7 +1,6 @@
 from quart import Blueprint, json, request, current_app
 from werkzeug.datastructures import ImmutableMultiDict
 from flask_api import status
-from datetime import datetime
 from utils import Utils
 from defines import *
 
@@ -24,45 +23,26 @@ async def create():
         return MSG_ARGS_INVALID_NUMBER, status.HTTP_400_BAD_REQUEST
 
     project_name = post.get("name", type=str, default=None)
-    users_id = post.get("users_id", type=str, default=None)
+    is_users_id_json, users_id = Utils.get_json(post.get('users_id', type=str, default=None))
     syntax_id = post.get("syntax_id", type=str, default=None)
     description = post.get("description", type=str, default=None)
 
     # 3) TEST ARGS
-    if not (project_name and users_id and syntax_id):
+    if not (project_name and is_users_id_json and syntax_id):
         current_app.logger.info(Utils.log_format(ARGS_INVALID_PARSE))
         return MSG_ARGS_INVALID_PARSE, status.HTTP_400_BAD_REQUEST
 
+    if users_id is None:
+        current_app.logger.info(Utils.log_format(ARGS_INVALID_JSON))
+        return MSG_ARGS_INVALID_JSON, status.HTTP_400_BAD_REQUEST
+
     # 4) USE PARTNERS WITH VALID ARGS
     current_app.logger.info(Utils.log_format(ENDPOINT_CALL))
-    # verify if name does not exist
-    filter_q = {
-        "name": project_name
-    }
-    fields = {
-        "_id": 0,
-        "name": 1
-    }
-
-    # create project
-    doc = {
-        "name": project_name,
-        "users": json.loads(users_id),
-        "syntax_id": syntax_id,
-        "description": description,
-        "creation": datetime.utcnow(),
-        "last_specs": None,
-        "latest_proto": True,
-        "specs": { "root": {} },
-        "pages": [{ "default": ""}],
-        "session": {},
-    }
-
     try:
-        already_exist = await mongo_partner.find_one(COLLECTION_PROJECTS, filter_q, fields)
+        already_exist = await mongo_partner.find_one(COLLECTION_PROJECTS, *MongoQueries.exist_name(project_name))
         
         if not already_exist:
-            result = await mongo_partner.insert_one(COLLECTION_PROJECTS, doc)
+            result = await mongo_partner.insert_one(COLLECTION_PROJECTS, MongoQueries.create_project(project_name, users_id, syntax_id, description))
     except WTimeoutError as err:
         current_app.logger.critical(Utils.log_format(MONGO_PARTNER_TIMEOUT), err)
         return MSG_MONGO_PARTNER_TIMEOUT, status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -106,81 +86,8 @@ async def get():
 
     # 4) USE PARTNERS WITH VALID ARGS
     current_app.logger.info(Utils.log_format(ENDPOINT_CALL))
-    aggregation = [
-        {
-            "$match": {
-                "_id": project_objectId
-            }
-        },
-        {
-            "$project": {
-                "_id": 0,
-                "name": 1,
-                "users": {
-                    "$map": {
-                        "input": "$users",
-                        "in": { "$toObjectId": "$$this" }
-                    }
-                },
-                "syntax_id": {
-                    "$toObjectId": "$syntax_id"
-                },
-                "creation": 1,
-                "last_specs": 1,
-                "latest_proto": 1,
-                "description": 1,
-            }
-        },
-        {
-            "$lookup": {
-                "from": "accounts",
-                "localField": "users",
-                "foreignField": "_id",
-                "as": "users"
-            }
-        },
-        {
-            "$lookup": {
-                "from": "syntax",
-                "localField": "syntax_id",
-                "foreignField": "_id",
-                "as": "syntaxes"
-            }
-        },
-        {
-            "$addFields": {
-                "users": {
-                    "$map": {
-                        "input": "$users",
-                        "in": { 
-                            "id": {
-                                "$toString": "$$this._id"
-                            },
-                            "name": "$$this.name"
-                        }
-                    }
-                },
-                "syntax": {
-                    "$arrayElemAt": ["$syntaxes", 0]
-                }
-            }
-        },
-        {
-            "$project": {
-                "id": 1,
-                "name": 1,
-                "users": 1,
-                "syntax": "$syntax.name",
-                "creation": 1,
-                "last_specs": 1,
-                "latest_proto": 1,
-                "description": 1,
-            }
-        },
-    ]
-
     try:
-        result = await mongo_partner.aggregate_list(COLLECTION_PROJECTS, aggregation)
+        result = await mongo_partner.aggregate_list(COLLECTION_PROJECTS, MongoQueries.get_project(project_objectId))
     except WTimeoutError as err:
         current_app.logger.critical(Utils.log_format(MONGO_PARTNER_TIMEOUT), err)
         return MSG_MONGO_PARTNER_TIMEOUT, status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -224,16 +131,8 @@ async def get_syntax_id():
 
     # 4) USE PARTNERS WITH VALID ARGS
     current_app.logger.info(Utils.log_format(ENDPOINT_CALL))
-    filter_q = {
-        "_id": project_objectId,
-    }
-    fields = {
-        "_id": 0,
-        "syntax_id": 1
-    }
-
     try:
-        result = await mongo_partner.find_one(COLLECTION_PROJECTS, filter_q, fields)
+        result = await mongo_partner.find_one(COLLECTION_PROJECTS, *MongoQueries.get_syntax_id_project(project_objectId))
     except WTimeoutError as err:
         current_app.logger.critical(Utils.log_format(MONGO_PARTNER_TIMEOUT), err)
         return MSG_MONGO_PARTNER_TIMEOUT, status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -273,19 +172,8 @@ async def exist_for_user():
 
     # 4) USE PARTNERS WITH VALID ARGS
     current_app.logger.info(Utils.log_format(ENDPOINT_CALL))
-    filter_q = {
-        "name": project_name,
-        "users": user_id
-    }
-    fields = {
-        "_id": 0,
-        "id": {
-            "$toString": "$_id"
-        }
-    }
-
     try:
-        result = await mongo_partner.find_one(COLLECTION_PROJECTS, filter_q, fields)
+        result = await mongo_partner.find_one(COLLECTION_PROJECTS, *MongoQueries.project_exist_for_user(project_name, user_id))
     except WTimeoutError as err:
         current_app.logger.critical(Utils.log_format(MONGO_PARTNER_TIMEOUT), err)
         return MSG_MONGO_PARTNER_TIMEOUT, status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -329,22 +217,8 @@ async def get_proto_pages():
 
     # 4) USE PARTNERS WITH VALID ARGS
     current_app.logger.info(Utils.log_format(ENDPOINT_CALL))
-    aggregation = [
-        {
-            "$match": {
-                "_id": project_objectId
-            }
-        },
-        {
-            "$project": {
-                "_id": 0,
-                "pages": 1
-            }
-        },
-    ]
-
     try:
-        result = await mongo_partner.aggregate_list(COLLECTION_PROJECTS, aggregation)
+        result = await mongo_partner.aggregate_list(COLLECTION_PROJECTS, MongoQueries.project_get_proto_pages(project_objectId))
     except WTimeoutError as err:
         current_app.logger.critical(Utils.log_format(MONGO_PARTNER_TIMEOUT), err)
         return MSG_MONGO_PARTNER_TIMEOUT, status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -381,82 +255,8 @@ async def search_for_user():
 
     # 4) USE PARTNERS WITH VALID ARGS
     current_app.logger.info(Utils.log_format(ENDPOINT_CALL))
-    aggregation = [
-        {
-            "$match": {
-                "users": user_id
-            }
-        },
-        {
-            "$project": {
-                "_id": 0,
-                "id": {
-                    "$toString": "$_id"
-                },
-                "name": 1,
-                "users": {
-                    "$map": {
-                        "input": "$users",
-                        "in": { "$toObjectId": "$$this" }
-                    }
-                },
-                "syntax_id": {
-                    "$toObjectId": "$syntax_id"
-                },
-                "creation": 1,
-                "last_specs": 1,
-                "latest_proto": 1
-            }
-        },
-        {
-            "$lookup": {
-                "from": "accounts",
-                "localField": "users",
-                "foreignField": "_id",
-                "as": "users"
-            }
-        },
-        {
-            "$lookup": {
-                "from": "syntax",
-                "localField": "syntax_id",
-                "foreignField": "_id",
-                "as": "syntaxes"
-            }
-        },
-        {
-            "$addFields": {
-                "users": {
-                    "$map": {
-                        "input": "$users",
-                        "in": { 
-                            "id": {
-                                "$toString": "$$this._id"
-                            },
-                            "name": "$$this.name"
-                        }
-                    }
-                },
-                "syntax": {
-                    "$arrayElemAt": ["$syntaxes", 0]
-                }
-            }
-        },
-        {
-            "$project": {
-                "id": 1,
-                "name": 1,
-                "users": 1,
-                "syntax_name": "$syntax.name",
-                "creation": 1,
-                "last_specs": 1,
-                "latest_proto": 1
-            }
-        },
-    ]
-
     try:
-        result = await mongo_partner.aggregate_list(COLLECTION_PROJECTS, aggregation)
+        result = await mongo_partner.aggregate_list(COLLECTION_PROJECTS, MongoQueries.project_search_for_user(user_id))
     except WTimeoutError as err:
         current_app.logger.critical(Utils.log_format(MONGO_PARTNER_TIMEOUT), err)
         return MSG_MONGO_PARTNER_TIMEOUT, status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -471,7 +271,7 @@ async def search_for_user():
         "result": result
     }, status.HTTP_200_OK
 
-
+# TODO
 @bp_project.route("/update", methods=['POST'])
 async def update():
     # 1) ACCESS TO PARTNERS AND APPLY TYPE
@@ -616,12 +416,8 @@ async def delete():
 
     # 4) USE PARTNERS WITH VALID ARGS
     current_app.logger.info(Utils.log_format(ENDPOINT_CALL))
-    filter_q = {
-        "_id": project_objectId
-    }
-
     try:
-        mongo_result = await mongo_partner.delete_one(COLLECTION_PROJECTS, filter_q)
+        mongo_result = await mongo_partner.delete_one(COLLECTION_PROJECTS, MongoQueries.filter_id(project_objectId))
     except WTimeoutError as err:
         current_app.logger.critical(Utils.log_format(MONGO_PARTNER_TIMEOUT), err)
         return MSG_MONGO_PARTNER_TIMEOUT, status.HTTP_500_INTERNAL_SERVER_ERROR
