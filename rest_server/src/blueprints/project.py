@@ -271,7 +271,7 @@ async def search_for_user():
         "result": result
     }, status.HTTP_200_OK
 
-# TODO
+
 @bp_project.route("/update", methods=['POST'])
 async def update():
     # 1) ACCESS TO PARTNERS AND APPLY TYPE
@@ -285,15 +285,20 @@ async def update():
 
     id = post.get("id", type=str, default=None)
     name = post.get("name", type=str, default=None)
-    add_ids = post.get("addCollabIds", type=str, default=None)
+    is_add_ids_json, add_ids = Utils.get_json(post.get('addCollabIds', type=str, default=None))
     remove_ids = post.get("removeCollabIds", type=str, default=None)
+    is_remove_ids_json, remove_ids = Utils.get_json(post.get('removeCollabIds', type=str, default=None))
     description = post.get("description", type=str, default=None)
     deleteDescription = post.get("deleteDescription", type=bool, default=None)
 
     # 3) TEST ARGS
-    if not (id and (name or add_ids or remove_ids or description or deleteDescription)): # check if true count equals post length
+    if not (id and (name or is_add_ids_json or is_remove_ids_json or description or deleteDescription)): # check if true count equals post length
         current_app.logger.info(Utils.log_format(ARGS_INVALID_PARSE))
         return MSG_ARGS_INVALID_PARSE, status.HTTP_400_BAD_REQUEST
+
+    if (is_add_ids_json and add_ids is None) or (is_remove_ids_json and remove_ids is None):
+        current_app.logger.info(Utils.log_format(ARGS_INVALID_JSON))
+        return MSG_ARGS_INVALID_JSON, status.HTTP_400_BAD_REQUEST
 
     objectId = MongoQueries.to_objectId(id)
     if not objectId:
@@ -303,20 +308,8 @@ async def update():
     # 4) USE PARTNERS WITH VALID ARGS
     current_app.logger.info(Utils.log_format(ENDPOINT_CALL))
     if name:
-        # verify if name does not exist for other than id
-        filter_q = {
-            "_id": {
-                "$ne": objectId
-            },
-            "name": name
-        }
-        fields = {
-            "_id": 0,
-            "name": 1
-        }
-
         try:
-            already_exist = await mongo_partner.find_one(COLLECTION_PROJECTS, filter_q, fields)
+            already_exist = await mongo_partner.find_one(COLLECTION_PROJECTS, *MongoQueries.unique_name(objectId, name))
         except WTimeoutError as err:
             current_app.logger.critical(Utils.log_format(MONGO_PARTNER_TIMEOUT), err)
             return MSG_MONGO_PARTNER_TIMEOUT, status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -327,51 +320,8 @@ async def update():
         if already_exist:
             return MSG_ALREADY_EXIST, status.HTTP_200_OK
 
-    # update fields
-    filter_q = {
-        "_id": objectId
-    }
-    operations = []
-
-    if name:
-        operations.append(mongo_partner.bulk_update_one(filter_q, {
-            "$set": {
-                "name": name
-            }
-        }))
-
-    if add_ids:
-        operations.append(mongo_partner.bulk_update_one(filter_q, {
-            "$addToSet": {
-                "users": {
-                    "$each": json.loads(add_ids)
-                }
-            }
-        }))
-
-    if remove_ids:
-        operations.append(mongo_partner.bulk_update_one(filter_q, {
-            "$pullAll": {
-                "users": json.loads(remove_ids)
-            }
-        }))
-
-    if description:
-        operations.append(mongo_partner.bulk_update_one(filter_q, {
-            "$set": {
-                "description": description
-            }
-        }))
-
-    if deleteDescription and not description:
-        operations.append(mongo_partner.bulk_update_one(filter_q, {
-            "$set": {
-                "description": ''
-            }
-        }))
-
     try:
-        result = await mongo_partner.bulk_write(COLLECTION_PROJECTS, operations)
+        result = await mongo_partner.bulk_write(COLLECTION_PROJECTS, MongoQueries.project_update(objectId, name, add_ids, remove_ids, description, deleteDescription))
     except WriteException as err:
         current_app.logger.error(Utils.log_format(MONGO_PARTNER_WRITE_ERROR), err)
         return MSG_MONGO_PARTNER_WRITE_ERROR, status.HTTP_500_INTERNAL_SERVER_ERROR

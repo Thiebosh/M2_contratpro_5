@@ -63,10 +63,6 @@ class MongoCore:
         return result.acknowledged
 
 
-    def bulk_update_one(self, filter_q:"dict[str, Any]", update_q:"dict[str, Any]") -> UpdateOne:
-        return UpdateOne(filter_q, update_q)
-
-
     async def bulk_write(self, collection:Collection, operations:"list[UpdateOne]") -> bool:
         try:
             result = self.collections[collection].bulk_write(operations)

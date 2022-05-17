@@ -1,6 +1,7 @@
 from typing import Any
 from bson.objectid import ObjectId
 from datetime import datetime
+from pymongo import UpdateOne
 
 class MongoQueries:
     @staticmethod
@@ -77,13 +78,13 @@ class MongoQueries:
         )
 
     @staticmethod
-    def exist_user_not_id(user_id:ObjectId, username:str) -> "tuple[dict[str, Any], dict[str, Any]]":
+    def unique_name(id:ObjectId, name:str) -> "tuple[dict[str, Any], dict[str, Any]]":
         return (
             {
                 "_id": {
-                    "$ne": user_id
+                    "$ne": id
                 },
-                "name": username
+                "name": name
             },
             {
                 "_id": 0,
@@ -189,7 +190,7 @@ class MongoQueries:
         }
 
     @staticmethod
-    def get_project(project_objectId:ObjectId, username:str) -> "list[dict[str, Any]]":
+    def get_project(project_objectId:ObjectId) -> "list[dict[str, Any]]":
         return [
             {
                 "$match": {
@@ -291,7 +292,7 @@ class MongoQueries:
         )
 
     @staticmethod
-    def project_get_proto_pages(project_objectId:ObjectId, username:str) -> "list[dict[str, Any]]":
+    def project_get_proto_pages(project_objectId:ObjectId) -> "list[dict[str, Any]]":
         return [
             {
                 "$match": {
@@ -381,3 +382,56 @@ class MongoQueries:
                 }
             },
         ]
+
+    @staticmethod
+    def project_update(
+            objectId:ObjectId,
+            name:"str|None",
+            add_ids:"list[str]|None",
+            remove_ids:"list[str]|None",
+            description:"str|None",
+            deleteDescription:"bool|None",
+        ) -> "list[UpdateOne]":
+        filter_q = {
+            "_id": objectId
+        }
+        operations = []
+
+        if name:
+            operations.append(UpdateOne(filter_q, {
+                "$set": {
+                    "name": name
+                }
+            }))
+
+        if add_ids:
+            operations.append(UpdateOne(filter_q, {
+                "$addToSet": {
+                    "users": {
+                        "$each": add_ids
+                    }
+                }
+            }))
+
+        if remove_ids:
+            operations.append(UpdateOne(filter_q, {
+                "$pullAll": {
+                    "users": remove_ids
+                }
+            }))
+
+        if description:
+            operations.append(UpdateOne(filter_q, {
+                "$set": {
+                    "description": description
+                }
+            }))
+
+        if deleteDescription and not description:
+            operations.append(UpdateOne(filter_q, {
+                "$set": {
+                    "description": ''
+                }
+            }))
+
+        return operations

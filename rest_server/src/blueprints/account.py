@@ -182,7 +182,7 @@ async def update():
     current_app.logger.info(Utils.log_format(ENDPOINT_CALL))
     if username:
         try:
-            already_exist = await mongo_partner.find_one(COLLECTION_ACCOUNTS, *MongoQueries.exist_user_not_id(user_objectId, username))
+            already_exist = await mongo_partner.find_one(COLLECTION_ACCOUNTS, *MongoQueries.unique_name(user_objectId, username))
         except WTimeoutError as err:
             current_app.logger.critical(Utils.log_format(MONGO_PARTNER_TIMEOUT), err)
             return MSG_MONGO_PARTNER_TIMEOUT, status.HTTP_500_INTERNAL_SERVER_ERROR
