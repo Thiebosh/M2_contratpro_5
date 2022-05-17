@@ -119,7 +119,7 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
     - deleted_projects : le nombre de projets supprimés car ne comptant que cet utilisateur.
     - deleted_from_projects (int): le nombre de projets mis à jour car comptant aussi d'autres utilisateur.
 
-## /project
+# Project
 
 # /project/create
 
@@ -274,7 +274,7 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 
 - { "success": mongo_result (bool), drive_result (bool)} : la suppression en base de données a échoué/ réussi.
 
-## /syntax
+# Syntax
 
 # /syntax/get
 
