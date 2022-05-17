@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import moment from 'moment';
+import {useEffect, useState} from 'react';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faPlus} from '@fortawesome/free-solid-svg-icons';
 
-import { useUserContext } from '../../session/user';
-import { Collabs } from '../../components/Collabs';
-import { postProjectsSearchForUser } from '../../partners/rest';
+import {useUserContext} from '../../session/user';
+import {Collabs} from '../../components/Collabs';
+import {postProjectsSearchForUser} from '../../partners/rest';
 
 import {dateFormat} from '../../index';
 
 import './Projects.scss';
+import dayjs from "dayjs";
 
 interface ProjectProps {
     id: string,
@@ -25,13 +25,13 @@ interface ProjectProps {
 }
 function Project(props: ProjectProps) {
     const userId = useUserContext().user.id;
-    const nullableDate = (date:string) => (date && moment(date).format(dateFormat)) || <>-</>;
+    const nullableDate = (date:string) => (date && dayjs(date).format(dateFormat)) || <>-</>;
     return (
         <tr>
             <td><a className='button' href={"/project/"+props.name}>{props.name}</a></td>
             <td><Collabs usernames={props.users.filter(item => item.id !== userId).map(item => item.name)} /></td>
             <td>{props.syntax_name}</td>
-            <td>{moment(props.creation).format(dateFormat)}</td>
+            <td>{dayjs(props.creation).format(dateFormat)}</td>
             <td>{nullableDate(props.last_specs)}</td>
             <td>{props.latest_proto ? "Up to date" : "Outdated"}</td>
         </tr>
