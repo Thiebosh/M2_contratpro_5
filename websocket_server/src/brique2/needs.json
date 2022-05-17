@@ -3,6 +3,7 @@
         "screen": [
             {
                 "name": "ecran1",
+                "inputHome": true,
                 "style": {
                     "color": "#6897bb",
                     "align": "center"

@@ -1,4 +1,3 @@
-
 .modal {
     position: fixed;
     z-index: 20;
@@ -11,14 +10,18 @@
     transform: translateX(-50%) translateY(-50%);
 }
 
-.modal_header {
-    background: orangered;
+h2 {
+    color:white;
+}
+
+.modal-header {
+    background-color: var(--color-primary-medium);
     padding: 10px 20px;
     display: flex;
     justify-content: space-between;
 }
 
-.modal_main {
+.modal-main {
     padding: 20px;
 }
 
@@ -32,9 +35,14 @@
 }
 
 .close-button:hover {
-    color: yellow;
+    color: black;
 }
 
 .overlay {
     background-color: rgba(0,0,0,0.5);
+}
+
+.modalInput:hover {
+    color: var(--color-primary);
+    cursor: pointer;
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Tree from "react-d3-tree"
-import clone from "clone";
+import { formatData } from "./functions/format"
+import { addChildren } from "./functions/node"
 
 import './Tree.scss';
 
@@ -8,19 +9,20 @@ import './Tree.scss';
 
 interface CustomTreeProps {
     syntax_filename:string,
-    openClose:Function
-}
-function openModal(setIsOpen:Function, nodeData:any){
-    setIsOpen(true);
+    openClose:Function,
+    setModalElements:Function
 }
 
+export let g_syntax:any = {};
+
 export function CustomTree(props:CustomTreeProps){
-    // formatData(data)
+
     const [tree, setTree] = useState<any>();
+    const [syntax, setSyntax] = useState<any>();
 
     useEffect(() => {
         getDataFromJson()
-        .then((data => init(props.syntax_filename, data, setTree)));
+        .then((data => init(props.syntax_filename, data, setTree, setSyntax)));
     }, [props.syntax_filename])
 
 
@@ -48,7 +50,7 @@ export function CustomTree(props:CustomTreeProps){
         } else if (nodeDatum.type === "adding"){
             return(
                 <g>
-                  <circle r="25" onClick={()=> openModal(props.openClose, nodeDatum)}>
+                  <circle r="25" onClick={()=> openModal(props.openClose, nodeDatum, syntax, props.setModalElements)}>
                 </circle>
                   <text fill="white" textAnchor="middle">
                     +
@@ -79,14 +81,22 @@ export function CustomTree(props:CustomTreeProps){
     )
 }
 
-function init(filename:string, data:any, setTree:React.Dispatch<any>){
+
+export let root = undefined;
+export let g_setTree:Function;
+
+function init(filename:string, data:any, setTree:React.Dispatch<any>, setSyntax:React.Dispatch<any>){
     fetch("/syntaxes/"+filename+".json")
     .then(syntax => syntax.json())
     .then(syntaxJson => {
-        formatData(data, syntaxJson);
-        data = [data["root"]];
+        setSyntax(syntaxJson);
+        g_syntax = syntaxJson;
+        formatData(data);
+        data = data["root"];
         data.name = "root";
         setTree(data);
+        root = data;
+        g_setTree = setTree;
     })
 }
 
@@ -96,62 +106,47 @@ function getDataFromJson():Promise<Record<string, unknown>>{
 }
 
 
-function formatData(data:any, syntax:any){
-    for (const key in data){
-        if (key === "name" || key === "children" || key === "parent"){
-            continue;
+function getParentChildrenValues(nodeData:any){
+    let parentChildrenValues:any = [];
+
+    nodeData.parent.children.forEach((child:any) => {
+        if(child.type !== "adding"){
+            parentChildrenValues.push(child.name); // pour éviter de les proposer si object et qu'on ne peut pas en avoir plusieurs
+        }
+    });
+    return parentChildrenValues;
+}
+
+function getPossibleChildrenSuggestion(nodeData:any){
+    let parentChildrenValues = getParentChildrenValues(nodeData);
+    let parentSyntax = g_syntax[nodeData.parent.name];
+    let newChildrenSuggestion:any = [];
+
+    parentSyntax.values.forEach((v:any) => {
+        if(v[0] === "?"){
+            v = v.substring(1);
         }
 
-        if (syntax[key].type === "array"){
-            if (!data.children){
-                data.children = [];
-            }
-            for (let i = 0; i < data[key].length; i++){
-                if (!data[key][i].children){
-                    data[key][i].children = [];
-                }
-                data[key][i].children.push({
-                    name:"+",
-                    type:"adding",
-                    parent:data[key][i]
-                });
-                data[key][i].name = key;
-                data.children.splice(-2,0,data[key][i])
-                formatData(data[key][i], syntax);
-            }
-        } else if (syntax[key].type === "object"){
-            data[key].name = key
-            if (!data.children){
-                data.children = [];
-            }
-            if (!data[key].children){
-                data[key].children = [];
-            }
-            data[key].children.push({
-                name:"+",
-                type:"adding",
-                parent:data[key]
-            });
-            data.children.splice(-2,0,data[key]);
-            formatData(data[key], syntax);
-        } else if(syntax[key].type === "field") {
-            if (syntax[syntax[key].field]){
-                if (!data.children){
-                    data.children = [];
-                }
-                let node = clone(syntax[syntax[key].field]);
-                node.value = data[key];
-                
-                if (node.values){
-                    let selectedElemIndex = node.values.indexOf(data[key]);
-                    node.values.splice(selectedElemIndex,1);
-                    node.values.splice(0,0,data[key]);
-                }
-                if (node.type === "select"){
-                    node.label = key;
-                }
-                data.children.splice(-2,0,node);
-            }
+        if (parentSyntax.type === "array" || (parentSyntax.type !== "array" && !parentChildrenValues.includes(v))){
+            newChildrenSuggestion.push(v)
         }
-    }
+    });
+    
+    return newChildrenSuggestion;
+}
+
+function openModal(setIsOpen:Function, nodeData:any, syntax:any, setModalElements:Function){
+    const newChildrenSuggestion = getPossibleChildrenSuggestion(nodeData);
+    const modalElements:any = []
+    newChildrenSuggestion.forEach((suggestion:any) => {
+        modalElements.push({
+            text: suggestion,
+            onclick: () => {
+                addChildren(nodeData, suggestion);
+                setIsOpen(false);
+            }
+    })});
+    setModalElements(modalElements)
+    setIsOpen(true);
+    
 }

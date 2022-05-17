@@ -17,7 +17,7 @@ export function Specs() {
     const [projectId, setProjectId] = useState<string>();
     const [syntaxId, setSyntaxId] = useState<string>();
     const [isOpen, setIsOpen] = useState(false);
-
+    const [modalElements, setModalElements] = useState([]);
 
     useEffect(() => {
         postProjectExistForUser(userContext.user.id, urlName || "")
@@ -162,12 +162,12 @@ export function Specs() {
             </div>
             <div id="treeContent" className={isOpen ? "inactive": ""}>
                 { syntaxId &&
-                    <CustomTree syntax_filename={syntaxId} openClose={setIsOpen}/>
+                    <CustomTree syntax_filename={syntaxId} openClose={setIsOpen} setModalElements={setModalElements}/>
                 }
             </div>
             <div>
                 {isOpen && (
-                    <Modal openClose={setIsOpen}/>
+                    <Modal openClose={setIsOpen} elements={modalElements}/>
                 )}
             </div>
             {/* { socketUsable ? (loadingPage ? <p className='centered'>Loading...</p> : <div id="placeholder"/>) : <p className='centered'>Connection to server...</p> } */}

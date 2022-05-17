@@ -3,13 +3,9 @@ from googleapiclient.discovery import Resource, build
 from googleapiclient.errors import HttpError
 
 
-class DrivePartner:
+class DriveCore:
     def __init__(self, creds_relative_path, scopes):
         self.service:Resource = build('drive', 'v3', credentials=Creds.from_service_account_file(creds_relative_path, scopes=scopes))
-
-
-    def close(self):
-        pass
 
 
     def remove_folder(self, name):
