@@ -8,7 +8,7 @@ import {
 } from 'react-router-dom';
 import {requireNoUser, requireUser, UserProvider, userContextMethods} from './session/user';
 
-import {NavBar} from './components/NavBar/NavBar';
+import {NavBar} from './components/NavBar';
 
 import {NotFound} from './pages/NotFound';
 import {Home} from './pages/Home';
@@ -27,7 +27,7 @@ export const sessionDuration = 20; //min
 export const dateFormat = "YYYY/MM/DD HH:mm";
 
 export function init_websocket(type:'specs'|'proto', projectId:string, username:string, setUsable:React.Dispatch<React.SetStateAction<boolean>>) {
-    const socket = new WebSocket("ws://localhost:8002");
+    const socket = new WebSocket("ws://" + window.location.hostname + ":8002");
 
     socket.onopen = () => {
         console.log('connecting...');
