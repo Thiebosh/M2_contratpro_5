@@ -58,5 +58,7 @@ MSG_DRIVE_PARTNER_MULTIPLE_IDS="multiple ids error"
 
 MSG_NO_SYNTAX="no syntax found"
 MSG_NO_ACCOUNT="no account found"
+MSG_PROJECT_NOT_FOUND="project not found"
+MSG_NOT_MEMBER="not in project or no project"
 
 MSG_ALREADY_EXIST={"success": "already exist"}
