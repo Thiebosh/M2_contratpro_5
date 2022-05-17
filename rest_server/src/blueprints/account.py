@@ -5,10 +5,9 @@ from simple_bcrypt import Bcrypt
 from utils import Utils
 from defines import *
 
-# add from mongo WriteException
-from partners.mongo.mongo_core import MongoCore, MongoCoreException, WTimeoutError, COLLECTION_ACCOUNTS, COLLECTION_PROJECTS
+from partners.mongo.mongo_core import MongoCore, MongoCoreException, WTimeoutError, WriteException, COLLECTION_ACCOUNTS, COLLECTION_PROJECTS
 from partners.mongo.mongo_queries import MongoQueries
-from partners.drive.drive_core import DriveCore
+from partners.drive.drive_core import DriveCore, DriveCoreException, ExecutionException, MultipleIdsException
 
 bp_account = Blueprint("account", __name__)
 
@@ -40,10 +39,12 @@ async def create():
 
         if not already_exist:
             result = await mongo_partner.insert_one(COLLECTION_ACCOUNTS, MongoQueries.create_user(username, Utils.encrypt_password(cryp_partner, password)))
+    except WriteException as err:
+        current_app.logger.error(Utils.log_format(MONGO_PARTNER_WRITE_ERROR), err)
+        return MSG_MONGO_PARTNER_WRITE_ERROR, status.HTTP_500_INTERNAL_SERVER_ERROR
     except WTimeoutError as err:
         current_app.logger.critical(Utils.log_format(MONGO_PARTNER_TIMEOUT), err)
         return MSG_MONGO_PARTNER_TIMEOUT, status.HTTP_500_INTERNAL_SERVER_ERROR
-    # except WriteException as err:
     except MongoCoreException as err:
         current_app.logger.error(Utils.log_format(MONGO_PARTNER_EXCEPTION), err)
         return MSG_MONGO_PARTNER_EXCEPTION, status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -175,6 +176,8 @@ async def update():
         current_app.logger.info(Utils.log_format(ARGS_INVALID_OBJECT_ID))
         return MSG_ARGS_INVALID_OBJECT_ID, status.HTTP_400_BAD_REQUEST
 
+    password = Utils.encrypt_password(cryp_partner, password) if password else None
+
     # 4) USE PARTNERS WITH VALID ARGS
     current_app.logger.info(Utils.log_format(ENDPOINT_CALL))
     if username:
@@ -191,7 +194,10 @@ async def update():
             return MSG_ALREADY_EXIST, status.HTTP_200_OK
 
     try:
-        result = await mongo_partner.update_one(COLLECTION_ACCOUNTS, *MongoQueries.update_user(user_objectId, username, Utils.encrypt_password(cryp_partner, password) if password else None))
+        result = await mongo_partner.update_one(COLLECTION_ACCOUNTS, *MongoQueries.update_user(user_objectId, username, password))
+    except WriteException as err:
+        current_app.logger.error(Utils.log_format(MONGO_PARTNER_WRITE_ERROR), err)
+        return MSG_MONGO_PARTNER_WRITE_ERROR, status.HTTP_500_INTERNAL_SERVER_ERROR
     except WTimeoutError as err:
         current_app.logger.critical(Utils.log_format(MONGO_PARTNER_TIMEOUT), err)
         return MSG_MONGO_PARTNER_TIMEOUT, status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -287,6 +293,9 @@ async def delete():
         success = await mongo_partner.delete_one(COLLECTION_ACCOUNTS, MongoQueries.filter_user(user_objectId))
         deleted_projects = await mongo_partner.delete_many(COLLECTION_PROJECTS, MongoQueries.filter_unique_contrib_projects(user_objectId))
         deleted_from_projects = await mongo_partner.update_many(COLLECTION_PROJECTS, *MongoQueries.delete_one_contrib_projects(user_objectId))
+    except WriteException as err:
+        current_app.logger.error(Utils.log_format(MONGO_PARTNER_WRITE_ERROR), err)
+        return MSG_MONGO_PARTNER_WRITE_ERROR, status.HTTP_500_INTERNAL_SERVER_ERROR
     except WTimeoutError as err:
         current_app.logger.critical(Utils.log_format(MONGO_PARTNER_TIMEOUT), err)
         return MSG_MONGO_PARTNER_TIMEOUT, status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -297,8 +306,15 @@ async def delete():
     try:
         for project in projectList:
             drive_partner.remove_folder(project["id"])
-    except Exception as e:
-        print(e)
+    except MultipleIdsException as err:
+        current_app.logger.critical(Utils.log_format(DRIVE_PARTNER_MULTIPLE_IDS), err)
+        return MSG_DRIVE_PARTNER_MULTIPLE_IDS, status.HTTP_500_INTERNAL_SERVER_ERROR
+    except ExecutionException as err:
+        current_app.logger.error(Utils.log_format(DRIVE_PARTNER_ERROR), err)
+        return MSG_DRIVE_PARTNER_ERROR, status.HTTP_500_INTERNAL_SERVER_ERROR
+    except DriveCoreException as err:
+        current_app.logger.error(Utils.log_format(MONGO_PARTNER_EXCEPTION), err)
+        return MSG_DRIVE_PARTNER_EXCEPTION, status.HTTP_500_INTERNAL_SERVER_ERROR
 
     # 5) FORMAT RESULT DATA
 

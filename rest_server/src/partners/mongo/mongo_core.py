@@ -17,7 +17,7 @@ class WriteException(MongoCoreException):
 
 
 class MongoCore:
-    def __init__(self, mongo_url):
+    def __init__(self, mongo_url:str):
         self.conn = MongoClient(mongo_url, tlsAllowInvalidCertificates=True)
         self.collections = {
             COLLECTION_ACCOUNTS: self.conn.spectry.accounts,

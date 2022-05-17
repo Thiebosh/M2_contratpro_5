@@ -31,7 +31,12 @@ ARGS_INVALID_JSON="args: invalid json format"
 ARGS_INVALID_OBJECT_ID="args: invalid objectId"
 
 MONGO_PARTNER_EXCEPTION="mongo partner failure: %s"
-MONGO_PARTNER_TIMEOUT="mongo partner: timeout - check wifi"
+MONGO_PARTNER_TIMEOUT="mongo partner: timeout - check wifi (%s)"
+MONGO_PARTNER_WRITE_ERROR="mongo partner: write operation failure (%s)"
+
+DRIVE_PARTNER_EXCEPTION="drive partner failure: %s"
+DRIVE_PARTNER_ERROR="drive partner: execution error (%s)"
+DRIVE_PARTNER_MULTIPLE_IDS="drive partner: multiple ids for folder name (%s)"
 
 NO_SYNTAX="no syntax found in db"
 NO_ACCOUNT="no account found (%s)"
@@ -45,6 +50,11 @@ MSG_ARGS_INVALID_OBJECT_ID="invalid objectId"
 
 MSG_MONGO_PARTNER_EXCEPTION="db request error"
 MSG_MONGO_PARTNER_TIMEOUT="operation timeout"
+MSG_MONGO_PARTNER_WRITE_ERROR="operation failure"
+
+MSG_DRIVE_PARTNER_EXCEPTION="drive request error"
+MSG_DRIVE_PARTNER_ERROR="drive request execution error"
+MSG_DRIVE_PARTNER_MULTIPLE_IDS="multiple ids error"
 
 MSG_NO_SYNTAX="no syntax found"
 MSG_NO_ACCOUNT="no account found"
