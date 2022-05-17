@@ -94,6 +94,7 @@ function init(filename:string, data:any, setTree:React.Dispatch<any>, setSyntax:
         formatData(data);
         data = data["root"];
         data.name = "root";
+        data.parent = null;
         setTree(data);
         root = data;
         g_setTree = setTree;

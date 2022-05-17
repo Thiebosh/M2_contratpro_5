@@ -1,28 +1,51 @@
 import { initChildrenIfNotDone } from "./utils"
-import { root, g_setTree, g_syntax} from "../Tree"
+import { g_setTree, g_syntax } from "../Tree"
 
 export function addAddingNode(data:any){
     const addingNode = {
         name:"+",
         type:"adding",
-        parent:data
+        parent:data,
     };
 
     data.children.push(addingNode);
 }
 
 export function addChildren(nodeData:any, suggestion:any){
+    // suggestion = selected new node
     const values = g_syntax[suggestion].values;
     if (values){
+        initChildrenIfNotDone(nodeData.parent);
+        const node = initNewNode(suggestion, nodeData.parent)
+
         values.forEach((val:any) => {
-            // if (val)
-        })
-        initChildrenIfNotDone(nodeData);
-        addAddingNode(nodeData);
-        // console.log(root);
-        g_setTree(root);
+            if (val[0] !== "?"){
+                //@ts-ignore
+                node[val] = {}
+            }
+        });
+        
+        nodeData.parent.children.push(node);
+        addAddingNode(node);
+        updateNodeChildren(node.parent);
+        
     }
-    // console.log(values)
-    // nodeData.parent.children.splice(-1,0,{name:suggestion})
-    // console.log(nodeData);
+}
+
+function initNewNode(suggestion:any, parent:any){
+    return {
+        name:suggestion,
+        type:g_syntax[suggestion].type,
+        children:[],
+        parent:parent
+    }
+}
+
+
+function updateNodeChildren(node:any){
+    let currentParent = node.parent;
+    while (currentParent.name !== "root"){
+        currentParent = currentParent.parent;
+    }
+    g_setTree(currentParent);
 }
