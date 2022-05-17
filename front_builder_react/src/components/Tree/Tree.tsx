@@ -50,7 +50,7 @@ export function CustomTree(props:CustomTreeProps){
         } else if (nodeDatum.type === "adding"){
             return(
                 <g>
-                  <circle r="25" onClick={()=> openModal(props.openClose, nodeDatum, syntax, props.setModalElements)}>
+                  <circle r="25" onClick={()=> openModal(props.openClose, nodeDatum, props.setModalElements)}>
                 </circle>
                   <text fill="white" textAnchor="middle">
                     +
@@ -136,7 +136,7 @@ function getPossibleChildrenSuggestion(nodeData:any){
     return newChildrenSuggestion;
 }
 
-function openModal(setIsOpen:Function, nodeData:any, syntax:any, setModalElements:Function){
+function openModal(setIsOpen:Function, nodeData:any, setModalElements:Function){
     const newChildrenSuggestion = getPossibleChildrenSuggestion(nodeData);
     const modalElements:any = []
     newChildrenSuggestion.forEach((suggestion:any) => {
