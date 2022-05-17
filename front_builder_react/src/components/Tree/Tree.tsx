@@ -28,11 +28,12 @@ export function CustomTree(props:CustomTreeProps){
 
     const renderRectSvgNode = ({ nodeDatum, toggleNode }:any) => {
         if(nodeDatum.type === "input"){
+            const syntaxField = syntax[nodeDatum.syntaxKey].field;
             return (
                 <g>
                     <foreignObject width={100} height={100} y={-10} x={-30}>
                         <label>{nodeDatum.syntaxKey}</label>
-                        <input type={nodeDatum.nature} value={nodeDatum.value} onChange={() => console.log("fds")}/>
+                        <input type={nodeDatum.nature} checked={nodeDatum.value[syntaxField]} value={nodeDatum.value} onChange={() => console.log("fds")}/>
                     </foreignObject>
                 </g>
             );

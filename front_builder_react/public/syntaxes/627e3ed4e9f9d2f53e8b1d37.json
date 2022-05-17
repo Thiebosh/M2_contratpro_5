@@ -34,7 +34,7 @@
         "type": "array",
         "values": [
             "name",
-            "?inputHome",
+            "?defaultPage",
             "?style",
             "?content"
         ]
@@ -51,6 +51,10 @@
     "name": {
         "type": "field",
         "field": "inputText"
+    },
+    "defaultPage": {
+        "type": "field",
+        "field": "inputHome"
     },
     "textValue": {
         "type": "field",
