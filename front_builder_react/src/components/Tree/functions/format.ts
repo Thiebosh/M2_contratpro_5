@@ -41,7 +41,7 @@ function formatObject(node:any, key:string){
 function formatField(node:any, key:string){
     const fieldType = g_syntax[key].field; // type of field for current node
     const fieldSyntax = g_syntax[fieldType]; // syntax for the specific field
-    
+
     if (fieldSyntax){
         initChildrenIfNotDone(node);
 

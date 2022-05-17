@@ -19,19 +19,20 @@ export function addChildren(nodeData:any, suggestion:any){
         const node = initNewNode(suggestion, nodeData.parent)
 
         createMandatoryChildren(node);
-        // console.log(node)
+        
         nodeData.parent.children.splice(-1,0,node);
         addAddingNode(node);
         updateNodeChildren(node.parent);
-        
     }
 }
 
 function hasMandatoryValues(node:any){
-    const values = g_syntax[node.syntaxKey].values;
-
-    if (values){
-        return values.some((v:any) => v[0] !== "?");
+    if (g_syntax[node.syntaxKey]){ // if we are at the end of the tree branch, this condition is false
+        const values = g_syntax[node.syntaxKey].values;
+    
+        if (values){
+            return values.some((v:any) => v[0] !== "?"); // at least one value is mandatory (doesn't get a "?")
+        }
     }
     return false;
 }
@@ -41,16 +42,29 @@ function createMandatoryChildren(node:any){
         g_syntax[node.syntaxKey].values.forEach((val:any) => {
             if (val[0] !== "?"){
                 //@ts-ignore
-                node[val] = initNewNode(val, node);
+                const newNode = initNewNode(val, node);
+                node[val] = g_syntax[val].type === "field" ? "" : newNode; 
+                //If field, value is empty (fields don't have json as value), else it contains the json
+
                 //@ts-ignore
-                node.children.push(node[val]);
-                createMandatoryChildren(node[val]);
+                node.children.push(newNode);
+                createMandatoryChildren(newNode);
             }
         });
     }
 }
 
 function initNewNode(suggestion:any, parent:any){
+    if (g_syntax[suggestion].type === "field"){ // if field, we have a different syntax of the node
+        const fieldSyntax = g_syntax[g_syntax[suggestion].field];
+        return {
+            syntaxKey:suggestion,
+            type:fieldSyntax.type,
+            parent:parent,
+            nature:fieldSyntax.nature,
+            value:""
+        }
+    }
     return {
         syntaxKey:suggestion,
         type:g_syntax[suggestion].type,
