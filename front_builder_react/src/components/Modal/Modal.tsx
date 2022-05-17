@@ -10,7 +10,6 @@ interface ModalProps {
 
 export function Modal(props:ModalProps){
     return (
-        <>
         <div className="modal">
             <header className="modal-header">
                 <h2>Modal Title</h2>
@@ -23,6 +22,5 @@ export function Modal(props:ModalProps){
                 </div>
             </main>
         </div>
-    </>
     )
 }
