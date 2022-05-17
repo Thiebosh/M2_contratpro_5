@@ -17,7 +17,7 @@ class WriteException(MongoCoreException):
 
 
 class MongoCore:
-    def __init__(self, mongo_url):
+    def __init__(self, mongo_url:str):
         self.conn = MongoClient(mongo_url, tlsAllowInvalidCertificates=True)
         self.collections = {
             COLLECTION_ACCOUNTS: self.conn.spectry.accounts,
@@ -61,10 +61,6 @@ class MongoCore:
             raise MongoCoreException("update_one global error") from err
 
         return result.acknowledged
-
-
-    def bulk_update_one(self, filter_q:"dict[str, Any]", update_q:"dict[str, Any]") -> UpdateOne:
-        return UpdateOne(filter_q, update_q)
 
 
     async def bulk_write(self, collection:Collection, operations:"list[UpdateOne]") -> bool:

@@ -17,7 +17,8 @@ function formatArray(node:any, key:string){
         initChildrenIfNotDone(node[key][i]); // to add adding node as child of all the children of the array
         addAddingNode(node[key][i]);
 
-        node[key][i].name = key;
+        node[key][i].syntaxKey = key;
+        node[key][i].parent = node;
 
         node.children.splice(-2,0,node[key][i]);
         formatData(node[key][i]);
@@ -25,7 +26,8 @@ function formatArray(node:any, key:string){
 }
 
 function formatObject(node:any, key:string){
-    node[key].name = key;
+    node[key].syntaxKey = key;
+    node[key].parent = node;
 
     initChildrenIfNotDone(node);
     initChildrenIfNotDone(node[key]); // same as for formatArray
@@ -45,9 +47,10 @@ function formatField(node:any, key:string){
 
         let fieldSyntaxClone = clone(fieldSyntax);
         fieldSyntaxClone.value = node[key];
-        
+        fieldSyntaxClone.parent = node;
+        fieldSyntaxClone.syntaxKey = key;
+
         if (fieldSyntaxClone.type === "select"){
-            fieldSyntaxClone.label = key;
             moveElementAtFirstPosition(fieldSyntaxClone.values,node[key])
         }
 

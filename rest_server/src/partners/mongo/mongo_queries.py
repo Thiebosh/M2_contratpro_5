@@ -1,5 +1,7 @@
 from typing import Any
 from bson.objectid import ObjectId
+from datetime import datetime
+from pymongo import UpdateOne
 
 class MongoQueries:
     @staticmethod
@@ -24,10 +26,10 @@ class MongoQueries:
         )
 
     @staticmethod
-    def exist_user(username:str) -> "tuple[dict[str, Any], dict[str, Any]]":
+    def exist_name(name:str) -> "tuple[dict[str, Any], dict[str, Any]]":
         return (
             {
-                "name": username
+                "name": name
             },
             {
                 "_id": 0,
@@ -76,13 +78,13 @@ class MongoQueries:
         )
 
     @staticmethod
-    def exist_user_not_id(user_id:ObjectId, username:str) -> "tuple[dict[str, Any], dict[str, Any]]":
+    def unique_name(id:ObjectId, name:str) -> "tuple[dict[str, Any], dict[str, Any]]":
         return (
             {
                 "_id": {
-                    "$ne": user_id
+                    "$ne": id
                 },
-                "name": username
+                "name": name
             },
             {
                 "_id": 0,
@@ -133,9 +135,9 @@ class MongoQueries:
         ]
 
     @staticmethod
-    def filter_user(user_objectId:ObjectId) -> "dict[str, Any]":
+    def filter_id(objectId:ObjectId) -> "dict[str, Any]":
         return {
-            "_id": user_objectId
+            "_id": objectId
         }
 
     @staticmethod
@@ -166,3 +168,270 @@ class MongoQueries:
                 }
             }
         )
+
+    @staticmethod
+    def create_project(
+            project_name:str,
+            users_id:"list[str]",
+            syntax_id:str,
+            description:str,
+        ) -> "dict[str, Any]":
+        return {
+            "name": project_name,
+            "users": users_id,
+            "syntax_id": syntax_id,
+            "description": description,
+            "creation": datetime.utcnow(),
+            "last_specs": None,
+            "latest_proto": True,
+            "specs": { "root": {} },
+            "pages": [{ "default": ""}],
+            "session": {},
+        }
+
+    @staticmethod
+    def get_project(project_objectId:ObjectId) -> "list[dict[str, Any]]":
+        return [
+            {
+                "$match": {
+                    "_id": project_objectId
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "name": 1,
+                    "users": {
+                        "$map": {
+                            "input": "$users",
+                            "in": { "$toObjectId": "$$this" }
+                        }
+                    },
+                    "syntax_id": {
+                        "$toObjectId": "$syntax_id"
+                    },
+                    "creation": 1,
+                    "last_specs": 1,
+                    "latest_proto": 1,
+                    "description": 1,
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "accounts",
+                    "localField": "users",
+                    "foreignField": "_id",
+                    "as": "users"
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "syntax",
+                    "localField": "syntax_id",
+                    "foreignField": "_id",
+                    "as": "syntaxes"
+                }
+            },
+            {
+                "$addFields": {
+                    "users": {
+                        "$map": {
+                            "input": "$users",
+                            "in": { 
+                                "id": {
+                                    "$toString": "$$this._id"
+                                },
+                                "name": "$$this.name"
+                            }
+                        }
+                    },
+                    "syntax": {
+                        "$arrayElemAt": ["$syntaxes", 0]
+                    }
+                }
+            },
+            {
+                "$project": {
+                    "id": 1,
+                    "name": 1,
+                    "users": 1,
+                    "syntax": "$syntax.name",
+                    "creation": 1,
+                    "last_specs": 1,
+                    "latest_proto": 1,
+                    "description": 1,
+                }
+            },
+        ]
+
+    @staticmethod
+    def get_syntax_id_project(project_objectId:ObjectId) -> "tuple[dict[str, Any], dict[str, Any]]":
+        return (
+            {
+                "_id": project_objectId,
+            },
+            {
+                "_id": 0,
+                "syntax_id": 1,
+            }
+        )
+
+    @staticmethod
+    def project_exist_for_user(project_name:str, user_id:str) -> "tuple[dict[str, Any], dict[str, Any]]":
+        return (
+            {
+                "name": project_name,
+                "users": user_id
+            },
+            {
+                "_id": 0,
+                "id": {
+                    "$toString": "$_id"
+                }
+            }
+        )
+
+    @staticmethod
+    def project_get_proto_pages(project_objectId:ObjectId) -> "list[dict[str, Any]]":
+        return [
+            {
+                "$match": {
+                    "_id": project_objectId
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "pages": 1
+                }
+            },
+        ]
+
+    @staticmethod
+    def project_search_for_user(user_id:str) -> "list[dict[str, Any]]":
+        return [
+            {
+                "$match": {
+                    "users": user_id
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "id": {
+                        "$toString": "$_id"
+                    },
+                    "name": 1,
+                    "users": {
+                        "$map": {
+                            "input": "$users",
+                            "in": { "$toObjectId": "$$this" }
+                        }
+                    },
+                    "syntax_id": {
+                        "$toObjectId": "$syntax_id"
+                    },
+                    "creation": 1,
+                    "last_specs": 1,
+                    "latest_proto": 1
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "accounts",
+                    "localField": "users",
+                    "foreignField": "_id",
+                    "as": "users"
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "syntax",
+                    "localField": "syntax_id",
+                    "foreignField": "_id",
+                    "as": "syntaxes"
+                }
+            },
+            {
+                "$addFields": {
+                    "users": {
+                        "$map": {
+                            "input": "$users",
+                            "in": { 
+                                "id": {
+                                    "$toString": "$$this._id"
+                                },
+                                "name": "$$this.name"
+                            }
+                        }
+                    },
+                    "syntax": {
+                        "$arrayElemAt": ["$syntaxes", 0]
+                    }
+                }
+            },
+            {
+                "$project": {
+                    "id": 1,
+                    "name": 1,
+                    "users": 1,
+                    "syntax_name": "$syntax.name",
+                    "creation": 1,
+                    "last_specs": 1,
+                    "latest_proto": 1
+                }
+            },
+        ]
+
+    @staticmethod
+    def project_update(
+            objectId:ObjectId,
+            name:"str|None",
+            add_ids:"list[str]|None",
+            remove_ids:"list[str]|None",
+            description:"str|None",
+            deleteDescription:"bool|None",
+        ) -> "list[UpdateOne]":
+        filter_q = {
+            "_id": objectId
+        }
+        operations = []
+
+        if name:
+            operations.append(UpdateOne(filter_q, {
+                "$set": {
+                    "name": name
+                }
+            }))
+
+        if add_ids:
+            operations.append(UpdateOne(filter_q, {
+                "$addToSet": {
+                    "users": {
+                        "$each": add_ids
+                    }
+                }
+            }))
+
+        if remove_ids:
+            operations.append(UpdateOne(filter_q, {
+                "$pullAll": {
+                    "users": remove_ids
+                }
+            }))
+
+        if description:
+            operations.append(UpdateOne(filter_q, {
+                "$set": {
+                    "description": description
+                }
+            }))
+
+        if deleteDescription and not description:
+            operations.append(UpdateOne(filter_q, {
+                "$set": {
+                    "description": ''
+                }
+            }))
+
+        return operations
