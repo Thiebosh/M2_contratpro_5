@@ -25,7 +25,7 @@ export function addChildren(nodeData:any, suggestion:any){
             }
         });
         
-        nodeData.parent.children.push(node);
+        nodeData.parent.children.splice(-1,0,node);
         addAddingNode(node);
         updateNodeChildren(node.parent);
         
@@ -44,7 +44,7 @@ function initNewNode(suggestion:any, parent:any){
 
 function updateNodeChildren(node:any){
     let currentParent;
-    
+
     if (node.parent) {
         currentParent = node.parent;
         
