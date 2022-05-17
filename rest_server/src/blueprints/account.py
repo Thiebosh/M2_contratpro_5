@@ -35,7 +35,7 @@ async def create():
     # 4) USE PARTNERS WITH VALID ARGS
     current_app.logger.info(Utils.log_format(ENDPOINT_CALL))
     try:
-        already_exist = await mongo_partner.find_one(COLLECTION_ACCOUNTS, *MongoQueries.exist_user(username))
+        already_exist = await mongo_partner.find_one(COLLECTION_ACCOUNTS, *MongoQueries.exist_name(username))
 
         if not already_exist:
             result = await mongo_partner.insert_one(COLLECTION_ACCOUNTS, MongoQueries.create_user(username, Utils.encrypt_password(cryp_partner, password)))
@@ -290,7 +290,7 @@ async def delete():
     try:
         projectList = await mongo_partner.find_list(COLLECTION_PROJECTS, *MongoQueries.get_unique_contrib_projects(user_objectId))
 
-        success = await mongo_partner.delete_one(COLLECTION_ACCOUNTS, MongoQueries.filter_user(user_objectId))
+        success = await mongo_partner.delete_one(COLLECTION_ACCOUNTS, MongoQueries.filter_id(user_objectId))
         deleted_projects = await mongo_partner.delete_many(COLLECTION_PROJECTS, MongoQueries.filter_unique_contrib_projects(user_objectId))
         deleted_from_projects = await mongo_partner.update_many(COLLECTION_PROJECTS, *MongoQueries.delete_one_contrib_projects(user_objectId))
     except WriteException as err:
