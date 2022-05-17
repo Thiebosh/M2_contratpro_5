@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Fade } from 'react-awesome-reveal';
-import moment from 'moment';
+import {useEffect, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
+import {Fade} from 'react-awesome-reveal';
 
-import { Collab, Collabs, CollabsInput, RemoveCollabsInput } from '../../../components/Collabs';
-import { useUserContext } from '../../../session/user';
-import { postProjectGet, postProjectExistForUser, postProjectUpdate, postProjectDelete } from '../../../partners/rest';
+import {Collab, Collabs, CollabsInput, RemoveCollabsInput} from '../../../components/Collabs';
+import {useUserContext} from '../../../session/user';
+import {postProjectDelete, postProjectExistForUser, postProjectGet, postProjectUpdate} from '../../../partners/rest';
 
-import { dateFormat } from '../../..';
+import {dateFormat} from '../../..';
 
 import './Detail.scss';
+import dayjs from "dayjs";
 
 interface EditProps {
     editOff: () => void,
@@ -21,7 +21,7 @@ interface EditProps {
     setWarnMsg:React.Dispatch<React.SetStateAction<string>>,
     setErrorMsg:React.Dispatch<React.SetStateAction<string>>,
     setDeleteMsg:React.Dispatch<React.SetStateAction<string>>,
-};
+}
 function Edit(props:EditProps) {
     const navigate = useNavigate();
 
@@ -78,7 +78,7 @@ export function Detail() {
     const [projectLatestProto, setProjectLatestProto] = useState<boolean>(false);
     const [projectDescription, setProjectDescription] = useState<string>('');
 
-    const nullableDate = (date:string) => date ? moment(date).format(dateFormat) : <>-</>;
+    const nullableDate = (date:string) => date ? dayjs(date).format(dateFormat) : <>-</>;
 
     const [edit, setEdit] = useState<boolean>(false);
     const editOn = () => setEdit(true);
@@ -196,7 +196,7 @@ export function Detail() {
                         <tr>
                             <th>Project creation date</th>
                             <th>:</th>
-                            <td>{moment(projectCreation).format(dateFormat)}</td>
+                            <td>{dayjs(projectCreation).format(dateFormat)}</td>
                         </tr>
                         <tr>
                             <th>Last specifications update</th>
