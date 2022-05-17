@@ -31,6 +31,7 @@ services:
             args:
                 arg_port: 5000
                 php_url: "http://render:5000"
+                valueID: "627e3ed4e9f9d2f53e8b1d37"
         ports:
             - "8002:5000"
         env_file:
