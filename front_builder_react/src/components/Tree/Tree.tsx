@@ -128,7 +128,7 @@ function getPossibleChildrenSuggestion(nodeData:any){
             v = v.substring(1);
         }
 
-        if (parentSyntax.type === "array" || (parentSyntax.type !== "array" && !parentChildrenValues.includes(v))){
+        if (g_syntax[v].type === "array" || (g_syntax[v].type !== "array" && !parentChildrenValues.includes(v))){
             newChildrenSuggestion.push(v)
         }
     });

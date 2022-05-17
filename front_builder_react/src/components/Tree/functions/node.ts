@@ -43,9 +43,14 @@ function initNewNode(suggestion:any, parent:any){
 
 
 function updateNodeChildren(node:any){
-    let currentParent = node.parent;
-    while (currentParent.syntaxKey !== "root"){
-        currentParent = currentParent.parent;
+    let currentParent;
+    
+    if (node.parent) {
+        currentParent = node.parent;
+        
+        while (currentParent.syntaxKey !== "root"){
+            currentParent = currentParent.parent;
+        }
     }
-    g_setTree(currentParent);
+    g_setTree(currentParent ? currentParent : node);
 }
