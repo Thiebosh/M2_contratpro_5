@@ -18,17 +18,35 @@ export function addChildren(nodeData:any, suggestion:any){
         initChildrenIfNotDone(nodeData.parent);
         const node = initNewNode(suggestion, nodeData.parent)
 
-        values.forEach((val:any) => {
-            if (val[0] !== "?"){
-                //@ts-ignore
-                node[val] = {}
-            }
-        });
-        
+        createMandatoryChildren(node);
+        // console.log(node)
         nodeData.parent.children.splice(-1,0,node);
         addAddingNode(node);
         updateNodeChildren(node.parent);
         
+    }
+}
+
+function hasMandatoryValues(node:any){
+    const values = g_syntax[node.syntaxKey].values;
+
+    if (values){
+        return values.some((v:any) => v[0] !== "?");
+    }
+    return false;
+}
+
+function createMandatoryChildren(node:any){
+    if(hasMandatoryValues(node)){
+        g_syntax[node.syntaxKey].values.forEach((val:any) => {
+            if (val[0] !== "?"){
+                //@ts-ignore
+                node[val] = initNewNode(val, node);
+                //@ts-ignore
+                node.children.push(node[val]);
+                createMandatoryChildren(node[val]);
+            }
+        });
     }
 }
 
