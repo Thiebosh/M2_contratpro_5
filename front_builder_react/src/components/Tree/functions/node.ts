@@ -3,7 +3,7 @@ import { g_setTree, g_syntax } from "../Tree"
 
 export function addAddingNode(data:any){
     const addingNode = {
-        name:"+",
+        syntaxKey:"+",
         type:"adding",
         parent:data,
     };
@@ -34,7 +34,7 @@ export function addChildren(nodeData:any, suggestion:any){
 
 function initNewNode(suggestion:any, parent:any){
     return {
-        name:suggestion,
+        syntaxKey:suggestion,
         type:g_syntax[suggestion].type,
         children:[],
         parent:parent
@@ -44,7 +44,7 @@ function initNewNode(suggestion:any, parent:any){
 
 function updateNodeChildren(node:any){
     let currentParent = node.parent;
-    while (currentParent.name !== "root"){
+    while (currentParent.syntaxKey !== "root"){
         currentParent = currentParent.parent;
     }
     g_setTree(currentParent);

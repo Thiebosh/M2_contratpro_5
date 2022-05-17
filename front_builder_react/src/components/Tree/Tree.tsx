@@ -39,7 +39,7 @@ export function CustomTree(props:CustomTreeProps){
             return (
                 <g>
                     <foreignObject width={100} height={100} y={-10} x={-30}>
-                        <label>{nodeDatum.label} :</label>
+                        <label>{nodeDatum.syntaxKey} :</label>
                         <select>
                             {nodeDatum.values.map((v:any) =>
                             {return <option value={v}>{v}</option>})}
@@ -63,7 +63,7 @@ export function CustomTree(props:CustomTreeProps){
           <circle r="25" onClick={toggleNode}>
         </circle>
           <text fill="white" textAnchor="middle">
-            {nodeDatum.name}
+            {nodeDatum.syntaxKey}
           </text>
         
         </g>)
@@ -93,7 +93,7 @@ function init(filename:string, data:any, setTree:React.Dispatch<any>, setSyntax:
         g_syntax = syntaxJson;
         formatData(data);
         data = data["root"];
-        data.name = "root";
+        data.syntaxKey = "root";
         data.parent = null;
         setTree(data);
         root = data;
@@ -112,7 +112,7 @@ function getParentChildrenValues(nodeData:any){
 
     nodeData.parent.children.forEach((child:any) => {
         if(child.type !== "adding"){
-            parentChildrenValues.push(child.name); // pour éviter de les proposer si object et qu'on ne peut pas en avoir plusieurs
+            parentChildrenValues.push(child.syntaxKey); // pour éviter de les proposer si object et qu'on ne peut pas en avoir plusieurs
         }
     });
     return parentChildrenValues;
@@ -120,7 +120,7 @@ function getParentChildrenValues(nodeData:any){
 
 function getPossibleChildrenSuggestion(nodeData:any){
     let parentChildrenValues = getParentChildrenValues(nodeData);
-    let parentSyntax = g_syntax[nodeData.parent.name];
+    let parentSyntax = g_syntax[nodeData.parent.syntaxKey];
     let newChildrenSuggestion:any = [];
 
     parentSyntax.values.forEach((v:any) => {
