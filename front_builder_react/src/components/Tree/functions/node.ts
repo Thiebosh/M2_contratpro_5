@@ -14,14 +14,22 @@ export function addAddingNode(data:any){
 export function addChildren(nodeData:any, suggestion:any){
     // suggestion = selected new node
     const values = g_syntax[suggestion].values;
+    let node;
     if (values){
         initChildrenIfNotDone(nodeData.parent);
-        const node = initNewNode(suggestion, nodeData.parent)
-
+        node = initNewNode(suggestion, nodeData.parent)
+    
         createMandatoryChildren(node);
         
         nodeData.parent.children.splice(-1,0,node);
         addAddingNode(node);
+        updateNodeChildren(node.parent);
+    } else {
+        node = initNewNode(suggestion, nodeData.parent)
+    
+        createMandatoryChildren(node);
+
+        nodeData.parent.children.splice(-1,0,node);
         updateNodeChildren(node.parent);
     }
 }
@@ -57,13 +65,21 @@ function createMandatoryChildren(node:any){
 function initNewNode(suggestion:any, parent:any){
     if (g_syntax[suggestion].type === "field"){ // if field, we have a different syntax of the node
         const fieldSyntax = g_syntax[g_syntax[suggestion].field];
-        return {
+        let nodeSyntax = {
             syntaxKey:suggestion,
             type:fieldSyntax.type,
             parent:parent,
-            nature:fieldSyntax.nature,
-            value:""
+        };
+        if (fieldSyntax.type === "input"){
+            //@ts-ignore
+            nodeSyntax.nature = fieldSyntax.nature;
+            //@ts-ignore
+            nodeSyntax.value = "";
+        } else if (fieldSyntax.type === "select") {
+            //@ts-ignore
+            nodeSyntax.values = fieldSyntax.values;
         }
+        return nodeSyntax;
     }
     return {
         syntaxKey:suggestion,
