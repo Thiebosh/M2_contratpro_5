@@ -55,7 +55,8 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 **Retours :**
 
 - { "id": False } : l'utilisateur n'existe pas ou les empreintes de mots de passes ne correspondent pas.
-- { "id": ["id" (str)] } : l'utilisateur existe et les empreintes de mots de passes correspondent ; l'identifiant du compte est ajouté au message de retour.
+- { "id": ["id" (str)] } : l'utilisateur existe et les empreintes de mots de passes correspondent ; l'identifiant du
+  compte est ajouté au message de retour.
 
 # /account/get
 
@@ -63,7 +64,7 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 
 **Arguments requis :**
 
-- "id" (str) : identifiant du compte à récupérer. 
+- "id" (str) : identifiant du compte à récupérer.
 
 **Retours :**
 
@@ -77,7 +78,7 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 **Arguments requis :**
 
 - "id" (str) : l'identifiant du compte à modifier.
- 
+
 **Arguments optionnels : un des deux**
 
 - "name" (str) : le nouveau nom que l'utilisateur souhaite associer au compte.
@@ -96,12 +97,13 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 **Arguments requis :**
 
 - "name" (str) : nom de l'utilisateur recherché.
-- "limit" (int) 
+- "limit" (int)
 - "excluded_users" (str)
 
 **Retours :**
 
-- { "result": [{"excluded_users": "str", "name": "str", "limit" : "str" } : la liste des utilisateurs dont le nom contient le motif recherché et l'identifiant de compte associé.
+- { "result": [{"excluded_users": "str", "name": "str", "limit" : "str" } : la liste des utilisateurs dont le nom
+  contient le motif recherché et l'identifiant de compte associé.
 
 # /account/delete
 
@@ -126,15 +128,9 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 **Arguments requis :**
 
 - "name" (str): le nom du projet, unique.
-- "users" (str): la liste des identifiants de compte ayant accès à ce projet.
+- "users_id" (str): la liste des identifiants de compte ayant accès à ce projet.
 - "syntax_id" (str): syntaxe du projet
 - "description": possibilité d'ajouter une description lors de la création
-- "creation" (date): date de création
-- "last_specs" (date): date de dernière mise à jour des spécificitées
-- "latest_proto" (date): date du dernier prototype 
-- "specs": { "root": {} }
-- "pages": [{ "default": ""}]
-- "session": {}
 
 **Retours :**
 
@@ -172,7 +168,7 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 
 **Retours :**
 
-- "id" (str) : identifiant de la syntaxe à utiliser
+- "id": result["syntax_id"] : identifiant des syntaxes à utiliser
 
 # /project/update
 
@@ -189,6 +185,7 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 
 **Retours :**
 
+- { "success": "already exist" } : élément déjà existant dans la bdd.
 - { "success": False } : l'intégration en base de données a échoué.
 - { "success": True } : l'intégration en base de données a réussi.
 
@@ -203,7 +200,7 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 
 **Retours :**
 
-- { "project_id": "str" } : le projet existe et l'utilisateur y est associé : il reçoit l'id du projet.
+- { "project_id":  result["id"] } : le projet existe et l'utilisateur y est associé : il reçoit l'id du projet.
 
 # /project/get_proto_pages
 
@@ -211,11 +208,11 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 
 **Arguments requis :**
 
-- "project_id" : identifiant du projet.
+- "project_id" (str): identifiant du projet.
 
 **Retours :**
 
-- { pages: {["link" : "string", "name" : "string" }]
+- { pages: {["name" : "string","link" : "string"}]
 
 # /project/search_for_user
 
@@ -275,5 +272,4 @@ Toutes les urls avec le code de retour 200 retournent des données au format jso
 
 **Retours :**
 
-- { "success": False } : la suppression en base de données a échoué.
-- { "success": True } : la suppression en base de données a réussi.
+- { "success": mongo_result (bool), drive_result (bool)} : la suppression en base de données a échoué/ réussi.
