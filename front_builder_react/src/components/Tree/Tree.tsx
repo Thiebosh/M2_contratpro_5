@@ -10,7 +10,8 @@ import './Tree.scss';
 interface CustomTreeProps {
     syntax_filename:string,
     openClose:Function,
-    setModalElements:Function
+    setModalElements:Function,
+    socket:any
 }
 
 export let g_syntax:any = {};
@@ -30,7 +31,7 @@ export function CustomTree(props:CustomTreeProps){
         if(nodeDatum.type === "input"){
             const syntaxField = syntax[nodeDatum.syntaxKey].field;
             return (
-                <g>
+                <g className={nodeDatum.path}>
                     <foreignObject width={100} height={100} y={-10} x={-30}>
                         <label>{nodeDatum.syntaxKey}</label>
                         <input type={nodeDatum.nature} checked={nodeDatum.value[syntaxField]} value={nodeDatum.value} onChange={() => console.log("fds")}/>
@@ -39,7 +40,7 @@ export function CustomTree(props:CustomTreeProps){
             );
         } else if (nodeDatum.type === "select"){
             return (
-                <g>
+                <g className={nodeDatum.path}>
                     <foreignObject width={100} height={100} y={-10} x={-30}>
                         <label>{nodeDatum.syntaxKey} :</label>
                         <select>
@@ -52,7 +53,7 @@ export function CustomTree(props:CustomTreeProps){
         } else if (nodeDatum.type === "adding"){
             return(
                 <g>
-                  <circle r="25" onClick={()=> openModal(props.openClose, nodeDatum, props.setModalElements)}>
+                  <circle r="25" onClick={()=> openModal(props.openClose, nodeDatum, props.setModalElements, props.socket)}>
                 </circle>
                   <text fill="white" textAnchor="middle">
                     +
@@ -61,7 +62,7 @@ export function CustomTree(props:CustomTreeProps){
                 </g>)
         }
         return(
-        <g>
+        <g className={nodeDatum.path}>
           <circle r="25" onClick={toggleNode}>
         </circle>
           <text fill="white" textAnchor="middle">
@@ -93,9 +94,9 @@ function init(filename:string, data:any, setTree:React.Dispatch<any>, setSyntax:
     .then(syntaxJson => {
         setSyntax(syntaxJson);
         g_syntax = syntaxJson;
+        data["root"].path = "root"
         formatData(data);
         data = data["root"];
-        data.syntaxKey = "root";
         data.parent = null;
         setTree(data);
         root = data;
@@ -138,14 +139,14 @@ function getPossibleChildrenSuggestion(nodeData:any){
     return newChildrenSuggestion;
 }
 
-function openModal(setIsOpen:Function, nodeData:any, setModalElements:Function){
+function openModal(setIsOpen:Function, nodeData:any, setModalElements:Function, socket:any){
     const newChildrenSuggestion = getPossibleChildrenSuggestion(nodeData);
     const modalElements:any = []
     newChildrenSuggestion.forEach((suggestion:any) => {
         modalElements.push({
             text: suggestion,
             onclick: () => {
-                addChildren(nodeData, suggestion);
+                addChildren(nodeData, suggestion, socket);
                 setIsOpen(false);
             }
     })});

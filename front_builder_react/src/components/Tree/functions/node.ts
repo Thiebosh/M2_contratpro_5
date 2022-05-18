@@ -11,7 +11,7 @@ export function addAddingNode(data:any){
     data.children.push(addingNode);
 }
 
-export function addChildren(nodeData:any, suggestion:any){
+export function addChildren(nodeData:any, suggestion:any, socket:any){
     // suggestion = selected new node
     const values = g_syntax[suggestion].values;
     let node;
@@ -32,6 +32,15 @@ export function addChildren(nodeData:any, suggestion:any){
         nodeData.parent.children.splice(-1,0,node);
         updateNodeChildren(node.parent);
     }
+    socket.send(JSON.stringify(
+        {
+            action:"create",
+            path:"root/screen/0",
+            content:{
+                name:""
+            }
+        }
+        ))
 }
 
 function hasMandatoryValues(node:any){

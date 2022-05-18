@@ -10,6 +10,9 @@ services:
                 ws_url: "ws://socket:5000"
         logging:
             driver: none
+        force-attach:
+            image: bash
+            command: tail -f /dev/null
         ports:
             - "80:8080" # http
             - "443:8080" # https
@@ -48,6 +51,11 @@ services:
             context: ./render_server/
             args:
                 arg_port: 5000
+        logging:
+            driver: none
+        force-attach:
+            image: bash
+            command: tail -f /dev/null
         # ports:
         #     - "8003:5000"
         tty: true # bind console

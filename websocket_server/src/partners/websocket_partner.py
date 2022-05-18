@@ -35,6 +35,7 @@ class WebSocketPartner():
         conn.setblocking(True)
         data = conn.recv(size)
         conn.setblocking(False)
+        print(f"WEBSOCKET: recieved <{data}>")
 
         if not len(data):
             return None
@@ -58,14 +59,17 @@ class WebSocketPartner():
             return None
 
         try:
-            return ret.encode("latin-1").decode(encoding) # raw str to latin-1 bytes + bytes to utf-8 str
+            result = ret.encode("latin-1").decode(encoding) # raw str to latin-1 bytes + bytes to utf-8 str
+            print(f"WEBSOCKET: converted to '{result}'")
+            return result
         except UnicodeDecodeError as err:
-            print(f"websocket partner error - {err}")
+            print(f"WEBSOCKET: error - {err}")
             return ret
 
     @staticmethod
     def send(conn, data:str, encoding):
         # tmp remplace : see how to use recv mask method in reverse way
+        print(f"WEBSOCKET: recieved to send {data}")
         data = data.replace("é", "e")\
                     .replace("è", "e")\
                     .replace("ê", "e")\
@@ -84,4 +88,7 @@ class WebSocketPartner():
             head += struct.pack('!BH', 126, len(data))
         else:
             head += struct.pack('!BQ', 127, len(data))
-        conn.send(head+data.encode(encoding))
+
+        result = head+data.encode(encoding)
+        print(f"WEBSOCKET: converted for send to <{result}>")
+        conn.send(result)

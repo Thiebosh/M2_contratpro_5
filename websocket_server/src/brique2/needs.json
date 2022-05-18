@@ -3,7 +3,9 @@
         "screen": [
             {
                 "name": "ecran1",
-                "inputHome": true,
+                "defaultPage":{
+                    "inputHome": true  
+                },
                 "style": {
                     "color": "#6897bb",
                     "align": "center"
@@ -18,7 +20,7 @@
                                 {
                                     "text": {
                                         "style": {
-                                            "color": "red",
+                                            "color": "#ff0000",
                                             "decoration": "underline"
                                         },
                                         "textValue": "hello world"
@@ -27,7 +29,7 @@
                                 {
                                     "block": {
                                         "style": {
-                                            "color": "blue"
+                                            "color": "#0000ff"
                                         },
                                         "content": [
                                             {
@@ -41,7 +43,7 @@
                                 {
                                     "text": {
                                         "style": {
-                                            "color": "red"
+                                            "color": "#ff0000"
                                         },
                                         "textValue": "other text"
                                     }
@@ -58,7 +60,7 @@
                                 {
                                     "text": {
                                         "style": {
-                                            "color": "green",
+                                            "color": "#008000",
                                             "decoration": "italic"
                                         },
                                         "textValue": "hello world1"
@@ -67,7 +69,82 @@
                                 {
                                     "text": {
                                         "style": {
-                                            "color": "lightblue"
+                                            "color": "#add8e6"
+                                        },
+                                        "textValue": "hello world2"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "ecran2",
+                "style": {
+                    "color": "#6897bb",
+                    "align": "center"
+                },
+                "content": [
+                    {
+                        "block": {
+                            "style": {
+                                "align": "center"
+                            },
+                            "content": [
+                                {
+                                    "text": {
+                                        "style": {
+                                            "color": "#ff0000",
+                                            "decoration": "underline"
+                                        },
+                                        "textValue": "hello world"
+                                    }
+                                },
+                                {
+                                    "block": {
+                                        "style": {
+                                            "color": "#0000ff"
+                                        },
+                                        "content": [
+                                            {
+                                                "text": {
+                                                    "textValue": "some nested text"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "text": {
+                                        "style": {
+                                            "color": "#ff0000"
+                                        },
+                                        "textValue": "other text"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "block": {
+                            "style": {
+                                "align": "center"
+                            },
+                            "content": [
+                                {
+                                    "text": {
+                                        "style": {
+                                            "color": "#008000",
+                                            "decoration": "italic"
+                                        },
+                                        "textValue": "hello world1"
+                                    }
+                                },
+                                {
+                                    "text": {
+                                        "style": {
+                                            "color": "#add8e6"
                                         },
                                         "textValue": "hello world2"
                                     }

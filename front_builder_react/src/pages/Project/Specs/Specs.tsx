@@ -92,12 +92,17 @@ export function Specs() {
                 case 'remove_collab':
                     setRemoveCollab(data["remove_collab"] as string);
                     break;
+
                 case 'save':
                     data["save"] ? setSuccessMsg("Save: success") : setErrorMsg("Save: failure");
                     break;
                 case 'generate':
                     data["generate"] ? setSuccessMsg("Generate: success") : setErrorMsg("Generate: failure");
                     break;
+
+                case "create":
+                    break
+                
             }
         };
 
@@ -162,7 +167,7 @@ export function Specs() {
             </div>
             <div id="treeContent" className={isOpen ? "inactive": ""}>
                 { syntaxId &&
-                    <CustomTree syntax_filename={syntaxId} openClose={setIsOpen} setModalElements={setModalElements}/>
+                    <CustomTree syntax_filename={syntaxId} openClose={setIsOpen} socket={socket} setModalElements={setModalElements}/>
                 }
             </div>
             <div>
