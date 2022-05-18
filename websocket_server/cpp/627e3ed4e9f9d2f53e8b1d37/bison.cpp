@@ -115,7 +115,6 @@ field
         }
     |   LINK
         {
-            cout << "add link container" << endl;
             currentContainer = Container::link;
             fileContent[currentPage] += (INDENT ? string(indent++, '\t') : "") + "<a>" + (ONE_LINE ? "" : "\n");
         }
@@ -166,13 +165,11 @@ field
         }
     |   TARGETVALUE STR_VALUE
         {
-            cout << "add target value" << endl;
             fileContent[currentPage].pop_back();
             fileContent[currentPage] += " href='" + (string)$2 + "'>";
         }
     |   EXTLINK TRUE // FALSE => do nothing => change to bool
         {
-            cout << "add extlink value" << endl;
             fileContent[currentPage].pop_back();
             fileContent[currentPage] += " target='_blank'>";
         }
