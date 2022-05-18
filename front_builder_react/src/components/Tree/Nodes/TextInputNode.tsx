@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function TextInputNode({ nodeDatum, syntaxField, updateValue }: {nodeDatum:any, syntaxField:any, updateValue: Function}) {
+export default function TextInputNode({ nodeDatum, updateValue }: {nodeDatum:any, updateValue: Function}) {
   let updateDelay: NodeJS.Timeout;
 
   function handleChange(e: any) {
@@ -17,7 +17,7 @@ export default function TextInputNode({ nodeDatum, syntaxField, updateValue }: {
       <g className={nodeDatum.path}>
         <foreignObject width={120} height={60} y={-30} x={-60}>
           <label>{nodeDatum.syntaxKey}</label>
-          <input type={nodeDatum.nature} checked={nodeDatum.value[syntaxField]} defaultValue={nodeDatum.value} onChange={handleChange}/>
+          <input type={nodeDatum.nature} checked={nodeDatum.value} defaultValue={nodeDatum.value} onChange={handleChange}/>
         </foreignObject>
       </g>
     )

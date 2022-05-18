@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import Tree from "react-d3-tree"
-import { formatData } from "./functions/format"
-import { addChildren } from "./functions/node"
+import {formatData} from "./functions/format"
+import {addChildren} from "./functions/node"
 
 import './Tree.scss';
 import TextInputNode from "./Nodes/TextInputNode";
@@ -44,8 +44,7 @@ export function CustomTree(props:CustomTreeProps){
 
     const renderRectSvgNode = ({ nodeDatum, toggleNode }:any) => {
         if(nodeDatum.type === "input"){
-            const syntaxField = syntax[nodeDatum.syntaxKey].field;
-            return <TextInputNode nodeDatum={nodeDatum} syntaxField={syntaxField} updateValue={updateValue} />;
+            return <TextInputNode nodeDatum={nodeDatum} updateValue={updateValue} />;
         }
         else if (nodeDatum.type === "select"){
             return <SelectNode nodeDatum={nodeDatum} updateSelect={updateSelect} />
