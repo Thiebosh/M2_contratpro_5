@@ -1,5 +1,6 @@
 import { initChildrenIfNotDone } from "./utils"
 import { g_setTree, g_syntax, root } from "../Tree"
+import clone from "clone";
 
 export function addAddingNode(data:any){
     const addingNode = {
@@ -11,59 +12,62 @@ export function addAddingNode(data:any){
     data.children.push(addingNode);
 }
 
-function findNodeWithPathForCreate(path:string, data:any, i:number=0){
+export function findNodeWithPathForCreate(path:string, data:any, i:number=0){
     //@ts-ignore
     const splittedPath = path.split("/");
     const nextSubPath = splittedPath[i+1]
     // console.log(path.split("/").join("/"))
-    console.log(data, nextSubPath)
-    if (data[nextSubPath]){
-        data[nextSubPath].push(initNewNode(nextSubPath, data));
-    } else {
-        data[nextSubPath] = initNewNode(nextSubPath, data);
-    }
-    if (i <= splittedPath.length - 2){
+    // console.log(data, nextSubPath)
+    // if (data[nextSubPath]){
+    //     data[nextSubPath].push(initNewNode(nextSubPath, data));
+    // } else {
+    //     data[nextSubPath] = initNewNode(nextSubPath, data);
+    // }
+    addChildren(data, nextSubPath)
+
+    if (i < splittedPath.length - 2){
         findNodeWithPathForCreate(path, data[nextSubPath], i+1);
     } else {
         return data;
     }
-    // if (path.)
-    // root.forEach((elem) => console.log(elem))
 }
 
-export function addChildren(nodeData:any, suggestion:any, socket:any){
+export function addChildren(nodeData:any, suggestion:any, socket?:any){
     // suggestion = selected new node
     const values = g_syntax[suggestion].values;
     let node;
+    let parent = nodeData.parent ? nodeData.parent : nodeData;
     if (values){
-        initChildrenIfNotDone(nodeData.parent);
-        node = initNewNode(suggestion, nodeData.parent)
+        initChildrenIfNotDone(parent);
+        node = initNewNode(suggestion, parent)
     
         createMandatoryChildren(node);
         
         addNewNodeAsValueInNodeData(node);
-        nodeData.parent.children.splice(-1,0,node);
+        parent.children.splice(-1,0,node);
         addAddingNode(node);
         updateNodeChildren(node.parent);
     } else {
-        node = initNewNode(suggestion, nodeData.parent)
+        node = initNewNode(suggestion, parent)
     
         createMandatoryChildren(node);
 
         addNewNodeAsValueInNodeData(node);
-        nodeData.parent.children.splice(-1,0,node);
+        parent.children.splice(-1,0,node);
         updateNodeChildren(node.parent);
     }
-    // console.log(findNodeWithPathForCreate("root/screen", root));
-    socket.send(JSON.stringify(
-        {
-            action:"create",
-            path:"root/screen",
-            content:{
-                name:""
+    
+    if (socket){
+        socket.send(JSON.stringify(
+            {
+                action:"create",
+                path:"root/screen",
+                content:{
+                    name:""
+                }
             }
-        }
-        ))
+            ))
+    }
 }
 
 function hasMandatoryValues(node:any){
@@ -143,5 +147,5 @@ function updateNodeChildren(node:any){
             currentParent = currentParent.parent;
         }
     }
-    g_setTree(currentParent ? currentParent : node);
+    g_setTree(currentParent ? clone(currentParent) : clone(node));
 }
