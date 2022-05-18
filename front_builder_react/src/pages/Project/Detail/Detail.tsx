@@ -141,7 +141,7 @@ export function Detail() {
             return;
         }
 
-        const projectNameEdit = editName.replaceAll('  ', ' ');
+        const projectNameEdit = editName.replaceAll(/\s\s+/g, ' ');
         console.log(projectNameEdit);
 
         postProjectUpdate(projectId, projectNameEdit, addCollabIds, removeCollabIds, editDescription, deleteDescription)

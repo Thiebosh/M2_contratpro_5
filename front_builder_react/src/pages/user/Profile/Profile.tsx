@@ -50,16 +50,16 @@ function Edit(props: EditProps) {
             return;
         }
 
-        const name_ = name.replaceAll('  ', ' ');
-        console.log(name_);
+        const userName = name.replaceAll(/\s\s+/g, ' ');
+        console.log(userName);
 
-        postAccountUpdate(userContext.user.id, name_, password)
+        postAccountUpdate(userContext.user.id, userName, password)
             .then((data) => {
                 if (data.success === "already exist") {
                     setErrorMsg("Username already used");
                     return;
                 }
-                props.setName(name_);
+                props.setName(userName);
                 props.editOff();
             })
             .catch(error => {
