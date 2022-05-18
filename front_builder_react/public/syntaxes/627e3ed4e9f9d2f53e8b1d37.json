@@ -28,7 +28,7 @@
             "targetValue",
             "?external",
             "?name",
-            "?block",
+            "content",
             "?style"
         ]
     },

@@ -13,7 +13,7 @@ HEXA    [0-9a-fA-F]
 KEY_    {QUOTE}
 _KEY    {QUOTE}:
 
-TEXT    {QUOTE}[0-9A-Za-z_. ]*{QUOTE}
+TEXT    {QUOTE}[0-9A-Za-z_.:/ ]*{QUOTE}
 COLOR   {QUOTE}#({HEXA}{6}|{HEXA}{3}){QUOTE}
 EOL     \r\n|\r|\n
 
