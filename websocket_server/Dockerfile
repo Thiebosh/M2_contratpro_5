@@ -42,9 +42,15 @@ RUN apt update &&\
 WORKDIR /src
 COPY cpp .
 
-ARG valueID
+ARG tableauID
 
-RUN make build valueID=$valueID
+RUN for i in $tableauID; \
+    do if [ "$i" != "(" ];  \
+    then if [ "$i" != ")" ];  \
+    then make build valueID=$i; \
+    fi \
+    fi \
+    done
 
 
 # third stage : copy all files
