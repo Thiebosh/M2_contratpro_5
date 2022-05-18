@@ -58,15 +58,5 @@ FROM server
 
 ARG valueID
 
-ARG tableauID
-
-COPY --from=builder /src/627e3ed4e9f9d2f53e8b1d37.exe /src/brique2/cpp/
-
-# RUN for i in $tableauID; \
-#     do if [ "$i" != "(" ];  \
-#     then if [ "$i" != ")" ];  \
-#     then COPY --from=builder /src/$i.exe /src/brique2/cpp/;  \
-#     fi \
-#     fi \
-#     done
+COPY --from=builder /src/$valueID.exe /src/brique2/cpp/
 
