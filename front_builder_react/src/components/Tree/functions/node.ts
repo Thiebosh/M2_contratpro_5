@@ -16,18 +16,11 @@ export function findNodeWithPathForCreate(path:string, data:any, i:number=0){
     //@ts-ignore
     const splittedPath = path.split("/");
     const nextSubPath = splittedPath[i+1]
-    // console.log(path.split("/").join("/"))
-    // console.log(data, nextSubPath)
-    // if (data[nextSubPath]){
-    //     data[nextSubPath].push(initNewNode(nextSubPath, data));
-    // } else {
-    //     data[nextSubPath] = initNewNode(nextSubPath, data);
-    // }
-    addChildren(data, nextSubPath)
 
     if (i < splittedPath.length - 2){
         findNodeWithPathForCreate(path, data[nextSubPath], i+1);
     } else {
+        addChildren(data, nextSubPath);
         return data;
     }
 }
@@ -36,12 +29,13 @@ export function addChildren(nodeData:any, suggestion:any, socket?:any){
     // suggestion = selected new node
     const values = g_syntax[suggestion].values;
     let node;
-    let parent = nodeData.parent ? nodeData.parent : nodeData;
+    let parent = nodeData.type === "adding" ? nodeData.parent : nodeData;
+    let content;
     if (values){
         initChildrenIfNotDone(parent);
         node = initNewNode(suggestion, parent)
     
-        createMandatoryChildren(node);
+        content = createMandatoryChildren(node);
         
         addNewNodeAsValueInNodeData(node);
         parent.children.splice(-1,0,node);
@@ -50,21 +44,20 @@ export function addChildren(nodeData:any, suggestion:any, socket?:any){
     } else {
         node = initNewNode(suggestion, parent)
     
-        createMandatoryChildren(node);
+        content = createMandatoryChildren(node);
 
         addNewNodeAsValueInNodeData(node);
         parent.children.splice(-1,0,node);
         updateNodeChildren(node.parent);
     }
-    
+
     if (socket){
         socket.send(JSON.stringify(
             {
                 action:"create",
-                path:"root/screen",
-                content:{
-                    name:""
-                }
+                //@ts-ignore
+                path:g_syntax[node.syntaxKey].type === "array" ? node.path.split("/").slice(0, -1).join("/")  : node.path,
+                content:content
             }
             ))
     }
@@ -97,7 +90,7 @@ function addNewNodeAsValueInNodeData(node:any){
     }
 }
 
-function createMandatoryChildren(node:any){
+function createMandatoryChildren(node:any, content:any={}){
     if(hasMandatoryValues(node)){
         g_syntax[node.syntaxKey].values.forEach((val:any) => {
             if (val[0] !== "?"){
@@ -105,13 +98,15 @@ function createMandatoryChildren(node:any){
                 const newNode = initNewNode(val, node);
                 node[val] = g_syntax[val].type === "field" ? "" : newNode; 
                 //If field, value is empty (fields don't have json as value), else it contains the json
-
+                //@ts-ignore
+                content[val] = node[val];
                 //@ts-ignore
                 node.children.push(newNode);
-                createMandatoryChildren(newNode);
+                createMandatoryChildren(newNode, content);
             }
         });
     }
+    return content;
 }
 
 function initNewNode(suggestion:any, parent:any){

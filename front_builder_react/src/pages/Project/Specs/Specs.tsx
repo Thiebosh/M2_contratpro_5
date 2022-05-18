@@ -106,10 +106,10 @@ export function Specs() {
                     break
             }
 
-            if("action" in data)
-                findNodeWithPathForCreate("root/screen", root);
-                // console.log(root);
-                // g_setTree(clone(root));
+            if("action" in data){
+                //@ts-ignore
+                findNodeWithPathForCreate(data.path, root);
+            }
         };
 
         return () => {
