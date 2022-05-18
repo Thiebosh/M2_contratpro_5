@@ -24,12 +24,11 @@ class FilesManagerSpecs(FilesManager):
         if os.path.exists(filepath):
             os.remove(filepath)
 
-        try:
-            error_line = lines.split('\n')[-1]
-            if retcode == -1 or "GENERATION_ERROR:" in error_line:
-                print(f"cpp executable return error '{retcode}' : {error_line}")
-                return False
+        if retcode == -1 or "ERROR :" in lines:
+            print(f"cpp executable return error: {lines}")
+            return False
 
+        try:
             chunks = [chunk.strip() for chunk in lines.split("\n\n\n\n") if chunk != '']
 
             self.files_currently_stored = False
