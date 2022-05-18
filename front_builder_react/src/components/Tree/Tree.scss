@@ -1,10 +1,37 @@
 .tree {
+    font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    font-size: 1.2em;
+
     g {
-        text {
-            stroke: none;
-            fill: black;
-            font-size: 1em;
-            font-weight: bold;
+        &.rd3t-node, &.rd3t-leaf-node {
+            stroke-width: 1px;
+
+            g {
+                fill: #F7FAFC;
+
+                circle {
+                    r: 35px;
+                }
+                text {
+                    stroke: none;
+                    fill: black;
+                    font-size: 1em;
+                }
+                foreignObject {
+                    background-color: #F7FAFC;
+
+                    select {
+                        margin-top: 4px;
+                        option {
+                            font-size: 0.9rem;
+                        }
+                    }
+                    input, select {
+                        font-size: 1rem;
+                        width: calc(100% - 10px);
+                    }
+                }
+            }
         }
     }
 }
