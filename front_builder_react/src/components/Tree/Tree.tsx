@@ -55,7 +55,7 @@ export function CustomTree(props:CustomTreeProps){
         return <TextNode nodeDatum={nodeDatum} toggleNode={toggleNode} />
     };
 
-    return tree && (
+    return tree ? (
         <Tree
             svgClassName="tree"
             data={tree}
@@ -63,6 +63,8 @@ export function CustomTree(props:CustomTreeProps){
             transitionDuration={0.5}
             renderCustomNodeElement={renderRectSvgNode}
         />
+    ) : (
+      <h1>Loading...</h1>
     )
 }
 
