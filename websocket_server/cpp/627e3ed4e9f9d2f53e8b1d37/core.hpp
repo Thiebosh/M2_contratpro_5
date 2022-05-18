@@ -16,6 +16,7 @@ enum class Container {
     root,
     screen,
     block,
+    link,
     text
 };
 
@@ -29,6 +30,7 @@ std::vector<string> htmlPages;
 std::map<Container, string> colorContainer = {
     {Container::screen, "background-color: "},
     {Container::block, "background-color: "},
+    {Container::link, "color: "},
     {Container::text, "color: "}
 };
 std::map<string, std::map<Container, string>> alignContainer = {
