@@ -22,6 +22,16 @@
             "?content"
         ]
     },
+    "link": {
+        "type": "object",
+        "values": [
+            "targetValue",
+            "?external",
+            "?name",
+            "?block",
+            "?style"
+        ]
+    },
     "text": {
         "type": "object",
         "values": [
@@ -29,7 +39,6 @@
             "textValue"
         ]
     },
-
     "screen": {
         "type": "array",
         "values": [
@@ -44,6 +53,7 @@
         "values": [
             "?block",
             "?text",
+            "?link",
             "?inputNumber"
         ]
     },
@@ -56,6 +66,10 @@
         "type": "field",
         "field": "inputHome"
     },
+    "targetValue": {
+        "type": "field",
+        "field": "inputText"
+    },
     "textValue": {
         "type": "field",
         "field": "inputText"
@@ -63,6 +77,10 @@
     "numberValue": {
         "type": "field",
         "field": "inputNumber"
+    },
+    "external": {
+        "type": "field",
+        "field": "inputOnOff"
     },
     "color": {
         "type": "field",
@@ -89,6 +107,10 @@
     "inputNumber": {
         "type": "input",
         "nature": "number"
+    },
+    "inputOnOff": {
+        "type": "input",
+        "nature": "checkbox"
     },
     "inputColor": {
         "type": "input",

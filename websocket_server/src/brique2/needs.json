@@ -25,6 +25,17 @@
                                     }
                                 },
                                 {
+                                    "link": {
+                                        "targetValue": "ecran1"
+                                    }
+                                },
+                                {
+                                    "link": {
+                                        "targetValue": "youtube.com",
+                                        "external": true
+                                    }
+                                },
+                                {
                                     "block": {
                                         "style": {
                                             "color": "#0000ff"
