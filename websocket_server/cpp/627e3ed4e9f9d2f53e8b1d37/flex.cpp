@@ -13,7 +13,7 @@ HEXA    [0-9a-fA-F]
 KEY_    {QUOTE}
 _KEY    {QUOTE}:
 
-TEXT    {QUOTE}[0-9A-Za-z_ ]*{QUOTE}
+TEXT    {QUOTE}[0-9A-Za-z_.:/ ]*{QUOTE}
 COLOR   {QUOTE}#({HEXA}{6}|{HEXA}{3}){QUOTE}
 EOL     \r\n|\r|\n
 
@@ -25,27 +25,31 @@ EOL     \r\n|\r|\n
 "]" { return CLOSE_ARRAY; }
 ,   { return NEXT; }
 
+{KEY_}root{_KEY}         { return ROOT; }
+{KEY_}style{_KEY}        { return STYLE; }
+{KEY_}block{_KEY}        { return BLOCK; }
+{KEY_}link{_KEY}         { return LINK; }
+{KEY_}text{_KEY}         { return TEXT; }
+{KEY_}screen{_KEY}       { return SCREEN; }
+{KEY_}content{_KEY}      { return CONTENT; }
+
+{KEY_}name{_KEY}         { return NAME; }
+{KEY_}defaultPage{_KEY}  { return DEFAULTSCREEN; }
+{KEY_}targetValue{_KEY}  { return TARGETVALUE; }
+{KEY_}textValue{_KEY}    { return TEXTVALUE; }
+{KEY_}numberValue{_KEY}  { return NUMBERVALUE; }
+{KEY_}external{_KEY}     { return EXTLINK; }
+{KEY_}color{_KEY}        { return COLOR; }
+{KEY_}align{_KEY}        { return ALIGN; }
+{KEY_}decoration{_KEY}   { return DECO; }
+
 (T|t)rue { return TRUE; }
 (F|f)alse { return FALSE; }
-
-{KEY_}root{_KEY}         { return ROOT; }
-{KEY_}screen{_KEY}       { return SCREEN; }
-{KEY_}defaultPage{_KEY}  { return HOME; }
-{KEY_}name{_KEY}         { return NAME; }
-{KEY_}style{_KEY}        { return STYLE; }
-{KEY_}align{_KEY}        { return ALIGN; }
-{KEY_}color{_KEY}        { return COLOR; }
-{KEY_}decoration{_KEY}   { return DECO; }
-{KEY_}content{_KEY}      { return CONTENT; }
-{KEY_}block{_KEY}        { return BLOCK; }
-{KEY_}text{_KEY}         { return TEXT; }
-{KEY_}textValue{_KEY}    { return TEXTVALUE; }
-
 {TEXT}  { yylval.string = unquote(yytext,yyleng); return STR_VALUE; }
 {COLOR} { yylval.string = unquote(yytext,yyleng); return COLOR_VALUE; }
 
 [ \t]|{EOL} { }
-.           { std::cout << std::endl << "Error - raw text : '" << yytext[0] << "'" << std::endl; exit(1); }
+.           { std::cout << std::endl << "ERROR : raw text scanned : '" << yytext[0] << "'" << std::endl; }
 
 %%
 

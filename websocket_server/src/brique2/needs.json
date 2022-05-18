@@ -26,13 +26,27 @@
                                 },
                                 {
                                     "link": {
-                                        "targetValue": "ecran1"
+                                        "targetValue": "ecran1",
+                                        "content": [
+                                            {
+                                                "text": {
+                                                    "textValue": "lien vers ecran 1"
+                                                }
+                                            }
+                                        ]
                                     }
                                 },
                                 {
                                     "link": {
-                                        "targetValue": "youtube.com",
-                                        "external": true
+                                        "targetValue": "http://youtube.com",
+                                        "external": true,
+                                        "content": [
+                                            {
+                                                "text": {
+                                                    "textValue": "lien externe vers youtube"
+                                                }
+                                            }
+                                        ]
                                     }
                                 },
                                 {
