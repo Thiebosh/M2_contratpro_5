@@ -32,7 +32,7 @@ export function CustomTree(props:CustomTreeProps){
             const syntaxField = syntax[nodeDatum.syntaxKey].field;
             return (
                 <g className={nodeDatum.path}>
-                    <foreignObject width={100} height={100} y={-10} x={-30}>
+                    <foreignObject width={120} height={60} y={-30} x={-60}>
                         <label>{nodeDatum.syntaxKey}</label>
                         <input type={nodeDatum.nature} checked={nodeDatum.value[syntaxField]} value={nodeDatum.value} onChange={() => console.log("fds")}/>
                     </foreignObject>
@@ -41,8 +41,8 @@ export function CustomTree(props:CustomTreeProps){
         } else if (nodeDatum.type === "select"){
             return (
                 <g className={nodeDatum.path}>
-                    <foreignObject width={100} height={100} y={-10} x={-30}>
-                        <label>{nodeDatum.syntaxKey} :</label>
+                    <foreignObject width={120} height={60} y={-30} x={-60}>
+                        <label>{nodeDatum.syntaxKey}</label>
                         <select>
                             {nodeDatum.values.map((v:any) =>
                             {return <option value={v}>{v}</option>})}
@@ -52,7 +52,7 @@ export function CustomTree(props:CustomTreeProps){
             );
         } else if (nodeDatum.type === "adding"){
             return(
-                <g>
+                <g className="add-circle">
                   <circle r="25" onClick={()=> openModal(props.openClose, nodeDatum, props.setModalElements, props.socket)}>
                 </circle>
                   <text fill="white" textAnchor="middle">
@@ -76,7 +76,7 @@ export function CustomTree(props:CustomTreeProps){
             <Tree
                 svgClassName="tree"
                 data={tree}
-                translate={{x:window.innerWidth*1/4,y:window.innerHeight/2}}
+                translate={{x:window.innerWidth/4,y:window.innerHeight/2}}
                 transitionDuration={0.5}
                 renderCustomNodeElement={renderRectSvgNode}
             />
