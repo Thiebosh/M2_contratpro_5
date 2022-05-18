@@ -82,13 +82,17 @@ function hasMandatoryValues(node:any){
 }
 
 function addNewNodeAsValueInNodeData(node:any){
-    if (node.parent[node.syntaxKey]){ // if array
-        node.parent[node.syntaxKey].push(node);
+    const parent = node.parent;
+    const syntaxKey = node.syntaxKey;
+    if (parent[syntaxKey]){ // if array
+        node.path = parent.path + "/" + syntaxKey + "/" + parent[syntaxKey].length;
+        parent[syntaxKey].push(node);
     } else {
-        if (g_syntax[node.syntaxKey].type === "field"){ // if field, we init with empty value
-            node.parent[node.syntaxKey] = "";
+        node.path = parent.path + "/" + syntaxKey;
+        if (g_syntax[syntaxKey].type === "field"){ // if field, we init with empty value
+            parent[syntaxKey] = "";
         } else { // else, it contains values of the node
-            node.parent[node.syntaxKey] = node;
+            parent[syntaxKey] = node;
         }
     }
 }
