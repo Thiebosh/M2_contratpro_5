@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Fade } from 'react-awesome-reveal';
-import { CustomTree} from "../../../components/Tree/Tree";
+import { CustomTree, g_setTree, root } from "../../../components/Tree/Tree";
 import { postProjectExistForUser, postProjectGetSyntaxId } from '../../../partners/rest';
 import { useUserContext } from '../../../session/user';
 import { init_websocket } from '../../..';
@@ -9,6 +9,7 @@ import { init_websocket } from '../../..';
 import './Specs.scss';
 import { Collabs } from '../../../components/Collabs';
 import { Modal } from "../../../components/Modal"
+import { findNodeWithPathForCreate } from "../../../components/Tree/functions/node"
 
 export function Specs() {
     const navigate = useNavigate();
@@ -101,9 +102,14 @@ export function Specs() {
                     break;
 
                 case "create":
+                    console.log("SUCCESS : ", data["create"])
                     break
-                
             }
+
+            if("action" in data)
+                findNodeWithPathForCreate("root/screen", root);
+                // console.log(root);
+                // g_setTree(clone(root));
         };
 
         return () => {

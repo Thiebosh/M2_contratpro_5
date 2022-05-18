@@ -1,7 +1,7 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import Tree from "react-d3-tree"
-import {formatData} from "./functions/format"
-import {addChildren} from "./functions/node"
+import { formatData } from "./functions/format"
+import { addChildren } from "./functions/node"
 
 import './Tree.scss';
 import TextInputNode from "./Nodes/TextInputNode";

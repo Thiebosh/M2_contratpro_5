@@ -30,8 +30,8 @@ EOL     \r\n|\r|\n
 
 {KEY_}root{_KEY}         { return ROOT; }
 {KEY_}screen{_KEY}       { return SCREEN; }
+{KEY_}defaultPage{_KEY}  { return HOME; }
 {KEY_}name{_KEY}         { return NAME; }
-{KEY_}inputHome{_KEY}    { return HOME; }
 {KEY_}style{_KEY}        { return STYLE; }
 {KEY_}align{_KEY}        { return ALIGN; }
 {KEY_}color{_KEY}        { return COLOR; }
