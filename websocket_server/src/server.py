@@ -14,6 +14,7 @@ from partners.cpp_partner import CppPartner
 from partners.php_partner import PhpPartner
 from partners.logger_partner import LoggerPartner
 
+
 class Server():
     def __init__(self, websocket=None, db=None, nas=None, generator=None, renderer=None, logger=None) -> None:
         # 1) INITIALIZE LOGGER
@@ -25,10 +26,10 @@ class Server():
         logger = logger or logging.getLogger("None")
         logger_partner = LoggerPartner(logger)
 
-        logger_partner.app_logger.info(INIT_SERVER)
+        logger_partner.logger.info(INIT_SERVER)
 
         # 2) INITIALIZE PARTNERS
-        logger_partner.app_logger.info(INIT_PARTNERS)
+        logger_partner.logger.info(INIT_PARTNERS)
 
         self.partners = {
             WEBSOCKET: websocket or WebSocketPartner(),
@@ -46,7 +47,8 @@ class Server():
         self.encoding = ENCODING
         self.init_server()
 
-        logger_partner.app_logger.info(INIT_DONE)
+        logger_partner.logger.info(INIT_DONE)
+
 
     def init_server(self, backlog=5):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -55,38 +57,57 @@ class Server():
         self.socket.bind((self.ip, self.port))
         self.socket.listen(backlog)
 
+
     def read(self):
         readable, _, exception = select.select(self.inputs, [], self.inputs, self.polling_freq)
         return readable, exception
 
+
     def close(self):
-        self.partners[LOGGER].app_logger.info("SERVER - Get close signal")
+        # 1) ACCESS TO PARTNERS AND APPLY TYPE
+        logger_partner:LoggerPartner = self.partners[LOGGER]
+
+        logger_partner.logger.info("SERVER - Get close signal")
         for input_socket in self.inputs:
             input_socket.close()
         for room in self.room_m.rooms.values():
             room.close_evt.set()
 
+
     def add_connection(self, input_socket):
+        # 1) ACCESS TO PARTNERS AND APPLY TYPE
+        websocket_partner:WebSocketPartner = self.partners[WEBSOCKET]
+        logger_partner:LoggerPartner = self.partners[LOGGER]
+
         new_socket, client_address = input_socket.accept()
         try:
-            if self.partners[WEBSOCKET].handshake(new_socket, self.encoding):
-                self.partners[LOGGER].app_logger.info(f"SERVER - new connexion {client_address}")
+            if websocket_partner.handshake(new_socket, self.encoding):
+                logger_partner.logger.info(f"SERVER - new connexion {client_address}")
                 self.inputs.append(new_socket)  # new input socket
             else:
-                self.partners[LOGGER].app_logger.info("SERVER - failed handshake")
+                logger_partner.logger.info("SERVER - failed handshake")
 
         except timeout:
-            self.partners[LOGGER].app_logger.info('SERVER - websocket connection timeout')
+            logger_partner.logger.info('SERVER - websocket connection timeout')
+
 
     def close_client_connection(self, socket):
-        self.partners[LOGGER].app_logger.info("SERVER - Close client")
+        # 1) ACCESS TO PARTNERS AND APPLY TYPE
+        logger_partner:LoggerPartner = self.partners[LOGGER]
+
+        logger_partner.logger.info("SERVER - Close client")
         self.inputs.remove(socket)
         socket.close()
 
+
     def run(self):
+        # 1) ACCESS TO PARTNERS AND APPLY TYPE
+        websocket_partner:WebSocketPartner = self.partners[WEBSOCKET]
+        logger_partner:LoggerPartner = self.partners[LOGGER]
+
         self.inputs.append(self.socket) # Contient tous les sockets (serveur + toutes les rooms)
 
-        self.partners[LOGGER].app_logger.info("SERVER - ready")
+        logger_partner.logger.info("SERVER - ready")
 
         while self.inputs:
             try:
@@ -101,7 +122,7 @@ class Server():
                     self.add_connection(input_socket)
                     continue
 
-                target = self.partners[WEBSOCKET].recv(input_socket, self.encoding)
+                target = websocket_partner.recv(input_socket, self.encoding)
 
                 if not target:
                     self.close_client_connection(input_socket)
@@ -110,7 +131,7 @@ class Server():
                 try:
                     target = json.loads(target)
                 except json.JSONDecodeError:
-                    self.partners[LOGGER].app_logger.info(f"SERVER - malformed json : '{target}'")
+                    logger_partner.logger.info(f"SERVER - malformed json : '{target}'")
                     self.close_client_connection(input_socket)
                     continue
 
@@ -135,7 +156,7 @@ class Server():
 
             # can't sleep because of handshakes
 
-        self.partners[LOGGER].app_logger.info("SERVER - Closing server...")
+        logger_partner.logger.info("SERVER - Closing server...")
 
 
     def callback_update_server_sockets(self,socket):

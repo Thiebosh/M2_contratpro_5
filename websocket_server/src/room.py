@@ -8,10 +8,13 @@ import json
 from input_manager import InputManager
 from defines import *
 
+from partners.websocket_partner import WebSocketPartner
+from partners.logger_partner import LoggerPartner
+
 class Room(ABC):
     def __init__(self, room_id, room_type, partners, callback_update_server_sockets, callback_remove_room, encoding, input_manager) -> None:
         logger_partner = partners[LOGGER]
-        logger_partner.app_logger.debug(f"{room_id} - {room_type} - Creating room...")
+        logger_partner.logger.debug(f"{room_id} - {room_type} - Creating room...")
         self.close_evt = threading.Event()
         self.queue = queue.Queue()
         self.lock = threading.Lock()
@@ -28,17 +31,20 @@ class Room(ABC):
         self.delay = datetime.now()
 
         self.input_manager:InputManager = input_manager
-        logger_partner.app_logger.debug(f"{room_id} - {room_type} - Room created")
+        logger_partner.logger.debug(f"{room_id} - {room_type} - Room created")
 
 
     async def close(self):
-        self.partners[LOGGER].app_logger.debug(f"{self.room_id}-{self.room_type} - Closing room...")
+        # 1) ACCESS TO PARTNERS AND APPLY TYPE
+        logger_partner:LoggerPartner = self.partners[LOGGER]
+
+        logger_partner.logger.debug(f"{self.room_id}-{self.room_type} - Closing room...")
 
         for socket in self.inputs:
             socket.close()
         await self.input_manager.close()
         self.callback_remove_room(self.room_id, self.room_type)
-        self.partners[LOGGER].app_logger.debug(f"{self.room_id}-{self.room_type} - Room closed")
+        logger_partner.logger.debug(f"{self.room_id}-{self.room_type} - Room closed")
 
 
 
@@ -66,7 +72,10 @@ class Room(ABC):
 
 
     def close_client_connection_to_room(self, socket):
-        self.partners[LOGGER].app_logger.debug(f"{self.room_id}-{self.room_type} - Close client")
+        # 1) ACCESS TO PARTNERS AND APPLY TYPE
+        logger_partner:LoggerPartner = self.partners[LOGGER]
+
+        logger_partner.logger.debug(f"{self.room_id}-{self.room_type} - Close client")
         if socket in self.outputs:
             self.outputs.remove(socket)
         self.inputs.remove(socket)
@@ -97,7 +106,11 @@ class Room(ABC):
 
 
     async def run(self, polling_freq=0.1):
-        self.partners[LOGGER].app_logger.debug(f"{self.room_id}-{self.room_type} - Room ready")
+        # 1) ACCESS TO PARTNERS AND APPLY TYPE
+        websocket_partner:WebSocketPartner = self.partners[WEBSOCKET]
+        logger_partner:LoggerPartner = self.partners[LOGGER]
+
+        logger_partner.logger.debug(f"{self.room_id}-{self.room_type} - Room ready")
 
         try:
             while not self.close_evt.is_set() and (self.inputs or (datetime.now() - self.delay <= timedelta(minutes=5))):
@@ -116,21 +129,21 @@ class Room(ABC):
                     break
 
                 for socket in readable: #Get all sockets and put the ones which have a msg to a list
-                    msg = self.partners[WEBSOCKET].recv(socket, self.encoding)
+                    msg = websocket_partner.recv(socket, self.encoding)
                     if not msg:
-                        self.partners[LOGGER].app_logger.debug(f"close {self.socket_name[socket]} because empty msg")
+                        logger_partner.logger.debug(f"close {self.socket_name[socket]} because empty msg")
                         self.close_client_connection_to_room(socket)
                         continue
 
                     try:
                         msg = json.loads(msg)
                     except json.JSONDecodeError:
-                        self.partners[LOGGER].app_logger.debug(f"{self.room_id}-{self.room_type} - malformed json : {msg}")
+                        logger_partner.logger.debug(f"{self.room_id}-{self.room_type} - malformed json : {msg}")
                         # self.close_client_connection_to_room(socket)
                         continue
 
                     if msg["action"] == "exitRoom":
-                        self.partners[LOGGER].app_logger.debug(f"close {self.socket_name[socket]} because asked")
+                        logger_partner.logger.debug(f"close {self.socket_name[socket]} because asked")
                         self.close_client_connection_to_room(socket)
                         continue
 
@@ -144,14 +157,14 @@ class Room(ABC):
                     except queue.Empty:
                         self.outputs.remove(socket)
                     else:
-                        self.partners[WEBSOCKET].send(socket, next_msg, self.encoding)
+                        websocket_partner.send(socket, next_msg, self.encoding)
 
                 for socket in exception:
                     self.close_client_connection_to_room(socket)
 
                 await asyncio.sleep(0.1)
         except Exception as e:
-            self.partners[LOGGER].app_logger.debug(f"{self.room_id}-{self.room_type} CRITICAL: {e}")
+            logger_partner.logger.debug(f"{self.room_id}-{self.room_type} CRITICAL: {e}")
 
 
         await self.close()

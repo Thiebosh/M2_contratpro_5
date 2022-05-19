@@ -1,6 +1,9 @@
 from partners.mongo_queries import MongoQueries, COLLECTION_PROJECTS
 from defines import *
 
+from partners.mongo_partner import MongoPartner
+from partners.logger_partner import LoggerPartner
+
 class JsonHandler():
 
     @staticmethod
@@ -13,20 +16,30 @@ class JsonHandler():
         self.room_type = room_type
         self.json_currently_stored = True
 
-        self.data = self.partners[DB].aggregate_list(COLLECTION_PROJECTS, MongoQueries.getSpecsFromId(self.project_id))[0]
+        # 1) ACCESS TO PARTNERS AND APPLY TYPE
+        db_partner:MongoPartner = self.partners[DB]
+
+        self.data = db_partner.aggregate_list(COLLECTION_PROJECTS, MongoQueries.getSpecsFromId(self.project_id))[0]
 
 
     async def close(self):
+        # 1) ACCESS TO PARTNERS AND APPLY TYPE
+        logger_partner:LoggerPartner = self.partners[LOGGER]
+
         result = await self.update_storage()
-        self.partners[LOGGER].app_logger.debug(f"{self.project_id}-{self.room_type} - Mongo - Project {'well' if result else 'not'} updated")
+        logger_partner.logger.debug(f"{self.project_id}-{self.room_type} - Mongo - Project {'well' if result else 'not'} updated")
 
 
     async def update_storage(self):
-        self.partners[LOGGER].app_logger.debug(f"{self.project_id}-{self.room_type} - {'no ' if self.json_currently_stored else ''}need of db update")
+        # 1) ACCESS TO PARTNERS AND APPLY TYPE
+        db_partner:MongoPartner = self.partners[DB]
+        logger_partner:LoggerPartner = self.partners[LOGGER]
+
+        logger_partner.logger.debug(f"{self.project_id}-{self.room_type} - {'no ' if self.json_currently_stored else ''}need of db update")
         if self.json_currently_stored:
             return True
 
-        self.json_currently_stored = await self.partners[DB].update_one_async(
+        self.json_currently_stored = await db_partner.update_one_async(
             COLLECTION_PROJECTS,
             *MongoQueries.updateSpecsForId(self.project_id, self.data)
         )

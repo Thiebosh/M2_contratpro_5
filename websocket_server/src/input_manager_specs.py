@@ -6,27 +6,34 @@ from partners.mongo_queries import MongoQueries, COLLECTION_PROJECTS
 from input_specs import InputSpecs
 from defines import *
 
+from partners.mongo_partner import MongoPartner
+from partners.cpp_partner import CppPartner
+from partners.logger_partner import LoggerPartner
+
 
 class InputManagerSpecs(InputManager):
     def __init__(self, room_id, room_type, shared_new_proto_flag, partners, send_conflict_message_callback) -> None:
         super().__init__(room_id, room_type, partners)
+        # 1) ACCESS TO PARTNERS AND APPLY TYPE
+        db_partner:MongoPartner = self.partners[DB]
+        generator_partner:CppPartner = self.partners[GENERATOR]
 
         self.send_conflict_message_callback = send_conflict_message_callback
 
         self.shared_new_proto_flag = shared_new_proto_flag
 
-        self.partners[GENERATOR].set_exe_file(self.partners[DB].find_one(COLLECTION_PROJECTS, *MongoQueries.getSyntaxIdFromId(self.room_id))["syntax_id"])
+        generator_partner.set_exe_file(db_partner.find_one(COLLECTION_PROJECTS, *MongoQueries.getSyntaxIdFromId(self.room_id))["syntax_id"])
 
         self.json_handler = JsonHandler(self.partners, room_id, room_type)
         self.files_manager = FilesManagerSpecs(self.partners, room_id, room_type)
 
-        self.current_version_generated = self.partners[DB].find_one(COLLECTION_PROJECTS, *MongoQueries.getProtoStateFromId(self.room_id))['latest_proto']
+        self.current_version_generated = db_partner.find_one(COLLECTION_PROJECTS, *MongoQueries.getProtoStateFromId(self.room_id))['latest_proto']
 
         # tmp test
-        # import pathlib
-        # with open(f"{pathlib.Path(__file__).parent.absolute()}/brique2/needs.json", 'r') as file:
-        #     self.json_handler.data = json.loads(file.read().replace('\n', '').replace('\n', ''))
-        # self.current_version_generated = False
+        import pathlib
+        with open(f"{pathlib.Path(__file__).parent.absolute()}/brique2/needs.json", 'r') as file:
+            self.json_handler.data = json.loads(file.read().replace('\n', '').replace('\n', ''))
+        self.current_version_generated = False
 
     async def close(self):
         await self.json_handler.close()
@@ -57,6 +64,10 @@ class InputManagerSpecs(InputManager):
 
 
     async def check_and_execute_action_function(self, input_to_process):
+        # 1) ACCESS TO PARTNERS AND APPLY TYPE
+        db_partner:MongoPartner = self.partners[DB]
+        logger_partner:LoggerPartner = self.partners[LOGGER]
+
         if input_to_process.failed:
             return False
 
@@ -75,24 +86,24 @@ class InputManagerSpecs(InputManager):
 
         elif action == "save":
             result = await self.json_handler.update_storage()
-            self.partners[LOGGER].app_logger.debug(f"Project {'well' if result else 'not'} updated")
+            logger_partner.logger.debug(f"Project {'well' if result else 'not'} updated")
 
         elif action == "generate":
             if self.current_version_generated:
-                self.partners[LOGGER].app_logger.debug(f"{self.room_id}-{self.room_type} - Project files already generated")
+                logger_partner.logger.debug(f"{self.room_id}-{self.room_type} - Project files already generated")
                 return True
 
             result = await self.files_manager.generate_files(json.dumps(self.json_handler.data))
-            self.partners[LOGGER].app_logger.debug(f"{self.room_id}-{self.room_type} - Project files {'well' if result else 'not'} generated")
+            logger_partner.logger.debug(f"{self.room_id}-{self.room_type} - Project files {'well' if result else 'not'} generated")
 
             if result is False:
                 return False
 
             result = await self.files_manager.update_stored_files()
-            self.partners[LOGGER].app_logger.debug(f"{self.room_id}-{self.room_type} - Project files {'well' if result else 'not'} updated")
+            logger_partner.logger.debug(f"{self.room_id}-{self.room_type} - Project files {'well' if result else 'not'} updated")
 
             self.current_version_generated = True
-            await self.partners[DB].update_one_async(COLLECTION_PROJECTS, *MongoQueries.updateProtoStateForId(self.room_id, True))
+            await db_partner.update_one_async(COLLECTION_PROJECTS, *MongoQueries.updateProtoStateForId(self.room_id, True))
 
             self.shared_new_proto_flag.set()
 
@@ -100,6 +111,6 @@ class InputManagerSpecs(InputManager):
 
         if action in ["create", "update", "delete"] and result:
             self.current_version_generated = False
-            await self.partners[DB].update_one_async(COLLECTION_PROJECTS, *MongoQueries.updateProtoStateForId(self.room_id, False))
+            await db_partner.update_one_async(COLLECTION_PROJECTS, *MongoQueries.updateProtoStateForId(self.room_id, False))
 
         return result
