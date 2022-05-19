@@ -9,7 +9,7 @@ import {init_websocket} from '../../..';
 import './Specs.scss';
 import {Collabs} from '../../../components/Collabs';
 import {Modal} from "../../../components/Modal"
-import {findNodeWithPathForCreate} from "../../../components/Tree/functions/node"
+import {findNodeWithPathForCreate, updateValueOnNode} from "../../../components/Tree/functions/node"
 
 export function Specs() {
     const navigate = useNavigate();
@@ -108,7 +108,7 @@ export function Specs() {
                     }
                     break;
                 case "update":
-                    console.log("UPDATE");
+                    updateValueOnNode(socketActionData.content,socketActionData.path,tree,setTree);
                     break;
             }
             
