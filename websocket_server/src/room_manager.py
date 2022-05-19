@@ -25,6 +25,8 @@ class RoomManager():
     def create_room(self, room_id:str, room_type:str, socket:socket, name, callback_update_server_sockets):
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
+        logger_partner.logger.info(f"{room_id}-{room_type} - start creating room")
+
         if room_id not in self.shared:
             self.shared[room_id] = {"new_proto_flag": asyncio.Event()}
         shared_new_proto_flag = self.shared[room_id]["new_proto_flag"]

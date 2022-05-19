@@ -13,6 +13,8 @@ class FilesManager(ABC):
 
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
+        logger_partner.logger.info(f"{self.project_id}-{self.room_type} - init file manager")
+
         if not self.project_id:
             logger_partner.logger.error("FilesGenerator - __init__: unknow project name")
             raise InitFailedException()

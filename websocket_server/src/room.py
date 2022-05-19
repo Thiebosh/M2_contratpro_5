@@ -63,6 +63,9 @@ class Room(ABC):
 
 
     def open_client_connection_to_room(self, socket:socket, name:str) -> None:
+        logger_partner:LoggerPartner = self.partners[LOGGER]
+        logger_partner.logger.info(f"{self.room_id}-{self.room_type} - new client")
+
         names = list(self.socket_name.values())
 
         self.inputs.append(socket)
@@ -76,8 +79,8 @@ class Room(ABC):
     def close_client_connection_to_room(self, socket:socket) -> None:
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         logger_partner:LoggerPartner = self.partners[LOGGER]
-
         logger_partner.logger.info(f"{self.room_id}-{self.room_type} - Close client")
+
         if socket in self.outputs:
             self.outputs.remove(socket)
         self.inputs.remove(socket)
@@ -112,7 +115,7 @@ class Room(ABC):
         websocket_partner:WebSocketPartner = self.partners[WEBSOCKET]
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
-        logger_partner.logger.info(f"{self.room_id}-{self.room_type} - Room ready")
+        logger_partner.logger.info(f"{self.room_id}-{self.room_type} - Room start running")
 
         try:
             while not self.close_evt.is_set() and (self.inputs or (datetime.now() - self.delay <= timedelta(minutes=5))):
@@ -138,18 +141,16 @@ class Room(ABC):
                         logger_partner.logger.error(WS_PARTNER_EXCEPTION, err)
 
                     if not msg:
-                        logger_partner.logger.info(f"close {self.socket_name[socket]} because empty msg")
                         self.close_client_connection_to_room(socket)
                         continue
 
                     is_msg_json, msg = Utils.get_json(msg)
                     if not is_msg_json:
-                        logger_partner.logger.info(f"{self.room_id}-{self.room_type} - malformed json : {msg}")
+                        logger_partner.logger.warning(f"{self.room_id}-{self.room_type} - malformed json : {msg}")
                         self.close_client_connection_to_room(socket) # reset this line if front memory leak persist
                         continue
 
                     if msg["action"] == "exitRoom":
-                        logger_partner.logger.info(f"close {self.socket_name[socket]} because asked")
                         self.close_client_connection_to_room(socket)
                         continue
 
@@ -170,6 +171,6 @@ class Room(ABC):
 
                 await asyncio.sleep(0.1)
         except Exception as err:
-            logger_partner.logger.info(f"{self.room_id}-{self.room_type} CRITICAL: {err}")
+            logger_partner.logger.critical(f"{self.room_id}-{self.room_type}: {err}")
 
         await self.close()

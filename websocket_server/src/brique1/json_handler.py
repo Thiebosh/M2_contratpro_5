@@ -22,6 +22,8 @@ class JsonHandler():
         db_partner:MongoPartner = self.partners[DB]
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
+        logger_partner.logger.info(f"{self.project_id}-{self.room_type} - call")
+
         try:
             self.data = db_partner.aggregate_list(COLLECTION_PROJECTS, MongoQueries.getSpecsFromId(self.project_id))[0]
         except WTimeoutError as err:
@@ -36,6 +38,8 @@ class JsonHandler():
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
+        logger_partner.logger.info(f"{self.project_id}-{self.room_type} - call")
+
         result = await self.update_storage()
         logger_partner.logger.info(f"{self.project_id}-{self.room_type} - Mongo - Project {'well' if result else 'not'} updated")
 
@@ -45,7 +49,8 @@ class JsonHandler():
         db_partner:MongoPartner = self.partners[DB]
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
-        logger_partner.logger.info(f"{self.project_id}-{self.room_type} - {'no ' if self.json_currently_stored else ''}need of db update")
+        logger_partner.logger.info(f"{self.project_id}-{self.room_type} - call")
+
         if self.json_currently_stored:
             return True
 

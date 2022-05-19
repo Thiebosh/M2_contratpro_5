@@ -65,11 +65,13 @@ class Server():
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
-        logger_partner.logger.info("SERVER - Get close signal")
+        logger_partner.logger.info("closing server...")
         for input_socket in self.inputs:
             input_socket.close()
         for room in self.room_m.rooms.values():
             room.close_evt.set()
+
+        logger_partner.logger.info("server closed")
 
 
     def add_connection(self, input_socket:socket) -> None:
@@ -78,24 +80,26 @@ class Server():
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
         new_socket, client_address = input_socket.accept()
+        logger_partner.logger.info(f"new connexion {client_address}")
+
         try:
             result = websocket_partner.handshake(new_socket)
         except timeout:
-            logger_partner.logger.info('SERVER - websocket connection timeout')
+            logger_partner.logger.error('websocket connection timeout')
+            return
         
         if not result:
-            logger_partner.logger.info("SERVER - failed handshake")
+            logger_partner.logger.warning("handshake failed")
             return
 
-        logger_partner.logger.info(f"SERVER - new connexion {client_address}")
-        self.inputs.append(new_socket)  # new input socket
+        self.inputs.append(new_socket)
 
 
     def close_client_connection(self, socket:socket) -> None:
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
-        logger_partner.logger.info("SERVER - Close client")
+        logger_partner.logger.info("Close client")
         self.inputs.remove(socket)
         socket.close()
 
@@ -107,7 +111,7 @@ class Server():
 
         self.inputs.append(self.socket) # Contient tous les sockets (serveur + toutes les rooms)
 
-        logger_partner.logger.info("SERVER - ready")
+        logger_partner.logger.info("start running")
 
         while self.inputs:
             try:
@@ -134,7 +138,7 @@ class Server():
 
                 is_target_json, target = Utils.get_json(target)
                 if not is_target_json:
-                    logger_partner.logger.info(f"SERVER - malformed json : '{target}'")
+                    logger_partner.logger.warning(f"malformed json : '{target}'")
                     self.close_client_connection(input_socket)
                     continue
 
@@ -159,7 +163,7 @@ class Server():
 
             # can't sleep because of handshakes
 
-        logger_partner.logger.info("SERVER - Closing server...")
+        logger_partner.logger.info("stop running")
 
 
     def callback_update_server_sockets(self, socket:socket) -> None:

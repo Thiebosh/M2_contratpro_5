@@ -19,6 +19,8 @@ class RenderPage():
         renderer_partner:PhpPartner = self.partners[RENDERER]
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
+        logger_partner.logger.info(f"{self.project_id}-{self.room_type} - init render")
+
         try:
             self.session = db_partner.aggregate_list(COLLECTION_PROJECTS, MongoQueries.getSessionFromId(self.project_id))[0]        
         except WTimeoutError as err:
@@ -34,6 +36,7 @@ class RenderPage():
             logger_partner.logger.error(PHP_PARTNER_EXCEPTION, err)
             raise InitFailedException() from err
         if not result:
+            logger_partner.logger.error(f"{self.project_id}-{self.room_type} - render - session not setted")
             raise Exception("RenderPage - PHP - session not setted")
 
         self.session_update = False
@@ -47,6 +50,8 @@ class RenderPage():
 
         if OS_IS_LOCAL:
             return
+
+        logger_partner.logger.info(f"{self.project_id}-{self.room_type} - close render")
 
         try:
             success, session = renderer_partner.get_session()
@@ -79,6 +84,8 @@ class RenderPage():
         renderer_partner:PhpPartner = self.partners[RENDERER]
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
+        logger_partner.logger.info(f"{self.project_id}-{self.room_type} - render page")
+
         try:
             result = renderer_partner.get_project_page(self.project_id, page)
             success, new_session = renderer_partner.get_session()
@@ -103,6 +110,8 @@ class RenderPage():
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         renderer_partner:PhpPartner = self.partners[RENDERER]
         logger_partner:LoggerPartner = self.partners[LOGGER]
+
+        logger_partner.logger.info(f"{self.project_id}-{self.room_type} - reset session")
 
         if self.session != {}:
             self.session = {}

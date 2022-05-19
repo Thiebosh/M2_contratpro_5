@@ -44,6 +44,8 @@ class FilesManagerProto(FilesManager):
         renderer_partner:PhpPartner = self.partners[RENDERER]
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
+        logger_partner.logger.info(f"{self.project_id}-{self.room_type} - call")
+
         try:
             renderer_partner.unset_project_files(self.project_id)
             renderer_partner.unset_project_folder(self.project_id)
@@ -57,6 +59,8 @@ class FilesManagerProto(FilesManager):
         nas_partner:DrivePartner = self.partners[NAS]
         renderer_partner:PhpPartner = self.partners[RENDERER]
         logger_partner:LoggerPartner = self.partners[LOGGER]
+
+        logger_partner.logger.info(f"{self.project_id}-{self.room_type} - call")
 
         try:
             result = renderer_partner.unset_project_files(self.project_id)

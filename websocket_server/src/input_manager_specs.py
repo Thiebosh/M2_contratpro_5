@@ -22,10 +22,11 @@ class InputManagerSpecs(InputManager):
         generator_partner:CppPartner = self.partners[GENERATOR]
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
+        logger_partner.logger.info(f"{self.room_id}-{self.room_type} - create input manager")
+
         self.send_conflict_message_callback = send_conflict_message_callback
 
         self.shared_new_proto_flag = shared_new_proto_flag
-
         try:
             result = db_partner.find_one(COLLECTION_PROJECTS, *MongoQueries.getSyntaxIdFromId(self.room_id))
         except WTimeoutError as err:
@@ -107,22 +108,26 @@ class InputManagerSpecs(InputManager):
                                                       input_to_process.get_content())
 
         elif action == "save":
+            logger_partner.logger.info(f"{self.room_id}-{self.room_type} - save specs")
+
             result = await self.json_handler.update_storage()
             logger_partner.logger.info(f"Project {'well' if result else 'not'} updated")
 
         elif action == "generate":
+            logger_partner.logger.info(f"{self.room_id}-{self.room_type} - generate proto")
+
             if self.current_version_generated:
-                logger_partner.logger.info(f"{self.room_id}-{self.room_type} - Project files already generated")
                 return True
 
             result = await self.files_manager.generate_files(json.dumps(self.json_handler.data))
-            logger_partner.logger.info(f"{self.room_id}-{self.room_type} - Project files {'well' if result else 'not'} generated")
-
             if result is False:
+                logger_partner.logger.error(f"{self.room_id}-{self.room_type} - Project files not generated")
                 return False
 
             result = await self.files_manager.update_stored_files()
-            logger_partner.logger.info(f"{self.room_id}-{self.room_type} - Project files {'well' if result else 'not'} updated")
+            if result is False:
+                logger_partner.logger.error(f"{self.room_id}-{self.room_type} - Project files not updated")
+                return False
 
             self.current_version_generated = True
             try:
@@ -138,10 +143,12 @@ class InputManagerSpecs(InputManager):
                 return False
 
             self.shared_new_proto_flag.set()
+            logger_partner.logger.info(f"{self.room_id}-{self.room_type} - proto updated")
 
         # else: error et renvoie wrong action ?
 
         if action in ["create", "update", "delete"] and result:
+            logger_partner.logger.info(f"{self.room_id}-{self.room_type} - specs updated")
             self.current_version_generated = False
             try:
                 await db_partner.update_one(COLLECTION_PROJECTS, *MongoQueries.updateProtoStateForId(self.room_id, False))

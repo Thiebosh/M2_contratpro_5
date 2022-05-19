@@ -5,6 +5,9 @@ from socket import socket
 from input_manager_specs import InputManagerSpecs
 from room import Room
 from input import Input
+from defines import *
+
+from partners.logger_partner import LoggerPartner
 
 
 class RoomSpecs(Room):
@@ -24,12 +27,15 @@ class RoomSpecs(Room):
 
 
     async def process_running_inputs(self) -> None:
+        logger_partner:LoggerPartner = self.partners[LOGGER]
+
         for input_to_process in self.input_manager.inputs:
             if (input_to_process.check_datetime()) or input_to_process.failed:
                 continue
 
             #If no conflicts, execute the action ; in every case : remove socket from list
             if self.input_manager.check_conflicts(input_to_process):
+                logger_partner.logger.info(f"{self.room_id}-{self.room_type} - conflicts")
                 continue
 
             result = await self.input_manager.check_and_execute_action_function(input_to_process)
