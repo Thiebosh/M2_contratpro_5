@@ -1,3 +1,4 @@
+from typing import Any
 from .files_manager import FilesManager
 from partners.mongo_queries import MongoQueries, COLLECTION_PROJECTS
 import os
@@ -9,14 +10,14 @@ from partners.cpp_partner import CppPartner
 from partners.logger_partner import LoggerPartner
 
 class FilesManagerSpecs(FilesManager):
-    def __init__(self, partners, project_id, room_type) -> None:
+    def __init__(self, partners:"dict[str,Any]", project_id:str, room_type:str):
         super().__init__(partners, project_id, room_type)
         self.files_currently_stored = True
         self.files=[]
         self.pages=[]
 
 
-    async def generate_files(self, specs_json):
+    async def generate_files(self, specs_json:str) -> bool:
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         generator_partner:CppPartner = self.partners[GENERATOR]
         logger_partner:LoggerPartner = self.partners[LOGGER]
@@ -56,7 +57,7 @@ class FilesManagerSpecs(FilesManager):
         return True
 
 
-    async def update_stored_files(self):
+    async def update_stored_files(self) -> bool:
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         db_partner:MongoPartner = self.partners[DB]
         nas_partner:DrivePartner = self.partners[NAS]

@@ -1,8 +1,7 @@
 import logging
-import select
-import socket
+from select import select
 import os
-from socket import timeout
+from socket import socket, timeout, AF_INET, SOCK_STREAM
 from room_manager import RoomManager
 from utils import Utils
 from defines import *
@@ -39,7 +38,7 @@ class Server():
             RENDERER: renderer or PhpPartner(base_url=os.environ.get('PHP_URL')),
             LOGGER:  logger_partner
         }
-        self.inputs = []
+        self.inputs:"list[socket]" = []
         self.polling_freq = 0.5
         self.room_m = RoomManager(self.partners)
         self.ip = OS_HOST
@@ -50,20 +49,20 @@ class Server():
         logger_partner.logger.info(INIT_DONE)
 
 
-    def init_server(self, backlog=5):
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    def init_server(self, backlog:int=5) -> None:
+        self.socket = socket(AF_INET, SOCK_STREAM)
         self.socket.setblocking(False)
 
         self.socket.bind((self.ip, self.port))
         self.socket.listen(backlog)
 
 
-    def read(self):
-        readable, _, exception = select.select(self.inputs, [], self.inputs, self.polling_freq)
+    def read(self) -> "tuple[list, list]":
+        readable, _, exception = select(self.inputs, [], self.inputs, self.polling_freq)
         return readable, exception
 
 
-    def close(self):
+    def close(self) -> None:
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
@@ -74,7 +73,7 @@ class Server():
             room.close_evt.set()
 
 
-    def add_connection(self, input_socket):
+    def add_connection(self, input_socket:socket) -> None:
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         websocket_partner:WebSocketPartner = self.partners[WEBSOCKET]
         logger_partner:LoggerPartner = self.partners[LOGGER]
@@ -91,7 +90,7 @@ class Server():
             logger_partner.logger.info('SERVER - websocket connection timeout')
 
 
-    def close_client_connection(self, socket):
+    def close_client_connection(self, socket:socket) -> None:
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
@@ -100,7 +99,7 @@ class Server():
         socket.close()
 
 
-    def run(self):
+    def run(self) -> None:
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         websocket_partner:WebSocketPartner = self.partners[WEBSOCKET]
         logger_partner:LoggerPartner = self.partners[LOGGER]
@@ -158,5 +157,5 @@ class Server():
         logger_partner.logger.info("SERVER - Closing server...")
 
 
-    def callback_update_server_sockets(self,socket):
+    def callback_update_server_sockets(self, socket:socket) -> None:
         self.inputs.append(socket)

@@ -1,10 +1,12 @@
 from abc import ABC, abstractmethod
 import asyncio
 from datetime import datetime, timedelta
-import queue
+from queue import Queue, Empty
 import threading
-import select
+from select import select
+from socket import socket
 import json
+from typing import Any
 from input_manager import InputManager
 from utils import Utils
 from defines import *
@@ -13,29 +15,30 @@ from partners.websocket_partner import WebSocketPartner
 from partners.logger_partner import LoggerPartner
 
 class Room(ABC):
-    def __init__(self, room_id, room_type, partners, callback_update_server_sockets, callback_remove_room, encoding, input_manager) -> None:
-        logger_partner = partners[LOGGER]
+    def __init__(self, room_id:str, room_type:str, partners:"dict[str, Any]", callback_update_server_sockets, callback_remove_room, encoding:str, input_manager:InputManager):
+        logger_partner:LoggerPartner = partners[LOGGER]
         logger_partner.logger.debug(f"{room_id} - {room_type} - Creating room...")
+
         self.close_evt = threading.Event()
-        self.queue = queue.Queue()
+        self.queue = Queue()
         self.lock = threading.Lock()
         self.room_id = room_id
         self.room_type = room_type
-        self.socket_name = {}
-        self.inputs = []
-        self.outputs = []
-        self.client_connection_queue = {}
+        self.socket_name:"dict[socket, str]" = {}
+        self.inputs:"list[socket]" = []
+        self.outputs:"list[socket]" = []
+        self.client_connection_queue:"dict[socket, Queue]" = {}
         self.callback_update_server_sockets = callback_update_server_sockets
         self.callback_remove_room = callback_remove_room
         self.partners = partners
         self.encoding = encoding
         self.delay = datetime.now()
 
-        self.input_manager:InputManager = input_manager
+        self.input_manager = input_manager
         logger_partner.logger.debug(f"{room_id} - {room_type} - Room created")
 
 
-    async def close(self):
+    async def close(self) -> None:
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
@@ -49,7 +52,7 @@ class Room(ABC):
 
 
 
-    def get_param(self):
+    def get_param(self) -> "dict[str, Any]":
         return {
             "close_evt": self.close_evt,
             "add_queue": self.queue,
@@ -57,22 +60,18 @@ class Room(ABC):
         }
 
 
-    def read(self, polling_freq):
-        return select.select(self.inputs, self.outputs, self.inputs, polling_freq)
-
-
-    def open_client_connection_to_room(self, socket, name):
+    def open_client_connection_to_room(self, socket:socket, name:str) -> None:
         names = list(self.socket_name.values())
 
         self.inputs.append(socket)
         self.socket_name[socket] = name
-        self.client_connection_queue[socket] = queue.Queue()
+        self.client_connection_queue[socket] = Queue()
 
         self.add_message_in_queue(socket, json.dumps({"init_collabs": names}))
         self.broadcast_message(socket, json.dumps({"add_collab": name}))
 
 
-    def close_client_connection_to_room(self, socket):
+    def close_client_connection_to_room(self, socket:socket) -> None:
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
@@ -88,13 +87,13 @@ class Room(ABC):
         self.broadcast_message(socket, json.dumps({"remove_collab": name}))
 
 
-    def add_message_in_queue(self, socket_receiver, msg):
+    def add_message_in_queue(self, socket_receiver:socket, msg:str) -> None:
         self.client_connection_queue[socket_receiver].put(msg)
         if socket_receiver not in self.outputs:
             self.outputs.append(socket_receiver)
 
-    
-    def broadcast_message(self, socket_sender, msg):
+
+    def broadcast_message(self, socket_sender:socket, msg:str) -> None:
         for client_socket in self.client_connection_queue:
             if socket_sender == client_socket:
                 continue
@@ -106,7 +105,7 @@ class Room(ABC):
         pass
 
 
-    async def run(self, polling_freq=0.1):
+    async def run(self, polling_freq:int=0.1) -> None:
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         websocket_partner:WebSocketPartner = self.partners[WEBSOCKET]
         logger_partner:LoggerPartner = self.partners[LOGGER]
@@ -125,7 +124,7 @@ class Room(ABC):
                     continue
 
                 try:
-                    readable, writable, exception = self.read(polling_freq)
+                    readable, writable, exception = select(self.inputs, self.outputs, self.inputs, polling_freq)
                 except KeyboardInterrupt:
                     break
 
@@ -154,7 +153,7 @@ class Room(ABC):
                 for socket in writable:
                     try:
                         next_msg = self.client_connection_queue[socket].get_nowait()  # unqueue msg
-                    except queue.Empty:
+                    except Empty:
                         self.outputs.remove(socket)
                     else:
                         websocket_partner.send(socket, next_msg, self.encoding)

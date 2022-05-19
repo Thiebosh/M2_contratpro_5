@@ -1,7 +1,9 @@
+from typing import Any
 from input_manager import InputManager
 from brique1.json_handler import JsonHandler
 from brique2.files_manager_specs import FilesManagerSpecs
 import json
+from asyncio import Event
 from partners.mongo_queries import MongoQueries, COLLECTION_PROJECTS
 from input_specs import InputSpecs
 from defines import *
@@ -12,7 +14,7 @@ from partners.logger_partner import LoggerPartner
 
 
 class InputManagerSpecs(InputManager):
-    def __init__(self, room_id, room_type, shared_new_proto_flag, partners, send_conflict_message_callback) -> None:
+    def __init__(self, room_id:str, room_type:str, shared_new_proto_flag:Event, partners:"dict[str,Any]", send_conflict_message_callback) -> None:
         super().__init__(room_id, room_type, partners)
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         db_partner:MongoPartner = self.partners[DB]
@@ -35,11 +37,13 @@ class InputManagerSpecs(InputManager):
         #     self.json_handler.data = json.loads(file.read().replace('\n', '').replace('\n', ''))
         # self.current_version_generated = False
 
-    async def close(self):
+
+    async def close(self) -> None:
         await self.json_handler.close()
         self.files_manager.close()
 
-    def check_conflicts(self, input_to_process:InputSpecs):
+
+    def check_conflicts(self, input_to_process:InputSpecs) -> bool:
         for current_input in self.inputs:
             if current_input == input_to_process or current_input.failed:
                 continue
@@ -63,7 +67,7 @@ class InputManagerSpecs(InputManager):
         return input_to_process.failed
 
 
-    async def check_and_execute_action_function(self, input_to_process):
+    async def check_and_execute_action_function(self, input_to_process:InputSpecs) -> bool:
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         db_partner:MongoPartner = self.partners[DB]
         logger_partner:LoggerPartner = self.partners[LOGGER]

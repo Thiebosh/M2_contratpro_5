@@ -1,16 +1,21 @@
 import threading
 import asyncio
+from socket import socket
+from typing import Any
+from room import Room
 from room_specs import RoomSpecs
 from room_proto import RoomProto
 
 class RoomManager():
-    def __init__(self, partners) -> None:
-        self.rooms = {}
-        self.shared = {} # room id to tuple lock - container
+    def __init__(self, partners:"dict[str,Any]") -> None:
+        self.rooms:"dict[str, Room]" = {}
+        self.shared:"dict[str,dict[str,Any]]" = {}
         self.partners = partners
 
-    def copy_partners_dict(self):
+
+    def copy_partners_dict(self) -> "dict[str,Any]":
         return {key: p.copy_partner() for key, p in self.partners.items()}
+
 
     def create_room(self, room_id, room_type, socket, name, callback_update_server_sockets, encoding):
         if room_id not in self.shared:
@@ -38,11 +43,13 @@ class RoomManager():
         worker.setDaemon(True)
         worker.start()
 
-    def add_client_to_room(self, room_id, room_type, socket, name):
+
+    def add_client_to_room(self, room_id:str, room_type:str, socket:socket, name:str) -> None:
         with self.rooms[f"{room_id}-{room_type}"].lock:
             self.rooms[f"{room_id}-{room_type}"].queue.put({"socket": socket, "name": name})
 
-    def callback_remove_room(self, room_id, room_type):
+
+    def callback_remove_room(self, room_id:str, room_type:str) -> None:
         self.rooms.pop(f"{room_id}-{room_type}")
 
         if not any(room_id in name for name in self.rooms.keys()):
