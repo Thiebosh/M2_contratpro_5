@@ -7,9 +7,9 @@ from room import Room
 from input import Input
 
 class RoomSpecs(Room):
-    def __init__(self, room_id:str, room_type:str, shared_new_proto_flag:Event, partners:"dict[str, Any]", callback_update_server_sockets, callback_remove_room, encoding:str) -> None:
+    def __init__(self, room_id:str, room_type:str, shared_new_proto_flag:Event, partners:"dict[str, Any]", callback_update_server_sockets, callback_remove_room) -> None:
         input_manager = InputManagerSpecs(room_id, room_type, shared_new_proto_flag, partners, self.send_conflict_message)
-        super().__init__(room_id, room_type, partners, callback_update_server_sockets, callback_remove_room, encoding, input_manager)
+        super().__init__(room_id, room_type, partners, callback_update_server_sockets, callback_remove_room, input_manager)
 
 
     def open_client_connection_to_room(self, socket:socket, name:str) -> None:

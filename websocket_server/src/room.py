@@ -15,7 +15,7 @@ from partners.websocket_partner import WebSocketPartner, WebSocketCoreException
 from partners.logger_partner import LoggerPartner
 
 class Room(ABC):
-    def __init__(self, room_id:str, room_type:str, partners:"dict[str, Any]", callback_update_server_sockets, callback_remove_room, encoding:str, input_manager:InputManager):
+    def __init__(self, room_id:str, room_type:str, partners:"dict[str, Any]", callback_update_server_sockets, callback_remove_room, input_manager:InputManager):
         logger_partner:LoggerPartner = partners[LOGGER]
         logger_partner.logger.debug(f"{room_id} - {room_type} - Creating room...")
 
@@ -31,7 +31,6 @@ class Room(ABC):
         self.callback_update_server_sockets = callback_update_server_sockets
         self.callback_remove_room = callback_remove_room
         self.partners = partners
-        self.encoding = encoding
         self.delay = datetime.now()
 
         self.input_manager = input_manager
@@ -131,7 +130,7 @@ class Room(ABC):
                 for socket in readable: #Get all sockets and put the ones which have a msg to a list
                     msg = None
                     try:
-                        msg = websocket_partner.recv(socket, self.encoding)
+                        msg = websocket_partner.recv(socket, ENCODING)
                     except WebSocketCoreException as err:
                         logger_partner.logger.error(WS_PARTNER_EXCEPTION, err)
 
@@ -161,7 +160,7 @@ class Room(ABC):
                     except Empty:
                         self.outputs.remove(socket)
                     else:
-                        websocket_partner.send(socket, next_msg, self.encoding)
+                        websocket_partner.send(socket, next_msg)
 
                 for socket in exception:
                     self.close_client_connection_to_room(socket)

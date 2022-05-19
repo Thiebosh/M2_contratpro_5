@@ -17,7 +17,7 @@ class RoomManager():
         return {key: p.copy_partner() for key, p in self.partners.items()}
 
 
-    def create_room(self, room_id, room_type, socket, name, callback_update_server_sockets, encoding):
+    def create_room(self, room_id, room_type, socket, name, callback_update_server_sockets):
         if room_id not in self.shared:
             self.shared[room_id] = {"new_proto_flag": asyncio.Event()}
         shared_new_proto_flag = self.shared[room_id]["new_proto_flag"]
@@ -29,7 +29,6 @@ class RoomManager():
             "partners": self.copy_partners_dict(),
             "callback_update_server_sockets": callback_update_server_sockets,
             "callback_remove_room": self.callback_remove_room,
-            "encoding": encoding
         }
         if room_type == "specs":
             room = RoomSpecs(**args)

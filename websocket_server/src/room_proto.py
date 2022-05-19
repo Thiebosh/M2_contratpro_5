@@ -6,11 +6,11 @@ from input_manager_proto import InputManagerProto
 from room import Room
 
 class RoomProto(Room):
-    def __init__(self, room_id:str, room_type:str, shared_new_proto_flag:Event, partners:"dict[str,Any]", callback_update_server_sockets, callback_remove_room, encoding:str) -> None:
+    def __init__(self, room_id:str, room_type:str, shared_new_proto_flag:Event, partners:"dict[str,Any]", callback_update_server_sockets, callback_remove_room) -> None:
         shared_new_proto_flag.clear()
 
         input_manager = InputManagerProto(room_id, room_type, partners)
-        super().__init__(room_id, room_type, partners, callback_update_server_sockets, callback_remove_room, encoding, input_manager)
+        super().__init__(room_id, room_type, partners, callback_update_server_sockets, callback_remove_room, input_manager)
 
         self.shared_new_proto_flag = shared_new_proto_flag
         self.update_proto:int = 0

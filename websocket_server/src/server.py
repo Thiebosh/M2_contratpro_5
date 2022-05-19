@@ -43,7 +43,6 @@ class Server():
         self.room_m = RoomManager(self.partners)
         self.ip = OS_HOST
         self.port = OS_PORT
-        self.encoding = ENCODING
         self.init_server()
 
         logger_partner.logger.info(INIT_DONE)
@@ -57,7 +56,7 @@ class Server():
         self.socket.listen(backlog)
 
 
-    def read(self) -> "tuple[list, list]":
+    def read(self) -> "tuple[list[socket], list[socket]]":
         readable, _, exception = select(self.inputs, [], self.inputs, self.polling_freq)
         return readable, exception
 
@@ -80,7 +79,7 @@ class Server():
 
         new_socket, client_address = input_socket.accept()
         try:
-            if websocket_partner.handshake(new_socket, self.encoding):
+            if websocket_partner.handshake(new_socket):
                 logger_partner.logger.info(f"SERVER - new connexion {client_address}")
                 self.inputs.append(new_socket)  # new input socket
             else:
@@ -123,7 +122,7 @@ class Server():
 
                 target = None
                 try:
-                    target = websocket_partner.recv(input_socket, self.encoding)
+                    target = websocket_partner.recv(input_socket)
                 except WebSocketCoreException as err:
                     logger_partner.logger.error(WS_PARTNER_EXCEPTION, err)
 
@@ -142,7 +141,7 @@ class Server():
                     and "author" in target:
 
                     if not f"{target['roomId']}-{target['type']}" in self.room_m.rooms:
-                        self.room_m.create_room(target['roomId'], target['type'], input_socket, target["author"], self.callback_update_server_sockets, self.encoding)
+                        self.room_m.create_room(target['roomId'], target['type'], input_socket, target["author"], self.callback_update_server_sockets)
 
                     else:
                         self.room_m.add_client_to_room(target['roomId'], target['type'], input_socket, target["author"])
