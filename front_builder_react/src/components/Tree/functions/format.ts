@@ -65,6 +65,9 @@ function formatField(node:any, key:string){
 }
 
 export function formatData(data:any){
+    if (g_syntax === undefined){
+        return;
+    }
     for (const key in data){
         if (skipKey(key)){
             continue;
