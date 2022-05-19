@@ -8,7 +8,7 @@ from partners.mongo_queries import MongoQueries, COLLECTION_PROJECTS
 from input_specs import InputSpecs
 from defines import *
 
-from partners.mongo_partner import MongoPartner
+from partners.mongo_partner import MongoPartner, WTimeoutError, WriteException, MongoCoreException
 from partners.cpp_partner import CppPartner
 from partners.logger_partner import LoggerPartner
 
@@ -19,17 +19,30 @@ class InputManagerSpecs(InputManager):
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         db_partner:MongoPartner = self.partners[DB]
         generator_partner:CppPartner = self.partners[GENERATOR]
+        logger_partner:LoggerPartner = self.partners[LOGGER]
 
         self.send_conflict_message_callback = send_conflict_message_callback
 
         self.shared_new_proto_flag = shared_new_proto_flag
 
-        generator_partner.set_exe_file(db_partner.find_one(COLLECTION_PROJECTS, *MongoQueries.getSyntaxIdFromId(self.room_id))["syntax_id"])
+        try:
+            result = db_partner.find_one(COLLECTION_PROJECTS, *MongoQueries.getSyntaxIdFromId(self.room_id))
+        except WTimeoutError as err:
+            logger_partner.logger.critical(MONGO_PARTNER_TIMEOUT, err)
+        except MongoCoreException as err:
+            logger_partner.logger.error(MONGO_PARTNER_EXCEPTION, err)
+
+        generator_partner.set_exe_file(result["syntax_id"])
 
         self.json_handler = JsonHandler(self.partners, room_id, room_type)
         self.files_manager = FilesManagerSpecs(self.partners, room_id, room_type)
 
-        self.current_version_generated = db_partner.find_one(COLLECTION_PROJECTS, *MongoQueries.getProtoStateFromId(self.room_id))['latest_proto']
+        try:
+            self.current_version_generated = db_partner.find_one(COLLECTION_PROJECTS, *MongoQueries.getProtoStateFromId(self.room_id))['latest_proto']
+        except WTimeoutError as err:
+            logger_partner.logger.critical(MONGO_PARTNER_TIMEOUT, err)
+        except MongoCoreException as err:
+            logger_partner.logger.error(MONGO_PARTNER_EXCEPTION, err)
 
         # tmp test
         # import pathlib
@@ -107,7 +120,17 @@ class InputManagerSpecs(InputManager):
             logger_partner.logger.debug(f"{self.room_id}-{self.room_type} - Project files {'well' if result else 'not'} updated")
 
             self.current_version_generated = True
-            await db_partner.update_one_async(COLLECTION_PROJECTS, *MongoQueries.updateProtoStateForId(self.room_id, True))
+            try:
+                await db_partner.update_one(COLLECTION_PROJECTS, *MongoQueries.updateProtoStateForId(self.room_id, True))
+            except WriteException as err:
+                logger_partner.logger.error(MONGO_PARTNER_WRITE_ERROR, err)
+                return False
+            except WTimeoutError as err:
+                logger_partner.logger.critical(MONGO_PARTNER_TIMEOUT, err)
+                return False
+            except MongoCoreException as err:
+                logger_partner.logger.error(MONGO_PARTNER_EXCEPTION, err)
+                return False
 
             self.shared_new_proto_flag.set()
 
@@ -115,6 +138,16 @@ class InputManagerSpecs(InputManager):
 
         if action in ["create", "update", "delete"] and result:
             self.current_version_generated = False
-            await db_partner.update_one_async(COLLECTION_PROJECTS, *MongoQueries.updateProtoStateForId(self.room_id, False))
+            try:
+                await db_partner.update_one(COLLECTION_PROJECTS, *MongoQueries.updateProtoStateForId(self.room_id, False))
+            except WriteException as err:
+                logger_partner.logger.error(MONGO_PARTNER_WRITE_ERROR, err)
+                return False
+            except WTimeoutError as err:
+                logger_partner.logger.critical(MONGO_PARTNER_TIMEOUT, err)
+                return False
+            except MongoCoreException as err:
+                logger_partner.logger.error(MONGO_PARTNER_EXCEPTION, err)
+                return False
 
         return result

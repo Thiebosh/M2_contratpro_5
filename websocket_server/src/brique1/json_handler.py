@@ -2,7 +2,7 @@ from typing import Any
 from partners.mongo_queries import MongoQueries, COLLECTION_PROJECTS
 from defines import *
 
-from partners.mongo_partner import MongoPartner
+from partners.mongo_partner import MongoPartner, WTimeoutError,WriteException, MongoCoreException
 from partners.logger_partner import LoggerPartner
 
 class JsonHandler():
@@ -19,8 +19,14 @@ class JsonHandler():
 
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         db_partner:MongoPartner = self.partners[DB]
+        logger_partner:LoggerPartner = self.partners[LOGGER]
 
-        self.data = db_partner.aggregate_list(COLLECTION_PROJECTS, MongoQueries.getSpecsFromId(self.project_id))[0]
+        try:
+            self.data = db_partner.aggregate_list(COLLECTION_PROJECTS, MongoQueries.getSpecsFromId(self.project_id))[0]
+        except WTimeoutError as err:
+            logger_partner.logger.critical(MONGO_PARTNER_TIMEOUT, err)
+        except MongoCoreException as err:
+            logger_partner.logger.error(MONGO_PARTNER_EXCEPTION, err)
 
 
     async def close(self) -> None:
@@ -40,10 +46,18 @@ class JsonHandler():
         if self.json_currently_stored:
             return True
 
-        self.json_currently_stored = await db_partner.update_one_async(
-            COLLECTION_PROJECTS,
-            *MongoQueries.updateSpecsForId(self.project_id, self.data)
-        )
+        try:
+            self.json_currently_stored = await db_partner.update_one(COLLECTION_PROJECTS, *MongoQueries.updateSpecsForId(self.project_id, self.data))
+        except WriteException as err:
+            logger_partner.logger.error(MONGO_PARTNER_WRITE_ERROR, err)
+            return False
+        except WTimeoutError as err:
+            logger_partner.logger.critical(MONGO_PARTNER_TIMEOUT, err)
+            return False
+        except MongoCoreException as err:
+            logger_partner.logger.error(MONGO_PARTNER_EXCEPTION, err)
+            return False
+
         return self.json_currently_stored
 
 

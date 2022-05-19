@@ -1,53 +1,66 @@
+from typing import Any, Collection
 from pymongo import MongoClient
-from pymongo.errors import WriteError
+from pymongo.errors import PyMongoError, WTimeoutError, WriteError
 
-LOGGER_ID = "MongoPartner:"
+COLLECTION_PROJECTS="projects"
+
+class MongoCoreException(Exception):
+    """Base class for all MongoCore exceptions"""
+
+class TimeoutException(MongoCoreException):
+    pass
+
+class WriteException(MongoCoreException):
+    pass
+
 
 class MongoPartner:
-    def __init__(self, mongo_url):
+    def __init__(self, mongo_url:str):
         self.mongo_url = mongo_url
         self.conn = MongoClient(mongo_url, tlsAllowInvalidCertificates=True)
         self.collections = {
-            "projects": self.conn.spectry.projects
+            COLLECTION_PROJECTS: self.conn.spectry.projects,
         }
+
 
     def copy_partner(self):
         return MongoPartner(self.mongo_url)
 
-    def close(self):
+
+    def close(self) -> None:
         self.conn.close()
 
 
-    async def update_one_async(self, collection, filter_q, update_q):
-        if collection not in self.collections:
-            return False
-
-        success = False
+    async def update_one(self, collection:Collection, filter_q:"dict[str, Any]", update_q:"dict[str, Any]") -> bool:
         try:
             result = self.collections[collection].update_one(filter_q, update_q)
-            success = result.acknowledged
-            print(f"{LOGGER_ID} updated {result.modified_count} doc")
+        except WriteError as err:
+            raise WriteException() from err
+        except WTimeoutError as err:
+            raise TimeoutException() from err
+        except PyMongoError as err:
+            raise MongoCoreException("update_one global error") from err
 
-        except WriteError as error:
-            print(LOGGER_ID, error.details)
-
-        except Exception as e:
-            print("something went wrong...")
-            print(type(e))
-            print(e)
-
-        return success
+        return result.acknowledged
 
 
-    def find_one(self, collection, filter_q, fields=None):
-        if collection not in self.collections:
-            return False
+    def find_one(self, collection:Collection, filter_q:"dict[str, Any]", fields:"dict[str, Any]|None"=None) -> "dict[str, Any]":
+        try:
+            result = self.collections[collection].find_one(filter_q, fields)
+        except WTimeoutError as err:
+            raise TimeoutException() from err
+        except PyMongoError as err:
+            raise MongoCoreException("find_one global error") from err
 
-        return self.collections[collection].find_one(filter_q, fields)
+        return result
 
 
-    def aggregate_list(self, collection, aggregation):
-        if collection not in self.collections:
-            return False
+    def aggregate_list(self, collection:Collection, aggregation:"dict[str, Any]") -> "list[dict[str, Any]]":
+        try:
+            result = list(self.collections[collection].aggregate(aggregation))
+        except WTimeoutError as err:
+            raise TimeoutException() from err
+        except PyMongoError as err:
+            raise MongoCoreException("aggregate_list global error") from err
 
-        return list(self.collections[collection].aggregate(aggregation))
+        return result

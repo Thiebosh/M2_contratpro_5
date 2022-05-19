@@ -4,7 +4,7 @@ from partners.mongo_queries import MongoQueries, COLLECTION_PROJECTS
 import os
 from defines import *
 
-from partners.mongo_partner import MongoPartner
+from partners.mongo_partner import MongoPartner, WTimeoutError,WriteException, MongoCoreException
 from partners.drive_partner import DrivePartner
 from partners.cpp_partner import CppPartner
 from partners.logger_partner import LoggerPartner
@@ -72,7 +72,18 @@ class FilesManagerSpecs(FilesManager):
             logger_partner.logger.debug(f"{self.project_id}-{self.room_type} - Project upload to storage failed")
             return False
 
-        result = await db_partner.update_one_async(COLLECTION_PROJECTS, *MongoQueries.updateProtoPagesForId(self.project_id, self.pages))
+        try:
+            result = await db_partner.update_one(COLLECTION_PROJECTS, *MongoQueries.updateProtoPagesForId(self.project_id, self.pages))
+        except WriteException as err:
+            logger_partner.logger.error(MONGO_PARTNER_WRITE_ERROR, err)
+            return False
+        except WTimeoutError as err:
+            logger_partner.logger.critical(MONGO_PARTNER_TIMEOUT, err)
+            return False
+        except MongoCoreException as err:
+            logger_partner.logger.error(MONGO_PARTNER_EXCEPTION, err)
+            return False
+
         if not result:
             logger_partner.logger.debug(f"{self.project_id}-{self.room_type} - Project pages update in db failed")
             return False
