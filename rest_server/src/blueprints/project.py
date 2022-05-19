@@ -1,4 +1,4 @@
-from quart import Blueprint, json, request, current_app
+from quart import Blueprint, request, current_app
 from werkzeug.datastructures import ImmutableMultiDict
 from flask_api import status
 from utils import Utils
