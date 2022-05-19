@@ -49,7 +49,6 @@ export function CreateProject() {
 
         postProjectCreate(name, currentCollabIds, syntaxId, description)
             .then((data) => {
-                console.log(data);
                 if (data.success === "already exist") {
                     setErrorMsg("Project name already used");
                     return;

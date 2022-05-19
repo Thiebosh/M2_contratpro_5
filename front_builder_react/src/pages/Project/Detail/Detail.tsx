@@ -47,7 +47,6 @@ function Edit(props: EditProps) {
     function triggerDelete() {
         postProjectDelete(projectId)
             .then((data) => {
-                console.log(data)
                 if (!data.success) {
                     setDeleteMsg("Something wrong appened");
                     return;
@@ -117,7 +116,6 @@ export function Detail() {
                         setProjectDescription(data.result.description);
                     })
                     .catch(error => {
-                        console.log("Error:", error);
                         setErrorMsg("Internal error");
                         console.log("Error:", error);
                     });
@@ -142,11 +140,9 @@ export function Detail() {
         }
 
         const projectNameEdit = editName.replaceAll(/\s\s+/g, ' ').trim();
-        console.log(projectNameEdit);
 
         postProjectUpdate(projectId, projectNameEdit, addCollabIds, removeCollabIds, editDescription, deleteDescription)
             .then((data) => {
-                console.log(data);
                 if (data.success === "already exist") {
                     setErrorMsg("Username already used");
                     return;
