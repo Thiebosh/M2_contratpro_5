@@ -10,7 +10,6 @@ class CppPartner():
 
         if state == None:
             self.state = os.path.exists(folder_path)
-            print(f"cpp - folder path is {'correct' if self.state else 'incorrect'}")
 
     def copy_partner(self):
         return CppPartner(folder_path=self.folder_path, state=True)
@@ -18,7 +17,6 @@ class CppPartner():
     def set_exe_file(self, exe_name):
         self.exe_path = f"{self.folder_path}/{exe_name}.exe"
         self.state = os.path.exists(self.exe_path)
-        print(f"cpp - exe path is {'correct' if self.state else 'incorrect'}")
 
     async def call(self, args, poll_freq=0.4):
         if not self.state or not self.exe_path:

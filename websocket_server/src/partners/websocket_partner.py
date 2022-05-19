@@ -1,13 +1,14 @@
 import base64
 import hashlib
 import struct
+from socket import socket
 
 class WebSocketPartner():
     def copy_partner(self):
         return WebSocketPartner()
 
     @staticmethod
-    def handshake(conn, encoding):
+    def handshake(conn:socket, encoding:str):
         key = None
         conn.setblocking(True)
         data = conn.recv(8192).decode(encoding)
@@ -31,7 +32,7 @@ class WebSocketPartner():
         return True
 
     @staticmethod
-    def recv(conn, encoding, size=8192):
+    def recv(conn:socket, encoding:str, size:int=8192):
         conn.setblocking(True)
         data = conn.recv(size)
         conn.setblocking(False)
@@ -64,7 +65,7 @@ class WebSocketPartner():
             return ret
 
     @staticmethod
-    def send(conn, data:str, encoding):
+    def send(conn:socket, data:str, encoding:str):
         # tmp remplace : see how to use recv mask method in reverse way
         data = data.replace("é", "e")\
                     .replace("è", "e")\
