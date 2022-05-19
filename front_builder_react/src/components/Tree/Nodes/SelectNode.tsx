@@ -10,8 +10,9 @@ export default function SelectNode({nodeDatum, updateSelect}: {nodeDatum: any, u
       <foreignObject width={120} height={60} y={-30} x={-60}>
         <label>{nodeDatum.syntaxKey}</label>
         <select onChange={handleSelect}>
-          {nodeDatum.values.map((v:any) =>
-          {return <option value={v}>{v}</option>})}
+          {nodeDatum.values.map((optionValue:any) => (
+            <option key={optionValue} value={optionValue}>{optionValue}</option>
+          ))}
         </select>
       </foreignObject>
     </g>

@@ -63,6 +63,7 @@ export function CustomTree(props:CustomTreeProps){
             translate={{x:window.innerWidth/4,y:window.innerHeight/2}}
             transitionDuration={0.5}
             renderCustomNodeElement={renderRectSvgNode}
+            separation={{siblings: 1, nonSiblings: 1}}
         />
     ) : (
       <h1>Loading...</h1>

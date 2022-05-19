@@ -26,7 +26,7 @@ function formatArray(node:any, key:string){
     }
 }
 
-function formatObject(node:any, key:string){
+function formatObject(node:any, key:string) {
     node[key].syntaxKey = key;
     node[key].parent = node;
 
