@@ -20,6 +20,8 @@ export function Specs() {
     const [isOpen, setIsOpen] = useState(false);
     const [modalElements, setModalElements] = useState([]);
     const [tree, setTree] = useState<any>();
+    const [syntax, setSyntax] = useState<any>();
+
 
 
     useEffect(() => {
@@ -30,6 +32,11 @@ export function Specs() {
             postProjectGetSyntaxId(data.project_id)
             .then((data) => {
                 setSyntaxId(data.id);
+                fetch("/syntaxes/"+data.id+".json")
+                .then(syntax => syntax.json())
+                .then(syntaxJson => {
+                    setSyntax(syntaxJson);
+                })
             })
             .catch(error => {
                 // setErrorMsg("Internal error");
@@ -78,14 +85,28 @@ export function Specs() {
         }
     }, [projectId, userContext.user.name, socketUsable]);
 
-    const [addPath, setAddPath] = useState<any>();
+    const [socketActionData, setSocketActionData] = useState<any>();
 
     useEffect(() => {
-        if (addPath) {
-            findNodeWithPathForCreate(addPath, tree, setTree);
-            setAddPath(undefined);
+        if (socketActionData) {
+            const splittedPathData = socketActionData.path.split("/");
+            const content = socketActionData.content;
+            const lastPathElement = splittedPathData[splittedPathData.length - 1];
+            const isLastPathElementNumber = !isNaN(parseInt(lastPathElement));
+            //if last path element is a number : means that we are adding to an array element
+            
+            if (content && (isLastPathElementNumber || syntax[lastPathElement].type !== "array")){
+                for (let key of Object.keys(content)){
+                    findNodeWithPathForCreate(socketActionData.path + "/" + key, tree, setTree); 
+                    /*concat with content if not array because adding new object/field... has the new one key in socket content
+                    for array, we know that we have to add a child with key equals to last path element*/
+                }
+            } else {
+                findNodeWithPathForCreate(socketActionData.path, tree, setTree);
+            }
+            setSocketActionData(undefined);
         }
-    }, [addPath, tree]);
+    }, [socketActionData, tree, syntax]);
     
     useEffect(() => {
         if (!socket) return;
@@ -118,7 +139,7 @@ export function Specs() {
             }
 
             if("action" in data){
-                setAddPath(data.path);                
+                setSocketActionData(data);                
             }
         };
 
@@ -183,7 +204,7 @@ export function Specs() {
             </div>
             <div id="treeContent" className={isOpen ? "inactive": ""}>
                 { syntaxId &&
-                    <CustomTree syntax_filename={syntaxId} tree={tree} setTree={setTree} openClose={setIsOpen} socket={socket} setModalElements={setModalElements}/>
+                    <CustomTree tree={tree} setTree={setTree} syntax={syntax} openClose={setIsOpen} socket={socket} setModalElements={setModalElements}/>
                 }
             </div>
             <div className="modal-overlay">

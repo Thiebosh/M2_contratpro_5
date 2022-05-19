@@ -30,12 +30,12 @@ export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch
     const values = g_syntax[suggestion].values;
     let node;
     let parent = nodeData.type === "adding" ? nodeData.parent : nodeData;
-    let content;
+    let jsonContent;
     if (values){
         initChildrenIfNotDone(parent);
         node = initNewNode(suggestion, parent)
     
-        content = createMandatoryChildren(node);
+        jsonContent = createMandatoryChildren(node);
         
         addNewNodeAsValueInNodeData(node);
         parent.children.splice(-1,0,node);
@@ -44,7 +44,7 @@ export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch
     } else {
         node = initNewNode(suggestion, parent)
     
-        content = createMandatoryChildren(node);
+        jsonContent = createMandatoryChildren(node);
 
         addNewNodeAsValueInNodeData(node);
         parent.children.splice(-1,0,node);
@@ -52,12 +52,28 @@ export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch
     }
 
     if (socket){
+        //@ts-ignore
+        const splittedPath = node.path.split("/");
+        let jsonPath =splittedPath.slice(0, -1).join("/");
+
+        if (!(g_syntax[node.syntaxKey].type === "array")){
+            jsonContent[splittedPath[splittedPath.length - 1]] = "";
+        }
+        console.log(JSON.stringify(
+            {
+                action:"create",
+                //@ts-ignore
+                path:jsonPath,
+                content:jsonContent
+            }
+            ))
+        //@ts-ignore
         socket.send(JSON.stringify(
             {
                 action:"create",
                 //@ts-ignore
-                path:g_syntax[node.syntaxKey].type === "array" ? node.path.split("/").slice(0, -1).join("/")  : node.path,
-                content:content
+                path:jsonPath,
+                content:jsonContent
             }
             ))
     }

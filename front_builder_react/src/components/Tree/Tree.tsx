@@ -12,9 +12,9 @@ import TextNode from "./Nodes/TextNode";
 // la doc : https://bkrem.github.io/react-d3-tree/docs/interfaces/_tree_types_.treeprops.html
 
 interface CustomTreeProps {
-    syntax_filename:string,
     tree:any,
     setTree:React.Dispatch<any>,
+    syntax:any,
     openClose:Function,
     setModalElements:Function,
     socket:any
@@ -24,12 +24,11 @@ export let g_syntax:any = {};
 
 export function CustomTree(props:CustomTreeProps){
 
-    const [syntax, setSyntax] = useState<any>();
 
     useEffect(() => {
         getDataFromJson()
-        .then((data => init(props.syntax_filename, data, props.setTree, setSyntax)));
-    }, [props.setTree, props.syntax_filename])
+        .then((data => init(props.syntax, data, props.setTree)));
+    }, [props.setTree, props.syntax])
 
     function updateSelect(e: any) {
         console.log('new select:', e)
@@ -71,18 +70,13 @@ export function CustomTree(props:CustomTreeProps){
 }
 
 
-function init(filename:string, data:any, setTree:React.Dispatch<any>, setSyntax:React.Dispatch<any>){
-    fetch("/syntaxes/"+filename+".json")
-    .then(syntax => syntax.json())
-    .then(syntaxJson => {
-        setSyntax(syntaxJson);
-        g_syntax = syntaxJson;
-        data["root"].path = "root"
-        formatData(data);
-        data = data["root"];
-        data.parent = null;
-        setTree(data);
-    })
+function init(syntax:any, data:any, setTree:React.Dispatch<any>){
+    g_syntax = syntax;
+    data["root"].path = "root"
+    formatData(data);
+    data = data["root"];
+    data.parent = null;
+    setTree(data);
 }
 
 function getDataFromJson():Promise<Record<string, unknown>>{
