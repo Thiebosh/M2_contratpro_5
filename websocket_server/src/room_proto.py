@@ -31,11 +31,15 @@ class RoomProto(Room):
             self.update_proto = 0
             self.input_manager.inputs = [] # discard all requests
 
-            self.input_manager.render_page.reset_session()
-            self.input_manager.files_manager.reload_files()
+            if not self.input_manager.render_page.reset_session():
+                return
+
+            self.broadcast_message(None, json.dumps({"set_session": self.input_manager.render_page.session}))
+
+            if not self.input_manager.files_manager.reload_files():
+                return
 
             self.broadcast_message(None, json.dumps({"proto_update": False}))
-            self.broadcast_message(None, json.dumps({"set_session": self.input_manager.render_page.session}))
             return
 
         for input_to_process in self.input_manager.inputs:

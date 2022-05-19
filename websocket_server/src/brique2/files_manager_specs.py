@@ -5,7 +5,7 @@ import os
 from defines import *
 
 from partners.mongo_partner import MongoPartner, WTimeoutError,WriteException, MongoCoreException
-from partners.drive_partner import DrivePartner
+from partners.drive_partner import DrivePartner, MultipleIdsException, ExecutionException, DriveCoreException
 from partners.cpp_partner import CppPartner
 from partners.logger_partner import LoggerPartner
 
@@ -67,7 +67,18 @@ class FilesManagerSpecs(FilesManager):
             logger_partner.logger.debug(f"{self.project_id}-{self.room_type} - Project files already stored")
             return True
 
-        result = nas_partner.upload_files_to_folder(self.project_id, self.files)
+        try:
+            result = nas_partner.upload_files_to_folder(self.project_id, self.files)
+        except MultipleIdsException as err:
+            logger_partner.logger.critical(DRIVE_PARTNER_MULTIPLE_IDS, err)
+            return False
+        except ExecutionException as err:
+            logger_partner.logger.error(DRIVE_PARTNER_ERROR, err)
+            return False
+        except DriveCoreException as err:
+            logger_partner.logger.error(MONGO_PARTNER_EXCEPTION, err)
+            return False
+
         if not result:
             logger_partner.logger.debug(f"{self.project_id}-{self.room_type} - Project upload to storage failed")
             return False
