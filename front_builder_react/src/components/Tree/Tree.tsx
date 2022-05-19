@@ -4,7 +4,7 @@ import {formatData} from "./functions/format"
 import {addChildren} from "./functions/node"
 
 import './Tree.scss';
-import TextInputNode from "./Nodes/TextInputNode";
+import InputNode from "./Nodes/InputNode";
 import SelectNode from "./Nodes/SelectNode";
 import AddElementNode from "./Nodes/AddElementNode";
 import TextNode from "./Nodes/TextNode";
@@ -44,7 +44,7 @@ export function CustomTree(props:CustomTreeProps){
 
     const renderRectSvgNode = ({ nodeDatum, toggleNode }:any) => {
         if(nodeDatum.type === "input"){
-            return <TextInputNode nodeDatum={nodeDatum} updateValue={updateValue} />;
+            return <InputNode nodeDatum={nodeDatum} updateValue={updateValue} />;
         }
         else if (nodeDatum.type === "select"){
             return <SelectNode nodeDatum={nodeDatum} updateSelect={updateSelect} />

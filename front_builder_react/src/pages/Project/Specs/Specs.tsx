@@ -135,7 +135,7 @@ export function Specs() {
 
                 case "create":
                     data["create"] ? setSuccessMsg("Create: success") : setErrorMsg("Create: failure");
-                    break
+                    break;
             }
 
             if("action" in data){

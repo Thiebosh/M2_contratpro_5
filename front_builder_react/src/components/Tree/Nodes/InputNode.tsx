@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function TextInputNode({ nodeDatum, updateValue }: {nodeDatum:any, updateValue: Function}) {
+export default function InputNode({ nodeDatum, updateValue }: {nodeDatum:any, updateValue: Function}) {
   let updateDelay: NodeJS.Timeout;
 
   function handleChange(e: any) {
