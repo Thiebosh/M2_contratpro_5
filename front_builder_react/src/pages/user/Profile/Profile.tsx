@@ -51,7 +51,6 @@ function Edit(props: EditProps) {
         }
 
         const userName = name.replaceAll(/\s\s+/g, ' ').trim();
-        console.log(userName);
 
         postAccountUpdate(userContext.user.id, userName, password)
             .then((data) => {
@@ -59,7 +58,7 @@ function Edit(props: EditProps) {
                     setErrorMsg("Username already used");
                     return;
                 }
-                props.setName(userName);
+                if (userName) props.setName(userName);
                 props.editOff();
             })
             .catch(error => {

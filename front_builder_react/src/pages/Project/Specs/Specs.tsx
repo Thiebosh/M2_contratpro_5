@@ -134,7 +134,7 @@ export function Specs() {
                     break;
 
                 case "create":
-                    console.log("SUCCESS : ", data["create"])
+                    data["create"] ? setSuccessMsg("Create: success") : setErrorMsg("Create: failure");
                     break
             }
 
