@@ -111,6 +111,16 @@ export function updateValueOnNode(value:any, path:string, data:any, setTree:Reac
     node.value = value;
     node.parent[node.syntaxKey] = value;
     updateNodeChildren(node, setTree);
+    if(socket){
+        socket.send(JSON.stringify(
+            {
+                action:"update",
+                //@ts-ignore
+                path:node.path,
+                content:value
+            }
+        ))
+    }
 }
 
 function hasMandatoryValues(node:any){

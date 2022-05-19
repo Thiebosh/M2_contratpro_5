@@ -89,21 +89,29 @@ export function Specs() {
 
     useEffect(() => {
         if (socketActionData) {
-            const splittedPathData = socketActionData.path.split("/");
-            const content = socketActionData.content;
-            const lastPathElement = splittedPathData[splittedPathData.length - 1];
-            const isLastPathElementNumber = !isNaN(parseInt(lastPathElement));
-            //if last path element is a number : means that we are adding to an array element
-            
-            if (content && (isLastPathElementNumber || syntax[lastPathElement].type !== "array")){
-                for (let key of Object.keys(content)){
-                    findNodeWithPathForCreate(socketActionData.path + "/" + key, tree, setTree); 
-                    /*concat with content if not array because adding new object/field... has the new one key in socket content
-                    for array, we know that we have to add a child with key equals to last path element*/
-                }
-            } else {
-                findNodeWithPathForCreate(socketActionData.path, tree, setTree);
+            switch(socketActionData["action"]){
+                case "create":
+                    const splittedPathData = socketActionData.path.split("/");
+                    const content = socketActionData.content;
+                    const lastPathElement = splittedPathData[splittedPathData.length - 1];
+                    const isLastPathElementNumber = !isNaN(parseInt(lastPathElement));
+                    //if last path element is a number : means that we are adding to an array element
+                    
+                    if (content && (isLastPathElementNumber || syntax[lastPathElement].type !== "array")){
+                        for (let key of Object.keys(content)){
+                            findNodeWithPathForCreate(socketActionData.path + "/" + key, tree, setTree); 
+                            /*concat with content if not array because adding new object/field... has the new one key in socket content
+                            for array, we know that we have to add a child with key equals to last path element*/
+                        }
+                    } else {
+                        findNodeWithPathForCreate(socketActionData.path, tree, setTree);
+                    }
+                    break;
+                case "update":
+                    console.log("UPDATE");
+                    break;
             }
+            
             setSocketActionData(undefined);
         }
     }, [socketActionData, tree, syntax]);
