@@ -8,10 +8,14 @@ export default function InputNode({ nodeDatum, updateValue }: {nodeDatum:any, up
     clearInterval(updateDelay);
     // Delay update
     updateDelay = setTimeout(() => {
-      if (e.target.value) {
-        updateValue(e.target.value)
+      if (nodeDatum.nature === "checkbox") {
+        updateValue(!!e.target.checked)
+      } else {
+        if (e.target.value) {
+          updateValue(e.target.value)
+        }
       }
-    },500)
+    },300)
   }
 
   return (
@@ -19,7 +23,7 @@ export default function InputNode({ nodeDatum, updateValue }: {nodeDatum:any, up
         <foreignObject width={120} height={70} y={-35} x={-60}>
           <div className="node-div">
             <label>{nodeDatum.syntaxKey}</label>
-            <input type={nodeDatum.nature} checked={nodeDatum.value} defaultValue={nodeDatum.value} onChange={handleChange}/>
+            <input type={nodeDatum.nature} defaultChecked={nodeDatum.value} defaultValue={nodeDatum.value} onChange={handleChange}/>
           </div>
         </foreignObject>
       </g>
