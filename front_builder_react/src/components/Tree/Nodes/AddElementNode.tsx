@@ -6,12 +6,12 @@ import './styles.scss';
 
 export default function AddElementNode({nodeDatum, handleAddElement}: {nodeDatum: any, handleAddElement: MouseEventHandler}) {
     return (
-      <g className="add-circle">
-        <circle r="25" stroke-dasharray="10,4" onClick={() => handleAddElement(nodeDatum)}/>
-        {/* <FontAwesomeIcon icon={faPlus}/> */}
-        <text fill="white" textAnchor="middle">
-          +
-        </text>
+      <g className="add-circle" onClick={() => handleAddElement(nodeDatum)}>
+        <circle r="25" strokeDasharray="10,4" />
+
+        <foreignObject width={22} height={22} x={-11} y={-11}>
+          <FontAwesomeIcon icon={faPlus} size="sm"/>
+        </foreignObject>
       </g>
     )
 }

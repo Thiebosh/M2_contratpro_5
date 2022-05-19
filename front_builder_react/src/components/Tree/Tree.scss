@@ -7,6 +7,9 @@
         &.rd3t-node, &.rd3t-leaf-node {
             stroke-width: 1px;
 
+            g:hover {
+                fill: rgb(215, 234, 250);
+            }
             g {
                 fill: #F7FAFC;
                 stroke: #2D3748;
