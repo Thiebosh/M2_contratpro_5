@@ -74,21 +74,21 @@ class InputManagerSpecs(InputManager):
 
         elif action == "save":
             result = await self.json_handler.update_storage()
-            print(f"Project {'well' if result else 'not'} updated")
+            self.partners["logger"].app_logger.debug(f"Project {'well' if result else 'not'} updated")
 
         elif action == "generate":
             if self.current_version_generated:
-                print(f"{self.room_id}-{self.room_type} - Project files already generated")
+                self.partners["logger"].app_logger.debug(f"{self.room_id}-{self.room_type} - Project files already generated")
                 return True
 
             result = await self.files_manager.generate_files(json.dumps(self.json_handler.data))
-            print(f"{self.room_id}-{self.room_type} - Project files {'well' if result else 'not'} generated")
+            self.partners["logger"].app_logger.debug(f"{self.room_id}-{self.room_type} - Project files {'well' if result else 'not'} generated")
 
             if result is False:
                 return False
 
             result = await self.files_manager.update_stored_files()
-            print(f"{self.room_id}-{self.room_type} - Project files {'well' if result else 'not'} updated")
+            self.partners["logger"].app_logger.debug(f"{self.room_id}-{self.room_type} - Project files {'well' if result else 'not'} updated")
 
             self.current_version_generated = True
             await self.partners["db"].update_one_async(COLLECTION_PROJECTS, *MongoQueries.updateProtoStateForId(self.room_id, True))

@@ -17,11 +17,11 @@ class JsonHandler():
 
     async def close(self):
         result = await self.update_storage()
-        print(f"{self.project_id}-{self.room_type} - Mongo - Project {'well' if result else 'not'} updated")
+        self.partners["logger"].app_logger.debug(f"{self.project_id}-{self.room_type} - Mongo - Project {'well' if result else 'not'} updated")
 
 
     async def update_storage(self):
-        print(f"{self.project_id}-{self.room_type} - {'no ' if self.json_currently_stored else ''}need of db update")
+        self.partners["logger"].app_logger.debug(f"{self.project_id}-{self.room_type} - {'no ' if self.json_currently_stored else ''}need of db update")
         if self.json_currently_stored:
             return True
 

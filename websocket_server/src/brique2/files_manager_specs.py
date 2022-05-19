@@ -27,7 +27,7 @@ class FilesManagerSpecs(FilesManager):
         try:
             error_line = lines.split('\n')[-1]
             if retcode == -1 or "GENERATION_ERROR:" in error_line:
-                print(f"cpp executable return error '{retcode}' : {error_line}")
+                self.partners["logger"].app_logger.debug(f"cpp executable return error '{retcode}' : {error_line}")
                 return False
 
             chunks = [chunk.strip() for chunk in lines.split("\n\n\n\n") if chunk != '']
@@ -42,7 +42,7 @@ class FilesManagerSpecs(FilesManager):
                 and value.split(".")[-1] == "html"
             ]
         except Exception as e:
-            print(f"cpp generated parse error: {e}")
+            self.partners["logger"].app_logger.debug(f"cpp generated parse error: {e}")
             return False
 
         return True
@@ -50,17 +50,17 @@ class FilesManagerSpecs(FilesManager):
 
     async def update_stored_files(self):
         if self.files_currently_stored:
-            print(f"{self.project_id}-{self.room_type} - Project files already stored")
+            self.partners["logger"].app_logger.debug(f"{self.project_id}-{self.room_type} - Project files already stored")
             return True
 
         result = self.partners["storage"].upload_files_to_folder(self.project_id, self.files)
         if not result:
-            print(f"{self.project_id}-{self.room_type} - Project upload to storage failed")
+            self.partners["logger"].app_logger.debug(f"{self.project_id}-{self.room_type} - Project upload to storage failed")
             return False
 
         result = await self.partners["db"].update_one_async(COLLECTION_PROJECTS, *MongoQueries.updateProtoPagesForId(self.project_id, self.pages))
         if not result:
-            print(f"{self.project_id}-{self.room_type} - Project pages update in db failed")
+            self.partners["logger"].app_logger.debug(f"{self.project_id}-{self.room_type} - Project pages update in db failed")
             return False
 
         self.files_currently_stored = True
