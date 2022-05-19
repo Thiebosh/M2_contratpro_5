@@ -189,6 +189,8 @@ export function Proto() {
             const targetPage = (event.composedPath()[index] as HTMLElement).attributes.getNamedItem("href")?.nodeValue;
             if (!targetPage || !socket || !socketUsable) return;
 
+            //TODO - update current page : if on pages, select it, else, select 404 (lignes 30 et 31)
+
             setLoadingPage(true);
             socket.send(JSON.stringify({"action":"execute", "page": targetPage}));
         }
