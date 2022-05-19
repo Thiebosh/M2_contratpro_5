@@ -177,16 +177,24 @@ export function Proto() {
 
     useEffect(() => {
         function handleLinks(event:Event) {
+            let index = 0;
+            while (index < event.composedPath().length && (event.composedPath()[index] as HTMLElement).tagName !== "A") ++index;
+
+            const target = (event.composedPath()[index] as HTMLElement).attributes.getNamedItem("target")?.nodeValue;
+            if (target === "_blank") return;
+
             event.preventDefault();
             event.stopPropagation();
 
-            const targetPage = (event.target as HTMLElement).attributes.getNamedItem("href")?.nodeValue;
+            const targetPage = (event.composedPath()[index] as HTMLElement).attributes.getNamedItem("href")?.nodeValue;
             if (!targetPage || !socket || !socketUsable) return;
+
+            //TODO - update current page : if on pages, select it, else, select 404 (lignes 30 et 31)
 
             setLoadingPage(true);
             socket.send(JSON.stringify({"action":"execute", "page": targetPage}));
         }
-        const targetElem = document.querySelector('#placeholder');
+        const targetElem = document.querySelector('#exec_window');
         targetElem?.addEventListener('click', handleLinks);
         return () => targetElem?.removeEventListener('click', handleLinks);
     }, [socket, socketUsable])

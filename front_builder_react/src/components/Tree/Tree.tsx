@@ -71,9 +71,6 @@ export function CustomTree(props:CustomTreeProps){
 }
 
 
-// export let root = undefined;
-// export let g_setTree:Function;
-
 function init(filename:string, data:any, setTree:React.Dispatch<any>, setSyntax:React.Dispatch<any>){
     fetch("/syntaxes/"+filename+".json")
     .then(syntax => syntax.json())
@@ -85,8 +82,6 @@ function init(filename:string, data:any, setTree:React.Dispatch<any>, setSyntax:
         data = data["root"];
         data.parent = null;
         setTree(data);
-        // root = data;
-        // g_setTree = setTree;
     })
 }
 
