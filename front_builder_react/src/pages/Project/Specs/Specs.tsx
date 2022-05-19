@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Fade } from 'react-awesome-reveal';
-import { CustomTree, g_setTree, root } from "../../../components/Tree/Tree";
-import { postProjectExistForUser, postProjectGetSyntaxId } from '../../../partners/rest';
-import { useUserContext } from '../../../session/user';
-import { init_websocket } from '../../..';
+import {useEffect, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
+import {Fade} from 'react-awesome-reveal';
+import {CustomTree, root} from "../../../components/Tree/Tree";
+import {postProjectExistForUser, postProjectGetSyntaxId} from '../../../partners/rest';
+import {useUserContext} from '../../../session/user';
+import {init_websocket} from '../../..';
 
 import './Specs.scss';
-import { Collabs } from '../../../components/Collabs';
-import { Modal } from "../../../components/Modal"
-import { findNodeWithPathForCreate } from "../../../components/Tree/functions/node"
+import {Collabs} from '../../../components/Collabs';
+import {Modal} from "../../../components/Modal"
+import {findNodeWithPathForCreate} from "../../../components/Tree/functions/node"
 
 export function Specs() {
     const navigate = useNavigate();
@@ -176,7 +176,7 @@ export function Specs() {
                     <CustomTree syntax_filename={syntaxId} openClose={setIsOpen} socket={socket} setModalElements={setModalElements}/>
                 }
             </div>
-            <div>
+            <div className="modal-overlay">
                 {isOpen && (
                     <Modal openClose={setIsOpen} elements={modalElements}/>
                 )}

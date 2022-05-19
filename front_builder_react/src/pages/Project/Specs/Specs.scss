@@ -58,10 +58,9 @@
 
     .popup {
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        text-align: center;
+        top: 1em;
+        left: 50%;
+        transform: translateX(-50%);
         z-index: 20;
 
         .success, .info, .error {
@@ -85,16 +84,32 @@
         }
     }
 
-    &.overlay .popup {
+    .modal-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0);
+        z-index: 9;
+    }
+    &.overlay .modal-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
         height: 100%;
         background-color: rgba(0, 0, 0, 0.5);
-        transition: background-color 0.2s ease;
+        transition: background-color 0.3s ease;
+        z-index: 15;
     }
 
     #treeContent {
         position: fixed;
         height: 100%;
         width: 100%;
+        background-color: #FFF;
+        z-index: 10;
     }
     
     .inactive {
