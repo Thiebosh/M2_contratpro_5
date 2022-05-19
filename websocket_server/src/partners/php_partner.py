@@ -40,9 +40,7 @@ class PhpPartner():
 
 
     def set_project_folder(self, project_id:str) -> bool:
-        if OS_IS_LOCAL:
-            return True
-        return self._post("create_folder", { "project_name": project_id })[0]
+        return True if OS_IS_LOCAL else self._post("create_folder", { "project_name": project_id })[0]
 
 
     def set_project_files(self, project_id:str, files:"list[dict[str,str]]") -> bool:
