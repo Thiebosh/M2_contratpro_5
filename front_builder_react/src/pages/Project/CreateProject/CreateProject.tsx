@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Fade } from 'react-awesome-reveal';
+import {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {Fade} from 'react-awesome-reveal';
 
-import { useUserContext } from '../../../session/user';
-import { CollabsInput } from '../../../components/Collabs';
-import { postProjectCreate, postSyntaxGetList } from '../../../partners/rest';
+import {useUserContext} from '../../../session/user';
+import {CollabsInput} from '../../../components/Collabs';
+import {postProjectCreate, postSyntaxGetList} from '../../../partners/rest';
 
 import './CreateProject.scss';
 
@@ -14,7 +14,7 @@ export function CreateProject() {
 
     const [name, setName] = useState<string>("");
     const [currentCollabIds, setCurrentCollabIds] = useState<string[]>([userId]);
-    const [syntaxList, setSyntaxList] = useState<{id:string, name:string, description:string}[]>([]);
+    const [syntaxList, setSyntaxList] = useState<{ id: string, name: string, description: string }[]>([]);
     const [syntaxId, setSyntaxId] = useState<string>("");
     const [description, setDescription] = useState<string>("");
     const [warnMsg, setWarnMsg] = useState<string>("");
@@ -22,18 +22,22 @@ export function CreateProject() {
 
     useEffect(() => {
         postSyntaxGetList()
-        .then((data) => {
-            setSyntaxId(data.result[0].id);
-            setSyntaxList(data.result);
-        })
-        .catch(error => {
-            setErrorMsg("Internal error");
-            console.log("Error:", error);
-        });
+            .then((data) => {
+                setSyntaxId(data.result[0].id);
+                setSyntaxList(data.result);
+            })
+            .catch(error => {
+                setErrorMsg("Internal error");
+                console.log("Error:", error);
+            });
     }, []);
 
-    useEffect(() => { warnMsg && setTimeout(() => setWarnMsg(""), 4000) }, [warnMsg]);
-    useEffect(() => { errorMsg && setTimeout(() => setErrorMsg(""), 4000) }, [errorMsg]);
+    useEffect(() => {
+        warnMsg && setTimeout(() => setWarnMsg(""), 4000)
+    }, [warnMsg]);
+    useEffect(() => {
+        errorMsg && setTimeout(() => setErrorMsg(""), 4000)
+    }, [errorMsg]);
 
     function triggerCreate() {
         if (!(name && syntaxId)) {
@@ -41,19 +45,21 @@ export function CreateProject() {
             return;
         }
 
+        name.trim();
+
         postProjectCreate(name, currentCollabIds, syntaxId, description)
-        .then((data) => {
-            console.log(data);
-            if (data.success === "already exist") {
-                setErrorMsg("Project name already used");
-                return;
-            }
-            navigate('/project/'+name);
-        })
-        .catch(error => {
-            setErrorMsg("Internal error");
-            console.log("Error:", error);
-        });
+            .then((data) => {
+                console.log(data);
+                if (data.success === "already exist") {
+                    setErrorMsg("Project name already used");
+                    return;
+                }
+                navigate('/project/' + name);
+            })
+            .catch(error => {
+                setErrorMsg("Internal error");
+                console.log("Error:", error);
+            });
     }
 
     return (
@@ -63,8 +69,8 @@ export function CreateProject() {
                 <div className='input_group'>
                     <label>Project name</label>
                     <input type='text'
-                        onChange={(event) => setName(event.target.value)}
-                        onKeyDown={(event) => (event.key === "Enter") && triggerCreate()}
+                           onChange={(event) => setName(event.target.value)}
+                           onKeyDown={(event) => (event.key === "Enter") && triggerCreate()}
                     />
                 </div>
                 <CollabsInput
@@ -76,16 +82,16 @@ export function CreateProject() {
                 <div className='input_group'>
                     <label>Project syntax</label>
                     <div className='syntaxes'>
-                        { syntaxList.map((item) => (
-                            <div 
+                        {syntaxList.map((item) => (
+                            <div
                                 key={item.id}
-                                className={"syntax "+(syntaxId === item.id && "current")}
+                                className={"syntax " + (syntaxId === item.id && "current")}
                                 onClick={() => setSyntaxId(item.id)}>
                                 <h3>{item.name}</h3>
                                 <hr/>
                                 <p>{item.description}</p>
                             </div>
-                        )) }
+                        ))}
                     </div>
                 </div>
                 <div className='input_group'>
@@ -96,8 +102,12 @@ export function CreateProject() {
                     />
                 </div>
                 <div className='button' onClick={triggerCreate}>Create</div>
-                { warnMsg && <Fade><div className='warning'>{warnMsg}</div></Fade> }
-                { errorMsg && <Fade><div className='error'>{errorMsg}</div></Fade> }
+                {warnMsg && <Fade>
+                    <div className='warning'>{warnMsg}</div>
+                </Fade>}
+                {errorMsg && <Fade>
+                    <div className='error'>{errorMsg}</div>
+                </Fade>}
             </div>
         </section>
     );
