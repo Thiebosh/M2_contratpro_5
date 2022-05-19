@@ -14,7 +14,7 @@ class DrivePartner:
     def __init__(self, creds_path, scopes):
         self.creds_path = creds_path
         self.scopes = scopes
-        self.service:Resource = build('drive', 'v3', credentials=Creds.from_service_account_file(creds_path, scopes=scopes))
+        self.service:Resource = build('drive', 'v3', credentials=Creds.from_service_account_file(creds_path, scopes=scopes), cache_discovery=False)
 
 
     def copy_partner(self):

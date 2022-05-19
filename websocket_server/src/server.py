@@ -1,11 +1,11 @@
 import logging
-from multiprocessing import get_logger
 import select
 import socket
 import json
 import os
 from socket import timeout
 from room_manager import RoomManager
+from defines import *
 
 from partners.websocket_partner import WebSocketPartner
 from partners.mongo_partner import MongoPartner
@@ -15,30 +15,38 @@ from partners.php_partner import PhpPartner
 from partners.logger_partner import LoggerPartner
 
 class Server():
-    def __init__(self, websocket=None, db=None, storage=None, generator=None, renderer=None, logger=None) -> None:
-        logging.basicConfig(level=logging.DEBUG,
-                    format='Websocket -->  [%(asctime)s] | %(name)s | %(levelname)s | %(message)s \n')#can add %(asctime)s |
+    def __init__(self, websocket=None, db=None, nas=None, generator=None, renderer=None, logger=None) -> None:
+        # 1) INITIALIZE LOGGER
+        logger_level = logging.INFO
+
+        logging.getLogger("googleapiclient").disabled = True
+        logging.basicConfig(level=logger_level, format='[%(asctime)s] %(levelname)s for %(funcName)s in %(module)s: %(message)s')
+
         logger = logger or logging.getLogger("None")
         logger_partner = LoggerPartner(logger)
 
-        logger_partner.app_logger.debug("SERVER - Starting..")
+        logger_partner.app_logger.info(INIT_SERVER)
+
+        # 2) INITIALIZE PARTNERS
+        logger_partner.app_logger.info(INIT_PARTNERS)
 
         self.partners = {
-            "websocket": websocket or WebSocketPartner(),
-            "db": db or MongoPartner(f"mongodb+srv://{os.environ.get('MONGO_USERNAME')}:{os.environ.get('MONGO_PASSWORD')}@{os.environ.get('MONGO_URL')}"),
-            "storage": storage or DrivePartner(creds_path=os.environ.get('DRIVE_PATH'), scopes=['https://www.googleapis.com/auth/drive']),
-            "generator": generator or CppPartner(folder_path=os.environ.get('CPP_PATH')),
-            "renderer": renderer or PhpPartner(base_url=os.environ.get('PHP_URL')),
-            "logger":  logger_partner
+            WEBSOCKET: websocket or WebSocketPartner(),
+            DB: db or MongoPartner(f"mongodb+srv://{OS_MONGO_USERNAME}:{OS_MONGO_PASSWORD}@{OS_MONGO_URL}"),
+            NAS: nas or DrivePartner(creds_path=os.environ.get('DRIVE_PATH'), scopes=['https://www.googleapis.com/auth/drive']),
+            GENERATOR: generator or CppPartner(folder_path=os.environ.get('CPP_PATH')),
+            RENDERER: renderer or PhpPartner(base_url=os.environ.get('PHP_URL')),
+            LOGGER:  logger_partner
         }
         self.inputs = []
         self.polling_freq = 0.5
         self.room_m = RoomManager(self.partners)
-        self.ip = os.environ.get("HOST")
-        self.port = int(os.environ.get("PORT"))
-        self.encoding = "utf-8"
+        self.ip = OS_HOST
+        self.port = OS_PORT
+        self.encoding = ENCODING
         self.init_server()
-        logger_partner.app_logger.debug("SERVER - started")
+
+        logger_partner.app_logger.info(INIT_DONE)
 
     def init_server(self, backlog=5):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -52,7 +60,7 @@ class Server():
         return readable, exception
 
     def close(self):
-        self.partners["logger"].app_logger.info("SERVER - Get close signal")
+        self.partners[LOGGER].app_logger.info("SERVER - Get close signal")
         for input_socket in self.inputs:
             input_socket.close()
         for room in self.room_m.rooms.values():
@@ -61,24 +69,24 @@ class Server():
     def add_connection(self, input_socket):
         new_socket, client_address = input_socket.accept()
         try:
-            if self.partners["websocket"].handshake(new_socket, self.encoding):
-                self.partners["logger"].app_logger.debug(f"SERVER - new connexion {client_address}")
+            if self.partners[WEBSOCKET].handshake(new_socket, self.encoding):
+                self.partners[LOGGER].app_logger.info(f"SERVER - new connexion {client_address}")
                 self.inputs.append(new_socket)  # new input socket
             else:
-                self.partners["logger"].app_logger.debug("SERVER - failed handshake")
+                self.partners[LOGGER].app_logger.info("SERVER - failed handshake")
 
         except timeout:
-            self.partners["logger"].app_logger.debug('SERVER - websocket connection timeout')
+            self.partners[LOGGER].app_logger.info('SERVER - websocket connection timeout')
 
     def close_client_connection(self, socket):
-        self.partners["logger"].app_logger.debug("SERVER - Close client")
+        self.partners[LOGGER].app_logger.info("SERVER - Close client")
         self.inputs.remove(socket)
         socket.close()
 
     def run(self):
         self.inputs.append(self.socket) # Contient tous les sockets (serveur + toutes les rooms)
 
-        self.partners["logger"].app_logger.debug("SERVER - ready")
+        self.partners[LOGGER].app_logger.info("SERVER - ready")
 
         while self.inputs:
             try:
@@ -93,7 +101,7 @@ class Server():
                     self.add_connection(input_socket)
                     continue
 
-                target = self.partners["websocket"].recv(input_socket, self.encoding)
+                target = self.partners[WEBSOCKET].recv(input_socket, self.encoding)
 
                 if not target:
                     self.close_client_connection(input_socket)
@@ -102,7 +110,7 @@ class Server():
                 try:
                     target = json.loads(target)
                 except json.JSONDecodeError:
-                    self.partners["logger"].app_logger.debug(f"SERVER - malformed json : '{target}'")
+                    self.partners[LOGGER].app_logger.info(f"SERVER - malformed json : '{target}'")
                     self.close_client_connection(input_socket)
                     continue
 
@@ -127,7 +135,7 @@ class Server():
 
             # can't sleep because of handshakes
 
-        self.partners["logger"].app_logger.debug("SERVER - Closing server...")
+        self.partners[LOGGER].app_logger.info("SERVER - Closing server...")
 
 
     def callback_update_server_sockets(self,socket):
