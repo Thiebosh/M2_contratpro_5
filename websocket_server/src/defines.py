@@ -1,4 +1,5 @@
 import os
+from distutils.util import strtobool
 
 # OS environment
 OS_HOST=os.environ.get("HOST", '0.0.0.0')
@@ -8,7 +9,7 @@ OS_MONGO_USERNAME=os.environ.get("MONGO_USERNAME")
 OS_MONGO_PASSWORD=os.environ.get("MONGO_PASSWORD")
 OS_MONGO_URL=os.environ.get("MONGO_URL")
 
-OS_IS_LOCAL=os.environ.get("IS_LOCAL", default="False")
+OS_IS_LOCAL=strtobool(os.environ.get("IS_LOCAL", default="False"))
 
 # GLOBAL VALUES
 ENCODING="utf-8"

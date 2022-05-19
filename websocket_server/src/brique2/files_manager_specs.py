@@ -1,4 +1,3 @@
-from distutils.util import strtobool
 from .files_manager import FilesManager
 from partners.mongo_queries import MongoQueries, COLLECTION_PROJECTS
 import os
@@ -22,7 +21,7 @@ class FilesManagerSpecs(FilesManager):
         generator_partner:CppPartner = self.partners[GENERATOR]
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
-        if strtobool(os.environ.get('RENDER_STATE', default="False")):
+        if OS_IS_LOCAL:
             return True
 
         filepath = f"/src/brique2/cpp/{self.project_id}.json"
