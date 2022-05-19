@@ -14,3 +14,7 @@ export function moveElementAtFirstPosition(array:any, element:any){
     array.splice(selectedElemIndex,1);
     array.splice(0,0,element);
 }
+
+export function isStringNumber(str:string){
+    return !isNaN(parseInt(str));
+}

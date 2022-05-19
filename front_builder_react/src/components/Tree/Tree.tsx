@@ -44,7 +44,7 @@ export function CustomTree(props:CustomTreeProps){
 
     const renderRectSvgNode = ({ nodeDatum, toggleNode }:any) => {
         if(nodeDatum.type === "input"){
-            return <InputNode nodeDatum={nodeDatum} updateValue={updateValue} />;
+            return <InputNode nodeDatum={nodeDatum} updateValue={updateValue} tree={props.tree} setTree={props.setTree} socket={props.socket}/>;
         }
         else if (nodeDatum.type === "select"){
             return <SelectNode nodeDatum={nodeDatum} updateSelect={updateSelect} />
