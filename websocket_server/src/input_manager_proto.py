@@ -1,20 +1,23 @@
+from typing import Any
 from input_manager import InputManager
 from brique2.files_manager_proto import FilesManagerProto
 from brique3.render_page import RenderPage
 from input_proto import InputProto
 
 class InputManagerProto(InputManager):
-    def __init__(self, room_id, room_type, partners) -> None:
+    def __init__(self, room_id:str, room_type:str, partners:"dict[str,Any]") -> None:
         super().__init__(room_id, room_type, partners)
 
         self.files_manager = FilesManagerProto(partners, room_id, room_type)
         self.render_page = RenderPage(partners, room_id, room_type)
 
-    async def close(self):
+
+    async def close(self) -> None:
         self.files_manager.close()
         await self.render_page.close()
 
-    async def check_and_execute_action_function(self, input_to_process:InputProto):
+
+    async def check_and_execute_action_function(self, input_to_process:InputProto) -> "bool|dict[str,Any]":
         if input_to_process.failed:
             return False
 

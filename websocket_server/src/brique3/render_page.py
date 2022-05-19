@@ -9,7 +9,7 @@ from partners.php_partner import PhpPartner
 from partners.logger_partner import LoggerPartner
 
 class RenderPage():
-    def __init__(self, partners, project_id, room_type) -> None:
+    def __init__(self, partners:"dict[str,Any]", project_id:str, room_type:str):
         self.partners = partners
         self.project_id = project_id
         self.room_type = room_type
@@ -24,7 +24,7 @@ class RenderPage():
         self.session_update = False
 
 
-    async def close(self):
+    async def close(self) -> None:
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         db_partner:MongoPartner = self.partners[DB]
         renderer_partner:PhpPartner = self.partners[RENDERER]
@@ -51,7 +51,7 @@ class RenderPage():
         logger_partner.logger.debug(f"{self.project_id}-{self.room_type} - Mongo - Project session {'well' if result else 'not'} updated")
     
 
-    def page(self, page):
+    def page(self, page:str) -> "tuple[bool,str]":
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         renderer_partner:PhpPartner = self.partners[RENDERER]
         logger_partner:LoggerPartner = self.partners[LOGGER]
@@ -63,7 +63,7 @@ class RenderPage():
             is_new_session_json, new_session = Utils.get_json(new_session)
             if not is_new_session_json:
                 logger_partner.logger.debug(f"{self.project_id}-{self.room_type} - Php session format not json")
-                return
+                return (False, "")
 
             if self.session != new_session:
                 self.session = new_session
@@ -72,7 +72,7 @@ class RenderPage():
         return result
 
 
-    def reset_session(self):
+    def reset_session(self) -> bool:
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         renderer_partner:PhpPartner = self.partners[RENDERER]
 

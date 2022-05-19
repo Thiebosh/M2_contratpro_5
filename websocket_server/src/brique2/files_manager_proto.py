@@ -1,3 +1,4 @@
+from typing import Any
 from .files_manager import FilesManager
 from defines import *
 
@@ -6,7 +7,7 @@ from partners.php_partner import PhpPartner
 from partners.logger_partner import LoggerPartner
 
 class FilesManagerProto(FilesManager):
-    def __init__(self, partners, project_id, room_type) -> None:
+    def __init__(self, partners:"dict[str,Any]", project_id:str, room_type:str):
         super().__init__(partners, project_id, room_type)
 
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
@@ -26,7 +27,7 @@ class FilesManagerProto(FilesManager):
             raise Exception(f"{self.project_id}-{self.room_type} - PHP - files not uploaded")
 
 
-    def close(self):
+    def close(self) -> None:
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         renderer_partner:PhpPartner = self.partners[RENDERER]
         logger_partner:LoggerPartner = self.partners[LOGGER]
@@ -39,7 +40,7 @@ class FilesManagerProto(FilesManager):
         logger_partner.logger.debug(f"{self.project_id}-{self.room_type} - PHP - Project directory {'well' if result else 'not'} removed")
 
     
-    def reload_files(self):
+    def reload_files(self) -> None:
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         nas_partner:DrivePartner = self.partners[NAS]
         renderer_partner:PhpPartner = self.partners[RENDERER]
