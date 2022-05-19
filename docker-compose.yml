@@ -33,6 +33,8 @@ services:
             args:
                 arg_port: 5000
                 php_url: "http://render:5000"
+                tableauID: ( "627e3ed4e9f9d2f53e8b1d37" ) # ( valeur1 valeur2 valeur3 ... )
+                valueID: "627e3ed4e9f9d2f53e8b1d37"
         ports:
             - "8002:5000"
         env_file:
@@ -47,6 +49,8 @@ services:
             context: ./render_server/
             args:
                 arg_port: 5000
+        logging:
+            driver: none
         # ports:
         #     - "8003:5000"
         tty: true # bind console

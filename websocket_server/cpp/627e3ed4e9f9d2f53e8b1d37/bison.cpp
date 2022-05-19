@@ -27,20 +27,24 @@
 %token NEXT
 
 %token ROOT
-%token SCREEN
-%token HOME
-%token NAME
 %token STYLE
-%token ALIGN
-%token COLOR
-%token DECO
-%token CONTENT
 %token BLOCK
+%token LINK
 %token TEXT
+%token SCREEN
+%token CONTENT
+%token NAME
+%token DEFAULTSCREEN
+%token TARGETVALUE
 %token TEXTVALUE
+%token NUMBERVALUE
+%token EXTLINK
+%token COLOR
+%token ALIGN
+%token DECO
+
 %token TRUE
 %token FALSE
-
 %token <string> STR_VALUE
 %token <string> COLOR_VALUE
 
@@ -93,8 +97,7 @@ field
                     break;
             }
         }
-    |   HOME FALSE // do nothing
-    |   HOME TRUE
+    |   DEFAULTSCREEN TRUE // FALSE => do nothing => change to bool
         {
             if (defaultPage != "") displayError(ErrorType::input, ErrorObject::defaultPage_already_defined, "");
             if (currentPage == "") displayError(ErrorType::generation, ErrorObject::defaultPage_no_value, ""); // can't know
@@ -109,6 +112,17 @@ field
         doc
         {
             fileContent[currentPage] += (INDENT ? string(--indent, '\t') : "") + "</div>" + (ONE_LINE ? "" : "\n");
+        }
+    |   LINK
+        {
+            currentContainer = Container::link;
+            fileContent[currentPage] += (INDENT ? string(indent++, '\t') : "") + "<a>" + (ONE_LINE ? "" : "\n");
+            isNestedLinkExternal.push_back(false);
+        }
+        doc
+        {
+            isNestedLinkExternal.pop_back();
+            fileContent[currentPage] += (INDENT ? string(--indent, '\t') : "") + "</a>" + (ONE_LINE ? "" : "\n");
         }
     |   TEXT
         {
@@ -150,6 +164,18 @@ field
     |   ALIGN STR_VALUE
         {
             fileContent[currentPage] += alignContainer[$2][currentContainer] + " ";
+        }
+    |   TARGETVALUE STR_VALUE
+        {
+            bool isExternal = isNestedLinkExternal.back();
+            fileContent[currentPage].pop_back();
+            fileContent[currentPage] += " href='" + (isExternal ? "http://" + (string)$2 : (string)$2 + ".html" )+ "'>";
+        }
+    |   EXTLINK TRUE // FALSE => do nothing => change to bool
+        {
+            isNestedLinkExternal.back() = true;
+            fileContent[currentPage].pop_back();
+            fileContent[currentPage] += " target='_blank'>";
         }
     ;
 

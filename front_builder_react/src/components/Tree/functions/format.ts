@@ -16,32 +16,37 @@ function formatArray(node:any, key:string){
     for (let i = 0; i < node[key].length; i++){
         initChildrenIfNotDone(node[key][i]); // to add adding node as child of all the children of the array
         addAddingNode(node[key][i]);
-
+        
+        node[key][i].path = node.path + "/" + key + "/" + i;
         node[key][i].syntaxKey = key;
         node[key][i].parent = node;
 
-        node.children.splice(-2,0,node[key][i]);
+        node.children.splice(-1,0,node[key][i]);
         formatData(node[key][i]);
     }
 }
 
-function formatObject(node:any, key:string){
+function formatObject(node:any, key:string) {
     node[key].syntaxKey = key;
     node[key].parent = node;
+
+    if (node.path){
+        node[key].path = node.path + "/" + key;
+    }
 
     initChildrenIfNotDone(node);
     initChildrenIfNotDone(node[key]); // same as for formatArray
     
     addAddingNode(node[key]);
 
-    node.children.splice(-2,0,node[key]);
+    node.children.splice(-1,0,node[key]);
     formatData(node[key]);
 }
 
 function formatField(node:any, key:string){
     const fieldType = g_syntax[key].field; // type of field for current node
     const fieldSyntax = g_syntax[fieldType]; // syntax for the specific field
-    
+
     if (fieldSyntax){
         initChildrenIfNotDone(node);
 
@@ -49,12 +54,13 @@ function formatField(node:any, key:string){
         fieldSyntaxClone.value = node[key];
         fieldSyntaxClone.parent = node;
         fieldSyntaxClone.syntaxKey = key;
+        fieldSyntaxClone.path = node.path + "/" + key;
 
         if (fieldSyntaxClone.type === "select"){
             moveElementAtFirstPosition(fieldSyntaxClone.values,node[key])
         }
 
-        node.children.splice(-2,0,fieldSyntaxClone);
+        node.children.splice(-1,0,fieldSyntaxClone);
     }
 }
 
@@ -63,6 +69,7 @@ export function formatData(data:any){
         if (skipKey(key)){
             continue;
         }
+
         switch(g_syntax[key].type){
             case "array":
                 formatArray(data, key)

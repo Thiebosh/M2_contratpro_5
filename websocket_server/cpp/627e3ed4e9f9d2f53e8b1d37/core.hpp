@@ -16,6 +16,7 @@ enum class Container {
     root,
     screen,
     block,
+    link,
     text
 };
 
@@ -25,10 +26,12 @@ string defaultPage = "";
 std::map<string, string> fileContent;
 int indent = 0; //tmp
 std::vector<string> htmlPages;
+std::vector<bool> isNestedLinkExternal;
 
 std::map<Container, string> colorContainer = {
     {Container::screen, "background-color: "},
     {Container::block, "background-color: "},
+    {Container::link, "color: "},
     {Container::text, "color: "}
 };
 std::map<string, std::map<Container, string>> alignContainer = {

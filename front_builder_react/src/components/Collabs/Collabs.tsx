@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import {useState} from 'react';
 
-import { useUserContext } from '../../session/user';
-import { postAccountSearch } from '../../partners/rest';
+import {useUserContext} from '../../session/user';
+import {postAccountSearch} from '../../partners/rest';
 
 import './Collabs.scss';
 
@@ -49,39 +49,54 @@ export function CollabsInput(props:CollabsInputProps):JSX.Element {
     const [searchCollabNames, setSearchCollabNames] = useState<string[]>([]);
     const [searchCollabMapNameToId, setSearchCollabMapNameToId] = useState<Map<string, string>>(new Map());
 
-    const onChangeInputDataList = (nativeEvent:Event, text:string) => nativeEvent instanceof InputEvent ? searchCollab(text) : addCollab(text);
+    const onChangeInputDataList = (nativeEvent: any, text:string) => {
+        nativeEvent.inputType !== "insertReplacementText" ? searchCollab(text) : addCollab(text)
+    };
     const onKeyDownInputDataList = (key:string, value:string, nativeEvent:KeyboardEvent) => {
         if (!(nativeEvent instanceof KeyboardEvent)) setInputValue(''); //cas particulier : clic sur option == input
         (key === "Enter") && addCollab(value);
     }
 
+    let searchDelay: NodeJS.Timeout;
     function searchCollab(collab:string) {
-        setInputValue(collab);
-        setSearchCollabMapNameToId(new Map());
+        if (collab !== inputValue) {
+            setInputValue(collab);
 
-        if (!collab) return;
-        postAccountSearch(collab, 6, [userId, ...currentCollabIds, ...(initialCollabIds || [])])
-        .then((data) => {
-            setSearchCollabNames(data.result.map(item => item.name));
-            setSearchCollabMapNameToId(data.result.reduce((accu, item) => accu.set(item.name, item.id), new Map<string, string>()));
-        })
-        .catch(error => {
-            setErrorMsg("Internal error");
-            console.log("Error:", error);
-        });
+            clearInterval(searchDelay);
+            // Add delay to search
+            searchDelay = setTimeout(() => {
+                setSearchCollabMapNameToId(new Map());
+
+                if (!collab) return;
+                postAccountSearch(collab, 6, [userId, ...currentCollabIds, ...(initialCollabIds || [])])
+                  .then((data) => {
+                      setSearchCollabNames(data.result.map(item => item.name));
+                      setSearchCollabMapNameToId(data.result.reduce((accu, item) => accu.set(item.name, item.id), new Map<string, string>()));
+                  })
+                  .catch(error => {
+                      setErrorMsg("Internal error");
+                      console.error("Error:", error);
+                  });
+            }, 300)
+        }
     }
 
     function addCollab(collab:string) {
-        if (currentCollabNames.includes(collab)) return;
+        if (collab) {
+            // Reset input
+            setInputValue('')
 
-        const collabId = searchCollabMapNameToId.get(collab);
-        if (!collabId) return;
+            if (currentCollabNames.includes(collab)) return;
 
-        setCurrentCollabNames([...currentCollabNames, collab]);
-        setCurrentCollabIds([...currentCollabIds, collabId]);
-        setCurrentCollabMapNameToId(currentCollabMapNameToId.set(collab, collabId));
+            const collabId = searchCollabMapNameToId.get(collab);
+            if (!collabId) return;
 
-        setSearchCollabNames([...searchCollabNames.filter(item => item !== collab)]);
+            setCurrentCollabNames([...currentCollabNames, collab]);
+            setCurrentCollabIds([...currentCollabIds, collabId]);
+            setCurrentCollabMapNameToId(currentCollabMapNameToId.set(collab, collabId));
+
+            setSearchCollabNames([...searchCollabNames.filter(item => item !== collab)]);
+        }
     }
 
     function removeCollab(collab:string) {
@@ -105,7 +120,9 @@ export function CollabsInput(props:CollabsInputProps):JSX.Element {
                 onKeyDown={(event) => onKeyDownInputDataList(event.key, event.currentTarget.value, event.nativeEvent)}
             />
             <datalist id="potentialCollabList">
-                {searchCollabNames.map(item => (<option key={item} value={item}/>))}
+                {searchCollabNames.map(item => (
+                  <option key={item} value={item} />
+                ))}
             </datalist>
         </div>
     );
@@ -127,20 +144,27 @@ export function RemoveCollabsInput(props:RemoveCollabsInputProps):JSX.Element {
     const [inputValue, setInputValue] = useState<string>("");
     const [currentCollabNames, setCurrentCollabNames] = useState<string[]>([]);
 
-    const onChangeInputDataList = (nativeEvent:Event, text:string) => nativeEvent instanceof InputEvent ? setInputValue(text) : addCollab(text);
+    const onChangeInputDataList = (nativeEvent:any, text:string) => {
+        nativeEvent.inputType !== "insertReplacementText" ? setInputValue(text) : addCollab(text)
+    };
     const onKeyDownInputDataList = (key:string, value:string, nativeEvent:KeyboardEvent) => {
         if (!(nativeEvent instanceof KeyboardEvent)) setInputValue(''); //cas particulier : clic sur option == input
         (key === "Enter") && addCollab(value);
     }
 
     function addCollab(collab:string) {
-        if (currentCollabNames.includes(collab)) return;
+        if (collab) {
+            // Reset input
+            setInputValue('')
 
-        const collabId = collabs.find(item => item.name === collab)?.id;
-        if (!collabId) return;
+            if (currentCollabNames.includes(collab)) return;
 
-        setCurrentCollabNames([...currentCollabNames, collab]);
-        setCurrentCollabIds([...currentCollabIds, collabId]);
+            const collabId = collabs.find(item => item.name === collab)?.id;
+            if (!collabId) return;
+
+            setCurrentCollabNames([...currentCollabNames, collab]);
+            setCurrentCollabIds([...currentCollabIds, collabId]);
+        }
     }
 
     function removeCollab(collab:string) {
@@ -164,7 +188,9 @@ export function RemoveCollabsInput(props:RemoveCollabsInputProps):JSX.Element {
                 onKeyDown={(event) => onKeyDownInputDataList(event.key, event.currentTarget.value, event.nativeEvent)}
             />
             <datalist id="currentCollabList">
-                {collabs.filter(item => !currentCollabNames.includes(item.name)).map(item => (<option key={item.name} value={item.name}/>))}
+                {collabs.filter(item => !currentCollabNames.includes(item.name)).map(item => (
+                  <option key={item.name} value={item.name}/>
+                ))}
             </datalist>
         </div>
     );

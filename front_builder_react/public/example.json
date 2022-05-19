@@ -3,7 +3,7 @@
         "screen": [
             {
                 "name": "ecran1",
-                "inputHome": true,
+                "defaultPage": true,
                 "style": {
                     "color": "#6897bb",
                     "align": "center"
@@ -22,6 +22,31 @@
                                             "decoration": "underline"
                                         },
                                         "textValue": "hello world"
+                                    }
+                                },
+                                {
+                                    "link": {
+                                        "targetValue": "ecran1",
+                                        "content": [
+                                            {
+                                                "text": {
+                                                    "textValue": "lien vers ecran 1"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "link": {
+                                        "external": true,
+                                        "targetValue": "youtube.com",
+                                        "content": [
+                                            {
+                                                "text": {
+                                                    "textValue": "lien externe vers youtube"
+                                                }
+                                            }
+                                        ]
                                     }
                                 },
                                 {

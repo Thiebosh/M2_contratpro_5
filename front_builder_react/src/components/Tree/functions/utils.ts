@@ -5,7 +5,7 @@ export function initChildrenIfNotDone(data:any){
 }
 
 export function skipKey(key:string){
-    const keysToSkip = ["syntaxKey", "children", "parent"]
+    const keysToSkip = ["syntaxKey", "children", "parent", "path"]
     return keysToSkip.includes(key)
 }
 

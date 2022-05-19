@@ -1,14 +1,15 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Fade } from 'react-awesome-reveal';
-import { CustomTree} from "../../../components/Tree/Tree";
-import { postProjectExistForUser, postProjectGetSyntaxId } from '../../../partners/rest';
-import { useUserContext } from '../../../session/user';
-import { init_websocket } from '../../..';
+import {useEffect, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
+import {Fade} from 'react-awesome-reveal';
+import {CustomTree} from "../../../components/Tree/Tree";
+import {postProjectExistForUser, postProjectGetSyntaxId} from '../../../partners/rest';
+import {useUserContext} from '../../../session/user';
+import {init_websocket} from '../../..';
 
 import './Specs.scss';
-import { Collabs } from '../../../components/Collabs';
-import { Modal } from "../../../components/Modal"
+import {Collabs} from '../../../components/Collabs';
+import {Modal} from "../../../components/Modal"
+import {findNodeWithPathForCreate} from "../../../components/Tree/functions/node"
 
 export function Specs() {
     const navigate = useNavigate();
@@ -18,6 +19,8 @@ export function Specs() {
     const [syntaxId, setSyntaxId] = useState<string>();
     const [isOpen, setIsOpen] = useState(false);
     const [modalElements, setModalElements] = useState([]);
+    const [tree, setTree] = useState<any>();
+
 
     useEffect(() => {
         postProjectExistForUser(userContext.user.id, urlName || "")
@@ -75,6 +78,15 @@ export function Specs() {
         }
     }, [projectId, userContext.user.name, socketUsable]);
 
+    const [addPath, setAddPath] = useState<any>();
+
+    useEffect(() => {
+        if (addPath) {
+            findNodeWithPathForCreate(addPath, tree, setTree);
+            setAddPath(undefined);
+        }
+    }, [addPath, tree]);
+    
     useEffect(() => {
         if (!socket) return;
 
@@ -92,12 +104,21 @@ export function Specs() {
                 case 'remove_collab':
                     setRemoveCollab(data["remove_collab"] as string);
                     break;
+
                 case 'save':
                     data["save"] ? setSuccessMsg("Save: success") : setErrorMsg("Save: failure");
                     break;
                 case 'generate':
                     data["generate"] ? setSuccessMsg("Generate: success") : setErrorMsg("Generate: failure");
                     break;
+
+                case "create":
+                    console.log("SUCCESS : ", data["create"])
+                    break
+            }
+
+            if("action" in data){
+                setAddPath(data.path);                
             }
         };
 
@@ -162,10 +183,10 @@ export function Specs() {
             </div>
             <div id="treeContent" className={isOpen ? "inactive": ""}>
                 { syntaxId &&
-                    <CustomTree syntax_filename={syntaxId} openClose={setIsOpen} setModalElements={setModalElements}/>
+                    <CustomTree syntax_filename={syntaxId} tree={tree} setTree={setTree} openClose={setIsOpen} socket={socket} setModalElements={setModalElements}/>
                 }
             </div>
-            <div>
+            <div className="modal-overlay">
                 {isOpen && (
                     <Modal openClose={setIsOpen} elements={modalElements}/>
                 )}
