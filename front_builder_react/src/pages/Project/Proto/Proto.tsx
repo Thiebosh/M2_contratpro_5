@@ -203,12 +203,6 @@ export function Proto() {
 
         const targetElem = document.querySelector('#exec_window');
         targetElem?.addEventListener('click', handleLinks);
-
-        return () => {
-            targetElem?.removeEventListener('click', handleLinks);
-            setSocketUsable(false);
-            socket?.close();
-        }
     }, [socket, socketUsable])
 
     return (
