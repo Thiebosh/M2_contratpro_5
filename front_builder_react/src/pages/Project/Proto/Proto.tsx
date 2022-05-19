@@ -80,7 +80,6 @@ export function Proto() {
 
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data)
-            console.log(data);
             switch (Object.keys(data)[0]) {
                 case 'init_collabs':
                     setInitCollab(data["init_collabs"] as string[]);
@@ -184,6 +183,7 @@ export function Proto() {
         function handleLinks(event: Event) {
             let index = 0;
             while (index < event.composedPath().length && (event.composedPath()[index] as HTMLElement).tagName !== "A") ++index;
+            if (index === event.composedPath().length) return;
 
             const target = (event.composedPath()[index] as HTMLElement).attributes.getNamedItem("target")?.nodeValue;
             if (target === "_blank") return;
@@ -194,8 +194,13 @@ export function Proto() {
             const targetPage = (event.composedPath()[index] as HTMLElement).attributes.getNamedItem("href")?.nodeValue;
             if (!targetPage || !socket || !socketUsable) return;
 
-            //TODO - update current page : if on pages, select it, else, select 404 (lignes 30 et 31)
-            setCurrentPage(targetPage in pages ? targetPage : "404");
+            if (!pages.filter(item => item.link === targetPage)) {
+                setCurrentPage("404");
+            }
+            else {
+                const filtered = pages.filter(item => item.link === targetPage);
+                setCurrentPage(filtered[filtered.length - 1]?.name);
+            }
 
             setLoadingPage(true);
             socket.send(JSON.stringify({"action": "execute", "page": targetPage}));
@@ -203,7 +208,7 @@ export function Proto() {
 
         const targetElem = document.querySelector('#exec_window');
         targetElem?.addEventListener('click', handleLinks);
-    }, [socket, socketUsable])
+    }, [socket, socketUsable, pages])
 
     return (
         <section id="proto">
