@@ -177,11 +177,14 @@ export function Proto() {
 
     useEffect(() => {
         function handleLinks(event:Event) {
-            event.preventDefault();
-            event.stopPropagation();
-
             let index = 0;
             while (index < event.composedPath().length && (event.composedPath()[index] as HTMLElement).tagName !== "A") ++index;
+
+            const target = (event.composedPath()[index] as HTMLElement).attributes.getNamedItem("target")?.nodeValue;
+            if (target === "_blank") return;
+
+            event.preventDefault();
+            event.stopPropagation();
 
             const targetPage = (event.composedPath()[index] as HTMLElement).attributes.getNamedItem("href")?.nodeValue;
             if (!targetPage || !socket || !socketUsable) return;
