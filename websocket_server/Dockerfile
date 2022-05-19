@@ -56,7 +56,21 @@ RUN for i in $tableauID; \
 # third stage : copy all files
 FROM server
 
-ARG valueID
+ARG tableauID
 
-COPY --from=builder /src/$valueID.exe /src/brique2/cpp/
+RUN for i in $tableauID; \
+    do if [ "$i" != "(" ];  \
+    then if [ "$i" != ")" ];  \
+    then cp /src/$i.exe /src/brique2/cpp/; \
+    fi \
+    fi \
+    done
+
+# RUN for i in $tableauID; \
+#     do if [ "$i" != "(" ];  \
+#     then if [ "$i" != ")" ];  \
+#     then COPY --from=builder /src/$i.exe /src/brique2/cpp/;  \
+#     fi \
+#     fi \
+#     done
 

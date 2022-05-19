@@ -26,6 +26,7 @@ string defaultPage = "";
 std::map<string, string> fileContent;
 int indent = 0; //tmp
 std::vector<string> htmlPages;
+std::vector<bool> isNestedLinkExternal;
 
 std::map<Container, string> colorContainer = {
     {Container::screen, "background-color: "},

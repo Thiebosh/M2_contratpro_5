@@ -152,6 +152,11 @@ export function Specs() {
     useEffect(() => {
         if (!(socket && socketUsable)) return;
         // socket.send(JSON.stringify({"action":"execute", "page": ""})) // init if needed
+
+        return () => {
+            setSocketUsable(false);
+            socket.close();
+        }
     }, [socket, socketUsable]);
 
     const [successMsg, setSuccessMsg] = useState<string>("");

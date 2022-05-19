@@ -117,9 +117,11 @@ field
         {
             currentContainer = Container::link;
             fileContent[currentPage] += (INDENT ? string(indent++, '\t') : "") + "<a>" + (ONE_LINE ? "" : "\n");
+            isNestedLinkExternal.push_back(false);
         }
         doc
         {
+            isNestedLinkExternal.pop_back();
             fileContent[currentPage] += (INDENT ? string(--indent, '\t') : "") + "</a>" + (ONE_LINE ? "" : "\n");
         }
     |   TEXT
@@ -165,11 +167,13 @@ field
         }
     |   TARGETVALUE STR_VALUE
         {
+            bool isExternal = isNestedLinkExternal.back();
             fileContent[currentPage].pop_back();
-            fileContent[currentPage] += " href='" + (string)$2 + "'>";
+            fileContent[currentPage] += " href='" + (isExternal ? "http://" + (string)$2 : (string)$2 + ".html" )+ "'>";
         }
     |   EXTLINK TRUE // FALSE => do nothing => change to bool
         {
+            isNestedLinkExternal.back() = true;
             fileContent[currentPage].pop_back();
             fileContent[currentPage] += " target='_blank'>";
         }

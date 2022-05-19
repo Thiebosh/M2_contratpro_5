@@ -19,16 +19,16 @@ class FilesManagerProto(FilesManager):
 
     def close(self):
         result = self.partners["renderer"].unset_project_files(self.project_id)
-        print(f"{self.project_id}-{self.room_type} - PHP - Project files {'well' if result else 'not'} removed")
+        self.partners["logger"].app_logger.debug(f"{self.project_id}-{self.room_type} - PHP - Project files {'well' if result else 'not'} removed")
         if result is False:
             return # error ?
         result = self.partners["renderer"].unset_project_folder(self.project_id)
-        print(f"{self.project_id}-{self.room_type} - PHP - Project directory {'well' if result else 'not'} removed")
+        self.partners["logger"].app_logger.debug(f"{self.project_id}-{self.room_type} - PHP - Project directory {'well' if result else 'not'} removed")
 
     
     def reload_files(self):
         result = self.partners["renderer"].unset_project_files(self.project_id)
-        print(f"{self.project_id}-{self.room_type} - PHP - Project files {'well' if result else 'not'} removed")
+        self.partners["logger"].app_logger.debug(f"{self.project_id}-{self.room_type} - PHP - Project files {'well' if result else 'not'} removed")
         if result is False:
             return # error ?
 
@@ -36,4 +36,4 @@ class FilesManagerProto(FilesManager):
         if not self.partners["renderer"].set_project_files(self.project_id, self.files):
             return # error ?
 
-        print(f"{self.project_id}-{self.room_type} - PHP - Project files {'well' if result else 'not'} updated")
+        self.partners["logger"].app_logger.debug(f"{self.project_id}-{self.room_type} - PHP - Project files {'well' if result else 'not'} updated")
