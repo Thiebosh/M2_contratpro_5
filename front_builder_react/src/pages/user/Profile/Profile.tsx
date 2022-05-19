@@ -50,8 +50,7 @@ function Edit(props: EditProps) {
             return;
         }
 
-        const userName = name.replaceAll(/\s\s+/g, ' ');
-        userName.trim();
+        const userName = name.replaceAll(/\s\s+/g, ' ').trim();
         console.log(userName);
 
         postAccountUpdate(userContext.user.id, userName, password)
