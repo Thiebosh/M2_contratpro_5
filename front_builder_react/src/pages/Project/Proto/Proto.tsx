@@ -138,7 +138,12 @@ export function Proto() {
     useEffect(() => {
         if (!(socket && socketUsable && pages.length >= 2)) return;
         setCurrentPage(pages[1].name);
-        socket.send(JSON.stringify({"action": "execute", "page": pages[1].link}))
+        socket.send(JSON.stringify({"action":"execute", "page": pages[1].link}))
+
+        return () => {
+            setSocketUsable(false);
+            socket.close();
+        }
     }, [socket, socketUsable, pages]);
 
     const [successMsg, setSuccessMsg] = useState<string>("");
@@ -204,7 +209,12 @@ export function Proto() {
 
         const targetElem = document.querySelector('#exec_window');
         targetElem?.addEventListener('click', handleLinks);
-        return () => targetElem?.removeEventListener('click', handleLinks);
+
+        return () => {
+            targetElem?.removeEventListener('click', handleLinks);
+            setSocketUsable(false);
+            socket?.close();
+        }
     }, [socket, socketUsable])
 
     return (
