@@ -1,4 +1,6 @@
-import React, {MouseEventHandler} from 'react'
+import React, {MouseEventHandler} from 'react';
+
+import './styles.scss';
 
 export default function TextNode({ nodeDatum, toggleNode }: {nodeDatum: any, toggleNode: MouseEventHandler}) {
     return (

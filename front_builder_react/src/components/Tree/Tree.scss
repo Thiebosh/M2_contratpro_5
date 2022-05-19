@@ -1,6 +1,7 @@
 .tree {
     font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
     font-size: 1.2em;
+    color: #2D3748;
 
     g {
         &.rd3t-node, &.rd3t-leaf-node {
@@ -8,6 +9,7 @@
 
             g {
                 fill: #F7FAFC;
+                stroke: #2D3748;
 
                 circle {
                     r: 35px;
