@@ -1,4 +1,4 @@
-import { initChildrenIfNotDone } from "./utils"
+import { initChildrenIfNotDone, isStringNumber } from "./utils"
 import { g_syntax } from "../Tree"
 import clone from "clone";
 
@@ -73,6 +73,44 @@ export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch
             }
             ))
     }
+}
+
+function getChildWithPath(data:any, path:any){
+    const children = data.children;
+    for(let i = 0; i < children.length; i++){
+        if(children[i].path === path){
+            return children[i];
+        }
+    }
+}
+
+//@ts-ignore
+function findNodeWithPathForUpdate(path:string, data:any, i:number=0){
+    const splittedPath = path.split("/");
+    const nextSubPath = splittedPath[i+1]
+
+    if(!isStringNumber(nextSubPath)){ 
+    /*if current path element isn't an index, we check if it's a field if yes : means 
+    that we have to get node in children because in the node data, the value of the key isn't a JSON : it's the input value*/
+        if(g_syntax[nextSubPath].type === "field"){
+            return getChildWithPath(data, path);
+        }
+    }
+
+    if (i < splittedPath.length - 1){
+        return findNodeWithPathForUpdate(path, data[nextSubPath], i+1);
+    } else {
+        return data;
+    }
+}
+
+export function updateValueOnNode(value:any, path:string, data:any, setTree:React.Dispatch<any>, socket?:any){
+    path = path.split("_")[0]; //get real path because given path is suffixed with "_" and type of element (e.g : "_input")
+
+    const node = findNodeWithPathForUpdate(path, data);
+    node.value = value;
+    node.parent[node.syntaxKey] = value;
+    updateNodeChildren(node, setTree);
 }
 
 function hasMandatoryValues(node:any){
