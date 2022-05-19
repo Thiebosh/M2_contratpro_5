@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {Fade} from 'react-awesome-reveal';
-import {CustomTree, root} from "../../../components/Tree/Tree";
+import {CustomTree} from "../../../components/Tree/Tree";
 import {postProjectExistForUser, postProjectGetSyntaxId} from '../../../partners/rest';
 import {useUserContext} from '../../../session/user';
 import {init_websocket} from '../../..';
@@ -19,6 +19,8 @@ export function Specs() {
     const [syntaxId, setSyntaxId] = useState<string>();
     const [isOpen, setIsOpen] = useState(false);
     const [modalElements, setModalElements] = useState([]);
+    const [tree, setTree] = useState<any>();
+
 
     useEffect(() => {
         postProjectExistForUser(userContext.user.id, urlName || "")
@@ -76,6 +78,15 @@ export function Specs() {
         }
     }, [projectId, userContext.user.name, socketUsable]);
 
+    const [addPath, setAddPath] = useState<any>();
+
+    useEffect(() => {
+        if (addPath) {
+            findNodeWithPathForCreate(addPath, tree, setTree);
+            setAddPath(undefined);
+        }
+    }, [addPath, tree]);
+    
     useEffect(() => {
         if (!socket) return;
 
@@ -107,8 +118,7 @@ export function Specs() {
             }
 
             if("action" in data){
-                //@ts-ignore
-                findNodeWithPathForCreate(data.path, root);
+                setAddPath(data.path);                
             }
         };
 
@@ -173,7 +183,7 @@ export function Specs() {
             </div>
             <div id="treeContent" className={isOpen ? "inactive": ""}>
                 { syntaxId &&
-                    <CustomTree syntax_filename={syntaxId} openClose={setIsOpen} socket={socket} setModalElements={setModalElements}/>
+                    <CustomTree syntax_filename={syntaxId} tree={tree} setTree={setTree} openClose={setIsOpen} socket={socket} setModalElements={setModalElements}/>
                 }
             </div>
             <div className="modal-overlay">

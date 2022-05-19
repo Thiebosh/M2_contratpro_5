@@ -1,5 +1,5 @@
 import { initChildrenIfNotDone } from "./utils"
-import { g_setTree, g_syntax, root } from "../Tree"
+import { g_syntax } from "../Tree"
 import clone from "clone";
 
 export function addAddingNode(data:any){
@@ -12,20 +12,20 @@ export function addAddingNode(data:any){
     data.children.push(addingNode);
 }
 
-export function findNodeWithPathForCreate(path:string, data:any, i:number=0){
+export function findNodeWithPathForCreate(path:string, data:any, setTree:React.Dispatch<any>, i:number=0){
     //@ts-ignore
     const splittedPath = path.split("/");
     const nextSubPath = splittedPath[i+1]
 
     if (i < splittedPath.length - 2){
-        findNodeWithPathForCreate(path, data[nextSubPath], i+1);
+        findNodeWithPathForCreate(path, data[nextSubPath], setTree, i+1);
     } else {
-        addChildren(data, nextSubPath);
+        addChildren(data, nextSubPath, setTree);
         return data;
     }
 }
 
-export function addChildren(nodeData:any, suggestion:any, socket?:any){
+export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch<any>, socket?:any){
     // suggestion = selected new node
     const values = g_syntax[suggestion].values;
     let node;
@@ -40,7 +40,7 @@ export function addChildren(nodeData:any, suggestion:any, socket?:any){
         addNewNodeAsValueInNodeData(node);
         parent.children.splice(-1,0,node);
         addAddingNode(node);
-        updateNodeChildren(node.parent);
+        updateNodeChildren(node.parent, setTree);
     } else {
         node = initNewNode(suggestion, parent)
     
@@ -48,7 +48,7 @@ export function addChildren(nodeData:any, suggestion:any, socket?:any){
 
         addNewNodeAsValueInNodeData(node);
         parent.children.splice(-1,0,node);
-        updateNodeChildren(node.parent);
+        updateNodeChildren(node.parent, setTree);
     }
 
     if (socket){
@@ -136,7 +136,7 @@ function initNewNode(suggestion:any, parent:any){
 }
 
 
-function updateNodeChildren(node:any){
+function updateNodeChildren(node:any, setTree:React.Dispatch<any>){
     let currentParent;
 
     if (node.parent) {
@@ -146,5 +146,5 @@ function updateNodeChildren(node:any){
             currentParent = currentParent.parent;
         }
     }
-    g_setTree(currentParent ? clone(currentParent) : clone(node));
+    setTree(currentParent ? clone(currentParent) : clone(node));
 }

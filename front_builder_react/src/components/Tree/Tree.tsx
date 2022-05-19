@@ -13,6 +13,8 @@ import TextNode from "./Nodes/TextNode";
 
 interface CustomTreeProps {
     syntax_filename:string,
+    tree:any,
+    setTree:React.Dispatch<any>,
     openClose:Function,
     setModalElements:Function,
     socket:any
@@ -22,13 +24,12 @@ export let g_syntax:any = {};
 
 export function CustomTree(props:CustomTreeProps){
 
-    const [tree, setTree] = useState<any>();
     const [syntax, setSyntax] = useState<any>();
 
     useEffect(() => {
         getDataFromJson()
-        .then((data => init(props.syntax_filename, data, setTree, setSyntax)));
-    }, [props.syntax_filename])
+        .then((data => init(props.syntax_filename, data, props.setTree, setSyntax)));
+    }, [props.setTree, props.syntax_filename])
 
     function updateSelect(e: any) {
         console.log('new select:', e)
@@ -39,7 +40,7 @@ export function CustomTree(props:CustomTreeProps){
     }
 
     const handleAddElement = (nodeDatum: any) => {
-        openModal(props.openClose, nodeDatum, props.setModalElements, props.socket)
+        openModal(props.openClose, nodeDatum, props.setModalElements, props.setTree, props.socket)
     }
 
     const renderRectSvgNode = ({ nodeDatum, toggleNode }:any) => {
@@ -55,10 +56,10 @@ export function CustomTree(props:CustomTreeProps){
         return <TextNode nodeDatum={nodeDatum} toggleNode={toggleNode} />
     };
 
-    return tree ? (
+    return props.tree ? (
         <Tree
             svgClassName="tree"
-            data={tree}
+            data={props.tree}
             translate={{x:window.innerWidth/4,y:window.innerHeight/2}}
             transitionDuration={0.5}
             renderCustomNodeElement={renderRectSvgNode}
@@ -69,8 +70,8 @@ export function CustomTree(props:CustomTreeProps){
 }
 
 
-export let root = undefined;
-export let g_setTree:Function;
+// export let root = undefined;
+// export let g_setTree:Function;
 
 function init(filename:string, data:any, setTree:React.Dispatch<any>, setSyntax:React.Dispatch<any>){
     fetch("/syntaxes/"+filename+".json")
@@ -83,8 +84,8 @@ function init(filename:string, data:any, setTree:React.Dispatch<any>, setSyntax:
         data = data["root"];
         data.parent = null;
         setTree(data);
-        root = data;
-        g_setTree = setTree;
+        // root = data;
+        // g_setTree = setTree;
     })
 }
 
@@ -123,14 +124,14 @@ function getPossibleChildrenSuggestion(nodeData:any){
     return newChildrenSuggestion;
 }
 
-function openModal(setIsOpen:Function, nodeData:any, setModalElements:Function, socket:any){
+function openModal(setIsOpen:Function, nodeData:any, setModalElements:Function, setTree:React.Dispatch<any>, socket:any){
     const newChildrenSuggestion = getPossibleChildrenSuggestion(nodeData);
     const modalElements:any = []
     newChildrenSuggestion.forEach((suggestion:any) => {
         modalElements.push({
             text: suggestion,
             onclick: () => {
-                addChildren(nodeData, suggestion, socket);
+                addChildren(nodeData, suggestion, setTree, socket);
                 setIsOpen(false);
             }
     })});
