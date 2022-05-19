@@ -79,14 +79,16 @@ class Server():
 
         new_socket, client_address = input_socket.accept()
         try:
-            if websocket_partner.handshake(new_socket):
-                logger_partner.logger.info(f"SERVER - new connexion {client_address}")
-                self.inputs.append(new_socket)  # new input socket
-            else:
-                logger_partner.logger.info("SERVER - failed handshake")
-
+            result = websocket_partner.handshake(new_socket)
         except timeout:
             logger_partner.logger.info('SERVER - websocket connection timeout')
+        
+        if not result:
+            logger_partner.logger.info("SERVER - failed handshake")
+            return
+
+        logger_partner.logger.info(f"SERVER - new connexion {client_address}")
+        self.inputs.append(new_socket)  # new input socket
 
 
     def close_client_connection(self, socket:socket) -> None:

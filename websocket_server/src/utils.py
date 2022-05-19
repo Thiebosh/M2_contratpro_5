@@ -1,5 +1,11 @@
 import json
 
+class InitFailedException(Exception):
+    pass
+
+class CloseFailedException(Exception):
+    pass
+
 class Utils:
     @staticmethod
     def get_json(json_string:"str|None") -> "tuple[bool, dict|list|None]":

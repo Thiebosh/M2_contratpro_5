@@ -6,6 +6,7 @@ import json
 from asyncio import Event
 from partners.mongo_queries import MongoQueries, COLLECTION_PROJECTS
 from input_specs import InputSpecs
+from utils import InitFailedException
 from defines import *
 
 from partners.mongo_partner import MongoPartner, WTimeoutError, WriteException, MongoCoreException
@@ -29,8 +30,10 @@ class InputManagerSpecs(InputManager):
             result = db_partner.find_one(COLLECTION_PROJECTS, *MongoQueries.getSyntaxIdFromId(self.room_id))
         except WTimeoutError as err:
             logger_partner.logger.critical(MONGO_PARTNER_TIMEOUT, err)
+            raise InitFailedException() from err
         except MongoCoreException as err:
             logger_partner.logger.error(MONGO_PARTNER_EXCEPTION, err)
+            raise InitFailedException() from err
 
         generator_partner.set_exe_file(result["syntax_id"])
 
@@ -41,8 +44,10 @@ class InputManagerSpecs(InputManager):
             self.current_version_generated = db_partner.find_one(COLLECTION_PROJECTS, *MongoQueries.getProtoStateFromId(self.room_id))['latest_proto']
         except WTimeoutError as err:
             logger_partner.logger.critical(MONGO_PARTNER_TIMEOUT, err)
+            raise InitFailedException() from err
         except MongoCoreException as err:
             logger_partner.logger.error(MONGO_PARTNER_EXCEPTION, err)
+            raise InitFailedException() from err
 
         # tmp test
         import pathlib
@@ -103,21 +108,21 @@ class InputManagerSpecs(InputManager):
 
         elif action == "save":
             result = await self.json_handler.update_storage()
-            logger_partner.logger.debug(f"Project {'well' if result else 'not'} updated")
+            logger_partner.logger.info(f"Project {'well' if result else 'not'} updated")
 
         elif action == "generate":
             if self.current_version_generated:
-                logger_partner.logger.debug(f"{self.room_id}-{self.room_type} - Project files already generated")
+                logger_partner.logger.info(f"{self.room_id}-{self.room_type} - Project files already generated")
                 return True
 
             result = await self.files_manager.generate_files(json.dumps(self.json_handler.data))
-            logger_partner.logger.debug(f"{self.room_id}-{self.room_type} - Project files {'well' if result else 'not'} generated")
+            logger_partner.logger.info(f"{self.room_id}-{self.room_type} - Project files {'well' if result else 'not'} generated")
 
             if result is False:
                 return False
 
             result = await self.files_manager.update_stored_files()
-            logger_partner.logger.debug(f"{self.room_id}-{self.room_type} - Project files {'well' if result else 'not'} updated")
+            logger_partner.logger.info(f"{self.room_id}-{self.room_type} - Project files {'well' if result else 'not'} updated")
 
             self.current_version_generated = True
             try:

@@ -8,7 +8,7 @@ from socket import socket
 import json
 from typing import Any
 from input_manager import InputManager
-from utils import Utils
+from utils import Utils, InitFailedException
 from defines import *
 
 from partners.websocket_partner import WebSocketPartner, WebSocketCoreException
@@ -17,7 +17,7 @@ from partners.logger_partner import LoggerPartner
 class Room(ABC):
     def __init__(self, room_id:str, room_type:str, partners:"dict[str, Any]", callback_update_server_sockets, callback_remove_room, input_manager:InputManager):
         logger_partner:LoggerPartner = partners[LOGGER]
-        logger_partner.logger.debug(f"{room_id} - {room_type} - Creating room...")
+        logger_partner.logger.info(f"{room_id} - {room_type} - Creating room...")
 
         self.close_evt = threading.Event()
         self.queue = Queue()
@@ -34,21 +34,24 @@ class Room(ABC):
         self.delay = datetime.now()
 
         self.input_manager = input_manager
-        logger_partner.logger.debug(f"{room_id} - {room_type} - Room created")
+        logger_partner.logger.info(f"{room_id} - {room_type} - Room created")
 
 
     async def close(self) -> None:
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
-        logger_partner.logger.debug(f"{self.room_id}-{self.room_type} - Closing room...")
+        logger_partner.logger.info(f"{self.room_id}-{self.room_type} - Closing room...")
 
         for socket in self.inputs:
             socket.close()
-        await self.input_manager.close()
+        try:
+            await self.input_manager.close()
+        except InitFailedException as err:
+            logger_partner.logger.error(f"{self.room_id}-{self.room_type} - Room close exception : {err}")
         self.callback_remove_room(self.room_id, self.room_type)
-        logger_partner.logger.debug(f"{self.room_id}-{self.room_type} - Room closed")
 
+        logger_partner.logger.info(f"{self.room_id}-{self.room_type} - Room closed")
 
 
     def get_param(self) -> "dict[str, Any]":
@@ -74,7 +77,7 @@ class Room(ABC):
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
-        logger_partner.logger.debug(f"{self.room_id}-{self.room_type} - Close client")
+        logger_partner.logger.info(f"{self.room_id}-{self.room_type} - Close client")
         if socket in self.outputs:
             self.outputs.remove(socket)
         self.inputs.remove(socket)
@@ -109,7 +112,7 @@ class Room(ABC):
         websocket_partner:WebSocketPartner = self.partners[WEBSOCKET]
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
-        logger_partner.logger.debug(f"{self.room_id}-{self.room_type} - Room ready")
+        logger_partner.logger.info(f"{self.room_id}-{self.room_type} - Room ready")
 
         try:
             while not self.close_evt.is_set() and (self.inputs or (datetime.now() - self.delay <= timedelta(minutes=5))):
@@ -130,23 +133,23 @@ class Room(ABC):
                 for socket in readable: #Get all sockets and put the ones which have a msg to a list
                     msg = None
                     try:
-                        msg = websocket_partner.recv(socket, ENCODING)
+                        msg = websocket_partner.recv(socket)
                     except WebSocketCoreException as err:
                         logger_partner.logger.error(WS_PARTNER_EXCEPTION, err)
 
                     if not msg:
-                        logger_partner.logger.debug(f"close {self.socket_name[socket]} because empty msg")
+                        logger_partner.logger.info(f"close {self.socket_name[socket]} because empty msg")
                         self.close_client_connection_to_room(socket)
                         continue
 
                     is_msg_json, msg = Utils.get_json(msg)
                     if not is_msg_json:
-                        logger_partner.logger.debug(f"{self.room_id}-{self.room_type} - malformed json : {msg}")
+                        logger_partner.logger.info(f"{self.room_id}-{self.room_type} - malformed json : {msg}")
                         self.close_client_connection_to_room(socket) # reset this line if front memory leak persist
                         continue
 
                     if msg["action"] == "exitRoom":
-                        logger_partner.logger.debug(f"close {self.socket_name[socket]} because asked")
+                        logger_partner.logger.info(f"close {self.socket_name[socket]} because asked")
                         self.close_client_connection_to_room(socket)
                         continue
 
@@ -166,8 +169,7 @@ class Room(ABC):
                     self.close_client_connection_to_room(socket)
 
                 await asyncio.sleep(0.1)
-        except Exception as e:
-            logger_partner.logger.debug(f"{self.room_id}-{self.room_type} CRITICAL: {e}")
-
+        except Exception as err:
+            logger_partner.logger.info(f"{self.room_id}-{self.room_type} CRITICAL: {err}")
 
         await self.close()

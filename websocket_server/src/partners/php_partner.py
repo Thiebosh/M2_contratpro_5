@@ -1,6 +1,7 @@
 from typing import Any
 import requests
 from requests.exceptions import RequestException
+from utils import InitFailedException
 from defines import *
 
 class PhpCoreException(Exception):
@@ -11,6 +12,8 @@ class PhpPartner():
         self.base_url = base_url
         self.session = requests.session()
         self.state = True if OS_IS_LOCAL else state or self._get("probe")[0]
+        if self.state is False:
+            raise InitFailedException()
 
 
     def copy_partner(self):

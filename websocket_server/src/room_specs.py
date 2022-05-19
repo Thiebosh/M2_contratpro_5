@@ -6,6 +6,7 @@ from input_manager_specs import InputManagerSpecs
 from room import Room
 from input import Input
 
+
 class RoomSpecs(Room):
     def __init__(self, room_id:str, room_type:str, shared_new_proto_flag:Event, partners:"dict[str, Any]", callback_update_server_sockets, callback_remove_room) -> None:
         input_manager = InputManagerSpecs(room_id, room_type, shared_new_proto_flag, partners, self.send_conflict_message)

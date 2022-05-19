@@ -35,7 +35,7 @@ class FilesManagerSpecs(FilesManager):
             os.remove(filepath)
 
         if retcode == -1 or "ERROR :" in lines:
-            logger_partner.logger.debug(f"cpp executable return error: {lines}")
+            logger_partner.logger.info(f"cpp executable return error: {lines}")
             return False
 
         try:
@@ -50,8 +50,8 @@ class FilesManagerSpecs(FilesManager):
                 if key == "name" 
                 and value.split(".")[-1] == "html"
             ]
-        except Exception as e:
-            logger_partner.logger.debug(f"cpp generated parse error: {e}")
+        except Exception as err:
+            logger_partner.logger.info(f"cpp generated parse error: {err}")
             return False
 
         return True
@@ -64,7 +64,7 @@ class FilesManagerSpecs(FilesManager):
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
         if self.files_currently_stored:
-            logger_partner.logger.debug(f"{self.project_id}-{self.room_type} - Project files already stored")
+            logger_partner.logger.info(f"{self.project_id}-{self.room_type} - Project files already stored")
             return True
 
         try:
@@ -80,7 +80,7 @@ class FilesManagerSpecs(FilesManager):
             return False
 
         if not result:
-            logger_partner.logger.debug(f"{self.project_id}-{self.room_type} - Project upload to storage failed")
+            logger_partner.logger.info(f"{self.project_id}-{self.room_type} - Project upload to storage failed")
             return False
 
         try:
@@ -96,7 +96,7 @@ class FilesManagerSpecs(FilesManager):
             return False
 
         if not result:
-            logger_partner.logger.debug(f"{self.project_id}-{self.room_type} - Project pages update in db failed")
+            logger_partner.logger.info(f"{self.project_id}-{self.room_type} - Project pages update in db failed")
             return False
 
         self.files_currently_stored = True

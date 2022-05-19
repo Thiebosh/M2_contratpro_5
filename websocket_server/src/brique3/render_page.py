@@ -1,7 +1,7 @@
 import json
 from typing import Any
 from partners.mongo_queries import MongoQueries, COLLECTION_PROJECTS
-from utils import Utils
+from utils import Utils, InitFailedException, CloseFailedException
 from defines import *
 
 from partners.mongo_partner import MongoPartner, WTimeoutError, WriteException, MongoCoreException
@@ -23,13 +23,16 @@ class RenderPage():
             self.session = db_partner.aggregate_list(COLLECTION_PROJECTS, MongoQueries.getSessionFromId(self.project_id))[0]        
         except WTimeoutError as err:
             logger_partner.logger.critical(MONGO_PARTNER_TIMEOUT, err)
+            raise InitFailedException() from err
         except MongoCoreException as err:
             logger_partner.logger.error(MONGO_PARTNER_EXCEPTION, err)
+            raise InitFailedException() from err
 
         try:
             result = renderer_partner.set_session(json.dumps(self.session))
         except PhpCoreException as err:
             logger_partner.logger.error(PHP_PARTNER_EXCEPTION, err)
+            raise InitFailedException() from err
         if not result:
             raise Exception("RenderPage - PHP - session not setted")
 
@@ -49,6 +52,7 @@ class RenderPage():
             success, session = renderer_partner.get_session()
         except PhpCoreException as err:
             logger_partner.logger.error(PHP_PARTNER_EXCEPTION, err)
+            raise CloseFailedException() from err
 
         if not success:
             return
@@ -58,19 +62,19 @@ class RenderPage():
             return
 
         try:
-            result = await db_partner.update_one(COLLECTION_PROJECTS, *MongoQueries.updateSessionForId(self.project_id, session))
+            await db_partner.update_one(COLLECTION_PROJECTS, *MongoQueries.updateSessionForId(self.project_id, session))
         except WriteException as err:
             logger_partner.logger.error(MONGO_PARTNER_WRITE_ERROR, err)
-            return False
+            raise CloseFailedException() from err
         except WTimeoutError as err:
             logger_partner.logger.critical(MONGO_PARTNER_TIMEOUT, err)
-            return False
+            raise CloseFailedException() from err
         except MongoCoreException as err:
             logger_partner.logger.error(MONGO_PARTNER_EXCEPTION, err)
-            return False
+            raise CloseFailedException() from err
 
 
-    def page(self, page:str) -> "tuple[bool,str]":
+    def page(self, page:str) -> "tuple[int,str]":
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         renderer_partner:PhpPartner = self.partners[RENDERER]
         logger_partner:LoggerPartner = self.partners[LOGGER]
@@ -80,12 +84,13 @@ class RenderPage():
             success, new_session = renderer_partner.get_session()
         except PhpCoreException as err:
             logger_partner.logger.error(PHP_PARTNER_EXCEPTION, err)
+            return (500, "")
 
         if success:
             is_new_session_json, new_session = Utils.get_json(new_session)
             if not is_new_session_json:
-                logger_partner.logger.debug(f"{self.project_id}-{self.room_type} - Php session format not json")
-                return (False, "")
+                logger_partner.logger.info(f"{self.project_id}-{self.room_type} - Php session format not json")
+                return (500, "")
 
             if self.session != new_session:
                 self.session = new_session
@@ -107,5 +112,6 @@ class RenderPage():
             result = renderer_partner.reset_session()
         except PhpCoreException as err:
             logger_partner.logger.error(PHP_PARTNER_EXCEPTION, err)
+            return False
 
         return result

@@ -1,6 +1,7 @@
 import asyncio
 import os
 from subprocess import Popen, PIPE
+from utils import InitFailedException
 from defines import *
 
 class CppPartner():
@@ -11,6 +12,8 @@ class CppPartner():
 
         if state == None:
             self.state = True if OS_IS_LOCAL else os.path.exists(folder_path)
+            if self.state is False:
+                raise InitFailedException()
 
 
     def copy_partner(self):
@@ -20,6 +23,8 @@ class CppPartner():
     def set_exe_file(self, exe_name:str) -> None:
         self.exe_path = f"{self.folder_path}/{exe_name}.exe"
         self.state = True if OS_IS_LOCAL else os.path.exists(self.exe_path)
+        if self.state is False:
+            raise InitFailedException()
 
 
     async def call(self, args, poll_freq=0.4) -> "tuple[str,int]":
