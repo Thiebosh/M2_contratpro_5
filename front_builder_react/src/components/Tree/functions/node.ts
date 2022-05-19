@@ -56,17 +56,13 @@ export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch
         const splittedPath = node.path.split("/");
         let jsonPath =splittedPath.slice(0, -1).join("/");
 
-        if (!(g_syntax[node.syntaxKey].type === "array")){
+        if ((g_syntax[node.syntaxKey].type === "field")){ 
+            /*to init creation of new field : for field, content contains only key with value that we init in the following line
+            for array, content is empty
+            for object : content contains json and not only one key-value*/
             jsonContent[splittedPath[splittedPath.length - 1]] = "";
         }
-        console.log(JSON.stringify(
-            {
-                action:"create",
-                //@ts-ignore
-                path:jsonPath,
-                content:jsonContent
-            }
-            ))
+        
         //@ts-ignore
         socket.send(JSON.stringify(
             {
@@ -108,15 +104,16 @@ function addNewNodeAsValueInNodeData(node:any){
 
 function createMandatoryChildren(node:any, content:any={}){
     if(hasMandatoryValues(node)){
+        if (!(node.syntaxKey in content)){
+            content[node.syntaxKey] = {};
+        }
+
         g_syntax[node.syntaxKey].values.forEach((val:any) => {
             if (val[0] !== "?"){
-                //@ts-ignore
                 const newNode = initNewNode(val, node);
                 node[val] = g_syntax[val].type === "field" ? "" : newNode; 
                 //If field, value is empty (fields don't have json as value), else it contains the json
-                //@ts-ignore
-                content[val] = node[val];
-                //@ts-ignore
+                content[node.syntaxKey][val] = node[val];
                 node.children.push(newNode);
                 createMandatoryChildren(newNode, content);
             }
