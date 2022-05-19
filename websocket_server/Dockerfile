@@ -39,12 +39,12 @@ RUN apt update &&\
         flex \
         bison
 
+ARG syntaxes
+
 WORKDIR /src
 COPY cpp .
 
-ARG tableauID
-
-RUN for i in $tableauID; \
+RUN for i in $syntaxes; \
     do if [ "$i" != "(" ];  \
     then if [ "$i" != ")" ];  \
     then make build valueID=$i; \
@@ -56,21 +56,6 @@ RUN for i in $tableauID; \
 # third stage : copy all files
 FROM server
 
-ARG tableauID
+COPY --from=builder /src/executables/ /src/brique2/cpp/
 
-RUN for i in $tableauID; \
-    do if [ "$i" != "(" ];  \
-    then if [ "$i" != ")" ];  \
-    then cp /src/$i.exe /src/brique2/cpp/; \
-    fi \
-    fi \
-    done
-
-# RUN for i in $tableauID; \
-#     do if [ "$i" != "(" ];  \
-#     then if [ "$i" != ")" ];  \
-#     then COPY --from=builder /src/$i.exe /src/brique2/cpp/;  \
-#     fi \
-#     fi \
-#     done
-
+RUN ls /src/brique2/cpp/
