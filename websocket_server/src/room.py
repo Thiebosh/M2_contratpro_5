@@ -11,7 +11,7 @@ from input_manager import InputManager
 from utils import Utils
 from defines import *
 
-from partners.websocket_partner import WebSocketPartner
+from partners.websocket_partner import WebSocketPartner, WebSocketCoreException
 from partners.logger_partner import LoggerPartner
 
 class Room(ABC):
@@ -129,7 +129,12 @@ class Room(ABC):
                     break
 
                 for socket in readable: #Get all sockets and put the ones which have a msg to a list
-                    msg = websocket_partner.recv(socket, self.encoding)
+                    msg = None
+                    try:
+                        msg = websocket_partner.recv(socket, self.encoding)
+                    except WebSocketCoreException as err:
+                        logger_partner.logger.error(WS_PARTNER_EXCEPTION, err)
+
                     if not msg:
                         logger_partner.logger.debug(f"close {self.socket_name[socket]} because empty msg")
                         self.close_client_connection_to_room(socket)

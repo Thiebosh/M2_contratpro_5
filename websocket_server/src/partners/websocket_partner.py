@@ -3,12 +3,15 @@ import hashlib
 import struct
 from socket import socket
 
+class WebSocketCoreException(Exception):
+    """Base class for all WebSocketCore exceptions"""
+
 class WebSocketPartner():
     def copy_partner(self):
         return WebSocketPartner()
 
     @staticmethod
-    def handshake(conn:socket, encoding:str):
+    def handshake(conn:socket, encoding:str) -> bool:
         key = None
         conn.setblocking(True)
         data = conn.recv(8192).decode(encoding)
@@ -32,7 +35,7 @@ class WebSocketPartner():
         return True
 
     @staticmethod
-    def recv(conn:socket, encoding:str, size:int=8192):
+    def recv(conn:socket, encoding:str, size:int=8192) -> "str|None":
         conn.setblocking(True)
         data = conn.recv(size)
         conn.setblocking(False)
@@ -60,12 +63,13 @@ class WebSocketPartner():
 
         try:
             result = ret.encode("latin-1").decode(encoding) # raw str to latin-1 bytes + bytes to utf-8 str
-            return result
         except UnicodeDecodeError as err:
-            return ret
+            raise WebSocketCoreException("recv double decode error") from err
+
+        return result
 
     @staticmethod
-    def send(conn:socket, data:str, encoding:str):
+    def send(conn:socket, data:str, encoding:str) -> None:
         # tmp remplace : see how to use recv mask method in reverse way
         data = data.replace("é", "e")\
                     .replace("è", "e")\

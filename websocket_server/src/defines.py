@@ -36,3 +36,5 @@ DRIVE_PARTNER_ERROR="drive partner: execution error (%s)"
 DRIVE_PARTNER_MULTIPLE_IDS="drive partner: multiple ids for folder name (%s)"
 
 PHP_PARTNER_EXCEPTION="php partner failure: %s"
+
+WS_PARTNER_EXCEPTION="websocket partner failure: %s"

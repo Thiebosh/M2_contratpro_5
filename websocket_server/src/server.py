@@ -6,7 +6,7 @@ from room_manager import RoomManager
 from utils import Utils
 from defines import *
 
-from partners.websocket_partner import WebSocketPartner
+from partners.websocket_partner import WebSocketPartner, WebSocketCoreException
 from partners.mongo_partner import MongoPartner
 from partners.drive_partner import DrivePartner
 from partners.cpp_partner import CppPartner
@@ -121,7 +121,11 @@ class Server():
                     self.add_connection(input_socket)
                     continue
 
-                target = websocket_partner.recv(input_socket, self.encoding)
+                target = None
+                try:
+                    target = websocket_partner.recv(input_socket, self.encoding)
+                except WebSocketCoreException as err:
+                    logger_partner.logger.error(WS_PARTNER_EXCEPTION, err)
 
                 if not target:
                     self.close_client_connection(input_socket)
