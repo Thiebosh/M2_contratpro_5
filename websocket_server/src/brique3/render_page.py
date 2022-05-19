@@ -1,8 +1,7 @@
-from distutils.util import strtobool
 import json
-import os
 from typing import Any
 from partners.mongo_queries import MongoQueries, COLLECTION_PROJECTS
+from utils import Utils
 from defines import *
 
 from partners.mongo_partner import MongoPartner
@@ -31,7 +30,7 @@ class RenderPage():
         renderer_partner:PhpPartner = self.partners[RENDERER]
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
-        if strtobool(os.environ.get('RENDER_STATE', default="False")):
+        if OS_IS_LOCAL:
             return
 
         success, session = renderer_partner.get_session()
@@ -40,9 +39,14 @@ class RenderPage():
             logger_partner.logger.debug(f"{self.project_id}-{self.room_type} - Project session {'well' if result else 'not'} retrieved")
             return
 
+        is_session_json, session = Utils.get_json(session)
+        if not is_session_json:
+            logger_partner.logger.debug(f"{self.project_id}-{self.room_type} - Project session format not json")
+            return
+
         result = await db_partner.update_one_async(
             COLLECTION_PROJECTS,
-            *MongoQueries.updateSessionForId(self.project_id, json.loads(session))
+            *MongoQueries.updateSessionForId(self.project_id, session)
         )
         logger_partner.logger.debug(f"{self.project_id}-{self.room_type} - Mongo - Project session {'well' if result else 'not'} updated")
     
@@ -50,12 +54,17 @@ class RenderPage():
     def page(self, page):
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         renderer_partner:PhpPartner = self.partners[RENDERER]
+        logger_partner:LoggerPartner = self.partners[LOGGER]
 
         result = renderer_partner.get_project_page(self.project_id, page)
 
         success, new_session = renderer_partner.get_session()
         if success:
-            new_session = json.loads(new_session)
+            is_new_session_json, new_session = Utils.get_json(new_session)
+            if not is_new_session_json:
+                logger_partner.logger.debug(f"{self.project_id}-{self.room_type} - Php session format not json")
+                return
+
             if self.session != new_session:
                 self.session = new_session
                 self.session_update = True

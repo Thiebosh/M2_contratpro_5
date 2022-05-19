@@ -1,10 +1,10 @@
 import logging
 import select
 import socket
-import json
 import os
 from socket import timeout
 from room_manager import RoomManager
+from utils import Utils
 from defines import *
 
 from partners.websocket_partner import WebSocketPartner
@@ -128,9 +128,8 @@ class Server():
                     self.close_client_connection(input_socket)
                     continue
 
-                try:
-                    target = json.loads(target)
-                except json.JSONDecodeError:
+                is_target_json, target = Utils.get_json(target)
+                if not is_target_json:
                     logger_partner.logger.info(f"SERVER - malformed json : '{target}'")
                     self.close_client_connection(input_socket)
                     continue

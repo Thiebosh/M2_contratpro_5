@@ -6,6 +6,7 @@ import threading
 import select
 import json
 from input_manager import InputManager
+from utils import Utils
 from defines import *
 
 from partners.websocket_partner import WebSocketPartner
@@ -135,11 +136,10 @@ class Room(ABC):
                         self.close_client_connection_to_room(socket)
                         continue
 
-                    try:
-                        msg = json.loads(msg)
-                    except json.JSONDecodeError:
+                    is_msg_json, msg = Utils.get_json(msg)
+                    if not is_msg_json:
                         logger_partner.logger.debug(f"{self.room_id}-{self.room_type} - malformed json : {msg}")
-                        # self.close_client_connection_to_room(socket)
+                        self.close_client_connection_to_room(socket) # reset this line if front memory leak persist
                         continue
 
                     if msg["action"] == "exitRoom":

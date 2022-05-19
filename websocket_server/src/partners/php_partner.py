@@ -1,8 +1,7 @@
-from distutils.util import strtobool
 import requests # eventuellement requests_async mais à voir car doit garder session
 from requests.exceptions import RequestException
+from defines import *
 
-import os # tmp
 
 class PhpPartner():
     def __init__(self, base_url, state=None) -> None:
@@ -38,13 +37,13 @@ class PhpPartner():
 
 
     def _get(self, endpoint, print_=False, get_code=False):
-        if strtobool(os.environ.get('RENDER_STATE', default="false")):
+        if OS_IS_LOCAL:
             return 500, ""
         return self._call(lambda: self.session.get(url=f"{self.base_url}?action={endpoint}"), endpoint, print_, get_code)
 
 
     def _post(self, endpoint, data, print_=False, get_code=False):
-        if strtobool(os.environ.get('RENDER_STATE', default="False")):
+        if OS_IS_LOCAL:
             return 200, ""
         return self._call(lambda: self.session.post(url=f"{self.base_url}?action={endpoint}", data=data), endpoint, print_, get_code)
 
@@ -83,7 +82,7 @@ class PhpPartner():
 
 
     def get_session(self):
-        if strtobool(os.environ.get('RENDER_STATE', default="false")):
+        if OS_IS_LOCAL:
             return True, "{}"
         return self._get("get_session")
 
