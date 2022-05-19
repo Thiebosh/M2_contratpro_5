@@ -1,4 +1,6 @@
-import React from 'react'
+import React from 'react';
+
+import './styles.scss';
 
 export default function SelectNode({nodeDatum, updateSelect}: {nodeDatum: any, updateSelect: Function}) {
   function handleSelect(e: any) {
@@ -7,13 +9,13 @@ export default function SelectNode({nodeDatum, updateSelect}: {nodeDatum: any, u
 
   return (
     <g className={nodeDatum.path}>
-      <foreignObject width={120} height={60} y={-30} x={-60}>
-        <label>{nodeDatum.syntaxKey}</label>
-        <select onChange={handleSelect}>
-          {nodeDatum.values.map((optionValue:any) => (
-            <option key={optionValue} value={optionValue}>{optionValue}</option>
-          ))}
-        </select>
+      <foreignObject width={120} height={70} y={-35} x={-60}>
+        <div className="node-div"><label>{nodeDatum.syntaxKey}</label>
+          <select onChange={handleSelect}>
+            {nodeDatum.values.map((optionValue: any) => (
+              <option key={optionValue} value={optionValue}>{optionValue}</option>
+            ))}
+          </select></div>
       </foreignObject>
     </g>
   )
