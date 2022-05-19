@@ -5,7 +5,7 @@ from utils import Utils
 from defines import *
 
 from partners.mongo_partner import MongoPartner, WTimeoutError, WriteException, MongoCoreException
-from partners.php_partner import PhpPartner
+from partners.php_partner import PhpPartner, PhpCoreException
 from partners.logger_partner import LoggerPartner
 
 class RenderPage():
@@ -26,8 +26,13 @@ class RenderPage():
         except MongoCoreException as err:
             logger_partner.logger.error(MONGO_PARTNER_EXCEPTION, err)
 
-        if not renderer_partner.set_session(json.dumps(self.session)):
+        try:
+            result = renderer_partner.set_session(json.dumps(self.session))
+        except PhpCoreException as err:
+            logger_partner.logger.error(PHP_PARTNER_EXCEPTION, err)
+        if not result:
             raise Exception("RenderPage - PHP - session not setted")
+
         self.session_update = False
 
 
@@ -40,15 +45,16 @@ class RenderPage():
         if OS_IS_LOCAL:
             return
 
-        success, session = renderer_partner.get_session()
+        try:
+            success, session = renderer_partner.get_session()
+        except PhpCoreException as err:
+            logger_partner.logger.error(PHP_PARTNER_EXCEPTION, err)
 
         if not success:
-            logger_partner.logger.debug(f"{self.project_id}-{self.room_type} - Project session {'well' if result else 'not'} retrieved")
             return
 
         is_session_json, session = Utils.get_json(session)
         if not is_session_json:
-            logger_partner.logger.debug(f"{self.project_id}-{self.room_type} - Project session format not json")
             return
 
         try:
@@ -63,17 +69,18 @@ class RenderPage():
             logger_partner.logger.error(MONGO_PARTNER_EXCEPTION, err)
             return False
 
-        logger_partner.logger.debug(f"{self.project_id}-{self.room_type} - Mongo - Project session {'well' if result else 'not'} updated")
-    
 
     def page(self, page:str) -> "tuple[bool,str]":
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         renderer_partner:PhpPartner = self.partners[RENDERER]
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
-        result = renderer_partner.get_project_page(self.project_id, page)
+        try:
+            result = renderer_partner.get_project_page(self.project_id, page)
+            success, new_session = renderer_partner.get_session()
+        except PhpCoreException as err:
+            logger_partner.logger.error(PHP_PARTNER_EXCEPTION, err)
 
-        success, new_session = renderer_partner.get_session()
         if success:
             is_new_session_json, new_session = Utils.get_json(new_session)
             if not is_new_session_json:
@@ -90,9 +97,15 @@ class RenderPage():
     def reset_session(self) -> bool:
         # 1) ACCESS TO PARTNERS AND APPLY TYPE
         renderer_partner:PhpPartner = self.partners[RENDERER]
+        logger_partner:LoggerPartner = self.partners[LOGGER]
 
         if self.session != {}:
             self.session = {}
             self.session_update = True
 
-        return renderer_partner.reset_session()
+        try:
+            result = renderer_partner.reset_session()
+        except PhpCoreException as err:
+            logger_partner.logger.error(PHP_PARTNER_EXCEPTION, err)
+
+        return result

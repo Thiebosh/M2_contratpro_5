@@ -3,6 +3,8 @@ import requests
 from requests.exceptions import RequestException
 from defines import *
 
+class PhpCoreException(Exception):
+    """Base class for all PhpCore exceptions"""
 
 class PhpPartner():
     def __init__(self, base_url:str, state:bool=None) -> None:
@@ -21,8 +23,8 @@ class PhpPartner():
 
         try:
             result:requests.Response = method_callback()
-        except RequestException:
-            raise Exception("php - server not started")
+        except RequestException as err:
+            raise PhpCoreException("_call global error") from err
 
         content = result.content.decode("utf-8").encode("utf-8").decode('utf-8') # bytes to str + str without to with accents
 

@@ -5,7 +5,7 @@ from googleapiclient.http import MediaIoBaseUpload, MediaIoBaseDownload, BatchHt
 from googleapiclient.errors import Error, HttpError, BatchError
 
 class DriveCoreException(Exception):
-    """Base class for all MongoCore exceptions"""
+    """Base class for all DriveCore exceptions"""
 
 class ExecutionException(DriveCoreException):
     pass

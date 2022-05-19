@@ -3,7 +3,7 @@ from .files_manager import FilesManager
 from defines import *
 
 from partners.drive_partner import DrivePartner, MultipleIdsException, ExecutionException, DriveCoreException
-from partners.php_partner import PhpPartner
+from partners.php_partner import PhpPartner, PhpCoreException
 from partners.logger_partner import LoggerPartner
 
 class FilesManagerProto(FilesManager):
@@ -24,14 +24,13 @@ class FilesManagerProto(FilesManager):
         except DriveCoreException as err:
             logger_partner.logger.error(MONGO_PARTNER_EXCEPTION, err)
 
-        if not renderer_partner.set_project_folder(self.project_id):
-            raise Exception(f"{self.project_id}-{self.room_type} - PHP - folder not created")
-
-        # security
-        if not renderer_partner.unset_project_files(self.project_id):
-            raise Exception(f"{self.project_id}-{self.room_type} - PHP - folder emptiness pb")
-
-        if not renderer_partner.set_project_files(self.project_id, self.files):
+        try:
+            renderer_partner.set_project_folder(self.project_id)
+            renderer_partner.unset_project_files(self.project_id)
+            result = renderer_partner.set_project_files(self.project_id, self.files)
+        except PhpCoreException as err:
+            logger_partner.logger.error(PHP_PARTNER_EXCEPTION, err)
+        if not result:
             raise Exception(f"{self.project_id}-{self.room_type} - PHP - files not uploaded")
 
 
@@ -40,12 +39,11 @@ class FilesManagerProto(FilesManager):
         renderer_partner:PhpPartner = self.partners[RENDERER]
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
-        result = renderer_partner.unset_project_files(self.project_id)
-        logger_partner.logger.debug(f"{self.project_id}-{self.room_type} - PHP - Project files {'well' if result else 'not'} removed")
-        if result is False:
-            return # error ?
-        result = renderer_partner.unset_project_folder(self.project_id)
-        logger_partner.logger.debug(f"{self.project_id}-{self.room_type} - PHP - Project directory {'well' if result else 'not'} removed")
+        try:
+            renderer_partner.unset_project_files(self.project_id)
+            renderer_partner.unset_project_folder(self.project_id)
+        except PhpCoreException as err:
+            logger_partner.logger.error(PHP_PARTNER_EXCEPTION, err)
 
     
     def reload_files(self) -> bool:
@@ -54,8 +52,10 @@ class FilesManagerProto(FilesManager):
         renderer_partner:PhpPartner = self.partners[RENDERER]
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
-        result = renderer_partner.unset_project_files(self.project_id)
-        logger_partner.logger.debug(f"{self.project_id}-{self.room_type} - PHP - Project files {'well' if result else 'not'} removed")
+        try:
+            result = renderer_partner.unset_project_files(self.project_id)
+        except PhpCoreException as err:
+            logger_partner.logger.error(PHP_PARTNER_EXCEPTION, err)
         if result is False:
             return False
 
@@ -71,8 +71,11 @@ class FilesManagerProto(FilesManager):
             logger_partner.logger.error(MONGO_PARTNER_EXCEPTION, err)
             return False
 
-        if not renderer_partner.set_project_files(self.project_id, self.files):
+        try:
+            result = renderer_partner.set_project_files(self.project_id, self.files)
+        except PhpCoreException as err:
+            logger_partner.logger.error(PHP_PARTNER_EXCEPTION, err)
+        if not result:
             return False
 
-        logger_partner.logger.debug(f"{self.project_id}-{self.room_type} - PHP - Project files {'well' if result else 'not'} updated")
         return True
