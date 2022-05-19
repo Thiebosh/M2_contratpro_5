@@ -190,13 +190,7 @@ export function Proto() {
             if (!targetPage || !socket || !socketUsable) return;
 
             //TODO - update current page : if on pages, select it, else, select 404 (lignes 30 et 31)
-            setCurrentPage(targetPage);
-            if (targetPage === 'Ecran1') {
-                setPages([{name: 'Ecran1', link: ''}])
-            } else {
-                setPages([{name: '404', link: ''}]);
-            }
-
+            setCurrentPage(targetPage in pages ? targetPage : "404");
 
             setLoadingPage(true);
             socket.send(JSON.stringify({"action": "execute", "page": targetPage}));
