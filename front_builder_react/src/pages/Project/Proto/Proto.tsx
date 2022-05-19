@@ -180,13 +180,16 @@ export function Proto() {
             event.preventDefault();
             event.stopPropagation();
 
-            const targetPage = (event.target as HTMLElement).attributes.getNamedItem("href")?.nodeValue;
+            let index = 0;
+            while (index < event.composedPath().length && (event.composedPath()[index] as HTMLElement).tagName !== "A") ++index;
+
+            const targetPage = (event.composedPath()[index] as HTMLElement).attributes.getNamedItem("href")?.nodeValue;
             if (!targetPage || !socket || !socketUsable) return;
 
             setLoadingPage(true);
             socket.send(JSON.stringify({"action":"execute", "page": targetPage}));
         }
-        const targetElem = document.querySelector('#placeholder');
+        const targetElem = document.querySelector('#exec_window');
         targetElem?.addEventListener('click', handleLinks);
         return () => targetElem?.removeEventListener('click', handleLinks);
     }, [socket, socketUsable])
