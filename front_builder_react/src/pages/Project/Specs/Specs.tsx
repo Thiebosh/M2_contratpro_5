@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {Fade} from 'react-awesome-reveal';
-import {CustomTree} from "../../../components/Tree/Tree";
+import {CustomTree} from "../../../components/Tree";
 import {postProjectExistForUser, postProjectGetSyntaxId} from '../../../partners/rest';
 import {useUserContext} from '../../../session/user';
 import {init_websocket} from '../../..';
@@ -240,7 +240,9 @@ export function Specs() {
                     <Collabs usernames={[userContext.user.name+" (you)", ...loggedCollabs]} />
                 </div>
             </div>
+
             <div className="chat">
+                <h4>Chat</h4>
                 <div className="msgs">
                     { chatMsgs.map((item, index) => (<div key={item.author+index}><span className="bold">{item.author}</span> - {item.text}</div>)) }
                 </div>
@@ -252,6 +254,7 @@ export function Specs() {
                     onKeyDown={(event) => (event.key === "Enter") && sendChatMsg()}
                 />
             </div>
+
             <div className='popup'>
                 { successMsg && <Fade><div className='success'>{successMsg}</div></Fade> }
                 { infoMsg && <Fade><div className='info'>{infoMsg}</div></Fade> }
