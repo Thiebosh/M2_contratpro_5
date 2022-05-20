@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createBrowserHistory } from 'history';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleUser } from '@fortawesome/free-solid-svg-icons';
@@ -56,16 +56,24 @@ function Link(props:LinkProps) {
     );
 }
 
-export function NavBar() {
+interface NavBarProps {
+    projectName: string,
+    setProjectName: React.Dispatch<React.SetStateAction<string>>,
+}
+export function NavBar(props:NavBarProps) {
     const currentPath:string = createBrowserHistory().location.pathname;
 
-    let projectName = '';
-    if (currentPath.startsWith('/project/')) {
-        const split = currentPath.split('/');
-        if (split.length > 2) {
-            projectName = split[2];
+    const projectName = props.projectName;
+    const setProjectName = props.setProjectName;
+
+    useEffect(() => {
+        if (currentPath.startsWith('/project/')) {
+            const split = currentPath.split('/');
+            if (split.length > 2) {
+                setProjectName(split[2]);
+            }
         }
-    }
+    }, [])
 
     return (
     <nav id='navbar'>

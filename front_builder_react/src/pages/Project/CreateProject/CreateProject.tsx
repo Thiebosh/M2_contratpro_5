@@ -8,7 +8,10 @@ import {postProjectCreate, postSyntaxGetList} from '../../../partners/rest';
 
 import './CreateProject.scss';
 
-export function CreateProject() {
+interface CreateProjectProps {
+    setProjectName: React.Dispatch<React.SetStateAction<string>>,
+}
+export function CreateProject(props:CreateProjectProps) {
     const navigate = useNavigate();
     const userId = useUserContext().user.id;
 
@@ -53,6 +56,7 @@ export function CreateProject() {
                     setErrorMsg("Project name already used");
                     return;
                 }
+                props.setProjectName(name);
                 navigate('/project/' + name);
             })
             .catch(error => {

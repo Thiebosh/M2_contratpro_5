@@ -59,10 +59,11 @@ export function init_websocket(type:'specs'|'proto', projectId:string, username:
 
 function App():JSX.Element {
     const triggerRefresh = useState<boolean>(false)[1];
+    const [projectName, setProjectName] = useState<string>('');
     return (
         <>
             <UserProvider value={userContextMethods(triggerRefresh)}>
-                <NavBar/>
+                <NavBar projectName={projectName} setProjectName={setProjectName}/>
                 <Router>
                     <Routes>
                         <Route path="/" element={<Navigate replace to="/home" />} />
@@ -71,7 +72,7 @@ function App():JSX.Element {
                         <Route path="/user/login" element={requireNoUser(<Login/>)} />
                         <Route path="/user/profile" element={requireUser(<Profile/>)} />
                         <Route path="/projects" element={requireUser(<Projects/>)} />
-                        <Route path="/projects/create" element={requireUser(<CreateProject/>)} />
+                        <Route path="/projects/create" element={requireUser(<CreateProject setProjectName={setProjectName}/>)} />
                         <Route path="/project/:urlName" element={requireUser(<Detail/>)} />
                         <Route path="/project/:urlName/specs" element={requireUser(<Specs/>)} />
                         <Route path="/project/:urlName/proto" element={requireUser(<Proto/>)} />
