@@ -1,5 +1,6 @@
 import threading
 import asyncio
+import traceback
 from socket import socket
 from typing import Any
 from room import Room
@@ -53,9 +54,14 @@ class RoomManager():
         room.open_client_connection_to_room(socket, name)
         self.rooms[f"{room_id}-{room_type}"] = room
 
-        worker = threading.Thread(target=lambda: asyncio.run(room.run()))
-        worker.setDaemon(True)
-        worker.start()
+        try:
+            worker = threading.Thread(target=lambda: asyncio.run(room.run())) # here
+            worker.setDaemon(True)
+            worker.start()
+        except Exception as err:
+            traceback.print_exc()
+            logger_partner.logger.critical("running room failed :", err)
+            return
 
 
     def add_client_to_room(self, room_id:str, room_type:str, socket:socket, name:str) -> None:

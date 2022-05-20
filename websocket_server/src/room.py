@@ -164,6 +164,8 @@ class Room(ABC):
                         next_msg = self.client_connection_queue[socket].get_nowait()  # unqueue msg
                     except Empty:
                         self.outputs.remove(socket)
+                    except KeyError:
+                        self.outputs.remove(socket)
                     else:
                         websocket_partner.send(socket, next_msg)
 
