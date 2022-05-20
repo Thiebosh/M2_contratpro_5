@@ -34,7 +34,7 @@ export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch
     if (values){
         initChildrenIfNotDone(parent);
         node = initNewNode(suggestion, parent)
-    
+
         jsonContent = createMandatoryChildren(node);
         
         addNewNodeAsValueInNodeData(node);
@@ -62,7 +62,7 @@ export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch
             for object : content contains json and not only one key-value*/
             jsonContent[splittedPath[splittedPath.length - 1]] = "";
         }
-        
+
         //@ts-ignore
         socket.send(JSON.stringify(
             {
@@ -137,6 +137,9 @@ function hasMandatoryValues(node:any){
 function addNewNodeAsValueInNodeData(node:any){
     const parent = node.parent;
     const syntaxKey = node.syntaxKey;
+    if (g_syntax[syntaxKey].type === "array" && !parent[syntaxKey]){
+        parent[syntaxKey] = [];
+    }
     if (parent[syntaxKey]){ // if array
         node.path = parent.path + "/" + syntaxKey + "/" + parent[syntaxKey].length;
         parent[syntaxKey].push(node);

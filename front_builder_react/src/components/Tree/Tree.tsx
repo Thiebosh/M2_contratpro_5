@@ -24,11 +24,7 @@ export let g_syntax:any = {};
 
 export function CustomTree(props:CustomTreeProps){
 
-
-    useEffect(() => {
-        getDataFromJson()
-        .then((data => init(props.syntax, data, props.setTree)));
-    }, [props.setTree, props.syntax])
+    g_syntax = props.syntax;
 
     function updateSelect(e: any) {
         console.log('new select:', e)
@@ -47,7 +43,7 @@ export function CustomTree(props:CustomTreeProps){
             return <InputNode nodeDatum={nodeDatum} updateValue={updateValue} tree={props.tree} setTree={props.setTree} socket={props.socket}/>;
         }
         else if (nodeDatum.type === "select"){
-            return <SelectNode nodeDatum={nodeDatum} updateSelect={updateSelect} />
+            return <SelectNode nodeDatum={nodeDatum} updateSelect={updateSelect} tree={props.tree} setTree={props.setTree} socket={props.socket}/>
         }
         else if (nodeDatum.type === "adding"){
             return <AddElementNode nodeDatum={nodeDatum} handleAddElement={handleAddElement} />
