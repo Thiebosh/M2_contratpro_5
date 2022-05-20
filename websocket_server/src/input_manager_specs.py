@@ -64,7 +64,7 @@ class InputManagerSpecs(InputManager):
 
     def check_conflicts(self, input_to_process:InputSpecs) -> bool:
         for current_input in self.inputs:
-            if current_input == input_to_process or current_input.failed:
+            if current_input == input_to_process or current_input.socket == input_to_process.socket or current_input.failed:
                 continue
 
             first_path = current_input.get_path()
