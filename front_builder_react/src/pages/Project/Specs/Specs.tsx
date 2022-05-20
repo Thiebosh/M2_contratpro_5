@@ -141,7 +141,6 @@ export function Specs() {
         socket.onmessage = (event) => {
             // setLoadingPage(false);
             const data:Record<string, unknown> = JSON.parse(event.data)
-            console.log(data);
             switch(Object.keys(data)[0]) {
                 case 'init_collabs':
                     setInitCollab(data["init_collabs"] as string[]);
@@ -154,7 +153,6 @@ export function Specs() {
                     break;
 
                 case 'init_chat':
-                    console.log("chat:", data["init_chat"]);
                     //@ts-ignore
                     setChatMsgs(data["init_chat"]);
                     break;
@@ -178,6 +176,7 @@ export function Specs() {
             }
 
             if("action" in data){
+                console.log(data);
                 setSocketActionData(data);                
             }
         };
