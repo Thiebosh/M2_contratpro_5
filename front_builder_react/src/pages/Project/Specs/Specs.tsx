@@ -10,6 +10,15 @@ import './Specs.scss';
 import {Collabs} from '../../../components/Collabs';
 import {Modal} from "../../../components/Modal"
 import {findNodeWithPathForCreate, updateValueOnNode} from "../../../components/Tree/functions/node"
+import {formatData} from "../../../components/Tree/functions/format"
+
+function init(data:any, setTree:React.Dispatch<any>){
+    data["root"].path = "root"
+    formatData(data);
+    data = data["root"];
+    data.parent = null;
+    setTree(data);
+}
 
 export function Specs() {
     const navigate = useNavigate();
@@ -21,8 +30,6 @@ export function Specs() {
     const [modalElements, setModalElements] = useState([]);
     const [tree, setTree] = useState<any>();
     const [syntax, setSyntax] = useState<any>();
-
-
 
     useEffect(() => {
         postProjectExistForUser(userContext.user.id, urlName || "")
@@ -169,7 +176,8 @@ export function Specs() {
                     break;
 
                 case 'init_tree':
-                    console.log("tree:", data);
+                    console.log("recieve", data["init_tree"])
+                    init(data["init_tree"], setTree);
                     break;
                 case 'save':
                     data["save"] ? setSuccessMsg("Save: success") : setErrorMsg("Save: failure");
