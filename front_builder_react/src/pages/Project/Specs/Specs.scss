@@ -72,11 +72,11 @@
             margin-top: 0;
             margin-bottom: 8px;
         }
-        .msgs {
+        #msgs {
             text-align: left;
             width: 10em;
-            max-height: 40vh;
-            overflow: scroll;
+            max-height: 10em;
+            overflow-y: auto;
         }
         input {
             border: 1px solid lightgray;
