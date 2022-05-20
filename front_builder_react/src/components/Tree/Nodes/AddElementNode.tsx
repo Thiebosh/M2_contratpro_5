@@ -10,7 +10,7 @@ export default function AddElementNode({nodeDatum, handleAddElement}: {nodeDatum
         <circle r="25" strokeDasharray="10,4" />
 
         <foreignObject width={22} height={22} x={-11} y={-11}>
-          <FontAwesomeIcon icon={faPlus} size="sm"/>
+          <FontAwesomeIcon icon={faPlus} size="1x" />
         </foreignObject>
       </g>
     )
