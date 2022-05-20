@@ -165,7 +165,7 @@ class Room(ABC):
                     except Empty:
                         self.outputs.remove(socket)
                     except KeyError:
-                        self.outputs.remove(socket)
+                        pass
                     else:
                         websocket_partner.send(socket, next_msg)
 

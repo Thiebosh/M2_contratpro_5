@@ -1,3 +1,4 @@
+from os import stat
 from typing import Any
 from bson import ObjectId
 from datetime import datetime
@@ -105,5 +106,25 @@ class MongoQueries():
             {
                 "_id": 0,
                 "syntax_id": 1,
+            }
+        )
+
+    @staticmethod
+    def getChatFromId(id:str):
+        return (
+            {"_id": ObjectId(id)},
+            {
+                "_id": 0,
+                "chat": 1,
+            }
+        )
+
+    @staticmethod
+    def updateChatForId(id:str, chat:"list[dict[str, str]]"):
+        return (
+            {"_id": ObjectId(id)},
+            {"$set": {
+                "chat": chat,
+                }
             }
         )

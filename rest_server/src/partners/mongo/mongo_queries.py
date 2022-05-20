@@ -187,6 +187,7 @@ class MongoQueries:
             "specs": { "root": {} },
             "pages": [{ "default": ""}],
             "session": {},
+            "chat": [],
         }
 
     @staticmethod

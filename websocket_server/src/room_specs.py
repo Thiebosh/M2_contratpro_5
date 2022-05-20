@@ -7,6 +7,8 @@ from room import Room
 from input import Input
 from defines import *
 
+from partners.mongo_queries import MongoQueries, COLLECTION_PROJECTS
+from partners.mongo_partner import MongoPartner, WTimeoutError, WriteException, MongoCoreException
 from partners.logger_partner import LoggerPartner
 
 
@@ -15,7 +17,18 @@ class RoomSpecs(Room):
         input_manager = InputManagerSpecs(room_id, room_type, shared_new_proto_flag, partners, self.send_conflict_message)
         super().__init__(room_id, room_type, partners, callback_update_server_sockets, callback_remove_room, input_manager)
 
+        db_partner:MongoPartner = self.partners[DB]
+        logger_partner:LoggerPartner = self.partners[LOGGER]
+
         self.chat:"list[dict[str,str]]" = []
+        try:
+            result = db_partner.find_one(COLLECTION_PROJECTS, *MongoQueries.getChatFromId(self.room_id))
+            if result:
+                self.chat = result["chat"]
+        except WTimeoutError as err:
+            logger_partner.logger.critical(MONGO_PARTNER_TIMEOUT, err)
+        except MongoCoreException as err:
+            logger_partner.logger.error(MONGO_PARTNER_EXCEPTION, err)
 
 
     def open_client_connection_to_room(self, socket:socket, name:str) -> None:
@@ -30,12 +43,22 @@ class RoomSpecs(Room):
 
 
     async def process_running_inputs(self) -> None:
+        db_partner:MongoPartner = self.partners[DB]
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
         for input_to_process in self.input_manager.inputs:
             if input_to_process.get_action() == "chat":
                 self.chat.append(input_to_process.get_chat())
                 self.broadcast_message(input_to_process.get_socket(), json.dumps({"chat":input_to_process.get_chat()}))
+
+                try:
+                    await db_partner.update_one(COLLECTION_PROJECTS, *MongoQueries.updateChatForId(self.room_id, self.chat))
+                except WriteException as err:
+                    logger_partner.logger.error(MONGO_PARTNER_WRITE_ERROR, err)
+                except WTimeoutError as err:
+                    logger_partner.logger.critical(MONGO_PARTNER_TIMEOUT, err)
+                except MongoCoreException as err:
+                    logger_partner.logger.error(MONGO_PARTNER_EXCEPTION, err)
                 continue
 
             if (input_to_process.check_datetime()) or input_to_process.failed:
