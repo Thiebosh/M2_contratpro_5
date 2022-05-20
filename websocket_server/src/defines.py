@@ -13,6 +13,7 @@ OS_IS_LOCAL=strtobool(os.environ.get("IS_LOCAL", default="False"))
 
 # GLOBAL VALUES
 ENCODING="utf-8"
+ROOM_AWAIT_MINUTES=5
 
 # DICT KEYS
 WEBSOCKET="websocket"

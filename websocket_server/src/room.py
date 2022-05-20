@@ -119,7 +119,7 @@ class Room(ABC):
         logger_partner.logger.info(f"{self.room_id}-{self.room_type} - Room start running")
 
         try:
-            while not self.close_evt.is_set() and (self.inputs or (datetime.now() - self.delay <= timedelta(minutes=5))):
+            while not self.close_evt.is_set() and (self.inputs or (datetime.now() - self.delay <= timedelta(minutes=ROOM_AWAIT_MINUTES))):
                 with self.lock:
                     while not self.queue.empty():
                         client = self.queue.get()
