@@ -108,7 +108,7 @@ export function Specs() {
                     }
                     break;
                 case "update":
-                    updateValueOnNode(socketActionData.content,socketActionData.path,tree,setTree);
+                    updateValueOnNode(socketActionData.content, socketActionData.path, tree, setTree);
                     break;
             }
             

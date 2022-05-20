@@ -1,23 +1,42 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './styles.scss';
-import { updateValueOnNode } from "./../functions/node"
+import { updateValueOnNode } from "./../functions/node";
+
+function changeOnEnter(){
+  
+}
 
 export default function InputNode({ nodeDatum, updateValue, tree, setTree, socket}: {nodeDatum:any, updateValue: Function, tree:any, setTree:React.Dispatch<any>, socket:any}) {
-  let updateDelay: NodeJS.Timeout;
+
+  const [value, setValue] = useState(nodeDatum.value);
+  const [checked, setChecked] = useState(nodeDatum.value);
+
+  useEffect(()=> {
+    setValue(nodeDatum.value);
+    setChecked(nodeDatum.value);
+  }, [nodeDatum.value]);
+
+  function changeOnEnter(e:any){
+    if (nodeDatum.nature === "text" && e.target.value && e.target.className){
+      updateValueOnNode(e.target.value, e.target.className, tree, setTree, socket);
+    }
+  }
 
   function handleChange(e: any) {
-    clearInterval(updateDelay);
-    // Delay update
-    updateDelay = setTimeout(() => {
+    if (nodeDatum.nature === "checkbox") {
+      setChecked(!!e.target.checked)
+    } else {
+      if (e.target.value) {
+        setValue(e.target.value)
+      }
+    }
+    
       if (nodeDatum.nature === "checkbox") {
         updateValue(!!e.target.checked)
-      } else {
-        if (e.target.value) {
+      } else if (nodeDatum.nature !== "text" && e.target.value && e.target.className){
           updateValueOnNode(e.target.value, e.target.className, tree, setTree, socket);
           updateValue(e.target.value)
-        }
       }
-    },300)
   }
 
   return (
@@ -25,7 +44,8 @@ export default function InputNode({ nodeDatum, updateValue, tree, setTree, socke
         <foreignObject width={120} height={70} y={-35} x={-60}>
           <div className="node-div">
             <label>{nodeDatum.syntaxKey}</label>
-            <input  className={nodeDatum.path+"_input"} type={nodeDatum.nature} defaultChecked={nodeDatum.value} defaultValue={nodeDatum.value} onChange={handleChange}/>
+            <input  className={nodeDatum.path+"_input"} type={nodeDatum.nature} checked={checked} 
+            value={value} onChange={handleChange} onKeyDown={(e)=>(e.key === "Enter") && changeOnEnter(e)}/>
           </div>
         </foreignObject>
       </g>
