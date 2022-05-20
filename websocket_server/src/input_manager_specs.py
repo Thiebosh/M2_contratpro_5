@@ -25,8 +25,8 @@ class InputManagerSpecs(InputManager):
         logger_partner.logger.info(f"{self.room_id}-{self.room_type} - create input manager")
 
         self.send_conflict_message_callback = send_conflict_message_callback
-
         self.shared_new_proto_flag = shared_new_proto_flag
+
         try:
             result = db_partner.find_one(COLLECTION_PROJECTS, *MongoQueries.getSyntaxIdFromId(self.room_id))
         except WTimeoutError as err:

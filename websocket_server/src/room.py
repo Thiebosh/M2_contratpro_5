@@ -8,6 +8,7 @@ from socket import socket
 import json
 from typing import Any
 from input_manager import InputManager
+import traceback
 from utils import Utils, InitFailedException
 from defines import *
 
@@ -171,6 +172,7 @@ class Room(ABC):
 
                 await asyncio.sleep(0.1)
         except Exception as err:
+            traceback.print_exc()
             logger_partner.logger.critical(f"{self.room_id}-{self.room_type}: {err}")
 
         await self.close()

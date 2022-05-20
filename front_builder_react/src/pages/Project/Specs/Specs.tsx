@@ -78,6 +78,25 @@ export function Specs() {
         }
     }, [removeCollab, loggedCollabs]);
 
+    const [chatInput, setChatInput] = useState<string>("");
+    const [addChatMsg, setAddChatMsg] = useState<{author:string, text:string}|undefined>(undefined);
+    const [chatMsgs, setChatMsgs] = useState<{author:string, text:string}[]>([]);
+    const sendChatMsg = () => {
+        if (!socket || !socketUsable) {
+            setErrorMsg("Not connected to server!");
+            return;
+        }
+        socket.send(JSON.stringify({action:"chat", chat: {author:userContext.user.name, text:chatInput}}));
+        setChatMsgs([...chatMsgs, {author:userContext.user.name, text:chatInput}]);
+        setChatInput("");
+    }
+    useEffect(() => {
+        if (addChatMsg) {
+            setChatMsgs([...chatMsgs, addChatMsg])
+            setAddChatMsg(undefined);
+        }
+    }, [chatMsgs, addChatMsg]);
+
     useEffect(() => {
         if (projectId && !socketUsable) {
             // setLoadingPage(true);
@@ -134,13 +153,25 @@ export function Specs() {
                     setRemoveCollab(data["remove_collab"] as string);
                     break;
 
+                case 'init_chat':
+                    console.log("chat:", data["init_chat"]);
+                    //@ts-ignore
+                    setChatMsgs(data["init_chat"]);
+                    break;
+                case 'chat':
+                    //@ts-ignore
+                    setAddChatMsg(data["chat"]);
+                    break;
+
+                case 'init_tree':
+                    console.log("tree:", data);
+                    break;
                 case 'save':
                     data["save"] ? setSuccessMsg("Save: success") : setErrorMsg("Save: failure");
                     break;
                 case 'generate':
                     data["generate"] ? setSuccessMsg("Generate: success") : setErrorMsg("Generate: failure");
                     break;
-
                 case "create":
                     data["create"] ? setSuccessMsg("Create: success") : setErrorMsg("Create: failure");
                     break;
@@ -209,6 +240,18 @@ export function Specs() {
                 <div className="users">
                     <Collabs usernames={[userContext.user.name+" (you)", ...loggedCollabs]} />
                 </div>
+            </div>
+            <div className="chat">
+                <div className="msgs">
+                    { chatMsgs.map((item, index) => (<div key={item.author+index}><span className="bold">{item.author}</span> - {item.text}</div>)) }
+                </div>
+                <hr/>
+                <input
+                    type="text"
+                    value={chatInput}
+                    onChange={(event) => setChatInput(event.target.value)}
+                    onKeyDown={(event) => (event.key === "Enter") && sendChatMsg()}
+                />
             </div>
             <div className='popup'>
                 { successMsg && <Fade><div className='success'>{successMsg}</div></Fade> }

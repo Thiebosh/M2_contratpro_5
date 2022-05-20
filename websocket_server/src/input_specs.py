@@ -19,5 +19,9 @@ class InputSpecs(Input):
         return self.msg["content"]
 
 
+    def get_chat(self) -> str:
+        return self.msg["chat"]
+
+
     def check_datetime(self) -> bool:
         return datetime.now() - self.datetime <= timedelta(seconds=1)

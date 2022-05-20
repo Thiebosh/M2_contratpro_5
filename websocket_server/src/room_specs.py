@@ -15,11 +15,14 @@ class RoomSpecs(Room):
         input_manager = InputManagerSpecs(room_id, room_type, shared_new_proto_flag, partners, self.send_conflict_message)
         super().__init__(room_id, room_type, partners, callback_update_server_sockets, callback_remove_room, input_manager)
 
+        self.chat:"list[dict[str,str]]" = []
+
 
     def open_client_connection_to_room(self, socket:socket, name:str) -> None:
         super().open_client_connection_to_room(socket, name)
 
-        self.add_message_in_queue(socket, json.dumps({"init": self.input_manager.json_handler.data}))
+        self.add_message_in_queue(socket, json.dumps({"init_chat": self.chat}))
+        self.add_message_in_queue(socket, json.dumps({"init_tree": self.input_manager.json_handler.data}))
 
 
     def send_conflict_message(self, input_to_process:Input) -> None:
@@ -30,6 +33,11 @@ class RoomSpecs(Room):
         logger_partner:LoggerPartner = self.partners[LOGGER]
 
         for input_to_process in self.input_manager.inputs:
+            if input_to_process.get_action() == "chat":
+                self.chat.append(input_to_process.get_chat())
+                self.broadcast_message(input_to_process.get_socket(), json.dumps({"chat":input_to_process.get_chat()}))
+                continue
+
             if (input_to_process.check_datetime()) or input_to_process.failed:
                 continue
 
@@ -47,4 +55,10 @@ class RoomSpecs(Room):
             msg = json.dumps({"author": self.socket_name[input_to_process.get_socket()], **input_to_process.get_msg()})
             self.broadcast_message(input_to_process.socket, msg)
 
-        self.input_manager.inputs = [input_unit for input_unit in self.input_manager.inputs if input_unit.check_datetime() and not input_unit.failed]
+        self.input_manager.inputs = [
+            input_unit 
+            for input_unit in self.input_manager.inputs 
+            if input_unit.check_datetime() 
+                and not input_unit.failed
+                and not input_unit.get_action() == "chat"
+        ]
