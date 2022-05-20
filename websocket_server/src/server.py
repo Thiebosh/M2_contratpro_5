@@ -20,7 +20,7 @@ class Server():
         logger_level = logging.INFO
 
         logging.getLogger("googleapiclient").disabled = True
-        logging.basicConfig(level=logger_level, format='[%(asctime)s] %(levelname)s for %(funcName)s in %(module)s: %(message)s')
+        logging.basicConfig(level=logger_level, format='[%(asctime)s] %(levelname)s for %(module)s (%(funcName)s) : %(message)s')
 
         logger = logger or logging.getLogger("None")
         logger_partner = LoggerPartner(logger)
