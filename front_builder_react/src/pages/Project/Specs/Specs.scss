@@ -68,11 +68,16 @@
         border-width: 1px;
         padding: 0.5em 0.4em;
 
+        h4 {
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
         .msgs {
             text-align: left;
             width: 10em;
+            max-height: 40vh;
+            overflow: scroll;
         }
-
         input {
             border: 1px solid lightgray;
             border-radius: 5px;
