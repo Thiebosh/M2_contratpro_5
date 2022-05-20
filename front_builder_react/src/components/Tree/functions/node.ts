@@ -169,6 +169,9 @@ function createMandatoryChildren(node:any, content:any={}){
                 createMandatoryChildren(newNode, content);
             }
         });
+    } else {
+        content[node.syntaxKey] = {}; 
+        //if object which doesn't have mandatory children, content is name of new element (e.g : "block") with empty json
     }
     return content;
 }
