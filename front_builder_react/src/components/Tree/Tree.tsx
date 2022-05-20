@@ -59,6 +59,7 @@ export function CustomTree(props:CustomTreeProps){
             transitionDuration={0.5}
             renderCustomNodeElement={renderRectSvgNode}
             separation={{siblings: 1, nonSiblings: 1}}
+            pathFunc="step"
         />
     ) : (
       <h1>Loading...</h1>
