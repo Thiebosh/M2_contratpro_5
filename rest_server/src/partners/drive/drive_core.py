@@ -4,7 +4,7 @@ from googleapiclient.errors import Error, HttpError
 
 
 class DriveCoreException(Exception):
-    """Base class for all MongoCore exceptions"""
+    """Base class for all DriveCore exceptions"""
 
 class ExecutionException(DriveCoreException):
     pass

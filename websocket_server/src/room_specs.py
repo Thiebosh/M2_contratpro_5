@@ -1,30 +1,41 @@
 import json
+from typing import Any
+from asyncio import Event
+from socket import socket
 from input_manager_specs import InputManagerSpecs
 from room import Room
+from input import Input
+from defines import *
+
+from partners.logger_partner import LoggerPartner
+
 
 class RoomSpecs(Room):
-    def __init__(self, room_id, room_type, shared_new_proto_flag, partners, callback_update_server_sockets, callback_remove_room, encoding) -> None:
+    def __init__(self, room_id:str, room_type:str, shared_new_proto_flag:Event, partners:"dict[str, Any]", callback_update_server_sockets, callback_remove_room) -> None:
         input_manager = InputManagerSpecs(room_id, room_type, shared_new_proto_flag, partners, self.send_conflict_message)
-        super().__init__(room_id, room_type, partners, callback_update_server_sockets, callback_remove_room, encoding, input_manager)
+        super().__init__(room_id, room_type, partners, callback_update_server_sockets, callback_remove_room, input_manager)
 
 
-    def open_client_connection_to_room(self, socket, name):
+    def open_client_connection_to_room(self, socket:socket, name:str) -> None:
         super().open_client_connection_to_room(socket, name)
 
         self.add_message_in_queue(socket, json.dumps({"init": self.input_manager.json_handler.data}))
 
 
-    def send_conflict_message(self, input_to_process):
+    def send_conflict_message(self, input_to_process:Input) -> None:
         self.add_message_in_queue(input_to_process.socket, json.dumps({"error": "conflict"}))
 
 
-    async def process_running_inputs(self):
+    async def process_running_inputs(self) -> None:
+        logger_partner:LoggerPartner = self.partners[LOGGER]
+
         for input_to_process in self.input_manager.inputs:
             if (input_to_process.check_datetime()) or input_to_process.failed:
                 continue
 
             #If no conflicts, execute the action ; in every case : remove socket from list
             if self.input_manager.check_conflicts(input_to_process):
+                logger_partner.logger.info(f"{self.room_id}-{self.room_type} - conflicts")
                 continue
 
             result = await self.input_manager.check_and_execute_action_function(input_to_process)
