@@ -43,7 +43,7 @@ export function init_websocket(type:'specs'|'proto', projectId:string, username:
     socket.onerror = (error) => {
         setUsable(false);
         socket.close();
-        console.log(`[error] ${error}`);
+        console.error('[error]', error);
     };
     socket.onclose = (event) => {
         setUsable(false);
