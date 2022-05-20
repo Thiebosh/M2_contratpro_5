@@ -55,7 +55,7 @@ class RoomManager():
         self.rooms[f"{room_id}-{room_type}"] = room
 
         try:
-            worker = threading.Thread(target=lambda: asyncio.run(room.run())) # here
+            worker = threading.Thread(target=lambda: asyncio.run(room.run()))
             worker.setDaemon(True)
             worker.start()
         except Exception as err:
