@@ -86,8 +86,11 @@ export function Specs() {
             setErrorMsg("Not connected to server!");
             return;
         }
-        socket.send(JSON.stringify({action:"chat", chat: {author:userContext.user.name, text:chatInput}}));
-        setChatMsgs([...chatMsgs, {author:userContext.user.name, text:chatInput}]);
+        const input = chatInput.trim();
+        if (input) {
+            socket.send(JSON.stringify({action:"chat", chat: {author:userContext.user.name, text:input}}));
+            setChatMsgs([...chatMsgs, {author:userContext.user.name, text:input}]);
+        }
         setChatInput("");
     }
     useEffect(() => {
@@ -96,6 +99,10 @@ export function Specs() {
             setAddChatMsg(undefined);
         }
     }, [chatMsgs, addChatMsg]);
+    useEffect(() => {
+        const element = document.getElementById("msgs") as HTMLElement;
+        element.scrollTop = element.scrollHeight
+    }, [chatMsgs]);
 
     useEffect(() => {
         if (projectId && !socketUsable) {
@@ -171,7 +178,7 @@ export function Specs() {
                     data["generate"] ? setSuccessMsg("Generate: success") : setErrorMsg("Generate: failure");
                     break;
                 case "create":
-                    data["create"] ? setSuccessMsg("Create: success") : setErrorMsg("Create: failure");
+                    if (!data["create"]) setErrorMsg("Create: failure");
                     break;
             }
 
@@ -243,7 +250,7 @@ export function Specs() {
 
             <div className="chat">
                 <h4>Chat</h4>
-                <div className="msgs">
+                <div id="msgs">
                     { chatMsgs.map((item, index) => (<div key={item.author+index}><span className="bold">{item.author}</span> - {item.text}</div>)) }
                 </div>
                 <hr/>
