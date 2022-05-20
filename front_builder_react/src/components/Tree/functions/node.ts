@@ -54,24 +54,30 @@ export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch
     if (socket){
         //@ts-ignore
         const splittedPath = node.path.split("/");
-        let jsonPath =splittedPath.slice(0, -1).join("/");
+        let jsonPath = splittedPath.slice(0, -1).join("/");
 
-        if ((g_syntax[node.syntaxKey].type === "field")){ 
+        if (g_syntax[node.syntaxKey].type === "field"){ 
             /*to init creation of new field : for field, content contains only key with value that we init in the following line
             for array, content is empty
             for object : content contains json and not only one key-value*/
             jsonContent[splittedPath[splittedPath.length - 1]] = "";
-        }
-
-        //@ts-ignore
-        socket.send(JSON.stringify(
-            {
-                action:"create",
-                //@ts-ignore
-                path:jsonPath,
-                content:jsonContent
-            }
+        } else if (g_syntax[node.syntaxKey].type === "array" && parent[node.syntaxKey].length === 1){
+            socket.send(JSON.stringify(
+                {
+                    action:"create",
+                    path:jsonPath.split("/").slice(0, -1).join("/"),
+                    content:{[node.syntaxKey]: [jsonContent]}
+                }
+            ));
+        } else {
+            socket.send(JSON.stringify(
+                {
+                    action:"create",
+                    path:jsonPath,
+                    content:jsonContent
+                }
             ))
+        }
     }
 }
 
