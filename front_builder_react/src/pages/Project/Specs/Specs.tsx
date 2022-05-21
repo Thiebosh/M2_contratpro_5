@@ -282,7 +282,7 @@ export function Specs() {
             </div>
             <div className="modal-overlay">
                 {isOpen && (
-                    <Modal openClose={setIsOpen} elements={modalElements}/>
+                    <Modal title="Add element" openClose={setIsOpen} elements={modalElements}/>
                 )}
             </div>
             {/* { socketUsable ? (loadingPage ? <p className='centered'>Loading...</p> : <div id="placeholder"/>) : <p className='centered'>Connection to server...</p> } */}

@@ -1,6 +1,7 @@
 import "./Modal.scss"
 
 interface ModalProps {
+    title:string,
     openClose:Function,
     elements:{
         text: string,
@@ -12,14 +13,14 @@ export function Modal(props:ModalProps){
     return (
         <div className="modal">
             <header className="modal-header">
-                <h2>Modal Title</h2>
+                <h2>{props.title}</h2>
                 <button onClick={() => props.openClose(false)} className="close-button">&times;</button>
             </header>
             <main className="modal-main">
-                <div id="modal-content">
-                    <h3>Que souhaitez-vous ajouter ?</h3>
+                <h3>What would you like to add?</h3>
+                <div className="modal-content">
                     {props.elements.map(item => (
-                      <div key={item.text} className="modalInput" onClick={item.onclick}>
+                      <div key={item.text} className="button" onClick={item.onclick}>
                         {item.text.charAt(0).toUpperCase() + item.text.slice(1)}
                       </div>
                     ))}
