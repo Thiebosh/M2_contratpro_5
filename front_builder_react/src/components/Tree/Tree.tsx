@@ -76,12 +76,6 @@ function init(syntax:any, data:any, setTree:React.Dispatch<any>){
     setTree(data);
 }
 
-function getDataFromJson():Promise<Record<string, unknown>>{
-    return fetch("/example.json")
-    .then(data => data.json())
-}
-
-
 function getParentChildrenValues(nodeData:any){
     let parentChildrenValues:any = [];
 

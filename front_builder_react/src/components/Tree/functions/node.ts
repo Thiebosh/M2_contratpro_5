@@ -51,29 +51,34 @@ export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch
         updateNodeChildren(node.parent, setTree);
     }
 
-    if(Object.keys(jsonContent).length === 0){
-        jsonContent[node.syntaxKey] = {};
-    }
+    
 
     if (socket){
         //@ts-ignore
         const splittedPath = node.path.split("/");
         let jsonPath = splittedPath.slice(0, -1).join("/");
 
-        if (g_syntax[node.syntaxKey].type === "field"){ 
-            /*to init creation of new field : for field, content contains only key with value that we init in the following line
-            for array, content is empty
-            for object : content contains json and not only one key-value*/
-            jsonContent[splittedPath[splittedPath.length - 1]] = "";
-        } else if (g_syntax[node.syntaxKey].type === "array" && parent[node.syntaxKey].length === 1){
+        if (g_syntax[node.syntaxKey].type === "array" && parent[node.syntaxKey].length === 1){
             socket.send(JSON.stringify(
                 {
                     action:"create",
                     path:jsonPath.split("/").slice(0, -1).join("/"),
                     content:{[node.syntaxKey]: [jsonContent]}
                 }
-            ));
+            )); //if array doesn't exist as child of the node the path stop at the parent and the content contains mandatory children
+            // in brackets to create the array and insert node inside
         } else {
+            if (g_syntax[node.syntaxKey].type !== "array" && Object.keys(jsonContent).length === 0){
+                jsonContent[node.syntaxKey] = {};
+            } // If not array and jsonContent empty, we have to put the syntaxKey as key in the content json because it has
+            // to be present in the websocket, and it is not in the path because we stop at the parent
+
+            if (g_syntax[node.syntaxKey].type === "field"){ 
+                /*to init creation of new field : for field, content contains only key with value that we init in the following line
+                for array, content contains mandatory children
+                for object : content contains json and not only one key-value*/
+                jsonContent[splittedPath[splittedPath.length - 1]] = "";
+            } 
             socket.send(JSON.stringify(
                 {
                     action:"create",
@@ -165,16 +170,21 @@ function addNewNodeAsValueInNodeData(node:any){
 
 function createMandatoryChildren(node:any, content:any={}){
     if(hasMandatoryValues(node)){
-        if (!(node.syntaxKey in content)){
-            content[node.syntaxKey] = {};
-        }
 
         g_syntax[node.syntaxKey].values.forEach((val:any) => {
             if (val[0] !== "?"){
                 const newNode = initNewNode(val, node);
                 node[val] = g_syntax[val].type === "field" ? "" : newNode; 
                 //If field, value is empty (fields don't have json as value), else it contains the json
-                content[node.syntaxKey][val] = node[val];
+                // console.log(node.parent[node.syntaxKey]);
+                if (g_syntax[node.syntaxKey].type === "array"){
+                    content[val] = node[val];
+                } else {
+                    if (!(node.syntaxKey in content)){
+                        content[node.syntaxKey] = {};
+                    }
+                    content[node.syntaxKey][val] = node[val];
+                }
                 node.children.push(newNode);
                 createMandatoryChildren(newNode, content);
             }
