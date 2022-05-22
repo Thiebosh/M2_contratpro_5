@@ -277,14 +277,10 @@ export function Specs() {
             </div>
             <div id="treeContent" className={isOpen ? "inactive": ""}>
                 { syntaxId &&
-                    <CustomTree tree={tree} setTree={setTree} syntax={syntax} openClose={setIsOpen} socket={socket} setModalElements={setModalElements}/>
+                    <CustomTree tree={tree} setTree={setTree} syntax={syntax} setIsOpen={setIsOpen} socket={socket} setModalElements={setModalElements}/>
                 }
             </div>
-            <div className="modal-overlay">
-                {isOpen && (
-                    <Modal title="Add element" openClose={setIsOpen} elements={modalElements}/>
-                )}
-            </div>
+            {isOpen && <Modal title="Add element" setIsOpen={setIsOpen} elements={modalElements}/>}
             {/* { socketUsable ? (loadingPage ? <p className='centered'>Loading...</p> : <div id="placeholder"/>) : <p className='centered'>Connection to server...</p> } */}
         </section>
     );

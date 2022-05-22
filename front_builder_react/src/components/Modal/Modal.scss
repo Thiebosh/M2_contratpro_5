@@ -1,58 +1,69 @@
-.modal {
-    position: fixed;
-    z-index: 20;
-    background: #fff;
-    width: 500px;
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    transition: background-color 0.3s ease;
+    z-index: 15;
 
-    /* Center the modal */
-    top: 50%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-50%);
+    .modal {
+        position: fixed;
+        z-index: 20;
+        background: #fff;
+        width: 500px;
 
-    h2 {
-        color:white;
-    }
+        /* Center the modal */
+        top: 50%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-50%);
 
-    .modal-header {
-        background-color: var(--color-primary-medium);
-        padding: 10px 20px;
-        display: flex;
-        justify-content: space-between;
-    }
+        h2 {
+            color:white;
+        }
 
-    .modal-main {
-        padding: 20px;
-    }
+        .modal-header {
+            background-color: var(--color-primary-medium);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+        }
 
-    .close-button {
-        border: none;
-        background: transparent;
-        padding: 10px;
-        cursor: pointer;
-        color: #fff;
-        font-size: 36px;
-    }
+        .modal-main {
+            padding: 20px;
+        }
 
-    .close-button:hover {
-        color: black;
-    }
+        .close-button {
+            border: none;
+            background: transparent;
+            padding: 10px;
+            cursor: pointer;
+            color: #fff;
+            font-size: 36px;
+        }
 
-    .modal-content {
-        width: 65%;
-        margin: auto;
-    }
+        .close-button:hover {
+            color: black;
+        }
 
-    .button {
-        width: 100%;
-        color: white;
-        background-color: var(--color-primary-light);
-        padding: .6em 0 .5em;
-        border-radius: 5px;
-        text-align: center;
-        font-weight: bold;
-        cursor: pointer;
-        font-size: 17px;
+        .modal-content {
+            width: 65%;
+            margin: auto;
+        }
 
-        margin: 6px 0;
+        .button {
+            width: 100%;
+            color: white;
+            background-color: var(--color-primary-light);
+            padding: .6em 0 .5em;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 17px;
+
+            margin: 6px 0;
+        }
     }
 }

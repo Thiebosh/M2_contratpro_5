@@ -15,7 +15,7 @@ interface CustomTreeProps {
     tree:any,
     setTree:React.Dispatch<any>,
     syntax:any,
-    openClose:Function,
+    setIsOpen:Function,
     setModalElements:Function,
     socket:any
 }
@@ -35,7 +35,7 @@ export function CustomTree(props:CustomTreeProps){
     }
 
     const handleAddElement = (nodeDatum: any) => {
-        openModal(props.openClose, nodeDatum, props.setModalElements, props.setTree, props.socket)
+        openModal(props.setIsOpen, nodeDatum, props.setModalElements, props.setTree, props.socket)
     }
 
     const renderRectSvgNode = ({ nodeDatum, toggleNode }:any) => {
