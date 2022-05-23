@@ -227,7 +227,6 @@ export function Specs() {
             }
             
             if("action" in data){
-                console.log(data);
                 setSocketActionData(data);                
             }
         };

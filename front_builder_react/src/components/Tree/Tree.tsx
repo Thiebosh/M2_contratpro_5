@@ -27,7 +27,8 @@ function addTargetNodePathAsLinkClass({source, target}:any) {
 }
 
 function onLinkHover(source:any, target:any){
-    const elems = document.getElementsByClassName("rd3t-link " + target.data.path);
+    const targetPath = target.data.path;
+    const elems = document.querySelectorAll("[class^='rd3t-link "+ targetPath +"']");
     Array.from(elems).forEach((elem) => {
         if (elem.classList){
             elem.classList.add("hoveredLink");
@@ -37,7 +38,8 @@ function onLinkHover(source:any, target:any){
 }
 
 function onLinkOut(source:any, target:any){
-    const elems = document.getElementsByClassName("rd3t-link " + target.data.path);
+    const targetPath = target.data.path;
+    const elems = document.querySelectorAll("[class^='rd3t-link "+ targetPath +"']");
     Array.from(elems).forEach((elem) => {
         if (elem.classList){
             elem.classList.remove("hoveredLink");
