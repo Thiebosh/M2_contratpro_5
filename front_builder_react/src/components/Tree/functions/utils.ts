@@ -18,3 +18,13 @@ export function moveElementAtFirstPosition(array:any, element:any){
 export function isStringNumber(str:string){
     return !isNaN(parseInt(str));
 }
+
+export function removeElementFromArrayWithPath(array:any, path:any){
+    let i = 0;
+    array.forEach((child:any) => {
+        if (child.path === path){
+            array.splice(i, 1);
+        }
+        i++;
+    });
+}

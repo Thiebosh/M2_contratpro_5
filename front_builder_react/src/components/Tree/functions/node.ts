@@ -1,4 +1,4 @@
-import { initChildrenIfNotDone, isStringNumber } from "./utils"
+import { initChildrenIfNotDone, isStringNumber, removeElementFromArrayWithPath } from "./utils"
 import { g_syntax } from "../Tree"
 import clone from "clone";
 
@@ -31,9 +31,14 @@ export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch
     let node;
     let parent = nodeData.type === "adding" ? nodeData.parent : nodeData;
     let jsonContent;
+    let initArray = false;
     if (values){
         initChildrenIfNotDone(parent);
         node = initNewNode(suggestion, parent)
+
+        if (g_syntax[node.syntaxKey].type === "array" && !parent[node.syntaxKey]){
+            initArray = true;
+        }
 
         jsonContent = createMandatoryChildren(node);
         
@@ -44,6 +49,10 @@ export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch
     } else {
         node = initNewNode(suggestion, parent)
     
+        if (g_syntax[node.syntaxKey].type === "array" && !parent[node.syntaxKey]){
+            initArray = true;
+        }
+
         jsonContent = createMandatoryChildren(node);
 
         addNewNodeAsValueInNodeData(node);
@@ -57,8 +66,7 @@ export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch
         //@ts-ignore
         const splittedPath = node.path.split("/");
         let jsonPath = splittedPath.slice(0, -1).join("/");
-
-        if (g_syntax[node.syntaxKey].type === "array" && parent[node.syntaxKey].length === 1){
+       if(initArray){
             socket.send(JSON.stringify(
                 {
                     action:"create",
@@ -246,14 +254,13 @@ function findNodeWithPathForDelete(path:string, data:any, i:number=0){
 
 export function deleteNode(path:any, data:any, setTree:React.Dispatch<any>, socket?:any){
     const node = findNodeWithPathForDelete(path,data);
-    delete node.parent[node.syntaxKey];
-    let i = 0;
-    node.parent.children.forEach((child:any) => {
-        if (child.path === node.path){
-            node.parent.children.splice(i, 1);
-        }
-        i++;
-    });
+    if (g_syntax[node.syntaxKey].type === "array"){
+        removeElementFromArrayWithPath(node.parent[node.syntaxKey], path);
+    } else {
+        delete node.parent[node.syntaxKey];
+    }
+    removeElementFromArrayWithPath(node.parent.children, path);
+    
     updateNodeChildren(node.parent,setTree);
 
     if(socket){
