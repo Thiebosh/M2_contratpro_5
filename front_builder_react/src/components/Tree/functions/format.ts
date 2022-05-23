@@ -15,12 +15,12 @@ function formatArray(node:any, key:string){
 
     for (let i = 0; i < node[key].length; i++){
         initChildrenIfNotDone(node[key][i]); // to add adding node as child of all the children of the array
-        addAddingNode(node[key][i]);
         
         node[key][i].path = node.path + "/" + key + "/" + i;
         node[key][i].syntaxKey = key;
         node[key][i].parent = node;
-
+        
+        addAddingNode(node[key][i]);
         node.children.splice(-1,0,node[key][i]);
         formatData(node[key][i]);
     }
