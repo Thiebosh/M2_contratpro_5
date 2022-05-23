@@ -165,10 +165,8 @@ function addNewNodeAsValueInNodeData(node:any){
         parent[syntaxKey] = [];
     }
     if (parent[syntaxKey]){ // if array
-        node.path = parent.path + "/" + syntaxKey + "/" + parent[syntaxKey].length;
         parent[syntaxKey].push(node);
     } else {
-        node.path = parent.path + "/" + syntaxKey;
         if (g_syntax[syntaxKey].type === "field"){ // if field, we init with empty value
             parent[syntaxKey] = "";
         } else { // else, it contains values of the node
@@ -222,12 +220,18 @@ function initNewNode(suggestion:any, parent:any){
         }
         return nodeSyntax;
     }
-
+    let path = parent.path + "/";
+    if (g_syntax[suggestion].type === "array"){
+        path+= suggestion + "/" + (parent[suggestion] === undefined ? 0 : parent[suggestion].length);
+    } else {
+        path += suggestion;
+    }
+    console.log(path)
     return {
         syntaxKey:suggestion,
         children:[],
         parent:parent,
-        path:parent.path + "/" + (g_syntax[suggestion].type === "array" ? parent[suggestion].length + "/" + suggestion : suggestion)
+        path:path
     }
 }
 
