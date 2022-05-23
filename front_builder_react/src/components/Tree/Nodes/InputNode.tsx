@@ -16,9 +16,7 @@ export default function InputNode({ nodeDatum, updateValue, tree, setTree, socke
     if (nodeDatum.nature === "checkbox") {
       setChecked(!!e.target.checked)
     } else {
-      if (e.target.value) {
-        setValue(e.target.value);
-      }
+      setValue(e.target.value);
     }
   }
 
