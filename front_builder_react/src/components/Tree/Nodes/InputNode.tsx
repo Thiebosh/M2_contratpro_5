@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import './styles.scss';
 import { updateValueOnNode } from "../functions/node";
+import './styles.scss';
 
 export default function InputNode({ nodeDatum, updateValue, tree, setTree, socket}: {nodeDatum:any, updateValue: Function, tree:any, setTree:React.Dispatch<any>, socket:any}) {
 

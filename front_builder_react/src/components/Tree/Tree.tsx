@@ -1,13 +1,13 @@
-import {useEffect, useState} from "react";
 import Tree from "react-d3-tree"
 import {formatData} from "./functions/format"
 import {addChildren} from "./functions/node"
 
-import './Tree.scss';
 import InputNode from "./Nodes/InputNode";
 import SelectNode from "./Nodes/SelectNode";
 import AddElementNode from "./Nodes/AddElementNode";
 import TextNode from "./Nodes/TextNode";
+
+import './Tree.scss';
 
 // la doc : https://bkrem.github.io/react-d3-tree/docs/interfaces/_tree_types_.treeprops.html
 

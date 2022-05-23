@@ -6,11 +6,12 @@ import {postProjectExistForUser, postProjectGetSyntaxId} from '../../../partners
 import {useUserContext} from '../../../session/user';
 import {init_websocket} from '../../..';
 
-import './Specs.scss';
 import {Collabs} from '../../../components/Collabs';
-import {Modal} from "../../../components/Modal"
-import {findNodeWithPathForCreate, updateValueOnNode} from "../../../components/Tree/functions/node"
-import {formatData} from "../../../components/Tree/functions/format"
+import {Modal} from "../../../components/Modal";
+import {findNodeWithPathForCreate, updateValueOnNode} from "../../../components/Tree/functions/node";
+import {formatData} from "../../../components/Tree/functions/format";
+
+import './Specs.scss';
 
 function init(data:any, setTree:React.Dispatch<any>){
     data["root"].path = "root"

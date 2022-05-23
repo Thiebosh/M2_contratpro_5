@@ -1,4 +1,4 @@
-import React, {MouseEventHandler} from 'react';
+import {MouseEventHandler} from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
