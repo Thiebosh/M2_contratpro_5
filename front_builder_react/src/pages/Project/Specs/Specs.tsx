@@ -26,7 +26,6 @@ export function Specs() {
     const { urlName } = useParams();
     const userContext = useUserContext();
     const [projectId, setProjectId] = useState<string>();
-    const [syntaxId, setSyntaxId] = useState<string>();
     const [isOpen, setIsOpen] = useState(false);
     const [modalElements, setModalElements] = useState([]);
     const [tree, setTree] = useState<any>();
@@ -39,7 +38,6 @@ export function Specs() {
 
             postProjectGetSyntaxId(data.project_id)
             .then((data) => {
-                setSyntaxId(data.id);
                 fetch("/syntaxes/"+data.id+".json")
                 .then(syntax => syntax.json())
                 .then(syntaxJson => {
@@ -61,7 +59,6 @@ export function Specs() {
 
     const [socket, setSocket] = useState<WebSocket>();
     const [socketUsable, setSocketUsable] = useState<boolean>(false);
-    // const [loadingPage, setLoadingPage] = useState<boolean>(true);
     const [loggedCollabs, setLoggedCollabs] = useState<string[]>([]);
 
     const [initCollab, setInitCollab] = useState<string[]>([]);
@@ -205,13 +202,19 @@ export function Specs() {
 
     useEffect(() => {
         if (!(socket && socketUsable)) return;
-        // socket.send(JSON.stringify({"action":"execute", "page": ""})) // init if needed
 
         return () => {
             setSocketUsable(false);
             socket.close();
         }
     }, [socket, socketUsable]);
+
+    // useEffect(() => {
+    //     if (!(socket && socketUsable)) return;
+    //     const targetElem = document.querySelector('#treeContent svg');
+    //     console.log(targetElem);
+    //     // targetElem?.addEventListener('click', handleLinks);
+    // }, [socket, socketUsable]);
 
     const [successMsg, setSuccessMsg] = useState<string>("");
     const [infoMsg, setInfoMsg] = useState<string>("");
@@ -277,12 +280,12 @@ export function Specs() {
                 { errorMsg && <Fade><div className='error'>{errorMsg}</div></Fade> }
             </div>
             <div id="treeContent" className={isOpen ? "inactive": ""}>
-                { syntaxId &&
-                    <CustomTree tree={tree} setTree={setTree} syntax={syntax} setIsOpen={setIsOpen} socket={socket} setModalElements={setModalElements}/>
+                { socketUsable
+                    ? <CustomTree tree={tree} setTree={setTree} syntax={syntax} setIsOpen={setIsOpen} socket={socket} setModalElements={setModalElements}/>
+                    : <p className='centered'>Connection to server...</p>
                 }
             </div>
             {isOpen && <Modal title="Add element" setIsOpen={setIsOpen} elements={modalElements}/>}
-            {/* { socketUsable ? (loadingPage ? <p className='centered'>Loading...</p> : <div id="placeholder"/>) : <p className='centered'>Connection to server...</p> } */}
         </section>
     );
 }

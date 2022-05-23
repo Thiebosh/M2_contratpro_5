@@ -125,4 +125,11 @@
     .inactive {
         pointer-events: none;
     }
+
+    .centered {
+        display: grid;
+        place-content: center;
+        height: 70% !important;
+        margin: 0;
+    }
 }
