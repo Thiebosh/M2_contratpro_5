@@ -78,7 +78,7 @@ class JsonHandler():
                 return False
 
         elif container_type == list:
-            if not (key.isnumeric() and len(container) > int(key)):
+            if not key.isnumeric() or not len(container) > int(key):
                 return False
 
             key = int(key)
@@ -129,16 +129,16 @@ class JsonHandler():
         container_type = type(container)
 
         if container_type is dict:
-            return not container.pop(target, None)
+            return container.pop(target, None)
 
         if container_type is list:
-            if not (target.isnumeric() and len(container) > int(target)):
+            if not target.isnumeric() or not len(container) > int(target):
                 return False
 
             del container[int(target)]
             self.json_currently_stored = False
             return True
-
+            
         return False
 
 
