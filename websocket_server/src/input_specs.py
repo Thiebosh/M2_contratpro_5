@@ -23,5 +23,9 @@ class InputSpecs(Input):
         return self.msg["chat"]
 
 
+    def get_position(self) -> "dict[str,float]":
+        return self.msg["position"]
+
+
     def check_datetime(self) -> bool:
         return datetime.now() - self.datetime <= timedelta(seconds=1)

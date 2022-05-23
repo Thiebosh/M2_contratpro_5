@@ -56,8 +56,16 @@ class WebSocketPartner():
             raw = data[6:]
 
         ret = ''
+        bracket_counter = 0
         for cnt, d in enumerate(raw):
-            ret += chr(d ^ mask[cnt%4])
+            next = chr(d ^ mask[cnt%4])
+            if next == "{":
+                bracket_counter += 1
+            elif next == "}":
+                bracket_counter -= 1
+            ret += next
+            if bracket_counter == 0:
+                break
 
         if ret.encode(ENCODING) == b'\x03\xc3\xa9':
             return None

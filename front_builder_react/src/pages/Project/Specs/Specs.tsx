@@ -150,22 +150,56 @@ export function Specs() {
             setSocketActionData(undefined);
         }
     }, [socketActionData, tree, syntax]);
-    
+
+    // function addCursor(newCollab:string) {
+    //     const svg = document.querySelector('#treeContent svg') as SVGElement;
+    //     const createCursor = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+    //     createCursor.setAttribute("r", "6");
+    //     createCursor.style.fill = "#00ff00";
+    //     createCursor.id = "cursor"+newCollab;
+    //     svg.appendChild(createCursor);
+    // }
+    // function updateCursor(currentCursor: {author:string, position:{x:number, y:number}}) {
+    //     console.log(currentCursor)
+    //     console.log(currentCursor["author"])
+    //     const cursor = document.querySelector('#cursor'+currentCursor["author"]) as SVGElement;
+    //     if (!cursor) return;
+    //     console.log(cursor)
+
+    //     cursor.setAttribute("cx", `${currentCursor["position"]["x"]}`)
+    //     cursor.setAttribute("cy", `${currentCursor["position"]["y"]}`)
+    // }
+    // function removeCursor(oldCollab:string) {
+    //     const svg = document.querySelector('#treeContent svg') as SVGElement;
+    //     const cursor = document.querySelector('#cursor'+oldCollab) as SVGElement;
+    //     if (!cursor) return;
+
+    //     svg.removeChild(cursor);
+    // }
+
     useEffect(() => {
         if (!socket) return;
 
         socket.onmessage = (event) => {
-            // setLoadingPage(false);
             const data:Record<string, unknown> = JSON.parse(event.data)
             switch(Object.keys(data)[0]) {
+                // case 'cursor':
+                //     // @ts-ignore
+                //     updateCursor(data["cursor"]);
+                //     break;
+
                 case 'init_collabs':
                     setInitCollab(data["init_collabs"] as string[]);
                     break;
                 case 'add_collab':
-                    setAddCollab(data["add_collab"] as string);
+                    const newCollab = data["add_collab"] as string;
+                    setAddCollab(newCollab);
+                    // addCursor(newCollab);
                     break;
                 case 'remove_collab':
-                    setRemoveCollab(data["remove_collab"] as string);
+                    const oldCollab = data["remove_collab"] as string;
+                    setRemoveCollab(oldCollab);
+                    // removeCursor(oldCollab);
                     break;
 
                 case 'init_chat':
@@ -215,12 +249,24 @@ export function Specs() {
         }
     }, [socket, socketUsable]);
 
-    useEffect(() => {
-        if (!(socket && socketUsable && tree)) return;
-        const targetElem = document.querySelector('#treeContent svg');
-        console.log(targetElem);
-        // targetElem?.addEventListener('click', handleLinks);
-    }, [socket, socketUsable, tree]);
+    // useEffect(() => {
+    //     if (!(socket && socketUsable && tree)) return;
+
+    //     const svg = document.querySelector('#treeContent svg') as SVGElement;
+    //     if (!svg) return;
+
+    //     var lastCall = 0;
+    //     svg.onmousemove = (e) => {
+    //         var now = Date.now();
+    //         if (lastCall + 100 > now) return;
+    //         lastCall = now;
+
+    //         //@ts-ignore
+    //         const pt = new DOMPointReadOnly(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM().inverse());
+    //         socket.send(JSON.stringify({action: "cursor", position: {x: pt.x, y: pt.y}}));
+
+    //     }
+    // }, [socket, socketUsable, tree]);
 
     const [successMsg, setSuccessMsg] = useState<string>("");
     const [infoMsg, setInfoMsg] = useState<string>("");

@@ -61,6 +61,15 @@ class RoomSpecs(Room):
                     logger_partner.logger.error(MONGO_PARTNER_EXCEPTION, err)
                 continue
 
+            if input_to_process.get_action() == "cursor":
+                self.broadcast_message(input_to_process.get_socket(), json.dumps({
+                    "cursor": {
+                        "position": input_to_process.get_position(),
+                        "author": self.socket_name[input_to_process.get_socket()]
+                    }
+                }))
+                continue
+
             if (input_to_process.check_datetime()) or input_to_process.failed:
                 continue
 
@@ -83,5 +92,5 @@ class RoomSpecs(Room):
             for input_unit in self.input_manager.inputs 
             if input_unit.check_datetime() 
                 and not input_unit.failed
-                and not input_unit.get_action() == "chat"
+                and not input_unit.get_action() in ["chat", "cursor"]
         ]
