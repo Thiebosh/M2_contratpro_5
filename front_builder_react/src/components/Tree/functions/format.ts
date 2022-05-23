@@ -85,4 +85,4 @@ export function formatData(data:any){
                 break;
         }
     }
-    }
+}

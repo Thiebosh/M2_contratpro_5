@@ -184,7 +184,7 @@ function createMandatoryChildren(node:any, content:any={}){
                 const newNode = initNewNode(val, node);
                 node[val] = g_syntax[val].type === "field" ? "" : newNode; 
                 //If field, value is empty (fields don't have json as value), else it contains the json
-                // console.log(node.parent[node.syntaxKey]);
+
                 if (g_syntax[node.syntaxKey].type === "array"){
                     content[val] = node[val];
                 } else {
@@ -208,6 +208,7 @@ function initNewNode(suggestion:any, parent:any){
             syntaxKey:suggestion,
             type:fieldSyntax.type,
             parent:parent,
+            path:parent.path + "/" + suggestion
         };
         if (fieldSyntax.type === "input"){
             //@ts-ignore
@@ -220,10 +221,12 @@ function initNewNode(suggestion:any, parent:any){
         }
         return nodeSyntax;
     }
+
     return {
         syntaxKey:suggestion,
         children:[],
-        parent:parent
+        parent:parent,
+        path:parent.path + "/" + (g_syntax[suggestion].type === "array" ? parent[suggestion].length + "/" + suggestion : suggestion)
     }
 }
 

@@ -12,12 +12,6 @@ export default function InputNode({ nodeDatum, updateValue, tree, setTree, socke
     setChecked(nodeDatum.value);
   }, [nodeDatum.value]);
 
-  function changeOnEnter(e:any){
-    if (nodeDatum.nature === "text" && e.target.value && e.target.className){
-      updateValueOnNode(e.target.value, e.target.className, tree, setTree, socket);
-    }
-  }
-
   function handleChange(e: any) {
     if (nodeDatum.nature === "checkbox") {
       setChecked(!!e.target.checked)
@@ -58,7 +52,6 @@ export default function InputNode({ nodeDatum, updateValue, tree, setTree, socke
               checked={checked}
               value={value}
               onChange={handleChange}
-              onKeyDown={(e)=>(e.key === "Enter") && changeOnEnter(e)}
             />
           </div>
         </foreignObject>
