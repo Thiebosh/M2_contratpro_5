@@ -1,2 +1,2 @@
-import {CustomTree} from "./Tree"
-export {CustomTree}
+import {CustomTree, setGSyntax} from "./Tree"
+export {CustomTree, setGSyntax}

@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {Fade} from 'react-awesome-reveal';
-import {CustomTree} from "../../../components/Tree";
+import {CustomTree, setGSyntax} from "../../../components/Tree";
 import {postProjectExistForUser, postProjectGetSyntaxId} from '../../../partners/rest';
 import {useUserContext} from '../../../session/user';
 import {init_websocket} from '../../..';
@@ -42,6 +42,7 @@ export function Specs() {
                 .then(syntax => syntax.json())
                 .then(syntaxJson => {
                     setSyntax(syntaxJson);
+                    setGSyntax(syntaxJson);
                 })
             })
             .catch(error => {
@@ -196,6 +197,7 @@ export function Specs() {
 
         return () => {
             setSocketUsable(false);
+            // setTree(undefined);
             socket.close();
         }
     }, [socket]);
@@ -205,16 +207,17 @@ export function Specs() {
 
         return () => {
             setSocketUsable(false);
+            // setTree(undefined);
             socket.close();
         }
     }, [socket, socketUsable]);
 
-    // useEffect(() => {
-    //     if (!(socket && socketUsable)) return;
-    //     const targetElem = document.querySelector('#treeContent svg');
-    //     console.log(targetElem);
-    //     // targetElem?.addEventListener('click', handleLinks);
-    // }, [socket, socketUsable]);
+    useEffect(() => {
+        if (!(socket && socketUsable && tree)) return;
+        const targetElem = document.querySelector('#treeContent svg');
+        console.log(targetElem);
+        // targetElem?.addEventListener('click', handleLinks);
+    }, [socket, socketUsable, tree]);
 
     const [successMsg, setSuccessMsg] = useState<string>("");
     const [infoMsg, setInfoMsg] = useState<string>("");
@@ -281,7 +284,10 @@ export function Specs() {
             </div>
             <div id="treeContent" className={isOpen ? "inactive": ""}>
                 { socketUsable
-                    ? <CustomTree tree={tree} setTree={setTree} syntax={syntax} setIsOpen={setIsOpen} socket={socket} setModalElements={setModalElements}/>
+                    ? (tree
+                        ? <CustomTree tree={tree} setTree={setTree} setIsOpen={setIsOpen} socket={socket} setModalElements={setModalElements}/>
+                        : <p className='centered'>Loading...</p>
+                    )
                     : <p className='centered'>Connection to server...</p>
                 }
             </div>

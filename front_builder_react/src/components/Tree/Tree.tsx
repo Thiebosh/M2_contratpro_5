@@ -14,18 +14,15 @@ import './Tree.scss';
 interface CustomTreeProps {
     tree:any,
     setTree:React.Dispatch<any>,
-    syntax:any,
     setIsOpen:Function,
     setModalElements:Function,
     socket:any
 }
 
 export let g_syntax:any = {};
+export const setGSyntax = (syntax:string) => g_syntax = syntax;
 
 export function CustomTree(props:CustomTreeProps){
-
-    g_syntax = props.syntax;
-
     function updateSelect(e: any) {
         console.log('new select:', e)
     }
@@ -51,7 +48,7 @@ export function CustomTree(props:CustomTreeProps){
         return <TextNode nodeDatum={nodeDatum} toggleNode={toggleNode} />
     };
 
-    return props.tree ? (
+    return (
         <Tree
             svgClassName="tree"
             data={props.tree}
@@ -61,9 +58,7 @@ export function CustomTree(props:CustomTreeProps){
             separation={{siblings: 1, nonSiblings: 1}}
             pathFunc="step"
         />
-    ) : (
-      <h1>Loading...</h1>
-    )
+    );
 }
 
 
