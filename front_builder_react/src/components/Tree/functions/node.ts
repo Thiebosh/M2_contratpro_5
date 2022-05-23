@@ -253,6 +253,13 @@ function updateNodeChildren(node:any, setTree:React.Dispatch<any>){
 function findNodeWithPathForDelete(path:string, data:any, i:number=0){
     const splittedPath = path.split("/");
     const nextSubPath = splittedPath[i+1]
+
+    if(!isStringNumber(nextSubPath) && nextSubPath !== undefined && g_syntax[nextSubPath].type === "field"){
+        /*if current path element isn't an index, we check if it's a field if yes : means
+        that we have to get node in children because in the node data, the value of the key isn't a JSON : it's the input value*/
+        return getChildWithPath(data, path);
+    }
+
     if (i < splittedPath.length - 1){
         return findNodeWithPathForDelete(path, data[nextSubPath], i+1);
     } else {

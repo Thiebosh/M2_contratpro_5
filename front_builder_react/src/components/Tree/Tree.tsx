@@ -17,7 +17,8 @@ interface CustomTreeProps {
     setTree:React.Dispatch<any>,
     setIsOpen:Function,
     setModalElements:Function,
-    socket:any
+    socket:any,
+    setErrorMsg:React.Dispatch<any>
 }
 
 export let g_syntax:any = {};
@@ -53,7 +54,7 @@ function onLinkOut(source:any, target:any){
 export function CustomTree(props:CustomTreeProps){
 
     function onLinkClick(source:any, target:any){
-        deleteNode(target.data.path, props.tree, props.setTree, props.socket)
+        target.data.syntaxKey === "+" ? props.setErrorMsg("Element can't be deleted") : deleteNode(target.data.path, props.tree, props.setTree, props.socket)
     }
 
     function updateSelect(e: any) {

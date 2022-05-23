@@ -333,7 +333,7 @@ export function Specs() {
             <div id="treeContent" className={isOpen ? "inactive": ""}>
                 { socketUsable
                     ? (tree
-                        ? <CustomTree tree={tree} setTree={setTree} setIsOpen={setIsOpen} socket={socket} setModalElements={setModalElements}/>
+                        ? <CustomTree tree={tree} setTree={setTree} setIsOpen={setIsOpen} socket={socket} setModalElements={setModalElements} setErrorMsg={setErrorMsg}/>
                         : <p className='centered'>Loading...</p>
                     )
                     : <p className='centered'>Connection to server...</p>
