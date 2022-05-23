@@ -37,4 +37,11 @@
             }
         }
     }
+    
+    .rd3t-link{
+        &:hover {
+            stroke-width: 6px;
+            stroke:red;
+        }
+    }
 }

@@ -22,6 +22,30 @@ interface CustomTreeProps {
 export let g_syntax:any = {};
 export const setGSyntax = (syntax:string) => g_syntax = syntax;
 
+function addTargetNodePathAsLinkClass({source, target}:any) {
+    return target.data.path;
+}
+
+function onLinkHover(source:any, target:any){
+    const elems = document.getElementsByClassName("rd3t-link " + target.data.path);
+    Array.from(elems).forEach((elem) => {
+        if (elem.classList){
+            elem.classList.add("hoveredLink");
+
+        }
+    })
+}
+
+function onLinkOut(source:any, target:any){
+    const elems = document.getElementsByClassName("rd3t-link " + target.data.path);
+    Array.from(elems).forEach((elem) => {
+        if (elem.classList){
+            elem.classList.remove("hoveredLink");
+
+        }
+    })
+}
+
 export function CustomTree(props:CustomTreeProps){
     function updateSelect(e: any) {
         console.log('new select:', e)
@@ -50,6 +74,8 @@ export function CustomTree(props:CustomTreeProps){
 
     return (
         <Tree
+            onLinkMouseOver={onLinkHover}
+            onLinkMouseOut={onLinkOut}
             svgClassName="tree"
             data={props.tree}
             translate={{x:window.innerWidth/4,y:window.innerHeight/2}}
@@ -57,6 +83,7 @@ export function CustomTree(props:CustomTreeProps){
             renderCustomNodeElement={renderRectSvgNode}
             separation={{siblings: 1, nonSiblings: 1}}
             pathFunc="step"
+            pathClassFunc={addTargetNodePathAsLinkClass}
         />
     );
 }

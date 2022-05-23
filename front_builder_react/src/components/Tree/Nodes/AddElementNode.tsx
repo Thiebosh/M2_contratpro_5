@@ -6,7 +6,7 @@ import './styles.scss';
 
 export default function AddElementNode({nodeDatum, handleAddElement}: {nodeDatum: any, handleAddElement: MouseEventHandler}) {
     return (
-      <g className="add-circle" onClick={() => handleAddElement(nodeDatum)}>
+      <g className={"add-circle " + nodeDatum.path} onClick={() => handleAddElement(nodeDatum)}>
         <circle r="25" strokeDasharray="10,4" />
 
         <foreignObject width={22} height={22} x={-11} y={-11}>

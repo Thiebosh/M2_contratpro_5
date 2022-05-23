@@ -7,6 +7,7 @@ export function addAddingNode(data:any){
         syntaxKey:"+",
         type:"adding",
         parent:data,
+        path:data.path + "/adding"
     };
 
     data.children.push(addingNode);
