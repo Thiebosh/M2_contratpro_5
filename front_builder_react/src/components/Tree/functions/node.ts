@@ -48,7 +48,7 @@ export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch
         addAddingNode(node);
         updateNodeChildren(node.parent, setTree);
     } else {
-        node = initNewNode(suggestion, parent)
+        node = initNewNode(suggestion, parent);
     
         if (g_syntax[node.syntaxKey].type === "array" && !parent[node.syntaxKey]){
             initArray = true;

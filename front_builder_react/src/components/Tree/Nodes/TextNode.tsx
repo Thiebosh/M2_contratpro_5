@@ -1,9 +1,8 @@
 import './styles.scss';
-import {deleteNode} from "./../functions/node"
 
-export default function TextNode({ nodeDatum, tree, setTree, socket}: {nodeDatum: any, tree:any, setTree: React.Dispatch<any>, socket:any}) {
+export default function TextNode({ nodeDatum }: {nodeDatum: any}) {
     return (
-      <g className={nodeDatum.path} onClick={() => deleteNode(nodeDatum.path, tree, setTree, socket)}>
+      <g className={nodeDatum.path}>
         <circle r="25" />
         <text fill="white" textAnchor="middle">
           {nodeDatum.syntaxKey}

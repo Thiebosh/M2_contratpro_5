@@ -1,11 +1,12 @@
 import Tree from "react-d3-tree"
 import {formatData} from "./functions/format"
-import {addChildren} from "./functions/node"
+import {addChildren, deleteNode} from "./functions/node"
 
 import InputNode from "./Nodes/InputNode";
 import SelectNode from "./Nodes/SelectNode";
 import AddElementNode from "./Nodes/AddElementNode";
 import TextNode from "./Nodes/TextNode";
+
 
 import './Tree.scss';
 
@@ -48,7 +49,13 @@ function onLinkOut(source:any, target:any){
     })
 }
 
+
 export function CustomTree(props:CustomTreeProps){
+
+    function onLinkClick(source:any, target:any){
+        deleteNode(target.data.path, props.tree, props.setTree, props.socket)
+    }
+
     function updateSelect(e: any) {
         console.log('new select:', e)
     }
@@ -71,13 +78,14 @@ export function CustomTree(props:CustomTreeProps){
         else if (nodeDatum.type === "adding"){
             return <AddElementNode nodeDatum={nodeDatum} handleAddElement={handleAddElement} />
         }
-        return <TextNode nodeDatum={nodeDatum} tree={props.tree} setTree={props.setTree} socket={props.socket} />
+        return <TextNode nodeDatum={nodeDatum} />
     };
 
     return (
         <Tree
             onLinkMouseOver={onLinkHover}
             onLinkMouseOut={onLinkOut}
+            onLinkClick={onLinkClick}
             svgClassName="tree"
             data={props.tree}
             translate={{x:window.innerWidth/4,y:window.innerHeight/2}}
