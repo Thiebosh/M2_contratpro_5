@@ -88,6 +88,7 @@ export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch
                 for object : content contains json and not only one key-value*/
                 jsonContent[splittedPath[splittedPath.length - 1]] = "";
             } 
+            
             socket.send(JSON.stringify(
                 {
                     action:"create",
@@ -178,7 +179,6 @@ function addNewNodeAsValueInNodeData(node:any){
 
 function createMandatoryChildren(node:any, content:any={}){
     if(hasMandatoryValues(node)){
-
         g_syntax[node.syntaxKey].values.forEach((val:any) => {
             if (val[0] !== "?"){
                 const newNode = initNewNode(val, node);
@@ -191,7 +191,23 @@ function createMandatoryChildren(node:any, content:any={}){
                     if (!(node.syntaxKey in content)){
                         content[node.syntaxKey] = {};
                     }
-                    content[node.syntaxKey][val] = node[val];
+
+                    switch(g_syntax[val].type){
+                        case "field":
+                            content[node.syntaxKey][val] = node[val];
+                            break;
+                        case "array":
+                            content[node.syntaxKey][val] = [{}];
+                            break;
+                        default:
+                            content[node.syntaxKey][val] = {};
+                            break;
+                    }
+                }
+
+                if (g_syntax[newNode.syntaxKey].type !== "field"){
+                    initChildrenIfNotDone(newNode);
+                    addAddingNode(newNode);
                 }
                 node.children.push(newNode);
                 createMandatoryChildren(newNode, content);
