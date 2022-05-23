@@ -8,7 +8,7 @@ import {init_websocket} from '../../..';
 
 import {Collabs} from '../../../components/Collabs';
 import {Modal} from "../../../components/Modal";
-import {findNodeWithPathForCreate, updateValueOnNode} from "../../../components/Tree/functions/node";
+import {findNodeWithPathForCreate, updateValueOnNode, deleteNode} from "../../../components/Tree/functions/node";
 import {formatData} from "../../../components/Tree/functions/format";
 
 import './Specs.scss';
@@ -142,6 +142,9 @@ export function Specs() {
                 case "update":
                     updateValueOnNode(socketActionData.content, socketActionData.path, tree, setTree);
                     break;
+                case "delete":
+                    deleteNode(socketActionData.path + "/" + socketActionData.content, tree, setTree)
+                    break;
             }
             
             setSocketActionData(undefined);
@@ -175,7 +178,7 @@ export function Specs() {
                     break;
 
                 case 'init_tree':
-                    console.log("recieve", data["init_tree"])
+                    console.log("receive", data["init_tree"])
                     init(data["init_tree"], setTree);
                     break;
                 case 'save':
@@ -188,7 +191,7 @@ export function Specs() {
                     if (!data["create"]) setErrorMsg("Create: failure");
                     break;
             }
-
+            
             if("action" in data){
                 console.log(data);
                 setSocketActionData(data);                

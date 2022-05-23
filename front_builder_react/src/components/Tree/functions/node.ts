@@ -232,3 +232,35 @@ function updateNodeChildren(node:any, setTree:React.Dispatch<any>){
     }
     setTree(currentParent ? clone(currentParent) : clone(node));
 }
+
+//@ts-ignore
+function findNodeWithPathForDelete(path:string, data:any, i:number=0){
+    const splittedPath = path.split("/");
+    const nextSubPath = splittedPath[i+1]
+    if (i < splittedPath.length - 1){
+        return findNodeWithPathForDelete(path, data[nextSubPath], i+1);
+    } else {
+        return data;
+    }
+}
+
+export function deleteNode(path:any, data:any, setTree:React.Dispatch<any>, socket?:any){
+    const node = findNodeWithPathForDelete(path,data);
+    delete node.parent[node.syntaxKey];
+    let i = 0;
+    node.parent.children.forEach((child:any) => {
+        if (child.path === node.path){
+            node.parent.children.splice(i, 1);
+        }
+        i++;
+    });
+    updateNodeChildren(node.parent,setTree);
+
+    if(socket){
+        socket.send(JSON.stringify({
+            action:"delete",
+            path:node.path.split("/").slice(0, -1).join("/"),
+            content:node.path.split("/")[node.path.split("/").length - 1]
+        }))
+    }
+}
