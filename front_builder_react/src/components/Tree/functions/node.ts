@@ -226,7 +226,6 @@ function initNewNode(suggestion:any, parent:any){
     } else {
         path += suggestion;
     }
-    console.log(path)
     return {
         syntaxKey:suggestion,
         children:[],
