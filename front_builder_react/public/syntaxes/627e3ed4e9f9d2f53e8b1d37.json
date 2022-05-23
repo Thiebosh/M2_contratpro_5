@@ -54,7 +54,7 @@
             "?block",
             "?text",
             "?link",
-            "?inputNumber"
+            "?numberValue"
         ]
     },
 
