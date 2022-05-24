@@ -146,7 +146,7 @@ class Room(ABC):
                         continue
 
                     is_msg_json, msg = Utils.get_json(msg)
-                    if not is_msg_json or not "action" in msg:
+                    if not is_msg_json or not msg or not "action" in msg:
                         logger_partner.logger.warning(f"{self.room_id}-{self.room_type} - malformed json : {msg}")
                         self.close_client_connection_to_room(socket) # reset this line if front memory leak persist
                         continue
