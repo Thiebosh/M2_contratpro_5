@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { updateValueOnNode } from "../functions/node";
 import './styles.scss';
 
-export default function InputNode({ nodeDatum, updateValue, tree, setTree, socket}: {nodeDatum:any, updateValue: Function, tree:any, setTree:React.Dispatch<any>, socket:any}) {
+export default function InputNode({ nodeDatum, updateValue, tree, setTree, queue, setNewSocket, socket}: {nodeDatum:any, updateValue: Function, tree:any, setTree:React.Dispatch<any>, queue:any, setNewSocket:React.Dispatch<any>, socket:any}) {
 
   const [value, setValue] = useState(nodeDatum.value);
   const [checked, setChecked] = useState(nodeDatum.value);
@@ -23,7 +23,7 @@ export default function InputNode({ nodeDatum, updateValue, tree, setTree, socke
   useEffect(() => {
     if (value !== nodeDatum.value) {
       const delayedUpdate = setTimeout(() => {
-        updateValueOnNode(value, nodeDatum.path + "_input", tree, setTree, socket);
+        updateValueOnNode(value, nodeDatum.path + "_input", tree, setTree, queue, setNewSocket, socket);
         updateValue(value)
       }, 400);
       return () => clearTimeout(delayedUpdate);

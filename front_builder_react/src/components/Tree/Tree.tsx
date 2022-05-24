@@ -19,6 +19,8 @@ interface CustomTreeProps {
     setModalElements:Function,
     socket:any,
     setErrorMsg:React.Dispatch<any>
+    queue:any,
+    setNewSocket:React.Dispatch<any>
 }
 
 export let g_syntax:any = {};
@@ -54,7 +56,7 @@ function onLinkOut(source:any, target:any){
 export function CustomTree(props:CustomTreeProps){
 
     function onLinkClick(source:any, target:any){
-        target.data.syntaxKey === "+" ? props.setErrorMsg("Element can't be deleted") : deleteNode(target.data.path, props.tree, props.setTree, props.socket)
+        target.data.syntaxKey === "+" ? props.setErrorMsg("Element can't be deleted") : deleteNode(target.data.path, props.tree, props.setTree, props.queue, props.setNewSocket ,props.socket)
     }
 
     function updateSelect(e: any) {
@@ -66,15 +68,15 @@ export function CustomTree(props:CustomTreeProps){
     }
 
     const handleAddElement = (nodeDatum: any) => {
-        openModal(props.setIsOpen, nodeDatum, props.setModalElements, props.setTree, props.socket)
+        openModal(props.setIsOpen, nodeDatum, props.setModalElements, props.setTree, props.queue, props.setNewSocket, props.socket)
     }
 
     const renderRectSvgNode = ({ nodeDatum, toggleNode }:any) => {
         if(nodeDatum.type === "input"){
-            return <InputNode nodeDatum={nodeDatum} updateValue={updateValue} tree={props.tree} setTree={props.setTree} socket={props.socket}/>;
+            return <InputNode nodeDatum={nodeDatum} updateValue={updateValue} tree={props.tree} setTree={props.setTree} queue={props.queue} setNewSocket={props.setNewSocket} socket={props.socket}/>;
         }
         else if (nodeDatum.type === "select"){
-            return <SelectNode nodeDatum={nodeDatum} updateSelect={updateSelect} tree={props.tree} setTree={props.setTree} socket={props.socket}/>
+            return <SelectNode nodeDatum={nodeDatum} updateSelect={updateSelect} tree={props.tree} setTree={props.setTree} queue={props.queue} setNewSocket={props.setNewSocket} socket={props.socket}/>
         }
         else if (nodeDatum.type === "adding"){
             return <AddElementNode nodeDatum={nodeDatum} handleAddElement={handleAddElement} />
@@ -97,16 +99,6 @@ export function CustomTree(props:CustomTreeProps){
             pathClassFunc={addTargetNodePathAsLinkClass}
         />
     );
-}
-
-
-function init(syntax:any, data:any, setTree:React.Dispatch<any>){
-    g_syntax = syntax;
-    data["root"].path = "root"
-    formatData(data);
-    data = data["root"];
-    data.parent = null;
-    setTree(data);
 }
 
 function getParentChildrenValues(nodeData:any){
@@ -138,14 +130,14 @@ function getPossibleChildrenSuggestion(nodeData:any){
     return newChildrenSuggestion;
 }
 
-function openModal(setIsOpen:Function, nodeData:any, setModalElements:Function, setTree:React.Dispatch<any>, socket:any){
+function openModal(setIsOpen:Function, nodeData:any, setModalElements:Function, setTree:React.Dispatch<any>, queue:any, setNewSocket:React.Dispatch<any>, socket:any){
     const newChildrenSuggestion = getPossibleChildrenSuggestion(nodeData);
     const modalElements:any = []
     newChildrenSuggestion.forEach((suggestion:any) => {
         modalElements.push({
             text: suggestion,
             onclick: () => {
-                addChildren(nodeData, suggestion, setTree, socket);
+                addChildren(nodeData, suggestion, setTree, queue, setNewSocket, socket);
                 setIsOpen(false);
             }
     })});

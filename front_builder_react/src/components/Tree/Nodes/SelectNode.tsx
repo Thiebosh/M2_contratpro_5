@@ -2,9 +2,9 @@ import React from 'react';
 import { updateValueOnNode } from "./../functions/node";
 import './styles.scss';
 
-export default function SelectNode({nodeDatum, updateSelect, tree, setTree, socket}: {nodeDatum: any, updateSelect: Function, tree:any, setTree:React.Dispatch<any>, socket:any}) {
+export default function SelectNode({nodeDatum, updateSelect, tree, setTree, queue, setNewSocket, socket}: {nodeDatum: any, updateSelect: Function, tree:any, setTree:React.Dispatch<any>, queue:any, setNewSocket:React.Dispatch<any>, socket:any}) {
   function handleSelect(e: any) {
-    updateValueOnNode(e.target.value, e.target.className, tree, setTree, socket);
+    updateValueOnNode(e.target.value, e.target.className, tree, setTree, queue, setNewSocket, socket);
     updateSelect(e.target.value)
   }
 

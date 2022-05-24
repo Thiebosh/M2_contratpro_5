@@ -1,6 +1,7 @@
 import { initChildrenIfNotDone, isStringNumber, removeElementFromArrayWithPath } from "./utils"
 import { g_syntax } from "../Tree"
 import clone from "clone";
+import React from "react";
 
 export function addAddingNode(data:any){
     const addingNode = {
@@ -13,20 +14,20 @@ export function addAddingNode(data:any){
     data.children.push(addingNode);
 }
 
-export function findNodeWithPathForCreate(path:string, data:any, setTree:React.Dispatch<any>, i:number=0){
+export function findNodeWithPathForCreate(path:string, data:any, setTree:React.Dispatch<any>, queue:any, setNewSocket:React.Dispatch<any>, i:number=0){
     //@ts-ignore
     const splittedPath = path.split("/");
     const nextSubPath = splittedPath[i+1]
 
     if (i < splittedPath.length - 2){
-        findNodeWithPathForCreate(path, data[nextSubPath], setTree, i+1);
+        findNodeWithPathForCreate(path, data[nextSubPath], setTree, queue, setNewSocket, i+1);
     } else {
-        addChildren(data, nextSubPath, setTree);
+        addChildren(data, nextSubPath, setTree, queue, setNewSocket);
         return data;
     }
 }
 
-export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch<any>, socket?:any){
+export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch<any>, queue:any, setNewSocket:React.Dispatch<any>, socket?:any){
     // suggestion = selected new node
     const values = g_syntax[suggestion].values;
     let node;
@@ -61,20 +62,21 @@ export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch
         updateNodeChildren(node.parent, setTree);
     }
 
-    
-
     if (socket){
         //@ts-ignore
         const splittedPath = node.path.split("/");
         let jsonPath = splittedPath.slice(0, -1).join("/");
+        let socketContent;
        if(initArray){
-            socket.send(JSON.stringify(
-                {
-                    action:"create",
-                    path:jsonPath.split("/").slice(0, -1).join("/"),
-                    content:{[node.syntaxKey]: [jsonContent]}
-                }
-            )); //if array doesn't exist as child of the node the path stop at the parent and the content contains mandatory children
+           socketContent = JSON.stringify(
+            {
+                action:"create",
+                path:jsonPath.split("/").slice(0, -1).join("/"),
+                content:{[node.syntaxKey]: [jsonContent]}
+            }
+            );
+           queue.enqueue(socketContent);
+            //if array doesn't exist as child of the node the path stop at the parent and the content contains mandatory children
             // in brackets to create the array and insert node inside
         } else {
             if (g_syntax[node.syntaxKey].type !== "array" && Object.keys(jsonContent).length === 0){
@@ -87,16 +89,17 @@ export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch
                 for array, content contains mandatory children
                 for object : content contains json and not only one key-value*/
                 jsonContent[splittedPath[splittedPath.length - 1]] = "";
-            } 
-            
-            socket.send(JSON.stringify(
+            }
+            socketContent = JSON.stringify(
                 {
                     action:"create",
                     path:jsonPath,
                     content:jsonContent
                 }
-            ))
+            ); 
+            queue.enqueue(socketContent)
         }
+        setNewSocket(true);
     }
 }
 
@@ -130,7 +133,7 @@ function findNodeWithPathForUpdate(path:string, data:any, i:number=0){
     }
 }
 
-export function updateValueOnNode(value:any, path:string, data:any, setTree:React.Dispatch<any>, socket?:any){
+export function updateValueOnNode(value:any, path:string, data:any, setTree:React.Dispatch<any>, queue:any, setNewSocket:React.Dispatch<any>, socket?:any){
     path = path.split("_")[0]; //get real path because given path is suffixed with "_" and type of element (e.g : "_input")
 
     const node = findNodeWithPathForUpdate(path, data);
@@ -138,14 +141,17 @@ export function updateValueOnNode(value:any, path:string, data:any, setTree:Reac
     node.parent[node.syntaxKey] = value;
     updateNodeChildren(node, setTree);
     if(socket){
-        socket.send(JSON.stringify(
+        const socketContent = JSON.stringify(
             {
                 action:"update",
                 //@ts-ignore
                 path:node.path,
                 content:value
             }
-        ))
+        );
+        
+        queue.enqueue(socketContent);
+        setNewSocket(true);
     }
 }
 
@@ -283,7 +289,7 @@ function findNodeWithPathForDelete(path:string, data:any, i:number=0){
     }
 }
 
-export function deleteNode(path:any, data:any, setTree:React.Dispatch<any>, socket?:any){
+export function deleteNode(path:any, data:any, setTree:React.Dispatch<any>, queue:any, setNewSocket:React.Dispatch<any>, socket?:any){
     const node = findNodeWithPathForDelete(path,data);
     if (g_syntax[node.syntaxKey].type === "array"){
         removeElementFromArrayWithPath(node.parent[node.syntaxKey], path);
@@ -295,10 +301,12 @@ export function deleteNode(path:any, data:any, setTree:React.Dispatch<any>, sock
     updateNodeChildren(node.parent,setTree);
 
     if(socket){
-        socket.send(JSON.stringify({
+        const socketContent = JSON.stringify({
             action:"delete",
             path:node.path.split("/").slice(0, -1).join("/"),
             content:node.path.split("/")[node.path.split("/").length - 1]
-        }))
+        });
+        queue.enqueue(socketContent);
+        setNewSocket(true);
     }
 }

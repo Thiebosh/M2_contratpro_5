@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useRef} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {Fade} from 'react-awesome-reveal';
 import {CustomTree, setGSyntax} from "../../../components/Tree";
@@ -10,6 +10,7 @@ import {Collabs} from '../../../components/Collabs';
 import {Modal} from "../../../components/Modal";
 import {findNodeWithPathForCreate, updateValueOnNode, deleteNode} from "../../../components/Tree/functions/node";
 import {formatData} from "../../../components/Tree/functions/format";
+import { Queue } from "queue-typescript"
 
 import './Specs.scss';
 
@@ -30,6 +31,12 @@ export function Specs() {
     const [modalElements, setModalElements] = useState([]);
     const [tree, setTree] = useState<any>();
     const [syntax, setSyntax] = useState<any>();
+    const [newSocket, setNewSocket] = useState<boolean>(false);
+    
+    const queue = useRef<any>(null);
+    useEffect(() => {
+        queue.current = new Queue<any>();
+    }, []);
 
     useEffect(() => {
         postProjectExistForUser(userContext.user.id, urlName || "")
@@ -131,25 +138,35 @@ export function Specs() {
                     
                     if (content && (isLastPathElementNumber || syntax[lastPathElement].type !== "array")){
                         for (let key of Object.keys(content)){
-                            findNodeWithPathForCreate(socketActionData.path + "/" + key, tree, setTree); 
+                            findNodeWithPathForCreate(socketActionData.path + "/" + key, tree, setTree, queue.current, setNewSocket); 
                             /*concat with content if not array because adding new object/field... has the new one key in socket content
                             for array, we know that we have to add a child with key equals to last path element*/
                         }
                     } else {
-                        findNodeWithPathForCreate(socketActionData.path, tree, setTree);
+                        findNodeWithPathForCreate(socketActionData.path, tree, setTree, queue.current, setNewSocket);
                     }
                     break;
                 case "update":
-                    updateValueOnNode(socketActionData.content, socketActionData.path, tree, setTree);
+                    updateValueOnNode(socketActionData.content, socketActionData.path, tree, setTree, queue.current, setNewSocket);
                     break;
                 case "delete":
-                    deleteNode(socketActionData.path + "/" + socketActionData.content, tree, setTree)
+                    deleteNode(socketActionData.path + "/" + socketActionData.content, tree, setTree, queue.current, setNewSocket)
                     break;
             }
             
             setSocketActionData(undefined);
         }
     }, [socketActionData, tree, syntax]);
+
+    useEffect(() => {
+        if (!newSocket) return;
+        if (!socket || !socketUsable) {
+            setErrorMsg("Not connected to server!");
+            return;
+        }
+        socket.send(queue.current.dequeue());
+        setNewSocket(false);
+    }, [newSocket, queue, socket, socketUsable]);
 
     // function addCursor(newCollab:string) {
     //     const svg = document.querySelector('#treeContent svg') as SVGElement;
@@ -333,7 +350,7 @@ export function Specs() {
             <div id="treeContent" className={isOpen ? "inactive": ""}>
                 { socketUsable
                     ? (tree
-                        ? <CustomTree tree={tree} setTree={setTree} setIsOpen={setIsOpen} socket={socket} setModalElements={setModalElements} setErrorMsg={setErrorMsg}/>
+                        ? <CustomTree queue={queue.current} tree={tree} setTree={setTree} setIsOpen={setIsOpen} socket={socket} setNewSocket={setNewSocket} setModalElements={setModalElements} setErrorMsg={setErrorMsg}/>
                         : <p className='centered'>Loading...</p>
                     )
                     : <p className='centered'>Connection to server...</p>
