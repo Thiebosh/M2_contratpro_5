@@ -89,8 +89,8 @@ class JsonHandler():
         return container[key] if len(path) == 1 else self._path_climber(path[1:], container[key])
 
 
-    def add_element(self, path: "list[str]", content:"int|float|str|dict[str, Any]"):
-        container = self._path_climber(path, self.data)
+    def add_element(self, path: str, content:"int|float|str|dict[str, Any]"):
+        container = self._path_climber(path.split("/"), self.data)
 
         if container is False:
             return False
@@ -120,8 +120,8 @@ class JsonHandler():
         return True
 
 
-    def remove_element(self, path: "list[str]", target: str) -> bool:
-        container = self._path_climber(path, self.data)
+    def remove_element(self, path: str, target: str) -> bool:
+        container = self._path_climber(path.split("/"), self.data)
 
         if container is False:
             return False
@@ -142,9 +142,11 @@ class JsonHandler():
         return False
 
 
-    def modify_element(self, path: "list[str]", content:"int|float|str") -> bool:
+    def modify_element(self, path: str, content:"int|float|str") -> bool:
         if type(content) not in (int, float, str):
             return False
+
+        path = path.split("/")
 
         container = self._path_climber(path[:-1], self.data)
 

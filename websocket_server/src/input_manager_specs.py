@@ -96,15 +96,15 @@ class InputManagerSpecs(InputManager):
 
         action = input_to_process.get_action()
         if action == "create":
-            result = self.json_handler.add_element(input_to_process.get_path().split("/"),
+            result = self.json_handler.add_element(input_to_process.get_path(),
                                                    input_to_process.get_content())
 
         elif action == "update":
-            result = self.json_handler.modify_element(input_to_process.get_path().split("/"),
+            result = self.json_handler.modify_element(input_to_process.get_path(),
                                                       input_to_process.get_content())
 
         elif action == "delete":
-            result = self.json_handler.remove_element(input_to_process.get_path().split("/"),
+            result = self.json_handler.remove_element(input_to_process.get_path(),
                                                       input_to_process.get_content())
 
         elif action == "save":
