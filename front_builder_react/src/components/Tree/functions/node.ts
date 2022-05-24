@@ -14,7 +14,7 @@ export function addAddingNode(data:any){
     data.children.push(addingNode);
 }
 
-export function findNodeWithPathForCreate(path:string, data:any, setTree:React.Dispatch<any>, queue:any, setNewSocket:React.Dispatch<any>, i:number=0){
+export function findNodeWithPathForCreate(path:string, data:any, setTree:React.Dispatch<any>, queue?:any, setNewSocket?:React.Dispatch<any>, i:number=0){
     //@ts-ignore
     const splittedPath = path.split("/");
     const nextSubPath = splittedPath[i+1]
@@ -27,7 +27,7 @@ export function findNodeWithPathForCreate(path:string, data:any, setTree:React.D
     }
 }
 
-export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch<any>, queue:any, setNewSocket:React.Dispatch<any>, socket?:any){
+export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch<any>, queue?:any, setNewSocket?:React.Dispatch<any>, socket?:any){
     // suggestion = selected new node
     const values = g_syntax[suggestion].values;
     let node;
@@ -62,7 +62,7 @@ export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch
         updateNodeChildren(node.parent, setTree);
     }
 
-    if (socket){
+    if (socket && setNewSocket){
         //@ts-ignore
         const splittedPath = node.path.split("/");
         let jsonPath = splittedPath.slice(0, -1).join("/");
@@ -126,21 +126,21 @@ function findNodeWithPathForUpdate(path:string, data:any, i:number=0){
                 return getChildWithPath(data, path);
             }
         }
-
+        
         return findNodeWithPathForUpdate(path, data[nextSubPath], i+1);
     } else {
         return data;
     }
 }
 
-export function updateValueOnNode(value:any, path:string, data:any, setTree:React.Dispatch<any>, queue:any, setNewSocket:React.Dispatch<any>, socket?:any){
+export function updateValueOnNode(value:any, path:string, data:any, setTree:React.Dispatch<any>, queue?:any, setNewSocket?:React.Dispatch<any>, socket?:any){
     path = path.split("_")[0]; //get real path because given path is suffixed with "_" and type of element (e.g : "_input")
 
     const node = findNodeWithPathForUpdate(path, data);
     node.value = value;
     node.parent[node.syntaxKey] = value;
     updateNodeChildren(node, setTree);
-    if(socket){
+    if(socket && setNewSocket){
         const socketContent = JSON.stringify(
             {
                 action:"update",
@@ -274,8 +274,7 @@ function updateNodeChildren(node:any, setTree:React.Dispatch<any>){
 //@ts-ignore
 function findNodeWithPathForDelete(path:string, data:any, i:number=0){
     const splittedPath = path.split("/");
-    const nextSubPath = splittedPath[i+1]
-
+    const nextSubPath = splittedPath[i+1];
     if(!isStringNumber(nextSubPath) && nextSubPath !== undefined && g_syntax[nextSubPath].type === "field"){
         /*if current path element isn't an index, we check if it's a field if yes : means
         that we have to get node in children because in the node data, the value of the key isn't a JSON : it's the input value*/
@@ -289,7 +288,7 @@ function findNodeWithPathForDelete(path:string, data:any, i:number=0){
     }
 }
 
-export function deleteNode(path:any, data:any, setTree:React.Dispatch<any>, queue:any, setNewSocket:React.Dispatch<any>, socket?:any){
+export function deleteNode(path:any, data:any, setTree:React.Dispatch<any>, queue?:any, setNewSocket?:React.Dispatch<any>, socket?:any){
     const node = findNodeWithPathForDelete(path,data);
     if (g_syntax[node.syntaxKey].type === "array"){
         removeElementFromArrayWithPath(node.parent[node.syntaxKey], path);
@@ -298,9 +297,9 @@ export function deleteNode(path:any, data:any, setTree:React.Dispatch<any>, queu
     }
     removeElementFromArrayWithPath(node.parent.children, path);
     
-    updateNodeChildren(node.parent,setTree);
+    updateNodeChildren(node.parent, setTree);
 
-    if(socket){
+    if(socket && setNewSocket){
         const socketContent = JSON.stringify({
             action:"delete",
             path:node.path.split("/").slice(0, -1).join("/"),
@@ -308,5 +307,45 @@ export function deleteNode(path:any, data:any, setTree:React.Dispatch<any>, queu
         });
         queue.enqueue(socketContent);
         setNewSocket(true);
+    }
+}
+
+//@ts-ignore
+function findByPath(path:string, data:any, i:number=0){
+    //@ts-ignore
+    const splittedPath = path.split("/");
+    const nextSubPath = splittedPath[i+1]
+
+    if (i < splittedPath.length - 1){
+        return findByPath(path, data[nextSubPath], i+1);
+    } else {
+        return data;
+    }
+}
+
+export function cancelOperation(action:string, path:string, content:any, tree:any, setTree:React.Dispatch<any>){
+    switch(action){
+        case "create":
+            const splittedPath = path.split("/");
+            const keys = Object.keys(content);
+            if (!isStringNumber(splittedPath[splittedPath.length - 1]) && (g_syntax[splittedPath[splittedPath.length - 1]].type === "array")){
+                const currentArrayElementIndex = findByPath(path, tree).length - 1;
+                deleteNode(path + "/" + currentArrayElementIndex, tree, setTree);
+            } else {
+                keys.forEach((key) => {
+                    if (g_syntax[key].type === "array"){
+                        deleteNode(path + "/" + key + "/0", tree, setTree);
+                    } else {
+                        deleteNode(path + "/" + key, tree, setTree);
+                    }
+                })
+            }
+            break;
+        case "update":
+            updateValueOnNode(content, path, tree, setTree);
+            break;
+        case "delete":
+            findNodeWithPathForCreate(path + "/" + content, tree, setTree)
+            break;
     }
 }

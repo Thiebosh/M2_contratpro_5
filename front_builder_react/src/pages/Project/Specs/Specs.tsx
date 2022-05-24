@@ -8,7 +8,7 @@ import {init_websocket} from '../../..';
 
 import {Collabs} from '../../../components/Collabs';
 import {Modal} from "../../../components/Modal";
-import {findNodeWithPathForCreate, updateValueOnNode, deleteNode} from "../../../components/Tree/functions/node";
+import {findNodeWithPathForCreate, updateValueOnNode, deleteNode, cancelOperation} from "../../../components/Tree/functions/node";
 import {formatData} from "../../../components/Tree/functions/format";
 import { Queue } from "queue-typescript"
 
@@ -32,6 +32,7 @@ export function Specs() {
     const [tree, setTree] = useState<any>();
     const [syntax, setSyntax] = useState<any>();
     const [newSocket, setNewSocket] = useState<boolean>(false);
+    const [errorSocketContent, setErrorSocketContent] = useState<any>();
     
     const queue = useRef<any>(null);
     useEffect(() => {
@@ -195,10 +196,18 @@ export function Specs() {
     }
 
     useEffect(() => {
+        if (!errorSocketContent) {
+            return;
+        }
+        cancelOperation(errorSocketContent.errorAction, errorSocketContent.path, errorSocketContent.content, tree, setTree);
+        setErrorSocketContent(undefined);
+    }, [errorSocketContent, tree]);
+
+    useEffect(() => {
         if (!socket) return;
 
         socket.onmessage = (event) => {
-            const data:Record<string, unknown> = JSON.parse(event.data)
+            const data:Record<string, unknown> = JSON.parse(event.data);
             switch(Object.keys(data)[0]) {
                 case 'cursor':
                     // @ts-ignore
@@ -240,7 +249,25 @@ export function Specs() {
                     data["generate"] ? setSuccessMsg("Generate: success") : setErrorMsg("Generate: failure");
                     break;
                 case "create":
-                    if (!data["create"]) setErrorMsg("Create: failure");
+                    if (!data["create"]) {
+                        setErrorMsg("Create: failure");
+                        data["errorAction"] = "create";
+                        setErrorSocketContent(data);
+                    }
+                    break;
+                case "update":
+                    if (!data["update"]) {
+                        setErrorMsg("Update: failure");
+                        data["errorAction"] = "update";
+                        setErrorSocketContent(data);
+                    }
+                    break;
+                case "delete":
+                    if (!data["delete"]) {
+                        setErrorMsg("Delete: failure");
+                        data["errorAction"] = "delete";
+                        setErrorSocketContent(data);
+                    }
                     break;
             }
             
@@ -251,7 +278,6 @@ export function Specs() {
 
         return () => {
             setSocketUsable(false);
-            // setTree(undefined);
             socket.close();
         }
     }, [socket]);
@@ -261,7 +287,6 @@ export function Specs() {
 
         return () => {
             setSocketUsable(false);
-            // setTree(undefined);
             socket.close();
         }
     }, [socket, socketUsable]);
