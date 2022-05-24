@@ -85,6 +85,9 @@ class RoomSpecs(Room):
                     **msg,
                     **{key: value for key, value in input_to_process.get_msg().items() if key != "action"}
                 }
+                if input_to_process.get_action() == "update":
+                    msg["content"] = self.input_manager.json_handler._path_climber(input_to_process.get_path().split("/"), self.input_manager.json_handler.data)
+                    print(msg)
             self.add_message_in_queue(input_to_process.socket, json.dumps(msg, ensure_ascii=False))
 
             if result is False:
