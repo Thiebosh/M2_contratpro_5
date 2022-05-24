@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useEffect } from 'react';
 import { updateValueOnNode } from "./../functions/node";
 import './styles.scss';
 
@@ -8,11 +9,17 @@ export default function SelectNode({nodeDatum, updateSelect, tree, setTree, queu
     updateSelect(e.target.value)
   }
 
+  const [selectedOption, setSelectedOption] = useState<string>();
+
+  useEffect(()=> {
+    setSelectedOption(nodeDatum.value);
+  }, [nodeDatum.value]);
+
   return (
     <g className={nodeDatum.path}>
       <foreignObject width={120} height={70} y={-35} x={-60}>
         <div className="node-div"><label>{nodeDatum.syntaxKey}</label>
-          <select onChange={handleSelect} className={nodeDatum.path+"_select"}>
+          <select onChange={handleSelect} value={selectedOption} className={nodeDatum.path+"_select"}>
             {nodeDatum.values.map((optionValue: any) => (
               <option key={optionValue} value={optionValue}>{optionValue}</option>
             ))}
