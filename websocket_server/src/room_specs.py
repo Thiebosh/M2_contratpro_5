@@ -79,7 +79,13 @@ class RoomSpecs(Room):
                 continue
 
             result = await self.input_manager.check_and_execute_action_function(input_to_process)
-            self.add_message_in_queue(input_to_process.socket, json.dumps({input_to_process.get_action(): result}, ensure_ascii=False))
+            msg = {input_to_process.get_action(): result}
+            if result is False:
+                msg = {
+                    **msg,
+                    **{key: value for key, value in input_to_process.get_msg().items() if key != "action"}
+                }
+            self.add_message_in_queue(input_to_process.socket, json.dumps(msg, ensure_ascii=False))
 
             if result is False:
                 continue
