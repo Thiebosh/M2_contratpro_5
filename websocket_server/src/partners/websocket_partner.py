@@ -67,7 +67,7 @@ class WebSocketPartner():
             if bracket_counter == 0:
                 break
 
-        if ret.encode(ENCODING) == b'\x03\xc3\xa9':
+        if ret.encode(ENCODING) == b'\x03\xc3\xa9' or ret.encode(ENCODING) == b'\x03':
             return None
 
         try:
