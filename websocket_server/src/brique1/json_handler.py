@@ -129,7 +129,8 @@ class JsonHandler():
         container_type = type(container)
 
         if container_type is dict:
-            return container.pop(target, None)
+            container.pop(target, None)
+            return True
 
         if container_type is list:
             if not target.isnumeric() or not len(container) > int(target):
@@ -145,8 +146,6 @@ class JsonHandler():
     def modify_element(self, path: str, content:"int|float|str") -> bool:
         if type(content) not in (int, float, str):
             return False
-
-        path = path.split("/")
 
         container = self._path_climber(path[:-1], self.data)
 
