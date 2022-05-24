@@ -30,7 +30,7 @@
 %token STYLE
 %token BLOCK
 %token LINK
-%token TEXT
+%token TEXTBLOCK
 %token SCREEN
 %token CONTENT
 %token NAME
@@ -58,12 +58,14 @@ proto_files
     :   proto_files NEXT proto_files
     |   SCREEN
         {
-            currentContainer = Container::screen;
+            currentContainer.push_back(Container::screen);
         }
         array
         {
             --indent;
             fileContent[currentPage] += "</section>";
+            cssPositionApplyer.pop_back();
+            currentContainer.pop_back();
         }
     ;
 
@@ -86,12 +88,13 @@ fields
 field
     :   NAME STR_VALUE
         {
-            switch(currentContainer) {
+            switch(currentContainer.back()) {
                 case Container::screen:
                     currentPage = $2;
                     currentPage.append(".html");
                     htmlPages.push_back(currentPage);
                     fileContent.insert({currentPage, "<section>"});
+                    cssPositionApplyer.push_back(fileContent[currentPage].length()-1);
                     if (!ONE_LINE) fileContent[currentPage] += "\n";
                     indent++;
                     break;
@@ -106,32 +109,41 @@ field
     |   CONTENT array
     |   BLOCK
         {
-            currentContainer = Container::block;
+            currentContainer.push_back(Container::block);
             fileContent[currentPage] += (INDENT ? string(indent++, '\t') : "") + "<div>" + (ONE_LINE ? "" : "\n");
+            cssPositionApplyer.push_back(fileContent[currentPage].length() - 1 - !ONE_LINE);
         }
         doc
         {
             fileContent[currentPage] += (INDENT ? string(--indent, '\t') : "") + "</div>" + (ONE_LINE ? "" : "\n");
+            cssPositionApplyer.pop_back();
+            currentContainer.pop_back();
         }
     |   LINK
         {
-            currentContainer = Container::link;
+            currentContainer.push_back(Container::link);
             fileContent[currentPage] += (INDENT ? string(indent++, '\t') : "") + "<a>" + (ONE_LINE ? "" : "\n");
             isNestedLinkExternal.push_back(false);
+            cssPositionApplyer.push_back(fileContent[currentPage].length() - 1 - !ONE_LINE);
         }
         doc
         {
-            isNestedLinkExternal.pop_back();
             fileContent[currentPage] += (INDENT ? string(--indent, '\t') : "") + "</a>" + (ONE_LINE ? "" : "\n");
+            isNestedLinkExternal.pop_back();
+            cssPositionApplyer.pop_back();
+            currentContainer.pop_back();
         }
-    |   TEXT
+    |   TEXTBLOCK
         {
-            currentContainer = Container::text;
+            currentContainer.push_back(Container::text);
             fileContent[currentPage] += (INDENT ? string(indent++, '\t') : "") + "<p>" + (ONE_LINE ? "" : "\n");
+            cssPositionApplyer.push_back(fileContent[currentPage].length() - 1 - !ONE_LINE);
         }
         doc
         {
             fileContent[currentPage] += (INDENT ? string(--indent, '\t') : "") + "</p>" + (ONE_LINE ? "" : "\n");
+            cssPositionApplyer.pop_back();
+            currentContainer.pop_back();
         }
     |   TEXTVALUE STR_VALUE
         {
@@ -139,31 +151,28 @@ field
         }
     |   STYLE
         {
-            if (!ONE_LINE) fileContent[currentPage].pop_back();
-            fileContent[currentPage].pop_back();
-            fileContent[currentPage] += " style=\"";
+            currentStyle = " style=\"";
         }
         doc
         {
-            fileContent[currentPage].pop_back();
-            fileContent[currentPage] += "\">";
-            if (!ONE_LINE) fileContent[currentPage] += "\n";
+            currentStyle += "\"";
+            fileContent[currentPage].insert(cssPositionApplyer.back(), currentStyle);
         }
     |   COLOR COLOR_VALUE
         {
-            fileContent[currentPage] += colorContainer[currentContainer] + $2 + "; ";
+            currentStyle += colorContainer[currentContainer.back()] + $2 + "; ";
         }
     |   COLOR STR_VALUE
         {
-            fileContent[currentPage] += colorContainer[currentContainer] + $2 + "; ";
+            currentStyle += colorContainer[currentContainer.back()] + $2 + "; ";
         }
     |   DECO STR_VALUE
         {
-            fileContent[currentPage] += "text-decoration: " + (string)$2 + "; ";
+            currentStyle += "text-decoration: " + (string)$2 + "; ";
         }
     |   ALIGN STR_VALUE
         {
-            fileContent[currentPage] += alignContainer[$2][currentContainer] + " ";
+            currentStyle += alignContainer[$2][currentContainer.back()] + "; ";
         }
     |   TARGETVALUE STR_VALUE
         {

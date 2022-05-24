@@ -20,13 +20,16 @@ enum class Container {
     text
 };
 
-Container currentContainer = Container::root;
+std::vector<Container> currentContainer = { Container::root };
 string currentPage = "";
 string defaultPage = "";
 std::map<string, string> fileContent;
 int indent = 0; //tmp
 std::vector<string> htmlPages;
 std::vector<bool> isNestedLinkExternal;
+
+std::vector<int> cssPositionApplyer;
+string currentStyle = "";
 
 std::map<Container, string> colorContainer = {
     {Container::screen, "background-color: "},
@@ -43,6 +46,19 @@ std::map<string, std::map<Container, string>> alignContainer = {
         }
     }
 };
+
+#define PROCESS_VAL(p) case(p): s = #p; break;
+
+std::ostream& operator<<(std::ostream& out, const Container value) {
+    const char* s = 0;
+    switch(value){
+        PROCESS_VAL(Container::screen);
+        PROCESS_VAL(Container::block);
+        PROCESS_VAL(Container::link);
+        PROCESS_VAL(Container::text);
+    }
+    return out << s;
+}
 
 void outputResultFiles() {
     if (!htmlPages.size()) displayError(ErrorType::input, ErrorObject::no_files_transmitted, "");

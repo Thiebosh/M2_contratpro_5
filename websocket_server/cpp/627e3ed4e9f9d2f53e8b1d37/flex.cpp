@@ -29,7 +29,7 @@ EOL     \r\n|\r|\n
 {KEY_}style{_KEY}        { return STYLE; }
 {KEY_}block{_KEY}        { return BLOCK; }
 {KEY_}link{_KEY}         { return LINK; }
-{KEY_}text{_KEY}         { return TEXT; }
+{KEY_}text{_KEY}         { return TEXTBLOCK; }
 {KEY_}screen{_KEY}       { return SCREEN; }
 {KEY_}content{_KEY}      { return CONTENT; }
 
