@@ -252,13 +252,14 @@ function initNewNode(suggestion:any, parent:any){
     return {
         syntaxKey:suggestion,
         children:[],
+        _children:[],
         parent:parent,
         path:path
     }
 }
 
 
-function updateNodeChildren(node:any, setTree:React.Dispatch<any>){
+export function updateNodeChildren(node:any, setTree:React.Dispatch<any>){
     let currentParent;
 
     if (node.parent) {
