@@ -11,8 +11,8 @@
             "?name",
             "?color",
             "?align",
-            "?decoration",
-            "?boldText",
+            "?textBold",
+            "?textDecoration",
             "?borders",
             "?borderRadius"
         ]
@@ -109,11 +109,11 @@
         "type": "field",
         "field": "selectAlign"
     },
-    "decoration": {
+    "textDecoration": {
         "type": "field",
         "field": "selectDecoration"
     },
-    "boldText": {
+    "textBold": {
         "type": "field",
         "field": "inputOnOff"
     },
