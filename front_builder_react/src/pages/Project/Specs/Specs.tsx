@@ -165,7 +165,11 @@ export function Specs() {
             setErrorMsg("Not connected to server!");
             return;
         }
-        
+        if(JSON.parse(queue.current.tail).action !== "cursor"){
+            //@ts-ignore
+            document.getElementsByClassName("rd3t-tree-container")[0].style.cursor = "wait"
+        }
+
         let lastCall = 0;
         while (queue.current.length > 0 ){
             var now = Date.now();
@@ -281,6 +285,12 @@ export function Specs() {
             
             if("action" in data){
                 setSocketActionData(data);                
+            }
+
+            //@ts-ignore
+            if(document.getElementsByClassName("rd3t-tree-container")[0].style.cursor !== "default"){
+                //@ts-ignore
+                document.getElementsByClassName("rd3t-tree-container")[0].style.cursor = "default";
             }
         };
 
