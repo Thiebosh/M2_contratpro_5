@@ -88,7 +88,9 @@ export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch
                 /*to init creation of new field : for field, content contains only key with value that we init in the following line
                 for array, content contains mandatory children
                 for object : content contains json and not only one key-value*/
-                jsonContent[splittedPath[splittedPath.length - 1]] = g_syntax[g_syntax[node.syntaxKey].field].default;
+                const fieldSyntax = g_syntax[node.syntaxKey]; // e.g : align, color ...
+                const fieldElementSyntax = g_syntax[fieldSyntax.field]; // e.g : selectAlign, inputNumber ...
+                jsonContent[splittedPath[splittedPath.length - 1]] = fieldElementSyntax.type === "select" ? fieldElementSyntax.default :  fieldElementSyntax.values[0];
             }
             socketContent = JSON.stringify(
                 {
