@@ -8,8 +8,10 @@ export default function InputNode({ nodeDatum, updateValue, tree, setTree, queue
   const [checked, setChecked] = useState(nodeDatum.value);
 
   useEffect(()=> {
-    setValue(nodeDatum.value);
-    setChecked(nodeDatum.value);
+    if (nodeDatum.value !== undefined) {
+      setValue(nodeDatum.value);
+      setChecked(nodeDatum.value);
+    }
   }, [nodeDatum.value]);
 
   function handleChange(e: any) {

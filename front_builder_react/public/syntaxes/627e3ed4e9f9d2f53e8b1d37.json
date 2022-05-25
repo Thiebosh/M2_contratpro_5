@@ -119,23 +119,28 @@
     "inputHome": {
         "type": "input",
         "nature": "radio",
-        "global": "true"
+        "global": "true",
+        "default": true
     },
     "inputText": {
         "type": "input",
-        "nature": "text"
+        "nature": "text",
+        "default": ""
     },
     "inputNumber": {
         "type": "input",
-        "nature": "number"
+        "nature": "number",
+        "default": 0
     },
     "inputOnOff": {
         "type": "input",
-        "nature": "checkbox"
+        "nature": "checkbox",
+        "default": false
     },
     "inputColor": {
         "type": "input",
-        "nature": "color"
+        "nature": "color",
+        "default": "#000000"
     },
 
     "selectAlign": {

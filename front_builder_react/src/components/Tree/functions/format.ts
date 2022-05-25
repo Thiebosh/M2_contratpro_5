@@ -51,13 +51,13 @@ function formatField(node:any, key:string){
         initChildrenIfNotDone(node);
 
         let fieldSyntaxClone = clone(fieldSyntax);
-        fieldSyntaxClone.value = node[key];
+        fieldSyntaxClone.value = node[key] !== undefined ? node[key] : fieldSyntax.default;
         fieldSyntaxClone.parent = node;
         fieldSyntaxClone.syntaxKey = key;
         fieldSyntaxClone.path = node.path + "/" + key;
 
         if (fieldSyntaxClone.type === "select"){
-            moveElementAtFirstPosition(fieldSyntaxClone.values,node[key])
+            moveElementAtFirstPosition(fieldSyntaxClone.values,node[key]);
         }
 
         node.children.splice(-1,0,fieldSyntaxClone);
