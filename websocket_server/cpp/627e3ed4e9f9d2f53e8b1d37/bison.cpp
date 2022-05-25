@@ -46,6 +46,7 @@
 %token DECO
 %token ISBOLD
 %token BORDERS
+%token BORDERRADIUS
 
 %token TRUE
 %token FALSE
@@ -205,6 +206,10 @@ field
     |   BORDERS COLOR_VALUE
         {
             currentStyle += "border: 1px solid " + (string)$2 + "; ";
+        }
+    |   BORDERRADIUS STR_VALUE
+        {
+            currentStyle += "border-radius: " + (string)$2 + "px; ";
         }
     |   ALIGN STR_VALUE
         {
