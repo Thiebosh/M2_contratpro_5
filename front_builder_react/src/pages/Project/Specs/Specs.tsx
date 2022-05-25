@@ -198,7 +198,6 @@ export function Specs() {
         const svg = document.querySelector('#treeContent svg') as SVGElement;
         const createCursor = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
         createCursor.setAttribute("r", "6");
-         console.log('nbCursors add', nbCursors, loggedCollabs)
         createCursor.style.fill = colors[nbCursors % colors.length];
         createCursor.id = "cursor"+newCollab.replace(/ /g, "_");
         svg.appendChild(createCursor);
@@ -217,7 +216,6 @@ export function Specs() {
         if (!cursor) return;
 
         nbCursors--;
-        console.log('nbCursors del', nbCursors, loggedCollabs)
         svg.removeChild(cursor);
     }
 
