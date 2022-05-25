@@ -1,7 +1,0 @@
-style:
-    display: flex + flex-direction: $row/column$ + align-items: center
-    display: flex
-    display: flex + flex-wrap: wrap + justify-content: center;
-    flex-grow: 1
-
-fonctionnement: for
