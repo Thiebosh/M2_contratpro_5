@@ -15,8 +15,10 @@ interface CollabsProps {
     className?: 'delete',
     onClick?: (item:string) => void,
 }
+
+const colors: string[] = ['#2B6CB0', '#8CBCB9', '#DDA448', '#BB342F', '#00171F'];
+
 export function Collabs(props: CollabsProps) {
-    const colors: string[] = ['#2B6CB0', '#8CBCB9', '#DDA448', '#BB342F', '#00171F'];
     return (
         <div className='collabs'>
             {props.usernames.map((item, pos) => (

@@ -14,6 +14,8 @@ import { Queue } from "queue-typescript"
 
 import './Specs.scss';
 
+const colors: string[] = ['#2B6CB0', '#8CBCB9', '#DDA448', '#BB342F', '#00171F'];
+
 function init(data:any, setTree:React.Dispatch<any>){
     data["root"].path = "root"
     formatData(data);
@@ -26,6 +28,7 @@ export function Specs() {
     const navigate = useNavigate();
     const { urlName } = useParams();
     const userContext = useUserContext();
+
     const [projectId, setProjectId] = useState<string>();
     const [isOpen, setIsOpen] = useState(false);
     const [modalElements, setModalElements] = useState([]);
@@ -188,10 +191,12 @@ export function Specs() {
         collabs.forEach(collab => addCursor(collab));
     }
     function addCursor(newCollab:string) {
+        nbCursors++;
         const svg = document.querySelector('#treeContent svg') as SVGElement;
         const createCursor = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
         createCursor.setAttribute("r", "6");
-        createCursor.style.fill = "#2b6cb0";
+
+        createCursor.style.fill = colors[nbCursors % colors.length];
         createCursor.id = "cursor"+newCollab.replace(/ /g, "_");
         svg.appendChild(createCursor);
     }
@@ -199,10 +204,11 @@ export function Specs() {
         const cursor = document.querySelector('#cursor'+currentCursor["author"].replace(/ /g, "_")) as SVGElement;
         if (!cursor) return;
 
-        cursor.setAttribute("cx", `${currentCursor["position"]["x"]}`)
-        cursor.setAttribute("cy", `${currentCursor["position"]["y"]}`)
+        cursor.setAttribute("cx", `${treePosition[0] + currentCursor["position"]["x"] }`)
+        cursor.setAttribute("cy", `${treePosition[1] + currentCursor["position"]["y"] }`)
     }
     function removeCursor(oldCollab:string) {
+        nbCursors--;
         const svg = document.querySelector('#treeContent svg') as SVGElement;
         const cursor = document.querySelector('#cursor'+oldCollab.replace(/ /g, "_")) as SVGElement;
         if (!cursor) return;
