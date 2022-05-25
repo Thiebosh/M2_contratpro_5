@@ -25,7 +25,6 @@
     "block": {
         "type": "object",
         "values": [
-            "?name",
             "?style",
             "?content"
         ]
@@ -73,10 +72,10 @@
     "content": {
         "type": "array",
         "values": [
+            "?repeat",
             "?block",
             "?title",
             "?text",
-            "?numberValue",
             "?button",
             "?userInput",
             "?link"
@@ -88,6 +87,13 @@
             "?style",
             "hintValue",
             "inputType"
+        ]
+    },
+    "repeat": {
+        "type": "object",
+        "values": [
+            "numberValue",
+            "block"
         ]
     },
 

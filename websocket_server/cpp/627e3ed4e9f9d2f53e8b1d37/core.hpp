@@ -31,6 +31,9 @@ std::vector<bool> isNestedLinkExternal;
 std::vector<int> cssPositionApplyer;
 string currentStyle = "";
 
+std::vector<string> loopLevel;
+std::vector<int> loopCount;
+
 std::map<Container, string> colorContainer = {
     {Container::screen, "background-color: "},
     {Container::block, "background-color: "},

@@ -35,15 +35,16 @@
 %token BUTTON
 %token SCREEN
 %token CONTENT
-%token INPUT //
+%token INPUT
+%token REPEAT
 
 %token NAME
 %token DEFAULTSCREEN
 %token TARGETVALUE
 %token TEXTVALUE
-%token HINTVALUE //
+%token HINTVALUE
 %token NUMBERVALUE
-%token INPUTTYPE //
+%token INPUTTYPE
 %token EXTLINK
 %token COLOR
 %token ALIGN
@@ -98,6 +99,8 @@ fields
     :   field NEXT fields
     |   field
     ;
+
+docWithNumber: OPEN_DOC NUMBERVALUE STR_VALUE { loopCount.push_back(stoi((string)$3)); } NEXT fields CLOSE_DOC;
 
 field
     :   NAME STR_VALUE
@@ -195,6 +198,24 @@ field
             if (ONE_LINE) fileContent[currentPage] += "\n";
             cssPositionApplyer.pop_back();
             currentContainer.pop_back();
+        }
+    |   REPEAT
+        {
+            if (loopLevel.empty()) loopLevel.push_back(currentPage);
+            currentPage = "loop"+loopLevel.size();
+            loopLevel.push_back(currentPage);
+            fileContent[currentPage] = "";
+        }
+        docWithNumber
+        {
+            string looped = fileContent[currentPage];
+            fileContent.erase(currentPage);
+            loopLevel.pop_back();
+            currentPage = loopLevel.back();
+            if (loopLevel.size() == 1) loopLevel.pop_back();
+
+            for (int i = 1; i <= loopCount.back(); ++i) fileContent[currentPage] += looped;
+            loopCount.pop_back();
         }
     |   TEXTVALUE STR_VALUE
         {

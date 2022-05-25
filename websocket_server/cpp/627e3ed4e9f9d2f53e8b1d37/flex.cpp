@@ -35,14 +35,15 @@ EOL     \r\n|\r|\n
 {KEY_}screen{_KEY}       { return SCREEN; }
 {KEY_}content{_KEY}      { return CONTENT; }
 {KEY_}userInput{_KEY}    { return INPUT; }
+{KEY_}repeat{_KEY}       { return REPEAT; }
 
 {KEY_}name{_KEY}                    { return NAME; }
 {KEY_}defaultPage{_KEY}             { return DEFAULTSCREEN; }
 {KEY_}targetValue{_KEY}             { return TARGETVALUE; }
 {KEY_}textValue{_KEY}               { return TEXTVALUE; }
-{KEY_}hintValue{_KEY}               { return HINTVALUE; } //
+{KEY_}hintValue{_KEY}               { return HINTVALUE; }
 {KEY_}numberValue{_KEY}             { return NUMBERVALUE; }
-{KEY_}inputType{_KEY}               { return INPUTTYPE; } //
+{KEY_}inputType{_KEY}               { return INPUTTYPE; }
 {KEY_}external{_KEY}                { return EXTLINK; }
 {KEY_}color{_KEY}                   { return COLOR; }
 {KEY_}align{_KEY}                   { return ALIGN; }
