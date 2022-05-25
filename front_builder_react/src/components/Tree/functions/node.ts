@@ -90,7 +90,7 @@ export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch
                 for object : content contains json and not only one key-value*/
                 const fieldSyntax = g_syntax[node.syntaxKey]; // e.g : align, color ...
                 const fieldElementSyntax = g_syntax[fieldSyntax.field]; // e.g : selectAlign, inputNumber ...
-                jsonContent[splittedPath[splittedPath.length - 1]] = fieldElementSyntax.type === "select" ? fieldElementSyntax.default :  fieldElementSyntax.values[0];
+                jsonContent[splittedPath[splittedPath.length - 1]] = fieldElementSyntax.type === "select" ? fieldElementSyntax.values[0] : fieldElementSyntax.default;
             }
             socketContent = JSON.stringify(
                 {
