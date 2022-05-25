@@ -76,9 +76,18 @@
             "?block",
             "?title",
             "?text",
+            "?numberValue",
             "?button",
-            "?link",
-            "?numberValue"
+            "?userInput",
+            "?link"
+        ]
+    },
+    "userInput": {
+        "type": "object",
+        "values": [
+            "?style",
+            "hintValue",
+            "inputType"
         ]
     },
 
@@ -98,9 +107,17 @@
         "type": "field",
         "field": "inputText"
     },
+    "hintValue": {
+        "type": "field",
+        "field": "inputText"
+    },
     "numberValue": {
         "type": "field",
         "field": "inputNumber"
+    },
+    "inputType": {
+        "type": "field",
+        "field": "selectInputType"
     },
     "external": {
         "type": "field",
@@ -194,6 +211,13 @@
             "none",
             "underline",
             "italic"
+        ]
+    },
+    "selectInputType": {
+        "type": "select",
+        "values": [
+            "text",
+            "password"
         ]
     }
 }

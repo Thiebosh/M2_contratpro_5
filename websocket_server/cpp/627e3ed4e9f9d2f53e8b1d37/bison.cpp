@@ -35,11 +35,15 @@
 %token BUTTON
 %token SCREEN
 %token CONTENT
+%token INPUT //
+
 %token NAME
 %token DEFAULTSCREEN
 %token TARGETVALUE
 %token TEXTVALUE
+%token HINTVALUE //
 %token NUMBERVALUE
+%token INPUTTYPE //
 %token EXTLINK
 %token COLOR
 %token ALIGN
@@ -179,9 +183,30 @@ field
             cssPositionApplyer.pop_back();
             currentContainer.pop_back();
         }
+    |   INPUT
+        {
+            currentContainer.push_back(Container::text);
+            fileContent[currentPage] += (INDENT ? string(indent++, '\t') : "") + "<input ";
+            cssPositionApplyer.push_back(fileContent[currentPage].length());
+        }
+        doc
+        {
+            fileContent[currentPage] += "value='' autocomplete='off'>";
+            if (ONE_LINE) fileContent[currentPage] += "\n";
+            cssPositionApplyer.pop_back();
+            currentContainer.pop_back();
+        }
     |   TEXTVALUE STR_VALUE
         {
             fileContent[currentPage] += (INDENT ? string(indent, '\t') : "") + $2 + (ONE_LINE ? "" : "\n");
+        }
+    |   INPUTTYPE STR_VALUE
+        {
+            fileContent[currentPage] += "type=\"" + (string)$2 + "\" ";
+        }
+    |   HINTVALUE STR_VALUE
+        {
+            fileContent[currentPage] += "placeholder=\"" + (string)$2 + "\" ";
         }
     |   STYLE
         {
