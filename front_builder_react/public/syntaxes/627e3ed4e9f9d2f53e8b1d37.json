@@ -11,8 +11,15 @@
             "?name",
             "?color",
             "?align",
-            "?decoration",
-            "?boldText"
+            "?width",
+            "?outerMargin",
+            "?innerMargin",
+            "?innerMarginVertical",
+            "?innerMarginHorizontal",
+            "?textBold",
+            "?textDecoration",
+            "?borders",
+            "?borderRadius"
         ]
     },
     "block": {
@@ -107,13 +114,41 @@
         "type": "field",
         "field": "selectAlign"
     },
-    "decoration": {
+    "textDecoration": {
         "type": "field",
         "field": "selectDecoration"
     },
-    "boldText": {
+    "textBold": {
         "type": "field",
         "field": "inputOnOff"
+    },
+    "borders": {
+        "type": "field",
+        "field": "inputColor"
+    },
+    "borderRadius": {
+        "type": "field",
+        "field": "inputNumber"
+    },
+    "width": {
+        "type": "field",
+        "field": "inputNumber"
+    },
+    "outerMargin": {
+        "type": "field",
+        "field": "inputNumber"
+    },
+    "innerMargin": {
+        "type": "field",
+        "field": "inputNumber"
+    },
+    "innerMarginVertical": {
+        "type": "field",
+        "field": "inputNumber"
+    },
+    "innerMarginHorizontal": {
+        "type": "field",
+        "field": "inputNumber"
     },
 
     "inputHome": {

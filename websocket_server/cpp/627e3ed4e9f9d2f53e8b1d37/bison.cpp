@@ -45,6 +45,13 @@
 %token ALIGN
 %token DECO
 %token ISBOLD
+%token BORDERS
+%token BORDERRADIUS
+%token WIDTH
+%token OUTERMARGIN
+%token INNERMARGIN
+%token INNERMARGIN_V
+%token INNERMARGIN_H
 
 %token TRUE
 %token FALSE
@@ -189,10 +196,6 @@ field
         {
             currentStyle += colorContainer[currentContainer.back()] + $2 + "; ";
         }
-    |   COLOR STR_VALUE
-        {
-            currentStyle += colorContainer[currentContainer.back()] + $2 + "; ";
-        }
     |   DECO STR_VALUE
         {
             currentStyle += "text-decoration: " + (string)$2 + "; ";
@@ -204,6 +207,34 @@ field
     |   ISBOLD FALSE
         {
             currentStyle += "font-weight: normal; ";
+        }
+    |   BORDERS COLOR_VALUE
+        {
+            currentStyle += "border: 1px solid " + (string)$2 + "; ";
+        }
+    |   BORDERRADIUS STR_VALUE
+        {
+            currentStyle += "border-radius: " + (string)$2 + "px; ";
+        }
+    |   WIDTH STR_VALUE
+        {
+            currentStyle += "width: " + (string)$2 + "%; ";
+        }
+    |   OUTERMARGIN STR_VALUE
+        {
+            currentStyle += "margin: " + (string)$2 + "em; ";
+        }
+    |   INNERMARGIN STR_VALUE
+        {
+            currentStyle += "padding: " + (string)$2 + "em; ";
+        }
+    |   INNERMARGIN_V STR_VALUE
+        {
+            currentStyle += "padding-top: " + (string)$2 + "em; padding-bottom: " + (string)$2 + "em;";
+        }
+    |   INNERMARGIN_H STR_VALUE
+        {
+            currentStyle += "padding-right: " + (string)$2 + "em; padding-left: " + (string)$2 + "em;";
         }
     |   ALIGN STR_VALUE
         {

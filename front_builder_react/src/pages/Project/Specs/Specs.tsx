@@ -165,8 +165,19 @@ export function Specs() {
             setErrorMsg("Not connected to server!");
             return;
         }
-        socket.send(queue.current.dequeue());
-        setNewSocket(false);
+        if(JSON.parse(queue.current.tail).action !== "cursor"){
+            //@ts-ignore
+            document.getElementsByClassName("rd3t-tree-container")[0].style.cursor = "wait"
+        }
+
+        let lastCall = 0;
+        while (queue.current.length > 0 ){
+            var now = Date.now();
+            if (lastCall + 20 > now) continue; // add delay here in ms
+            lastCall = now;
+            socket.send(queue.current.dequeue());
+            setNewSocket(false);
+        }
     }, [newSocket, queue, socket, socketUsable]);
 
     function addAllCursors(collabs:string[]) {
@@ -208,6 +219,7 @@ export function Specs() {
 
         socket.onmessage = (event) => {
             const data:Record<string, unknown> = JSON.parse(event.data);
+            console.log(data)
             switch(Object.keys(data)[0]) {
                 case 'cursor':
                     // @ts-ignore
@@ -274,6 +286,12 @@ export function Specs() {
             if("action" in data){
                 setSocketActionData(data);                
             }
+
+            //@ts-ignore
+            if(document.getElementsByClassName("rd3t-tree-container")[0] && document.getElementsByClassName("rd3t-tree-container")[0].style.cursor !== "default"){
+                //@ts-ignore
+                document.getElementsByClassName("rd3t-tree-container")[0].style.cursor = "default";
+            }
         };
 
         return () => {
@@ -333,7 +351,8 @@ export function Specs() {
             return;
         }
         setInfoMsg("Send generation request...");
-        socket.send(JSON.stringify({"action":"generate"}));
+        queue.current.enqueue(JSON.stringify({"action":"generate"}));
+        setNewSocket(true);
     }
 
     function triggerSave() {
@@ -342,7 +361,8 @@ export function Specs() {
             return;
         }
         setInfoMsg("Send save request...");
-        socket.send(JSON.stringify({"action":"save"}));
+        queue.current.enqueue(JSON.stringify({"action":"save"}));
+        setNewSocket(true);
     }
 
     return (
