@@ -36,6 +36,8 @@ export function Specs() {
     const [syntax, setSyntax] = useState<any>();
     const [newSocket, setNewSocket] = useState<boolean>(false);
     const [errorSocketContent, setErrorSocketContent] = useState<any>();
+
+    const [treePosition, setTreePosition] = useState([window.innerWidth/4, window.innerHeight/2])
     
     const queue = useRef<any>(null);
     useEffect(() => {
@@ -190,6 +192,7 @@ export function Specs() {
     function addAllCursors(collabs:string[]) {
         collabs.forEach(collab => addCursor(collab));
     }
+    let nbCursors = 0;
     function addCursor(newCollab:string) {
         nbCursors++;
         const svg = document.querySelector('#treeContent svg') as SVGElement;
@@ -341,11 +344,11 @@ export function Specs() {
             if (!treePosition) {
                 return;
             }
-            const deltaX = (parseInt(treePosition[1]) - window.innerWidth/4)
-            const deltaY = (parseInt(treePosition[2]) - window.innerHeight/2)
-
+            setTreePosition([parseInt(treePosition[1]), parseInt(treePosition[2])])
+            const deltaX = e.clientX - parseInt(treePosition[1])
+            const deltaY = e.clientY - 64 - parseInt(treePosition[2])
             //@ts-ignore
-            const pt = new DOMPointReadOnly(e.clientX - deltaX, e.clientY - 64 - deltaY);
+            const pt = new DOMPointReadOnly(deltaX, deltaY);
             //pb here : send screen position, not svg position
             queue.current.enqueue(JSON.stringify({action: "cursor", position: {x: pt.x, y: pt.y}}));
             setNewSocket(true);
