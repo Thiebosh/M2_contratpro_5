@@ -198,7 +198,7 @@ export function Specs() {
         const svg = document.querySelector('#treeContent svg') as SVGElement;
         const createCursor = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
         createCursor.setAttribute("r", "6");
-
+         console.log('nbCursors add', nbCursors, loggedCollabs)
         createCursor.style.fill = colors[nbCursors % colors.length];
         createCursor.id = "cursor"+newCollab.replace(/ /g, "_");
         svg.appendChild(createCursor);
@@ -206,16 +206,18 @@ export function Specs() {
     function updateCursor(currentCursor: {author:string, position:{x:number, y:number}}) {
         const cursor = document.querySelector('#cursor'+currentCursor["author"].replace(/ /g, "_")) as SVGElement;
         if (!cursor) return;
+        cursor.style.fill = colors[nbCursors % colors.length]
 
         cursor.setAttribute("cx", `${treePosition[0] + currentCursor["position"]["x"] }`)
         cursor.setAttribute("cy", `${treePosition[1] + currentCursor["position"]["y"] }`)
     }
     function removeCursor(oldCollab:string) {
-        nbCursors--;
         const svg = document.querySelector('#treeContent svg') as SVGElement;
         const cursor = document.querySelector('#cursor'+oldCollab.replace(/ /g, "_")) as SVGElement;
         if (!cursor) return;
 
+        nbCursors--;
+        console.log('nbCursors del', nbCursors, loggedCollabs)
         svg.removeChild(cursor);
     }
 
