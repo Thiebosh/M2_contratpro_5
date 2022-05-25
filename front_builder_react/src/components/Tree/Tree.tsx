@@ -81,7 +81,7 @@ export function CustomTree(props:CustomTreeProps){
         else if (nodeDatum.type === "adding"){
             return <AddElementNode nodeDatum={nodeDatum} handleAddElement={handleAddElement} />
         }
-        return <TextNode nodeDatum={nodeDatum} />
+        return <TextNode nodeDatum={nodeDatum} toggleNode={toggleNode} />
     };
 
     return (
