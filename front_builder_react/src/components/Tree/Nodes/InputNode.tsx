@@ -35,6 +35,7 @@ export default function InputNode({ nodeDatum, updateValue, tree, setTree, queue
   useEffect(() => {
     if (checked !== nodeDatum.value) {
       const delayedUpdate = setTimeout(() => {
+        updateValueOnNode(checked, nodeDatum.path + "_input", tree, setTree, queue, setNewSocket, socket);
         updateValue(checked)
       }, 400);
       return () => clearTimeout(delayedUpdate);

@@ -144,7 +144,7 @@ class JsonHandler():
 
 
     def modify_element(self, path: str, content:"int|float|str") -> bool:
-        if type(content) not in (int, float, str):
+        if type(content) not in (int, float, str, bool):
             return False
 
         path = path.split("/")
