@@ -348,7 +348,8 @@ export function Specs() {
             return;
         }
         setInfoMsg("Send generation request...");
-        socket.send(JSON.stringify({"action":"generate"}));
+        queue.current.enqueue(JSON.stringify({"action":"generate"}));
+        setNewSocket(true);
     }
 
     function triggerSave() {
@@ -357,7 +358,8 @@ export function Specs() {
             return;
         }
         setInfoMsg("Send save request...");
-        socket.send(JSON.stringify({"action":"save"}));
+        queue.current.enqueue(JSON.stringify({"action":"save"}));
+        setNewSocket(true);
     }
 
     return (
