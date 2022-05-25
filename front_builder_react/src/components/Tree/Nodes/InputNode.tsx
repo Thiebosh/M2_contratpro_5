@@ -8,8 +8,10 @@ export default function InputNode({ nodeDatum, updateValue, tree, setTree, queue
   const [checked, setChecked] = useState(nodeDatum.value);
 
   useEffect(()=> {
-    setValue(nodeDatum.value);
-    setChecked(nodeDatum.value);
+    if (nodeDatum.value !== undefined) {
+      setValue(nodeDatum.value);
+      setChecked(nodeDatum.value);
+    }
   }, [nodeDatum.value]);
 
   function handleChange(e: any) {
@@ -43,14 +45,16 @@ export default function InputNode({ nodeDatum, updateValue, tree, setTree, queue
       <g className={nodeDatum.path}>
         <foreignObject width={120} height={70} y={-35} x={-60}>
           <div className="node-div">
-            <label>{nodeDatum.syntaxKey}</label>
-            <input
-              className={nodeDatum.path+"_input"}
-              type={nodeDatum.nature}
-              checked={checked}
-              value={value}
-              onChange={handleChange}
-            />
+            <div className="node-content">
+              <label>{nodeDatum.syntaxKey}</label>
+              <input
+                className={nodeDatum.path + "_input"}
+                type={nodeDatum.nature}
+                checked={checked}
+                value={value}
+                onChange={handleChange}
+              />
+            </div>
           </div>
         </foreignObject>
       </g>

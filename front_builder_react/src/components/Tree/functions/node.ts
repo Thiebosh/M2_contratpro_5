@@ -88,7 +88,7 @@ export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch
                 /*to init creation of new field : for field, content contains only key with value that we init in the following line
                 for array, content contains mandatory children
                 for object : content contains json and not only one key-value*/
-                jsonContent[splittedPath[splittedPath.length - 1]] = "";
+                jsonContent[splittedPath[splittedPath.length - 1]] = g_syntax[g_syntax[node.syntaxKey].field].default;
             }
             socketContent = JSON.stringify(
                 {
@@ -236,7 +236,7 @@ function initNewNode(suggestion:any, parent:any){
             //@ts-ignore
             nodeSyntax.nature = fieldSyntax.nature;
             //@ts-ignore
-            nodeSyntax.value = "";
+            nodeSyntax.value = fieldSyntax.default;
         } else if (fieldSyntax.type === "select") {
             //@ts-ignore
             nodeSyntax.values = fieldSyntax.values;
