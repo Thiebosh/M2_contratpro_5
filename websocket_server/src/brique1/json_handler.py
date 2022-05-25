@@ -147,6 +147,8 @@ class JsonHandler():
         if type(content) not in (int, float, str):
             return False
 
+        path = path.split("/")
+        
         container = self._path_climber(path[:-1], self.data)
 
         if container is False or path[-1] not in container.keys():
