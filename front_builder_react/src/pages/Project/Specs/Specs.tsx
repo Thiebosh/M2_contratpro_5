@@ -399,7 +399,7 @@ export function Specs() {
                     <p onClick={triggerGenerate}>Generate prototype</p>
                 </div>
                 <div className="users">
-                    <Collabs usernames={[userContext.user.name+" (you)", ...loggedCollabs]} />
+                    <Collabs usernames={[userContext.user.name+" (you)", ...loggedCollabs]} colors={true} />
                 </div>
             </div>
 
