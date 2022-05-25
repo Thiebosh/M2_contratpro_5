@@ -49,6 +49,9 @@
 %token BORDERRADIUS
 %token WIDTH
 %token OUTERMARGIN
+%token INNERMARGIN
+%token INNERMARGIN_V
+%token INNERMARGIN_H
 
 %token TRUE
 %token FALSE
@@ -220,6 +223,18 @@ field
     |   OUTERMARGIN STR_VALUE
         {
             currentStyle += "margin: " + (string)$2 + "em; ";
+        }
+    |   INNERMARGIN STR_VALUE
+        {
+            currentStyle += "padding: " + (string)$2 + "em; ";
+        }
+    |   INNERMARGIN_V STR_VALUE
+        {
+            currentStyle += "padding-top: " + (string)$2 + "em; padding-bottom: " + (string)$2 + "em;";
+        }
+    |   INNERMARGIN_H STR_VALUE
+        {
+            currentStyle += "padding-right: " + (string)$2 + "em; padding-left: " + (string)$2 + "em;";
         }
     |   ALIGN STR_VALUE
         {
