@@ -45,6 +45,7 @@
 %token ALIGN
 %token DECO
 %token ISBOLD
+%token BORDERS
 
 %token TRUE
 %token FALSE
@@ -189,10 +190,6 @@ field
         {
             currentStyle += colorContainer[currentContainer.back()] + $2 + "; ";
         }
-    |   COLOR STR_VALUE
-        {
-            currentStyle += colorContainer[currentContainer.back()] + $2 + "; ";
-        }
     |   DECO STR_VALUE
         {
             currentStyle += "text-decoration: " + (string)$2 + "; ";
@@ -204,6 +201,10 @@ field
     |   ISBOLD FALSE
         {
             currentStyle += "font-weight: normal; ";
+        }
+    |   BORDERS COLOR_VALUE
+        {
+            currentStyle += "border: 1px solid " + (string)$2 + "; ";
         }
     |   ALIGN STR_VALUE
         {

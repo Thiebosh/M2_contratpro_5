@@ -45,6 +45,7 @@ EOL     \r\n|\r|\n
 {KEY_}align{_KEY}        { return ALIGN; }
 {KEY_}decoration{_KEY}   { return DECO; }
 {KEY_}boldText{_KEY}     { return ISBOLD; }
+{KEY_}borders{_KEY}      { return BORDERS; }
 
 (T|t)rue { return TRUE; }
 (F|f)alse { return FALSE; }

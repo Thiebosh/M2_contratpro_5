@@ -12,7 +12,8 @@
             "?color",
             "?align",
             "?decoration",
-            "?boldText"
+            "?boldText",
+            "?borders"
         ]
     },
     "block": {
@@ -114,6 +115,10 @@
     "boldText": {
         "type": "field",
         "field": "inputOnOff"
+    },
+    "borders": {
+        "type": "field",
+        "field": "inputColor"
     },
 
     "inputHome": {
