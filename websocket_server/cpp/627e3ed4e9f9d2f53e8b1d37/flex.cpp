@@ -30,6 +30,8 @@ EOL     \r\n|\r|\n
 {KEY_}block{_KEY}        { return BLOCK; }
 {KEY_}link{_KEY}         { return LINK; }
 {KEY_}text{_KEY}         { return TEXTBLOCK; }
+{KEY_}title{_KEY}        { return TITLE; }
+{KEY_}button{_KEY}       { return BUTTON; }
 {KEY_}screen{_KEY}       { return SCREEN; }
 {KEY_}content{_KEY}      { return CONTENT; }
 
@@ -42,6 +44,7 @@ EOL     \r\n|\r|\n
 {KEY_}color{_KEY}        { return COLOR; }
 {KEY_}align{_KEY}        { return ALIGN; }
 {KEY_}decoration{_KEY}   { return DECO; }
+{KEY_}boldText{_KEY}     { return ISBOLD; }
 
 (T|t)rue { return TRUE; }
 (F|f)alse { return FALSE; }

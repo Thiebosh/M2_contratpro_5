@@ -31,6 +31,8 @@
 %token BLOCK
 %token LINK
 %token TEXTBLOCK
+%token TITLE
+%token BUTTON
 %token SCREEN
 %token CONTENT
 %token NAME
@@ -42,6 +44,7 @@
 %token COLOR
 %token ALIGN
 %token DECO
+%token ISBOLD
 
 %token TRUE
 %token FALSE
@@ -145,6 +148,30 @@ field
             cssPositionApplyer.pop_back();
             currentContainer.pop_back();
         }
+    |   TITLE
+        {
+            currentContainer.push_back(Container::text);
+            fileContent[currentPage] += (INDENT ? string(indent++, '\t') : "") + "<h1>" + (ONE_LINE ? "" : "\n");
+            cssPositionApplyer.push_back(fileContent[currentPage].length() - 1 - !ONE_LINE);
+        }
+        doc
+        {
+            fileContent[currentPage] += (INDENT ? string(--indent, '\t') : "") + "</h1>" + (ONE_LINE ? "" : "\n");
+            cssPositionApplyer.pop_back();
+            currentContainer.pop_back();
+        }
+    |   BUTTON
+        {
+            currentContainer.push_back(Container::text);
+            fileContent[currentPage] += (INDENT ? string(indent++, '\t') : "") + "<button>" + (ONE_LINE ? "" : "\n");
+            cssPositionApplyer.push_back(fileContent[currentPage].length() - 1 - !ONE_LINE);
+        }
+        doc
+        {
+            fileContent[currentPage] += (INDENT ? string(--indent, '\t') : "") + "</button>" + (ONE_LINE ? "" : "\n");
+            cssPositionApplyer.pop_back();
+            currentContainer.pop_back();
+        }
     |   TEXTVALUE STR_VALUE
         {
             fileContent[currentPage] += (INDENT ? string(indent, '\t') : "") + $2 + (ONE_LINE ? "" : "\n");
@@ -169,6 +196,14 @@ field
     |   DECO STR_VALUE
         {
             currentStyle += "text-decoration: " + (string)$2 + "; ";
+        }
+    |   ISBOLD TRUE
+        {
+            currentStyle += "font-weight: bold; ";
+        }
+    |   ISBOLD FALSE
+        {
+            currentStyle += "font-weight: normal; ";
         }
     |   ALIGN STR_VALUE
         {

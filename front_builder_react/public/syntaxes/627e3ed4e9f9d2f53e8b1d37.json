@@ -11,7 +11,8 @@
             "?name",
             "?color",
             "?align",
-            "?decoration"
+            "?decoration",
+            "?boldText"
         ]
     },
     "block": {
@@ -39,6 +40,20 @@
             "textValue"
         ]
     },
+    "title": {
+        "type": "object",
+        "values": [
+            "?style",
+            "textValue"
+        ]
+    },
+    "button": {
+        "type": "object",
+        "values": [
+            "?style",
+            "textValue"
+        ]
+    },
     "screen": {
         "type": "array",
         "values": [
@@ -52,7 +67,9 @@
         "type": "array",
         "values": [
             "?block",
+            "?title",
             "?text",
+            "?button",
             "?link",
             "?numberValue"
         ]
@@ -93,6 +110,10 @@
     "decoration": {
         "type": "field",
         "field": "selectDecoration"
+    },
+    "boldText": {
+        "type": "field",
+        "field": "inputOnOff"
     },
 
     "inputHome": {
