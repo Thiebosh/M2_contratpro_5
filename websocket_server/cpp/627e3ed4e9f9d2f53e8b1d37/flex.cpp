@@ -47,6 +47,9 @@ EOL     \r\n|\r|\n
 {KEY_}textBold{_KEY}        { return ISBOLD; }
 {KEY_}borders{_KEY}         { return BORDERS; }
 {KEY_}borderRadius{_KEY}    { return BORDERRADIUS; }
+{KEY_}width{_KEY}           { return WIDTH; }
+{KEY_}outerMargin{_KEY}     { return OUTERMARGIN; }
+
 
 (T|t)rue { return TRUE; }
 (F|f)alse { return FALSE; }

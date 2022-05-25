@@ -11,6 +11,8 @@
             "?name",
             "?color",
             "?align",
+            "?width",
+            "?outerMargin",
             "?textBold",
             "?textDecoration",
             "?borders",
@@ -122,6 +124,14 @@
         "field": "inputColor"
     },
     "borderRadius": {
+        "type": "field",
+        "field": "inputNumber"
+    },
+    "width": {
+        "type": "field",
+        "field": "inputNumber"
+    },
+    "outerMargin": {
         "type": "field",
         "field": "inputNumber"
     },

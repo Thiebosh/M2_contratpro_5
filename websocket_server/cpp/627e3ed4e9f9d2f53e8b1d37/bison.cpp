@@ -47,6 +47,8 @@
 %token ISBOLD
 %token BORDERS
 %token BORDERRADIUS
+%token WIDTH
+%token OUTERMARGIN
 
 %token TRUE
 %token FALSE
@@ -210,6 +212,14 @@ field
     |   BORDERRADIUS STR_VALUE
         {
             currentStyle += "border-radius: " + (string)$2 + "px; ";
+        }
+    |   WIDTH STR_VALUE
+        {
+            currentStyle += "width: " + (string)$2 + "%; ";
+        }
+    |   OUTERMARGIN STR_VALUE
+        {
+            currentStyle += "margin: " + (string)$2 + "em; ";
         }
     |   ALIGN STR_VALUE
         {
