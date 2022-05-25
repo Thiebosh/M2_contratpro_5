@@ -172,10 +172,14 @@ export function Specs() {
 
         let lastCall = 0;
         while (queue.current.length > 0 ){
-            var now = Date.now();
+            const now = Date.now();
             if (lastCall + 20 > now) continue; // add delay here in ms
+
+            const msg = queue.current.dequeue()
+            if (msg.action === 'pointeur' && queue.current.length) continue;
+
             lastCall = now;
-            socket.send(queue.current.dequeue());
+            socket.send(msg);
             setNewSocket(false);
         }
     }, [newSocket, queue, socket, socketUsable]);
@@ -318,14 +322,24 @@ export function Specs() {
         const svg = document.querySelector('#treeContent svg') as SVGElement;
         if (!svg) return;
 
-        var lastCall = 0;
+        const regex = new RegExp(/translate\(([0-9]+.*),([0-9]+.*)\) /);
+        let lastCall = 0;
         svg.onmousemove = (e) => {
-            var now = Date.now();
-            if (lastCall + 20 > now) return; // add delay here in ms
+
+            const now = Date.now();
+            if (lastCall + 100 > now) return; // add delay here in ms
             lastCall = now;
 
+            // Get tree position
+            const treePosition = regex.exec((svg.firstChild as any).attributes.transform.value);
+            if (!treePosition) {
+                return;
+            }
+            const deltaX = (parseInt(treePosition[1]) - window.innerWidth/4)
+            const deltaY = (parseInt(treePosition[2]) - window.innerHeight/2)
+
             //@ts-ignore
-            const pt = new DOMPointReadOnly(e.clientX, e.clientY).matrixTransform(svg.getCTM().inverse());
+            const pt = new DOMPointReadOnly(e.clientX - deltaX, e.clientY - 64 - deltaY);
             //pb here : send screen position, not svg position
             queue.current.enqueue(JSON.stringify({action: "cursor", position: {x: pt.x, y: pt.y}}));
             setNewSocket(true);
