@@ -288,7 +288,7 @@ export function Specs() {
             }
 
             //@ts-ignore
-            if(document.getElementsByClassName("rd3t-tree-container")[0].style.cursor !== "default"){
+            if(document.getElementsByClassName("rd3t-tree-container")[0] && document.getElementsByClassName("rd3t-tree-container")[0].style.cursor !== "default"){
                 //@ts-ignore
                 document.getElementsByClassName("rd3t-tree-container")[0].style.cursor = "default";
             }
