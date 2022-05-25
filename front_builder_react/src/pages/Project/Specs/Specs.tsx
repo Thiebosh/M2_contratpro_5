@@ -165,8 +165,15 @@ export function Specs() {
             setErrorMsg("Not connected to server!");
             return;
         }
-        socket.send(queue.current.dequeue());
-        setNewSocket(false);
+        
+        let lastCall = 0;
+        while (queue.current.length > 0 ){
+            var now = Date.now();
+            if (lastCall + 20 > now) continue; // add delay here in ms
+            lastCall = now;
+            socket.send(queue.current.dequeue());
+            setNewSocket(false);
+        }
     }, [newSocket, queue, socket, socketUsable]);
 
     function addAllCursors(collabs:string[]) {
@@ -208,6 +215,7 @@ export function Specs() {
 
         socket.onmessage = (event) => {
             const data:Record<string, unknown> = JSON.parse(event.data);
+            console.log(data)
             switch(Object.keys(data)[0]) {
                 case 'cursor':
                     // @ts-ignore
