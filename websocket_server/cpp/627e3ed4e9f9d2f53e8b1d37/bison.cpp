@@ -208,6 +208,7 @@ field
     |   ALIGN STR_VALUE
         {
             currentStyle += alignContainer[$2][currentContainer.back()] + "; ";
+            if ((string)$2 == "center" && currentContainer.back() == Container::block) currentStyle += "width: fit-content; ";
         }
     |   TARGETVALUE STR_VALUE
         {
