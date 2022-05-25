@@ -172,10 +172,14 @@ export function Specs() {
 
         let lastCall = 0;
         while (queue.current.length > 0 ){
-            var now = Date.now();
+            const now = Date.now();
             if (lastCall + 20 > now) continue; // add delay here in ms
+
+            const msg = queue.current.dequeue()
+            if (msg.action === 'pointeur' && queue.current.length) continue;
+
             lastCall = now;
-            socket.send(queue.current.dequeue());
+            socket.send(msg);
             setNewSocket(false);
         }
     }, [newSocket, queue, socket, socketUsable]);
@@ -323,7 +327,7 @@ export function Specs() {
         svg.onmousemove = (e) => {
 
             const now = Date.now();
-            if (lastCall + 50 > now) return; // add delay here in ms
+            if (lastCall + 100 > now) return; // add delay here in ms
             lastCall = now;
 
             // Get tree position
