@@ -14,6 +14,8 @@ import { Queue } from "queue-typescript"
 
 import './Specs.scss';
 
+const colors: string[] = ['#2B6CB0', '#8CBCB9', '#DDA448', '#BB342F', '#00171F'];
+
 function init(data:any, setTree:React.Dispatch<any>){
     data["root"].path = "root"
     formatData(data);
@@ -26,6 +28,7 @@ export function Specs() {
     const navigate = useNavigate();
     const { urlName } = useParams();
     const userContext = useUserContext();
+
     const [projectId, setProjectId] = useState<string>();
     const [isOpen, setIsOpen] = useState(false);
     const [modalElements, setModalElements] = useState([]);
@@ -33,6 +36,8 @@ export function Specs() {
     const [syntax, setSyntax] = useState<any>();
     const [newSocket, setNewSocket] = useState<boolean>(false);
     const [errorSocketContent, setErrorSocketContent] = useState<any>();
+
+    const [treePosition, setTreePosition] = useState([window.innerWidth/4, window.innerHeight/2])
     
     const queue = useRef<any>(null);
     useEffect(() => {
@@ -172,10 +177,14 @@ export function Specs() {
 
         let lastCall = 0;
         while (queue.current.length > 0 ){
-            var now = Date.now();
+            const now = Date.now();
             if (lastCall + 20 > now) continue; // add delay here in ms
+
+            const msg = queue.current.dequeue()
+            if (msg.action === 'pointeur' && queue.current.length) continue;
+
             lastCall = now;
-            socket.send(queue.current.dequeue());
+            socket.send(msg);
             setNewSocket(false);
         }
     }, [newSocket, queue, socket, socketUsable]);
@@ -183,11 +192,14 @@ export function Specs() {
     function addAllCursors(collabs:string[]) {
         collabs.forEach(collab => addCursor(collab));
     }
+    let nbCursors = 0;
     function addCursor(newCollab:string) {
+        nbCursors++;
         const svg = document.querySelector('#treeContent svg') as SVGElement;
         const createCursor = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
         createCursor.setAttribute("r", "6");
-        createCursor.style.fill = "#2b6cb0";
+
+        createCursor.style.fill = colors[nbCursors % colors.length];
         createCursor.id = "cursor"+newCollab.replace(/ /g, "_");
         svg.appendChild(createCursor);
     }
@@ -195,10 +207,11 @@ export function Specs() {
         const cursor = document.querySelector('#cursor'+currentCursor["author"].replace(/ /g, "_")) as SVGElement;
         if (!cursor) return;
 
-        cursor.setAttribute("cx", `${currentCursor["position"]["x"]}`)
-        cursor.setAttribute("cy", `${currentCursor["position"]["y"]}`)
+        cursor.setAttribute("cx", `${treePosition[0] + currentCursor["position"]["x"] }`)
+        cursor.setAttribute("cy", `${treePosition[1] + currentCursor["position"]["y"] }`)
     }
     function removeCursor(oldCollab:string) {
+        nbCursors--;
         const svg = document.querySelector('#treeContent svg') as SVGElement;
         const cursor = document.querySelector('#cursor'+oldCollab.replace(/ /g, "_")) as SVGElement;
         if (!cursor) return;
@@ -318,14 +331,24 @@ export function Specs() {
         const svg = document.querySelector('#treeContent svg') as SVGElement;
         if (!svg) return;
 
-        var lastCall = 0;
+        const regex = new RegExp(/translate\(([0-9]+.*),([0-9]+.*)\) /);
+        let lastCall = 0;
         svg.onmousemove = (e) => {
-            var now = Date.now();
-            if (lastCall + 20 > now) return; // add delay here in ms
+
+            const now = Date.now();
+            if (lastCall + 100 > now) return; // add delay here in ms
             lastCall = now;
 
+            // Get tree position
+            const treePosition = regex.exec((svg.firstChild as any).attributes.transform.value);
+            if (!treePosition) {
+                return;
+            }
+            setTreePosition([parseInt(treePosition[1]), parseInt(treePosition[2])])
+            const deltaX = e.clientX - parseInt(treePosition[1])
+            const deltaY = e.clientY - 64 - parseInt(treePosition[2])
             //@ts-ignore
-            const pt = new DOMPointReadOnly(e.clientX, e.clientY).matrixTransform(svg.getCTM().inverse());
+            const pt = new DOMPointReadOnly(deltaX, deltaY);
             //pb here : send screen position, not svg position
             queue.current.enqueue(JSON.stringify({action: "cursor", position: {x: pt.x, y: pt.y}}));
             setNewSocket(true);

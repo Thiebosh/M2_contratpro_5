@@ -15,11 +15,14 @@ interface CollabsProps {
     className?: 'delete',
     onClick?: (item:string) => void,
 }
+
+const colors: string[] = ['#2B6CB0', '#8CBCB9', '#DDA448', '#BB342F', '#00171F'];
+
 export function Collabs(props: CollabsProps) {
     return (
         <div className='collabs'>
             {props.usernames.map((item, pos) => (
-                <div className={'bubble '+(props.className || "")} key={item+pos} onClick={() => props.onClick && props.onClick(item)}>
+                <div className={'bubble '+(props.className || "")} style={{backgroundColor: colors[pos % colors.length]}} key={item+pos} onClick={() => props.onClick && props.onClick(item)}>
                     {item[0]}
                     <span>{item}</span>
                 </div>

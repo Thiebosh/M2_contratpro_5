@@ -19,13 +19,17 @@
             "?textBold",
             "?textDecoration",
             "?borders",
-            "?borderRadius"
+            "?borderRadius",
+            "?flexible",
+            "?flexDirection",
+            "?flexAlignPrimary",
+            "?flexAlignSecondary",
+            "?flexChildRatio"
         ]
     },
     "block": {
         "type": "object",
         "values": [
-            "?name",
             "?style",
             "?content"
         ]
@@ -73,10 +77,10 @@
     "content": {
         "type": "array",
         "values": [
+            "?repeat",
             "?block",
             "?title",
             "?text",
-            "?numberValue",
             "?button",
             "?userInput",
             "?link"
@@ -88,6 +92,13 @@
             "?style",
             "hintValue",
             "inputType"
+        ]
+    },
+    "repeat": {
+        "type": "object",
+        "values": [
+            "numberValue",
+            "block"
         ]
     },
 
@@ -167,6 +178,26 @@
         "type": "field",
         "field": "inputNumber"
     },
+    "flexible": {
+        "type": "field",
+        "field": "inputOnOff"
+    },
+    "flexDirection": {
+        "type": "field",
+        "field": "selectFlexDirection"
+    },
+    "flexAlignPrimary": {
+        "type": "field",
+        "field": "selectFlexAlignPrimary"
+    },
+    "flexAlignSecondary": {
+        "type": "field",
+        "field": "selectFlexAlignSecondary"
+    },
+    "flexChildRatio": {
+        "type": "field",
+        "field": "inputNumber"
+    },
 
     "inputHome": {
         "type": "input",
@@ -218,6 +249,31 @@
         "values": [
             "text",
             "password"
+        ]
+    },
+    "selectFlexDirection": {
+        "type": "select",
+        "values": [
+            "row",
+            "column"
+        ]
+    },
+    "selectFlexAlignPrimary": {
+        "type": "select",
+        "values": [
+            "center",
+            "space-between",
+            "space-around",
+            "space-evenly"
+        ]
+    },
+    "selectFlexAlignSecondary": {
+        "type": "select",
+        "values": [
+            "center",
+            "start",
+            "end",
+            "stretch"
         ]
     }
 }

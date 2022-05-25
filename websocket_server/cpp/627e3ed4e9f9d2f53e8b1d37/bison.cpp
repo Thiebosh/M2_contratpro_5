@@ -35,15 +35,16 @@
 %token BUTTON
 %token SCREEN
 %token CONTENT
-%token INPUT //
+%token INPUT
+%token REPEAT
 
 %token NAME
 %token DEFAULTSCREEN
 %token TARGETVALUE
 %token TEXTVALUE
-%token HINTVALUE //
+%token HINTVALUE
 %token NUMBERVALUE
-%token INPUTTYPE //
+%token INPUTTYPE
 %token EXTLINK
 %token COLOR
 %token ALIGN
@@ -56,6 +57,11 @@
 %token INNERMARGIN
 %token INNERMARGIN_V
 %token INNERMARGIN_H
+%token FLEXIBLE
+%token FLEXDIRECTION
+%token FLEXALIGNPRIMARY
+%token FLEXALIGNSECONDARY
+%token FLEXCHILDRATIO
 
 %token TRUE
 %token FALSE
@@ -98,6 +104,8 @@ fields
     :   field NEXT fields
     |   field
     ;
+
+docWithNumber: OPEN_DOC NUMBERVALUE STR_VALUE { loopCount.push_back(stoi((string)$3)); } NEXT fields CLOSE_DOC;
 
 field
     :   NAME STR_VALUE
@@ -196,6 +204,24 @@ field
             cssPositionApplyer.pop_back();
             currentContainer.pop_back();
         }
+    |   REPEAT
+        {
+            if (loopLevel.empty()) loopLevel.push_back(currentPage);
+            currentPage = "loop"+loopLevel.size();
+            loopLevel.push_back(currentPage);
+            fileContent[currentPage] = "";
+        }
+        docWithNumber
+        {
+            string looped = fileContent[currentPage];
+            fileContent.erase(currentPage);
+            loopLevel.pop_back();
+            currentPage = loopLevel.back();
+            if (loopLevel.size() == 1) loopLevel.pop_back();
+
+            for (int i = 1; i <= loopCount.back(); ++i) fileContent[currentPage] += looped;
+            loopCount.pop_back();
+        }
     |   TEXTVALUE STR_VALUE
         {
             fileContent[currentPage] += (INDENT ? string(indent, '\t') : "") + $2 + (ONE_LINE ? "" : "\n");
@@ -260,6 +286,27 @@ field
     |   INNERMARGIN_H STR_VALUE
         {
             currentStyle += "padding-right: " + (string)$2 + "em; padding-left: " + (string)$2 + "em;";
+        }
+    |   FLEXIBLE FALSE
+    |   FLEXIBLE TRUE
+        {
+            currentStyle += "display: flex; flex-wrap: wrap;";
+        }
+    |   FLEXDIRECTION STR_VALUE
+        {
+            currentStyle += "flex-direction: " + (string)$2 + ";";
+        }
+    |   FLEXALIGNPRIMARY STR_VALUE
+        {
+            currentStyle += "justify-content: " + (string)$2 + ";";
+        }
+    |   FLEXALIGNSECONDARY STR_VALUE
+        {
+            currentStyle += "align-items: " + (string)$2 + ";";
+        }
+    |   FLEXCHILDRATIO STR_VALUE
+        {
+            currentStyle += "flex-grow: " + (string)$2 + ";";
         }
     |   ALIGN STR_VALUE
         {
