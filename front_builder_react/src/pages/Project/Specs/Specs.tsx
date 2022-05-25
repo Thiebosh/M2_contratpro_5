@@ -292,6 +292,9 @@ export function Specs() {
     }, [socket, socketUsable]);
 
     useEffect(() => {
+        const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1
+        if (isFirefox) return;
+
         if (!(tree)) return;
 
         const svg = document.querySelector('#treeContent svg') as SVGElement;
