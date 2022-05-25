@@ -14,6 +14,7 @@ interface CollabsProps {
     usernames: string[],
     className?: 'delete',
     onClick?: (item:string) => void,
+    colors?: boolean,
 }
 
 const colors: string[] = ['#2B6CB0', '#8CBCB9', '#DDA448', '#BB342F', '#00171F'];
@@ -22,7 +23,7 @@ export function Collabs(props: CollabsProps) {
     return (
         <div className='collabs'>
             {props.usernames.map((item, pos) => (
-                <div className={'bubble '+(props.className || "")} style={{backgroundColor: colors[pos % colors.length]}} key={item+pos} onClick={() => props.onClick && props.onClick(item)}>
+                <div className={'bubble '+(props.className || "")} style={props.colors ? {backgroundColor: colors[pos % colors.length]}: undefined} key={item+pos} onClick={() => props.onClick && props.onClick(item)}>
                     {item[0]}
                     <span>{item}</span>
                 </div>
@@ -116,7 +117,7 @@ export function CollabsInput(props:CollabsInputProps):JSX.Element {
     return (
         <div className='input_group'>
             <label>{props.label}</label>
-            <Collabs usernames={currentCollabNames} onClick={(item:string) => removeCollab(item)}/>
+            <Collabs usernames={currentCollabNames} onClick={(item:string) => removeCollab(item)} />
             <input type="text" list="potentialCollabList"
                 value={inputValue}
                 onChange={(event) => onChangeInputDataList(event.nativeEvent, event.target.value)}
