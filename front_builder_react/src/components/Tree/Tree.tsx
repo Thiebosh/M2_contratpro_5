@@ -81,7 +81,7 @@ export function CustomTree(props:CustomTreeProps){
         else if (nodeDatum.type === "adding"){
             return <AddElementNode nodeDatum={nodeDatum} handleAddElement={handleAddElement} />
         }
-        return <TextNode nodeDatum={nodeDatum} />
+        return <TextNode nodeDatum={nodeDatum} toggleNode={toggleNode} />
     };
 
     return (
@@ -92,7 +92,7 @@ export function CustomTree(props:CustomTreeProps){
             svgClassName="tree"
             data={props.tree}
             translate={{x:window.innerWidth/4,y:window.innerHeight/2}}
-            transitionDuration={0.5}
+            enableLegacyTransitions={true}
             renderCustomNodeElement={renderRectSvgNode}
             separation={{siblings: 1, nonSiblings: 1}}
             pathFunc="step"
