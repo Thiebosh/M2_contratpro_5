@@ -56,6 +56,11 @@ EOL     \r\n|\r|\n
 {KEY_}innerMargin{_KEY}             { return INNERMARGIN; }
 {KEY_}innerMarginVertical{_KEY}     { return INNERMARGIN_V; }
 {KEY_}innerMarginHorizontal{_KEY}   { return INNERMARGIN_H; }
+{KEY_}flexible{_KEY}                { return FLEXIBLE; }
+{KEY_}flexDirection{_KEY}           { return FLEXDIRECTION; }
+{KEY_}flexAlignPrimary{_KEY}        { return FLEXALIGNPRIMARY; }
+{KEY_}flexAlignSecondary{_KEY}      { return FLEXALIGNSECONDARY; }
+{KEY_}flexChildRatio{_KEY}          { return FLEXCHILDRATIO; }
 
 (T|t)rue { return TRUE; }
 (F|f)alse { return FALSE; }

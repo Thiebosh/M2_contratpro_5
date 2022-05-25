@@ -57,6 +57,11 @@
 %token INNERMARGIN
 %token INNERMARGIN_V
 %token INNERMARGIN_H
+%token FLEXIBLE
+%token FLEXDIRECTION
+%token FLEXALIGNPRIMARY
+%token FLEXALIGNSECONDARY
+%token FLEXCHILDRATIO
 
 %token TRUE
 %token FALSE
@@ -281,6 +286,27 @@ field
     |   INNERMARGIN_H STR_VALUE
         {
             currentStyle += "padding-right: " + (string)$2 + "em; padding-left: " + (string)$2 + "em;";
+        }
+    |   FLEXIBLE FALSE
+    |   FLEXIBLE TRUE
+        {
+            currentStyle += "display: flex; flex-wrap: wrap;";
+        }
+    |   FLEXDIRECTION STR_VALUE
+        {
+            currentStyle += "flex-direction: " + (string)$2 + ";";
+        }
+    |   FLEXALIGNPRIMARY STR_VALUE
+        {
+            currentStyle += "justify-content: " + (string)$2 + ";";
+        }
+    |   FLEXALIGNSECONDARY STR_VALUE
+        {
+            currentStyle += "align-items: " + (string)$2 + ";";
+        }
+    |   FLEXCHILDRATIO STR_VALUE
+        {
+            currentStyle += "flex-grow: " + (string)$2 + ";";
         }
     |   ALIGN STR_VALUE
         {
