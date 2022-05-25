@@ -13,6 +13,9 @@
             "?align",
             "?width",
             "?outerMargin",
+            "?innerMargin",
+            "?innerMarginVertical",
+            "?innerMarginHorizontal",
             "?textBold",
             "?textDecoration",
             "?borders",
@@ -132,6 +135,18 @@
         "field": "inputNumber"
     },
     "outerMargin": {
+        "type": "field",
+        "field": "inputNumber"
+    },
+    "innerMargin": {
+        "type": "field",
+        "field": "inputNumber"
+    },
+    "innerMarginVertical": {
+        "type": "field",
+        "field": "inputNumber"
+    },
+    "innerMarginHorizontal": {
         "type": "field",
         "field": "inputNumber"
     },

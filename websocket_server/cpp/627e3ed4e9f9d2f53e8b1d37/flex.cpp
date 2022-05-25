@@ -35,21 +35,23 @@ EOL     \r\n|\r|\n
 {KEY_}screen{_KEY}       { return SCREEN; }
 {KEY_}content{_KEY}      { return CONTENT; }
 
-{KEY_}name{_KEY}            { return NAME; }
-{KEY_}defaultPage{_KEY}     { return DEFAULTSCREEN; }
-{KEY_}targetValue{_KEY}     { return TARGETVALUE; }
-{KEY_}textValue{_KEY}       { return TEXTVALUE; }
-{KEY_}numberValue{_KEY}     { return NUMBERVALUE; }
-{KEY_}external{_KEY}        { return EXTLINK; }
-{KEY_}color{_KEY}           { return COLOR; }
-{KEY_}align{_KEY}           { return ALIGN; }
-{KEY_}textDecoration{_KEY}  { return DECO; }
-{KEY_}textBold{_KEY}        { return ISBOLD; }
-{KEY_}borders{_KEY}         { return BORDERS; }
-{KEY_}borderRadius{_KEY}    { return BORDERRADIUS; }
-{KEY_}width{_KEY}           { return WIDTH; }
-{KEY_}outerMargin{_KEY}     { return OUTERMARGIN; }
-
+{KEY_}name{_KEY}                    { return NAME; }
+{KEY_}defaultPage{_KEY}             { return DEFAULTSCREEN; }
+{KEY_}targetValue{_KEY}             { return TARGETVALUE; }
+{KEY_}textValue{_KEY}               { return TEXTVALUE; }
+{KEY_}numberValue{_KEY}             { return NUMBERVALUE; }
+{KEY_}external{_KEY}                { return EXTLINK; }
+{KEY_}color{_KEY}                   { return COLOR; }
+{KEY_}align{_KEY}                   { return ALIGN; }
+{KEY_}textDecoration{_KEY}          { return DECO; }
+{KEY_}textBold{_KEY}                { return ISBOLD; }
+{KEY_}borders{_KEY}                 { return BORDERS; }
+{KEY_}borderRadius{_KEY}            { return BORDERRADIUS; }
+{KEY_}width{_KEY}                   { return WIDTH; }
+{KEY_}outerMargin{_KEY}             { return OUTERMARGIN; }
+{KEY_}innerMargin{_KEY}             { return INNERMARGIN; }
+{KEY_}innerMarginVertical{_KEY}     { return INNERMARGIN_V; }
+{KEY_}innerMarginHorizontal{_KEY}   { return INNERMARGIN_H; }
 
 (T|t)rue { return TRUE; }
 (F|f)alse { return FALSE; }
