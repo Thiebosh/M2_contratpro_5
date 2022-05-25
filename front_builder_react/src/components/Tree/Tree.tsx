@@ -92,7 +92,7 @@ export function CustomTree(props:CustomTreeProps){
             svgClassName="tree"
             data={props.tree}
             translate={{x:window.innerWidth/4,y:window.innerHeight/2}}
-            transitionDuration={0.5}
+            enableLegacyTransitions={true}
             renderCustomNodeElement={renderRectSvgNode}
             separation={{siblings: 1, nonSiblings: 1}}
             pathFunc="step"
