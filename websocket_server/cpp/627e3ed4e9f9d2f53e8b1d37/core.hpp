@@ -77,7 +77,6 @@ void outputResultFiles() {
     cout << routeur_template.rdbuf() << endl << endl << endl << endl;
 
     //print html files
-	for (auto file : fileContent) cout << file.first << endl << file.second << endl << endl;
+	for (auto file : fileContent) cout << file.first << endl << file.second << endl << endl << endl << endl;
     cout << endl;
-    if (ONE_LINE) cout << endl;
 }

@@ -89,7 +89,7 @@ proto_files
         }
     ;
 
-array: OPEN_ARRAY array_content CLOSE_ARRAY;
+array: OPEN_ARRAY array_content CLOSE_ARRAY | OPEN_ARRAY CLOSE_ARRAY;
 
 array_content
     :   doc NEXT array_content
@@ -98,7 +98,7 @@ array_content
     |   STR_VALUE
     ;
 
-doc: OPEN_DOC fields CLOSE_DOC;
+doc: OPEN_DOC fields CLOSE_DOC | OPEN_DOC CLOSE_DOC;
 
 fields
     :   field NEXT fields
@@ -306,7 +306,7 @@ field
         }
     |   FLEXCHILDRATIO STR_VALUE
         {
-            currentStyle += "flex-grow: " + (string)$2 + ";";
+            currentStyle += "flex-grow: " + (string)$2 + "; width: min-content;";
         }
     |   ALIGN STR_VALUE
         {
