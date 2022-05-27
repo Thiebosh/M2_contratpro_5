@@ -327,8 +327,6 @@ export function Specs() {
         const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1
         if (isFirefox) return;
 
-        if (!(tree)) return;
-
         const svg = document.querySelector('#treeContent svg') as SVGElement;
         if (!svg) return;
 
@@ -354,7 +352,7 @@ export function Specs() {
             queue.current.enqueue(JSON.stringify({action: "cursor", position: {x: pt.x, y: pt.y}}));
             setNewSocket(true);
         }
-    }, [queue, tree]);
+    }, [queue]);
 
     const [successMsg, setSuccessMsg] = useState<string>("");
     const [infoMsg, setInfoMsg] = useState<string>("");
