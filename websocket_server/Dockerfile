@@ -14,6 +14,7 @@ ENV PHP_URL=$php_url
 ENV CPP_PATH="/src/brique2/cpp/"
 ENV DRIVE_PATH="/credentials/service_account.json"
 
+
 EXPOSE $arg_port
 
 CMD ["python", "."]
@@ -38,13 +39,23 @@ RUN apt update &&\
         flex \
         bison
 
+ARG syntaxes
+
 WORKDIR /src
 COPY cpp .
 
-RUN make build
+RUN for i in $syntaxes; \
+    do if [ "$i" != "(" ];  \
+    then if [ "$i" != ")" ];  \
+    then make build valueID=$i; \
+    fi \
+    fi \
+    done
 
 
 # third stage : copy all files
 FROM server
 
-COPY --from=builder /src/627e3ed4e9f9d2f53e8b1d37.exe /src/brique2/cpp/
+COPY --from=builder /src/executables/ /src/brique2/cpp/
+
+RUN ls /src/brique2/cpp/

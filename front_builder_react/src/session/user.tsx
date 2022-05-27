@@ -1,6 +1,6 @@
-import { createContext, useContext } from 'react';
-import moment from 'moment';
+import {createContext, useContext} from 'react';
 import {Navigate} from 'react-router-dom';
+import dayjs from 'dayjs'
 
 import {sessionDuration} from '../index';
 
@@ -16,7 +16,7 @@ function refreshSetUser(userId:string, userName:string) {
     const storage:timedUser = {
         userId: userId,
         userName: userName,
-        valid: moment().add(sessionDuration, 'minutes').toISOString()
+        valid: dayjs().add(sessionDuration, 'minute').format()
     };
     localStorage.setItem(userKey, JSON.stringify(storage));
 }
@@ -26,7 +26,7 @@ function refreshGetUser() {
     if (!value) return null;
 
     const storage:timedUser = JSON.parse(value);
-    if (moment().isAfter(storage.valid)) {
+    if (dayjs().isAfter(storage.valid)) {
         localStorage.removeItem(userKey);
         return null;
     }

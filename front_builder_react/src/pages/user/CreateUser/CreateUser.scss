@@ -5,26 +5,6 @@
         font-size: 36px;
     }
 
-    .input_group {
-        margin-bottom: 1.2em;
-        text-align: left;
-        display: flex;
-        flex-direction: column;
-
-        label {
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        input {
-            margin-top: 10px;
-            border: 1px solid lightgray;
-            border-radius: 5px;
-            padding: 13px 16px 9px;
-            font-size: 16px;
-        }
-    }
-
     .warning, .error {
         border-radius: 5px;
         color: white;
@@ -39,17 +19,5 @@
 
     .error {
         background-color: rgb(199, 12, 12);
-    }
-
-    .button {
-        width: 100%;
-        color: white;
-        background-color: var(--color-primary-light);
-        padding: .6em 0 .5em;
-        border-radius: 5px;
-        text-align: center;
-        font-weight: bold;
-        cursor: pointer;
-        font-size: 17px;
     }
 }

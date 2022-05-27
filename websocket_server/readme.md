@@ -3,7 +3,7 @@
 SET HOST=0.0.0.0
 SET PORT=8002
 
-SET RENDER_STATE=true
+SET IS_LOCAL=true
 
 SET CPP_PATH=src/brique2/cpp/
 SET DRIVE_PATH=credentials/service_account.json
