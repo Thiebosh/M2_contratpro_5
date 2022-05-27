@@ -19,7 +19,7 @@
         & > span {
             display: none;
             position: absolute;
-            transform: translate3d(40%, calc($size * 1.2), 0);
+            transform: translate3d(40%, calc(100% * 1.2), 0);
             z-index: 10;
             color: initial;
             background-color: white;

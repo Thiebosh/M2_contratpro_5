@@ -1,34 +1,23 @@
 from abc import ABC
+from typing import Any
+from utils import InitFailedException
+from defines import *
+
+from partners.logger_partner import LoggerPartner
 
 class FilesManager(ABC):
-    def __init__(self, partners, project_id, room_type) -> None:
+    def __init__(self, partners:"dict[str,Any]", project_id:str, room_type:str):
         self.partners = partners
         self.project_id = project_id
         self.room_type = room_type
 
+        logger_partner:LoggerPartner = self.partners[LOGGER]
+
+        logger_partner.logger.info(f"{self.project_id}-{self.room_type} - init file manager")
+
         if not self.project_id:
-            raise Exception("FilesGenerator - __init__: unknow project name")
+            logger_partner.logger.error("FilesGenerator - __init__: unknow project name")
+            raise InitFailedException()
 
     def close(self):
         pass
-
-    def _test(self):
-        self.partners["storage"].upload_files_to_folder(self.project_id, [
-            {
-                "name": "test1.py",
-                "content": "# !/usr/bin/python3 \n\ndef print_sorted(liste):\n    return sorted(liste)\n\n1"
-            },
-            {
-                "name": "test2.py",
-                "content": "# !/usr/bin/python3 \n\ndef print_sorted(liste):\n    return sorted(liste)\n\n2"
-            },
-            {
-                "name": "test3.py",
-                "content": "# !/usr/bin/python3 \n\ndef print_sorted(liste):\n    return sorted(liste)\n\n3"
-            },
-        ])
-
-        self.files = self.partners["storage"].download_files_from_folder(self.project_id)
-        print(self.files) # => working proof
-
-        self.files = self.partners["storage"].upload_files_to_folder(self.project_id, []) # add in rest server for cleaning deleting projects

@@ -39,18 +39,23 @@ RUN apt update &&\
         flex \
         bison
 
+ARG syntaxes
+
 WORKDIR /src
 COPY cpp .
 
-ARG valueID
-
-RUN make build valueID=$valueID
+RUN for i in $syntaxes; \
+    do if [ "$i" != "(" ];  \
+    then if [ "$i" != ")" ];  \
+    then make build valueID=$i; \
+    fi \
+    fi \
+    done
 
 
 # third stage : copy all files
 FROM server
 
-ARG valueID
+COPY --from=builder /src/executables/ /src/brique2/cpp/
 
-COPY --from=builder /src/$valueID.exe /src/brique2/cpp/
-
+RUN ls /src/brique2/cpp/
