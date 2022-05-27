@@ -16,19 +16,28 @@ enum class Container {
     root,
     screen,
     block,
+    link,
     text
 };
 
-Container currentContainer = Container::root;
+std::vector<Container> currentContainer = { Container::root };
 string currentPage = "";
 string defaultPage = "";
 std::map<string, string> fileContent;
 int indent = 0; //tmp
 std::vector<string> htmlPages;
+std::vector<bool> isNestedLinkExternal;
+
+std::vector<int> cssPositionApplyer;
+string currentStyle = "";
+
+std::vector<string> loopLevel;
+std::vector<int> loopCount;
 
 std::map<Container, string> colorContainer = {
     {Container::screen, "background-color: "},
     {Container::block, "background-color: "},
+    {Container::link, "color: "},
     {Container::text, "color: "}
 };
 std::map<string, std::map<Container, string>> alignContainer = {
@@ -41,11 +50,25 @@ std::map<string, std::map<Container, string>> alignContainer = {
     }
 };
 
+#define PROCESS_VAL(p) case(p): s = #p; break;
+
+std::ostream& operator<<(std::ostream& out, const Container value) {
+    const char* s = 0;
+    switch(value){
+        PROCESS_VAL(Container::screen);
+        PROCESS_VAL(Container::block);
+        PROCESS_VAL(Container::link);
+        PROCESS_VAL(Container::text);
+    }
+    return out << s;
+}
+
 void outputResultFiles() {
     if (!htmlPages.size()) displayError(ErrorType::input, ErrorObject::no_files_transmitted, "");
 
     // afficher default page
-    cout << "default page:" << endl << /*defaultPage*/"ecran1.html" << endl << endl << endl << endl; // ajouter element de pattern pour determiner page par défaut ou alors prendre première page comme défaut
+    if (defaultPage == "") defaultPage = htmlPages[0];
+    cout << "default page:" << endl << defaultPage << endl << endl << endl << endl;
 
     // print routeur.php
     cout << "routeur.php" << endl;
@@ -54,7 +77,6 @@ void outputResultFiles() {
     cout << routeur_template.rdbuf() << endl << endl << endl << endl;
 
     //print html files
-	for (auto file : fileContent) cout << file.first << endl << file.second << endl << endl;
+	for (auto file : fileContent) cout << file.first << endl << file.second << endl << endl << endl << endl;
     cout << endl;
-    if (ONE_LINE) cout << endl;
 }

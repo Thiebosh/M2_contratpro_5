@@ -8,7 +8,7 @@ import {
 } from 'react-router-dom';
 import {requireNoUser, requireUser, UserProvider, userContextMethods} from './session/user';
 
-import {NavBar} from './components/NavBar/NavBar';
+import {NavBar} from './components/NavBar';
 
 import {NotFound} from './pages/NotFound';
 import {Home} from './pages/Home';
@@ -27,7 +27,7 @@ export const sessionDuration = 20; //min
 export const dateFormat = "YYYY/MM/DD HH:mm";
 
 export function init_websocket(type:'specs'|'proto', projectId:string, username:string, setUsable:React.Dispatch<React.SetStateAction<boolean>>) {
-    const socket = new WebSocket("ws://localhost:8002");
+    const socket = new WebSocket("ws://" + window.location.hostname + ":8002");
 
     socket.onopen = () => {
         console.log('connecting...');
@@ -43,7 +43,7 @@ export function init_websocket(type:'specs'|'proto', projectId:string, username:
     socket.onerror = (error) => {
         setUsable(false);
         socket.close();
-        console.log(`[error] ${error}`);
+        console.error('[error]', error);
     };
     socket.onclose = (event) => {
         setUsable(false);
@@ -59,10 +59,11 @@ export function init_websocket(type:'specs'|'proto', projectId:string, username:
 
 function App():JSX.Element {
     const triggerRefresh = useState<boolean>(false)[1];
+    const [projectName, setProjectName] = useState<string>('');
     return (
         <>
             <UserProvider value={userContextMethods(triggerRefresh)}>
-                <NavBar/>
+                <NavBar projectName={projectName} setProjectName={setProjectName}/>
                 <Router>
                     <Routes>
                         <Route path="/" element={<Navigate replace to="/home" />} />
@@ -71,7 +72,7 @@ function App():JSX.Element {
                         <Route path="/user/login" element={requireNoUser(<Login/>)} />
                         <Route path="/user/profile" element={requireUser(<Profile/>)} />
                         <Route path="/projects" element={requireUser(<Projects/>)} />
-                        <Route path="/projects/create" element={requireUser(<CreateProject/>)} />
+                        <Route path="/projects/create" element={requireUser(<CreateProject setProjectName={setProjectName}/>)} />
                         <Route path="/project/:urlName" element={requireUser(<Detail/>)} />
                         <Route path="/project/:urlName/specs" element={requireUser(<Specs/>)} />
                         <Route path="/project/:urlName/proto" element={requireUser(<Proto/>)} />
