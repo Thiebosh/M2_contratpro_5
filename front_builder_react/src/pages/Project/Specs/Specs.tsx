@@ -178,11 +178,12 @@ export function Specs() {
         let lastCall = 0;
         while (queue.current.length > 0 ){
             const now = Date.now();
-            if (lastCall + 20 > now) continue; // add delay here in ms
+            if (lastCall + 50 > now) continue; // add delay here in ms
 
-            const msg = queue.current.dequeue()
-            if (msg.action === 'pointeur' && queue.current.length) continue;
-
+            const msg = queue.current.dequeue();
+            const parsedMsg = JSON.parse(msg); 
+            if (parsedMsg.action === 'cursor' && queue.current.length) continue;
+            
             lastCall = now;
             socket.send(msg);
             setNewSocket(false);

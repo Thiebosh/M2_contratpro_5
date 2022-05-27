@@ -30,7 +30,7 @@ export function findNodeWithPathForCreate(path:string, data:any, setTree:React.D
 export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch<any>, queue?:any, setNewSocket?:React.Dispatch<any>, socket?:any){
     // suggestion = selected new node
     const values = g_syntax[suggestion].values;
-    let node;
+    let node:any;
     let parent = nodeData.type === "adding" ? nodeData.parent : nodeData;
     let jsonContent;
     let initArray = false;
@@ -55,6 +55,13 @@ export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch
             initArray = true;
         }
 
+        if (g_syntax[node.syntaxKey].type === "field" && g_syntax[g_syntax[node.syntaxKey].field].global){
+            const associatedRadioInputs = document.querySelectorAll("input[type='radio'], input[class='" + node.syntaxKey + "']");
+            associatedRadioInputs.forEach((input:any) => {
+                const path = input.classList[0].split("_")[0];
+                updateValueOnNode(false, path, getRootNodeFromNode(node), setTree, queue, setNewSocket, socket);
+            })
+        }
         jsonContent = createMandatoryChildren(node);
 
         addNewNodeAsValueInNodeData(node);
@@ -260,10 +267,9 @@ function initNewNode(suggestion:any, parent:any){
     }
 }
 
-
-export function updateNodeChildren(node:any, setTree:React.Dispatch<any>){
+function getRootNodeFromNode(node:any){
     let currentParent;
-
+    
     if (node.parent) {
         currentParent = node.parent;
         
@@ -271,6 +277,11 @@ export function updateNodeChildren(node:any, setTree:React.Dispatch<any>){
             currentParent = currentParent.parent;
         }
     }
+    return currentParent;
+}
+
+export function updateNodeChildren(node:any, setTree:React.Dispatch<any>){
+    const currentParent = getRootNodeFromNode(node);
     setTree(currentParent ? clone(currentParent) : clone(node));
 }
 
@@ -314,13 +325,13 @@ export function deleteNode(path:any, data:any, setTree:React.Dispatch<any>, queu
 }
 
 //@ts-ignore
-function findByPath(path:string, data:any, i:number=0){
+function findParentNodeByPath(path:string, data:any, i:number=0){
     //@ts-ignore
     const splittedPath = path.split("/");
     const nextSubPath = splittedPath[i+1]
 
-    if (i < splittedPath.length - 1){
-        return findByPath(path, data[nextSubPath], i+1);
+    if (i < splittedPath.length - 2){
+        return findParentNodeByPath(path, data[nextSubPath], i+1);
     } else {
         return data;
     }
@@ -332,7 +343,7 @@ export function cancelOperation(action:string, path:string, content:any, tree:an
             const splittedPath = path.split("/");
             const keys = Object.keys(content);
             if (!isStringNumber(splittedPath[splittedPath.length - 1]) && (g_syntax[splittedPath[splittedPath.length - 1]].type === "array")){
-                const currentArrayElementIndex = findByPath(path, tree).length - 1;
+                const currentArrayElementIndex = findParentNodeByPath(path, tree)[findParentNodeByPath(path, tree).length - 1];
                 deleteNode(path + "/" + currentArrayElementIndex, tree, setTree);
             } else {
                 keys.forEach((key) => {

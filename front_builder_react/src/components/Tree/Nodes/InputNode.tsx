@@ -49,7 +49,7 @@ export default function InputNode({ nodeDatum, updateValue, tree, setTree, queue
             <div className="node-content">
               <label>{nodeDatum.syntaxKey}</label>
               <input
-                className={nodeDatum.path + "_input"}
+                className={nodeDatum.path + "_input " + nodeDatum.syntaxKey}
                 type={nodeDatum.nature}
                 checked={checked}
                 value={value}
