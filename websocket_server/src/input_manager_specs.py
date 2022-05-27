@@ -50,12 +50,6 @@ class InputManagerSpecs(InputManager):
             logger_partner.logger.error(MONGO_PARTNER_EXCEPTION, err)
             raise InitFailedException() from err
 
-        # tmp test
-        # import pathlib
-        # with open(f"{pathlib.Path(__file__).parent.absolute()}/brique2/needs.json", 'r') as file:
-        #     self.json_handler.data = json.loads(file.read().replace('\n', '').replace('\n', ''))
-        # self.current_version_generated = False
-
 
     async def close(self) -> None:
         await self.json_handler.close()
