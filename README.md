@@ -86,3 +86,6 @@ Nous avons utilisé une base de données MongoDB, hébergée en ligne, composée
     description: string
 }
 ```
+
+## Schéma d'ensemble
+![global scheme](https://github.com/Thiebosh/M2_contratpro_5/raw/main/documentation/global%20scheme.png)
