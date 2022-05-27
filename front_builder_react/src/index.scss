@@ -3,6 +3,8 @@
 	--color-primary-medium: rgb(52, 121, 194); //verif
     --color-primary-light: rgb(66, 153, 225);
     --color-shadow: #272728;
+    --color-text: #2D3748;
+    --color-background: #F7FAFC;
 }
 
 #root {
@@ -12,12 +14,15 @@
 
 html, body {
     height: 100%;
+    font-family: Inter,sans-serif;
+    text-rendering: optimizeLegibility;
+    color: var(--color-text);
 }
 
 body {
     margin: 0;
     text-align: center;
-    background-color: #f7fafc;
+    background-color: var(--color-background);
 }
 
 section {
@@ -46,5 +51,41 @@ section {
 
     a {
         text-decoration: none;
+    }
+
+    .bold {
+        font-weight: bold;
+    }
+
+    .button {
+        width: 100%;
+        color: white;
+        background-color: var(--color-primary-light);
+        padding: .6em 0 .5em;
+        border-radius: 5px;
+        text-align: center;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 17px;
+    }
+
+    .input_group {
+        margin-bottom: 1.2em;
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+
+        label {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        input, select, textarea {
+            margin-top: 10px;
+            border: 1px solid lightgray;
+            border-radius: 5px;
+            padding: 13px 16px 9px;
+            font-size: 16px;
+        }
     }
 }

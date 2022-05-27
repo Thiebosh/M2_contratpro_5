@@ -11,15 +11,37 @@
             "?name",
             "?color",
             "?align",
-            "?decoration"
+            "?width",
+            "?outerMargin",
+            "?innerMargin",
+            "?innerMarginVertical",
+            "?innerMarginHorizontal",
+            "?textBold",
+            "?textDecoration",
+            "?borders",
+            "?borderRadius",
+            "?flexible",
+            "?flexDirection",
+            "?flexAlignPrimary",
+            "?flexAlignSecondary",
+            "?flexChildRatio"
         ]
     },
     "block": {
         "type": "object",
         "values": [
-            "?name",
             "?style",
             "?content"
+        ]
+    },
+    "link": {
+        "type": "object",
+        "values": [
+            "targetValue",
+            "?external",
+            "?name",
+            "content",
+            "?style"
         ]
     },
     "text": {
@@ -29,12 +51,25 @@
             "textValue"
         ]
     },
-
+    "title": {
+        "type": "object",
+        "values": [
+            "?style",
+            "textValue"
+        ]
+    },
+    "button": {
+        "type": "object",
+        "values": [
+            "?style",
+            "textValue"
+        ]
+    },
     "screen": {
         "type": "array",
         "values": [
             "name",
-            "?inputHome",
+            "?defaultPage",
             "?style",
             "?content"
         ]
@@ -42,9 +77,28 @@
     "content": {
         "type": "array",
         "values": [
+            "?repeat",
             "?block",
+            "?title",
             "?text",
-            "?inputNumber"
+            "?button",
+            "?userInput",
+            "?link"
+        ]
+    },
+    "userInput": {
+        "type": "object",
+        "values": [
+            "?style",
+            "hintValue",
+            "inputType"
+        ]
+    },
+    "repeat": {
+        "type": "object",
+        "values": [
+            "numberValue",
+            "block"
         ]
     },
 
@@ -52,13 +106,33 @@
         "type": "field",
         "field": "inputText"
     },
+    "defaultPage": {
+        "type": "field",
+        "field": "inputHome"
+    },
+    "targetValue": {
+        "type": "field",
+        "field": "inputText"
+    },
     "textValue": {
+        "type": "field",
+        "field": "inputText"
+    },
+    "hintValue": {
         "type": "field",
         "field": "inputText"
     },
     "numberValue": {
         "type": "field",
         "field": "inputNumber"
+    },
+    "inputType": {
+        "type": "field",
+        "field": "selectInputType"
+    },
+    "external": {
+        "type": "field",
+        "field": "inputOnOff"
     },
     "color": {
         "type": "field",
@@ -68,27 +142,88 @@
         "type": "field",
         "field": "selectAlign"
     },
-    "decoration": {
+    "textDecoration": {
         "type": "field",
         "field": "selectDecoration"
+    },
+    "textBold": {
+        "type": "field",
+        "field": "inputOnOff"
+    },
+    "borders": {
+        "type": "field",
+        "field": "inputColor"
+    },
+    "borderRadius": {
+        "type": "field",
+        "field": "inputNumber"
+    },
+    "width": {
+        "type": "field",
+        "field": "inputNumber"
+    },
+    "outerMargin": {
+        "type": "field",
+        "field": "inputNumber"
+    },
+    "innerMargin": {
+        "type": "field",
+        "field": "inputNumber"
+    },
+    "innerMarginVertical": {
+        "type": "field",
+        "field": "inputNumber"
+    },
+    "innerMarginHorizontal": {
+        "type": "field",
+        "field": "inputNumber"
+    },
+    "flexible": {
+        "type": "field",
+        "field": "inputOnOff"
+    },
+    "flexDirection": {
+        "type": "field",
+        "field": "selectFlexDirection"
+    },
+    "flexAlignPrimary": {
+        "type": "field",
+        "field": "selectFlexAlignPrimary"
+    },
+    "flexAlignSecondary": {
+        "type": "field",
+        "field": "selectFlexAlignSecondary"
+    },
+    "flexChildRatio": {
+        "type": "field",
+        "field": "inputNumber"
     },
 
     "inputHome": {
         "type": "input",
         "nature": "radio",
-        "global": "true"
+        "global": "true",
+        "default": true
     },
     "inputText": {
         "type": "input",
-        "nature": "text"
+        "nature": "text",
+        "default": ""
     },
     "inputNumber": {
         "type": "input",
-        "nature": "number"
+        "nature": "number",
+        "default": 0
+    },
+    "inputOnOff": {
+        "type": "input",
+        "nature": "checkbox",
+        "default": true
     },
     "inputColor": {
         "type": "input",
-        "nature": "color"
+        "nature": "color",
+        "default": "#000000"
     },
 
     "selectAlign": {
@@ -107,6 +242,38 @@
             "none",
             "underline",
             "italic"
+        ]
+    },
+    "selectInputType": {
+        "type": "select",
+        "values": [
+            "text",
+            "password"
+        ]
+    },
+    "selectFlexDirection": {
+        "type": "select",
+        "values": [
+            "row",
+            "column"
+        ]
+    },
+    "selectFlexAlignPrimary": {
+        "type": "select",
+        "values": [
+            "center",
+            "space-between",
+            "space-around",
+            "space-evenly"
+        ]
+    },
+    "selectFlexAlignSecondary": {
+        "type": "select",
+        "values": [
+            "center",
+            "start",
+            "end",
+            "stretch"
         ]
     }
 }

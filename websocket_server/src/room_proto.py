@@ -1,25 +1,28 @@
 import json
+from typing import Any
+from asyncio import Event
+from socket import socket
 from input_manager_proto import InputManagerProto
 from room import Room
 
 class RoomProto(Room):
-    def __init__(self, room_id, room_type, shared_new_proto_flag, partners, callback_update_server_sockets, callback_remove_room, encoding) -> None:
+    def __init__(self, room_id:str, room_type:str, shared_new_proto_flag:Event, partners:"dict[str,Any]", callback_update_server_sockets, callback_remove_room) -> None:
         shared_new_proto_flag.clear()
 
         input_manager = InputManagerProto(room_id, room_type, partners)
-        super().__init__(room_id, room_type, partners, callback_update_server_sockets, callback_remove_room, encoding, input_manager)
+        super().__init__(room_id, room_type, partners, callback_update_server_sockets, callback_remove_room, input_manager)
 
         self.shared_new_proto_flag = shared_new_proto_flag
-        self.update_proto = 0
+        self.update_proto:int = 0
 
 
-    def open_client_connection_to_room(self, socket, name):
+    def open_client_connection_to_room(self, socket:socket, name:str) -> None:
         super().open_client_connection_to_room(socket, name)
 
         self.add_message_in_queue(socket, json.dumps({"set_session": self.input_manager.render_page.session}))
 
 
-    async def process_running_inputs(self):
+    async def process_running_inputs(self) -> None:
         if self.update_proto > 1:
             self.update_proto -= 1
             return
@@ -28,11 +31,15 @@ class RoomProto(Room):
             self.update_proto = 0
             self.input_manager.inputs = [] # discard all requests
 
-            self.input_manager.render_page.reset_session()
-            self.input_manager.files_manager.reload_files()
+            if not self.input_manager.render_page.reset_session():
+                return
+
+            self.broadcast_message(None, json.dumps({"set_session": self.input_manager.render_page.session}))
+
+            if not self.input_manager.files_manager.reload_files():
+                return
 
             self.broadcast_message(None, json.dumps({"proto_update": False}))
-            self.broadcast_message(None, json.dumps({"set_session": self.input_manager.render_page.session}))
             return
 
         for input_to_process in self.input_manager.inputs:
