@@ -32,10 +32,6 @@
                 padding-right: .4em;
             }
         }
-
-        .button.red {
-            background-color: rgb(199, 12, 12);
-        }
     }
 
     .popup {
@@ -101,9 +97,12 @@
             .button {
                 padding: .6em .9em .5em;
                 flex-grow: 1;
-            }
-            .button.red {
-                background-color: rgb(199, 12, 12);
+
+                &.red {
+                    background-color: rgb(199, 12, 12);
+                    border: none;
+                    width: fit-content;
+                }
             }
 
             .collabs {

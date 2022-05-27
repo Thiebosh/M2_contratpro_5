@@ -1,5 +1,4 @@
 import Tree from "react-d3-tree"
-import {formatData} from "./functions/format"
 import {addChildren, deleteNode} from "./functions/node"
 
 import InputNode from "./Nodes/InputNode";

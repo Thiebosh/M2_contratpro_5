@@ -37,7 +37,7 @@ function Project(props: ProjectProps) {
               <td>{dayjs(props.creation).format(dateFormat)}</td>
               <td>{nullableDate(props.last_specs)}</td>
               <td>{props.latest_proto ? "Up to date" : "Outdated"}</td>
-              <td><a className="button red" onClick={() => props.deleteProject(props.id)}><FontAwesomeIcon icon={faTrash}/></a></td>
+              <td><button className="button red" onClick={() => props.deleteProject(props.id)}><FontAwesomeIcon icon={faTrash}/></button></td>
           </tr>
     );
 }
@@ -58,8 +58,7 @@ export function Projects() {
                   return;
               }
               // Remove project from projects list
-              const newProjects = projects.filter(project => project.id !== projectId);
-              setProjects(newProjects);
+              setProjects(projects.filter(project => project.id !== projectId));
               setSuccessMsg("Project deleted")
           })
           .catch(error => {

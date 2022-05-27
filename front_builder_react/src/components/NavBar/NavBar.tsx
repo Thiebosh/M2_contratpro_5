@@ -73,7 +73,7 @@ export function NavBar(props:NavBarProps) {
                 setProjectName(split[2]);
             }
         }
-    }, [])
+    }, [currentPath, setProjectName])
 
     return (
     <nav id='navbar'>
