@@ -29,3 +29,7 @@ export function removeElementFromArrayWithPath(array:any, path:any){
         i++;
     });
 }
+
+export function isStringBoolean(str:string){
+    return str === "false" || str === "true";
+}
