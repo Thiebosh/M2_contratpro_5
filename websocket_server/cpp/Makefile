@@ -6,9 +6,9 @@ build:
 	flex -o compilation/compiled.flex.cpp $(valueID)/flex.cpp
 	g++ compilation/compiled.flex.cpp compilation/compiled.bison.cpp -o executables/$(valueID).exe
 
-run:
-	./executables/$(valueID).exe templates/needs.json
+# run:
+# 	./executables/$(valueID).exe templates/needs.json
 
-all:
-	make build
-	make run
+# all:
+# 	make build
+# 	make run
