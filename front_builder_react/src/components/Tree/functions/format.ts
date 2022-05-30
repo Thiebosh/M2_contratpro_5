@@ -9,6 +9,8 @@ import { g_syntax } from "../Tree"
 
 import { addAddingNode } from "./node"
 
+import { getPossibleChildrenSuggestion } from "./node"
+
 function formatArray(node:any, key:string){
     // key is the key of the json for the current iteration, it's a data of the node
     initChildrenIfNotDone(node); // to add children of current node as value of children key
@@ -20,8 +22,12 @@ function formatArray(node:any, key:string){
         node[key][i].syntaxKey = key;
         node[key][i].parent = node;
         
-        addAddingNode(node[key][i]);
+        if (getPossibleChildrenSuggestion(node[key][i]).length > 0) {
+            addAddingNode(node[key][i]);
+        }
+        
         node.children.splice(-1,0,node[key][i]);
+        
         formatData(node[key][i]);
     }
 }
@@ -61,6 +67,9 @@ function formatField(node:any, key:string){
         }
 
         node.children.splice(-1,0,fieldSyntaxClone);
+        if(getPossibleChildrenSuggestion(node).length === 0 && node.children[node.children.length -1].syntaxKey === "+"){
+            node.children.splice(-1,1);
+        }
     }
 }
 

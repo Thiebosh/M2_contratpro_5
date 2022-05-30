@@ -1,5 +1,5 @@
 import Tree from "react-d3-tree"
-import {addChildren, deleteNode} from "./functions/node"
+import {addChildren, deleteNode, getPossibleChildrenSuggestion, updateNodeChildren } from "./functions/node"
 
 import InputNode from "./Nodes/InputNode";
 import SelectNode from "./Nodes/SelectNode";
@@ -67,7 +67,7 @@ export function CustomTree(props:CustomTreeProps){
     }
 
     const handleAddElement = (nodeDatum: any) => {
-        openModal(props.setIsOpen, nodeDatum, props.setModalElements, props.setTree, props.queue, props.setNewSocket, props.socket)
+        openModal(nodeDatum)
     }
 
     const renderRectSvgNode = ({ nodeDatum, toggleNode }:any) => {
@@ -98,49 +98,20 @@ export function CustomTree(props:CustomTreeProps){
             pathClassFunc={addTargetNodePathAsLinkClass}
         />
     );
-}
 
-function getParentChildrenValues(nodeData:any){
-    let parentChildrenValues:any = [];
-
-    nodeData.parent.children.forEach((child:any) => {
-        if(child.type !== "adding"){
-            parentChildrenValues.push(child.syntaxKey); // pour éviter de les proposer si object et qu'on ne peut pas en avoir plusieurs
-        }
-    });
-    return parentChildrenValues;
-}
-
-function getPossibleChildrenSuggestion(nodeData:any){
-    let parentChildrenValues = getParentChildrenValues(nodeData);
-    let parentSyntax = g_syntax[nodeData.parent.syntaxKey];
-    let newChildrenSuggestion:any = [];
-
-    parentSyntax.values.forEach((v:any) => {
-        if(v[0] === "?"){
-            v = v.substring(1);
-        }
-
-        if (g_syntax[v].type === "array" || (g_syntax[v].type !== "array" && !parentChildrenValues.includes(v))){
-            newChildrenSuggestion.push(v)
-        }
-    });
-    
-    return newChildrenSuggestion;
-}
-
-function openModal(setIsOpen:Function, nodeData:any, setModalElements:Function, setTree:React.Dispatch<any>, queue:any, setNewSocket:React.Dispatch<any>, socket:any){
-    const newChildrenSuggestion = getPossibleChildrenSuggestion(nodeData);
-    const modalElements:any = []
-    newChildrenSuggestion.forEach((suggestion:any) => {
-        modalElements.push({
-            text: suggestion,
-            onclick: () => {
-                addChildren(nodeData, suggestion, setTree, queue, setNewSocket, socket);
-                setIsOpen(false);
-            }
-    })});
-    setModalElements(modalElements)
-    setIsOpen(true);
-    
+    function openModal(nodeData:any){
+        const newChildrenSuggestion = getPossibleChildrenSuggestion(nodeData.parent);
+        const modalElements:any = []
+        newChildrenSuggestion.forEach((suggestion:any) => {
+            modalElements.push({
+                text: suggestion,
+                onclick: () => {
+                    addChildren(nodeData, suggestion, props.setTree, props.queue, props.setNewSocket, props.socket);
+                    props.setIsOpen(false);
+                }
+        })});
+        props.setModalElements(modalElements)
+        props.setIsOpen(true);
+        
+    }
 }

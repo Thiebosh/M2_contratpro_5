@@ -8,7 +8,7 @@ export function addAddingNode(data:any){
         syntaxKey:"+",
         type:"adding",
         parent:data,
-        path:data.path + "/adding"
+        path:data.path + "/+"
     };
 
     data.children.push(addingNode);
@@ -63,9 +63,15 @@ export function addChildren(nodeData:any, suggestion:any, setTree:React.Dispatch
             })
         }
         jsonContent = createMandatoryChildren(node);
-
+        
         addNewNodeAsValueInNodeData(node);
-        parent.children.splice(-1,0,node);
+        const possibleChildrenSuggestion = getPossibleChildrenSuggestion(parent);
+        if (possibleChildrenSuggestion.length === 1 && possibleChildrenSuggestion[0] === node.syntaxKey){
+            parent.children.splice(-1, 1);
+            parent.children.push(node);
+        } else {
+            parent.children.splice(-1,0,node);
+        }
         updateNodeChildren(node.parent, setTree);
     }
 
@@ -310,7 +316,10 @@ export function deleteNode(path:any, data:any, setTree:React.Dispatch<any>, queu
         delete node.parent[node.syntaxKey];
     }
     removeElementFromArrayWithPath(node.parent.children, path);
-    
+    if(getPossibleChildrenSuggestion(node.parent).length > 0 && node.parent.children[node.parent.children.length -1].syntaxKey !== "+") {
+        addAddingNode(node.parent);
+    }
+
     updateNodeChildren(node.parent, setTree);
 
     if(socket && setNewSocket){
@@ -362,4 +371,33 @@ export function cancelOperation(action:string, path:string, content:any, tree:an
             findNodeWithPathForCreate(path + "/" + content, tree, setTree)
             break;
     }
+}
+
+function getChildrenValues(nodeData:any){
+    let parentChildrenValues:any = [];
+
+    nodeData.children.forEach((child:any) => {
+        if(child.type !== "adding"){
+            parentChildrenValues.push(child.syntaxKey); // pour éviter de les proposer si object et qu'on ne peut pas en avoir plusieurs
+        }
+    });
+    return parentChildrenValues;
+}
+
+export function getPossibleChildrenSuggestion(nodeData:any){
+    let newChildrenSuggestion:any = [];
+    let childrenValues = getChildrenValues(nodeData);
+    let nodeSyntax = g_syntax[nodeData.syntaxKey];
+
+    nodeSyntax.values.forEach((v:any) => {
+        if(v[0] === "?"){
+            v = v.substring(1);
+        }
+
+        if (g_syntax[v].type === "array" || (g_syntax[v].type !== "array" && !childrenValues.includes(v))){
+            newChildrenSuggestion.push(v)
+        }
+    });
+    
+    return newChildrenSuggestion;
 }
