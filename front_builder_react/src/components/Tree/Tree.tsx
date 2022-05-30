@@ -1,5 +1,5 @@
 import Tree from "react-d3-tree"
-import {addChildren, deleteNode, getPossibleChildrenSuggestion, updateNodeChildren } from "./functions/node"
+import {addChildren, deleteNode, getPossibleChildrenSuggestion } from "./functions/node"
 
 import InputNode from "./Nodes/InputNode";
 import SelectNode from "./Nodes/SelectNode";
