@@ -305,7 +305,7 @@ function findNodeWithPathForDelete(path:string, data:any, i:number=0){
 export function deleteNode(path:any, data:any, setTree:React.Dispatch<any>, queue?:any, setNewSocket?:React.Dispatch<any>, socket?:any){
     const node = findNodeWithPathForDelete(path,data);
     if (g_syntax[node.syntaxKey].type === "array"){
-        removeElementFromArrayWithPath(node.parent[node.syntaxKey], path);
+        removeElementFromArrayWithPath(node.parent[node.syntaxKey], path, true);
     } else {
         delete node.parent[node.syntaxKey];
     }
