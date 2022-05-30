@@ -368,7 +368,7 @@ export function cancelOperation(action:string, path:string, content:any, tree:an
             updateValueOnNode(content, path, tree, setTree);
             break;
         case "delete":
-            findNodeWithPathForCreate(path + "/" + content, tree, setTree)
+            findNodeWithPathForCreate(isStringNumber(content) ? path : path + "/" + content, tree, setTree)
             break;
     }
 }
